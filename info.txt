@@ -1,0 +1,36 @@
+#Info for updating the main codebase on Github, from the local computer, remote server, and Google Colab
+#https://github.com/hmghaly/word_align
+
+
+#If we want to update the code base after we make a change outside the current environment
+git pull --rebase git@github.com:hmghaly/word_align.git master
+
+#then if we change something locally
+git add .
+git commit -m "Update existing file"
+git push --mirror git@github.com:hmghaly/word_align.git
+
+
+
+
+1- First Generate the key at the current os
+!ssh-keygen -t rsa -b 4096 -C "hmghaly@gmail.com"
+!cat /root/.ssh/id_rsa.pub
+
+2- Add new SSH Key
+https://github.com/settings/ssh/new
+
+3- Make the directory a git directory by git init
+import os
+os.chdir("/content/drive/My Drive/Colab Notebooks/code")
+!git init
+
+4- Add the file to the repository
+import os
+os.chdir("/content/drive/My Drive/Colab Notebooks/code")
+!git init
+!ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+!git pull --rebase git@github.com:hmghaly/word_align.git master
+!git add .
+!git commit -m "Update existing file"
+!git push --mirror git@github.com:hmghaly/word_align.git
