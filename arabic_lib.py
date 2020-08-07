@@ -2,7 +2,7 @@ import os, sys, time, shelve, json
 from itertools import groupby
 #sys.path.append("../utils")
 
-from general import *
+#from general import *
 
 #https://github.com/hmghaly/word_align/edit/master/arabic_lib.py
 
