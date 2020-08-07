@@ -1,6 +1,7 @@
 import os, sys, time, shelve, json
 from itertools import groupby
-sys.path.append("../utils")
+#sys.path.append("../utils")
+
 from general import *
 
 #https://github.com/hmghaly/word_align/edit/master/arabic_lib.py
@@ -38,7 +39,9 @@ hamza=u'\u0621'
 
 alef=u'\u0627'
 alef_ta2=u'\u0627\u062a'
-tatweel=unichr(1600)
+if sys.version[0]=="2": tatweel=unichr(1600)
+else: tatweel=chr(1600)
+
 
 #print "tatweel", tatweel, [tatweel]
 
@@ -201,107 +204,105 @@ def get_freq_dict(fpath):
 	return cur_freq_dict
 
 
-if __name__=="__main__" and False:
-	batch_size=20000
-	src_lan="en"
-	trg_lang="ar"
-	root_dir="/Users/hmghaly/Documents"
-	freq_dict=get_freq_dict("freq.txt")
-	#counter_dict={}
-	#freq_fname="freq.txt"
-	
-	#freq_shelve=shelve.open("ar_token_freq.shelve")
-	#root_dir=r"c:\test"
-	#proj_dir=os.path.join(root_dir,"walign0")
-	#if not os.path.exists(proj_dir): os.makedirs(proj_dir)
 
-	#src_idx_fpath=os.path.join(proj_dir,"src-idx.txt")
-	#trg_idx_fpath=os.path.join(proj_dir,"trg-idx.txt")
-	#src_sents_fpath=os.path.join(proj_dir,"src-sents.txt")
-	#trg_sents_fpath=os.path.join(proj_dir,"trg-sents.txt")
+if __name__=="__main__":
+	print("Hello!")
+	word="السعادة"
+	word="وللجنة"
+	word="أكان"
+	word="أوكان"
+	candidates=get_candidates_ar(word)
+	for w in candidates:
+		print(w)
 
-	#pickle_path=os.path.join(root_dir,"walign.pickle")
-	fname="corpus_sample.txt"
-	fpath="../un_corpus/corpus_sample.txt"
-	print("loading indexes")
+	# batch_size=20000
+	# src_lan="en"
+	# trg_lang="ar"
+	# root_dir="/Users/hmghaly/Documents"
+	# freq_dict=get_freq_dict("freq.txt")
+
+	# #counter_dict={}
+	# #freq_fname="freq.txt"
 	
-	#if not pickle_load:
-	fopen=open(fpath)
-	#src_fwd_index=[]
-	#trg_fwd_index=[]
-	#raw_src_sents=[] #tokenized src and trg sentences
-	#raw_trg_sents=[]
-	test_words=[]
-	for i,f in enumerate(fopen):
-		#if i%5000==0: print(i)
-		#if i>batch_size: break
+	# #freq_shelve=shelve.open("ar_token_freq.shelve")
+	# #root_dir=r"c:\test"
+	# #proj_dir=os.path.join(root_dir,"walign0")
+	# #if not os.path.exists(proj_dir): os.makedirs(proj_dir)
+
+	# #src_idx_fpath=os.path.join(proj_dir,"src-idx.txt")
+	# #trg_idx_fpath=os.path.join(proj_dir,"trg-idx.txt")
+	# #src_sents_fpath=os.path.join(proj_dir,"src-sents.txt")
+	# #trg_sents_fpath=os.path.join(proj_dir,"trg-sents.txt")
+
+	# #pickle_path=os.path.join(root_dir,"walign.pickle")
+	# fname="corpus_sample.txt"
+	# fpath="../un_corpus/corpus_sample.txt"
+	# print("loading indexes")
+	
+	# #if not pickle_load:
+	# fopen=open(fpath)
+	# #src_fwd_index=[]
+	# #trg_fwd_index=[]
+	# #raw_src_sents=[] #tokenized src and trg sentences
+	# #raw_trg_sents=[]
+	# test_words=[]
+	# for i,f in enumerate(fopen):
+	# 	#if i%5000==0: print(i)
+	# 	#if i>batch_size: break
 		
-		line=f.strip("\n\r")
-		split=line.split("\t")
-		if len(split)!=2: continue
-		src,trg=split
-		src_uc,trg_uc=uc(src),uc(trg)
-		print src_uc
-		print " ".join(tok_ar(trg_uc,freq_dict))
-		print "-------"
+	# 	line=f.strip("\n\r")
+	# 	split=line.split("\t")
+	# 	if len(split)!=2: continue
+	# 	src,trg=split
+	# 	src_uc,trg_uc=uc(src),uc(trg)
+	# 	print(src_uc)
+	# 	print(" ".join(tok_ar(trg_uc,freq_dict)))
+	# 	print("-------")
 
 
-		continue
-		trg_clean=clean_ar(trg_uc)
-		trg_toks=tok_uc(trg_clean)
-		for tt in trg_toks:
-			if not is_arabic(tt): continue
+	# 	continue
+	# 	trg_clean=clean_ar(trg_uc)
+	# 	trg_toks=tok_uc(trg_clean)
+	# 	for tt in trg_toks:
+	# 		if not is_arabic(tt): continue
 			
-			word_split=morph_word(tt,freq_dict)
-			print tt, " ".join(word_split)
-			continue
+	# 		word_split=morph_word(tt,freq_dict)
+	# 		print(tt, " ".join(word_split))
+	# 		continue
 
-			test_words.append(tt)
-			#if tt[0]!=seen: continue			
-			cand_found=get_candidates_ar(tt)
-			for can in cand_found:
-				cur_pre,cur_root,cur_suf=can
-				root_expansion=expand_root(cur_root)
-				cur_wt=0
-				for rex in root_expansion: cur_wt+=freq_dict.get(rex,0)
-				#print cur_root
-				#print ">>>>>", " ".join(root_expansion)
-				print cur_pre,cur_root,cur_suf, freq_dict.get(cur_root,0), cur_wt
-				#print ">>>>", can[0],can[1],can[2]
-				#counter_dict[cur_root]=counter_dict.get(cur_root,0)+1
+	# 		test_words.append(tt)
+	# 		#if tt[0]!=seen: continue			
+	# 		cand_found=get_candidates_ar(tt)
+	# 		for can in cand_found:
+	# 			cur_pre,cur_root,cur_suf=can
+	# 			root_expansion=expand_root(cur_root)
+	# 			cur_wt=0
+	# 			for rex in root_expansion: cur_wt+=freq_dict.get(rex,0)
+	# 			#print cur_root
+	# 			#print ">>>>>", " ".join(root_expansion)
+	# 			print(cur_pre,cur_root,cur_suf, freq_dict.get(cur_root,0), cur_wt)
+	# 			#print ">>>>", can[0],can[1],can[2]
+	# 			#counter_dict[cur_root]=counter_dict.get(cur_root,0)+1
 				
 
-			print "------"
-			#if suffixes_found:
-			#	print tt
-			#	print " ".join(prefixes_found), prefixes_found
-			#	print " ".join(suffixes_found), suffixes_found
-			#	print "------"
-			#counter_dict[tt]=counter_dict.get(tt,0)+1
-		#print src
-		#print [src_uc]
-		#print trg
-		#print [trg_uc]
-		#print trg_clean
-		#print [trg_clean]
-		#print "------"
+	# 		print("------")
 
-	fopen.close()
-	counter_dict_keys=sorted(counter_dict.keys(),key=lambda x:-counter_dict[x])
-	#we keep this till we get more
-	fopen=open(freq_fname,"w")
-	for a in counter_dict_keys:
-		#print a, counter_dict[a]
-		line="%s\t%s\n"%(utf(a),counter_dict[a])
-		fopen.write(line)
-	fopen.close()
+	# fopen.close()
+	# counter_dict_keys=sorted(counter_dict.keys(),key=lambda x:-counter_dict[x])
+	# #we keep this till we get more
+	# fopen=open(freq_fname,"w")
+	# for a in counter_dict_keys:
+	# 	#print a, counter_dict[a]
+	# 	line="%s\t%s\n"%(utf(a),counter_dict[a])
+	# 	fopen.write(line)
+	# fopen.close()
 
-	#	freq_shelve[utf(a)]=counter_dict[a]
+	# #	freq_shelve[utf(a)]=counter_dict[a]
 
-	for tw in test_words[:2500]:
-		cur_candidates=get_candidates_ar(tw)
-		for p0,r0,s0 in cur_candidates:
-			print tw, p0,r0,s0, counter_dict.get(r0,0)
-		print "------"
+	# for tw in test_words[:2500]:
+	# 	cur_candidates=get_candidates_ar(tw)
+	# 	for p0,r0,s0 in cur_candidates:
+	# 		print(tw, p0,r0,s0, counter_dict.get(r0,0))
+	# 	print("------")
 
-	#freq_shelve.close()
+	# #freq_shelve.close()
