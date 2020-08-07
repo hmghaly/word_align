@@ -211,6 +211,7 @@ if __name__=="__main__":
 	word="وللجنة"
 	word="أكان"
 	word="أوكان"
+	word="للسلام"
 	candidates=get_candidates_ar(word)
 	for w in candidates:
 		print(w)
