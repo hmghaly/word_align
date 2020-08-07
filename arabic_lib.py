@@ -3,6 +3,8 @@ from itertools import groupby
 sys.path.append("../utils")
 from general import *
 
+#https://github.com/hmghaly/word_align/edit/master/arabic_lib.py
+
 def tok_uc(txt):
     txt=re.sub(r"(?u)(\W)",r" \1 ",txt)
     return [v for v in re.split("\s+",txt) if v]
