@@ -6,9 +6,273 @@ from itertools import groupby
 
 #https://github.com/hmghaly/word_align/edit/master/arabic_lib.py
 
+
+
 def tok_uc(txt):
     txt=re.sub(r"(?u)(\W)",r" \1 ",txt)
     return [v for v in re.split("\s+",txt) if v]
+
+#MAIN Arabic data and functions
+alif_prefix=["أ"]
+alif_next_prefixes=["و","ف","س",""]
+seen_prefix=["س"]
+laam_prefix=["ل"]
+al_prefix=["ال"]
+ll_prefix=["لل"]
+alif_laam_zero_prefixes=["و","ف",""]
+alif_laam_one_prefixes=["ب","ك",""]
+
+zero_prefixes=["و","ف",""]
+one_prefixes=["ب","ك","ل",""]
+all_prefixes=["0", "أ","ب","ك","ل","ف","و","س","لل","ال"]
+
+conversion_list=[("ال","al"),("لل","ll"),("أ","a"),("ب","b"),("س","s"),("ف","f"),("ك","k"),("ل","l"),("و","w"),("ه","h"),("م","m"),("ن","n"),("ا","a"),("ي","y"), ("ت","t"),("ة","h")]
+
+def convert_en2ar(en_str):
+  for a,b in conversion_list:
+    en_str=en_str.replace(b,a)
+  return en_str
+
+def convert_ar2en(ar_str):
+  for a,b in conversion_list:
+    ar_str=ar_str.replace(a,b)
+  return ar_str
+
+
+suffixes=["", "ي","ني","نا","ك","كم","كما","كن","ه","هم","هما","هن","ها"]
+jalala_word=["الله","لله"]
+alif_laam_words=["الذي","التي","اللذان","اللتان","اللذين","اللتين", "الذين","اللاتي","اللائي","اللواتي"]
+ism_mawsool=alif_laam_words+["ما"]
+ism_ishara=["هذا","هذه","هذان","هذين","هاتان","هاتين","هؤلاء","ذلك","تلك","أولئك"]
+jarr=["في","على","من","عن","إلى","حتى","منذ","مع"]
+pronouns=["أنا","نحن","أنت","أنتما","أنتم","أنتن","هو","هي","هما","هم","هن"]
+
+stem_additions=["ان","ون","ين","ا","و","ي","ات","ة","وا","ت","ن",""] #for plural,dual and female, tanween, conjugations, to do basic stemming
+
+laam_laam_words=[]
+laam_laam_dict={}
+laam_laam_dict["لله"]="الله"
+for v in alif_laam_words:
+  if "لل" in v: form = v[1:]
+  else: form= "ل"+v[1:]
+  laam_laam_dict[form]=v
+  laam_laam_words.append(form)
+
+combined_laam_words=jalala_word+alif_laam_words+laam_laam_words
+
+
+alif_combinations=[a+b for a in alif_prefix for b in alif_next_prefixes]
+simple_combinations=[a+b for a in alif_laam_zero_prefixes for b in one_prefixes]
+alif_laam_combinations=[a+b+c for a in alif_laam_zero_prefixes for b in alif_laam_one_prefixes for c in al_prefix]
+laam_laam_combinations=[a+b for a in alif_laam_zero_prefixes for b in ll_prefix]
+seen_combinations=[a+b for a in alif_laam_zero_prefixes for b in seen_prefix]
+all_prefix_combinations=alif_combinations+simple_combinations+alif_laam_combinations+laam_laam_combinations+seen_combinations
+
+def get_pre_suf_candidates(word1):
+  valid_prefixes=[]
+  valid_suffixes=[]
+  for apc in all_prefix_combinations:
+    if word1.startswith(apc): valid_prefixes.append(apc)
+  for asc in suffixes:
+    if word1.endswith(asc): valid_suffixes.append(asc)
+  pre_suf_candidates=[]
+  for vs in valid_suffixes:
+    for vp in valid_prefixes:
+      stem=word1[len(vp):len(word1)-len(vs)]
+      label=convert_ar2en(vp)+"-"+convert_ar2en(vs)
+      pre_suf_candidates.append((vp,stem,vs,label))
+      original_laam_word=laam_laam_dict.get(stem,"")
+      #print("original_laam_word",original_laam_word, ">>>", stem)
+      if original_laam_word:
+        stem=original_laam_word
+        vp+="ل"
+        label=convert_ar2en(vp)+"-"+convert_ar2en(vs)
+        pre_suf_candidates.append((vp,stem,vs,label))
+
+      if "لل" in vp and not "0" in vp:
+        vp+="0"
+        stem="ل"+stem
+        label=convert_ar2en(vp)+"-"+convert_ar2en(vs)
+        pre_suf_candidates.append((vp,stem,vs,label))
+  return pre_suf_candidates
+
+
+#STEP -1 : get a raw analysis of all prefixes and suffixes
+def get_pre_suf_candidates(word1): #this is the main function to get the candidates without sorting them
+  valid_prefixes=[]
+  valid_suffixes=[]
+  for apc in all_prefix_combinations:
+    if word1.startswith(apc): valid_prefixes.append(apc)
+  for asc in suffixes:
+    if word1.endswith(asc): valid_suffixes.append(asc)
+  pre_suf_candidates=[]
+  for vs in valid_suffixes:
+    for vp in valid_prefixes:
+      stem=word1[len(vp):len(word1)-len(vs)]
+      label=convert_ar2en(vp)+"-"+convert_ar2en(vs)
+      pre_suf_candidates.append((vp,stem,vs,label))
+      original_laam_word=laam_laam_dict.get(stem,"")
+      #print("original_laam_word",original_laam_word, ">>>", stem)
+      if original_laam_word:
+        stem=original_laam_word
+        vp+="ل"
+        label=convert_ar2en(vp)+"-"+convert_ar2en(vs)
+        pre_suf_candidates.append((vp,stem,vs,label))
+
+      if "لل" in vp and not "0" in vp:
+        vp+="0"
+        stem="ل"+stem
+        label=convert_ar2en(vp)+"-"+convert_ar2en(vs)
+        pre_suf_candidates.append((vp,stem,vs,label))
+  return pre_suf_candidates
+
+
+#STEP 2 - get the counts of the root for each pre-suf combination, filter out the combinations that don't make sense by giving them zero weight
+def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candidates based on stem count and other ad-hoc criteria 
+  sortable=[]
+  for item in cur_candidates:
+    pre,stem, suf,label = item
+    if len(stem)<2: wt=0
+    elif "ال" in pre and suf!="": wt=0
+    elif "س" in pre and not stem[0] in "سيتن": wt=0
+    else: wt=cur_counter_dict.get(stem,0)
+    sortable.append((item,wt))
+  sortable.sort(key=lambda x:-x[-1])
+  # for s in sortable:
+  #   print(s)
+  return [v[0] for v in sortable]
+
+#Main Function
+def ar_pre_suf(ar_word,cur_ar_counter_dict={}): #THIS IS THE MOST IMPORTANT FUNCTION - it gives sorted combinations of possible candidates of prefixes and suffixes
+  candidates=get_pre_suf_candidates(ar_word)
+  sorted_candiates=sort_filter(candidates,cur_ar_counter_dict)
+  new_sorted_candiates=[]
+  for sc in sorted_candiates:
+    utf_item=[sc0.encode("utf-8") for sc0 in sc]
+    new_sorted_candiates.append(utf_item)
+    #print(utf_item)
+  return sorted_candiates
+
+
+def anayze_pre(prefix_str): #This will be useful when extracting features
+  cur_pre=[]
+  if "ال" in prefix_str:
+    cur_pre.append("ال")
+    prefix_str=prefix_str.replace("ال","")
+  if "لل" in prefix_str:
+    cur_pre.append("لل")
+    prefix_str=prefix_str.replace("لل","")
+  for ps in prefix_str: cur_pre.append(ps)
+  return cur_pre
+
+
+def load_counts(counts_txt_fpath, tmp_count_dict={}): #tab separated counts txt to count dict - we can combine counts from different corpora by using the count dict from other corpora
+  
+  tmp_fopen=open(counts_txt_fpath)
+  for f in tmp_fopen:
+    f_split=f.strip("\n\r").split("\t")
+    if len(f_split)!=2: continue
+    word,count=f_split
+    count=int(count)
+    tmp_count_dict[word]=tmp_count_dict.get(word,0)+ count
+    if word[-1]=="ة": 
+      new_word=word[:-1]+"ت"
+      tmp_count_dict[new_word]=tmp_count_dict.get(new_word,0)+count
+    if word[-1]=="ى": 
+      new_word=word[:-1]+"ي"
+      tmp_count_dict[new_word]=tmp_count_dict.get(new_word,0)+count
+      new_word=word[:-1]+"ا"
+      tmp_count_dict[new_word]=tmp_count_dict.get(new_word,0)+count
+    if word[-1]=="ء": 
+      new_word=word[:-1]+"ئ"
+      tmp_count_dict[new_word]=tmp_count_dict.get(new_word,0)+count
+      new_word=word[:-1]+"ؤ"
+      tmp_count_dict[new_word]=tmp_count_dict.get(new_word,0)+count
+    if word[-2:]=="وا": 
+      new_word=word[:-1]
+      tmp_count_dict[new_word]=tmp_count_dict.get(new_word,0)+count
+
+  tmp_fopen.close()
+  return tmp_count_dict
+
+
+
+
+def analyze_stem(cur_word,cur_ar_counter_dict={}): #get the stem addition possibilities based on their counts to facilitate further annotation
+  possibilities=[]
+  for sa in stem_additions:
+    if cur_word.endswith(sa):
+      stemmed_word=cur_word[:len(cur_word)-len(sa)]
+      if len(stemmed_word)<2: freq=0
+      else: freq=cur_ar_counter_dict.get(stemmed_word,0)
+      possibilities.append((sa,freq))
+    else: possibilities.append((sa,0))
+  possibilities.sort(key=lambda x:(-x[-1],len(x[0])))
+  # for p in possibilities:
+  #   print(p)
+  return [v[0] for v in possibilities]
+
+pos_tags=[("NN", "Noun"),
+          ("VB", "Verb"),
+          ("JJ", "Adjective"),
+          ("IN", "Preposition"),
+          ("DEM", "Demonstrative"),
+          ("C", "Complementizer"),
+          ("PRO", "Pronoun"),
+          ("O", "Other")] 
+
+pos_tags_label_dict=dict(iter(pos_tags))
+
+def analyze_pos(pre,root,suf): #put tentative weights to POS tags to facilitate further annotation
+  tmp_pos_dict={}
+  for pt in pos_tags_label_dict:
+    tmp_pos_dict[pt]=0
+  tmp_pos_dict["NN"]+=0.1
+  tmp_pos_dict["VB"]+=0.1
+  tmp_pos_dict["JJ"]+=0.1
+  tmp_pos_dict["O"]+=0.05
+  if len(root)<2: tmp_pos_dict["O"]+=1
+
+  if "ال" in pre:
+    tmp_pos_dict["NN"]+=1
+    tmp_pos_dict["JJ"]+=1
+  elif "لل" in pre:
+    tmp_pos_dict["NN"]+=1
+  elif "ل" in pre:
+    tmp_pos_dict["NN"]+=1
+    tmp_pos_dict["VB"]+=1
+
+  if "ب" in pre:
+    tmp_pos_dict["NN"]+=1
+  
+  if root.endswith("وا"):
+    tmp_pos_dict["VB"]+=1
+
+  if "س" in pre:
+    tmp_pos_dict["VB"]+=1
+  if root.endswith("ة") or root.endswith("ات"):
+    tmp_pos_dict["NN"]+=1
+    tmp_pos_dict["JJ"]+=1
+  if root in ism_mawsool:
+    tmp_pos_dict["C"]+=1
+  if root in ism_ishara:
+    tmp_pos_dict["DEM"]+=1
+  if root in jarr:
+    tmp_pos_dict["IN"]+=1
+  if root in pronouns:
+    tmp_pos_dict["PRO"]+=1
+  pos_list=[]
+  for pt in pos_tags_label_dict:
+    pos_wt=tmp_pos_dict[pt]
+    pos_label=pos_tags_label_dict[pt]
+    pos_list.append((pos_label,pt,pos_wt))
+  pos_list.sort(key=lambda x:-x[-1])
+  # for pl in pos_list:
+  #   print(pl)
+  return [v[:-1] for v in pos_list]
+
+#===========================
+
 
 waw=u'\u0648'
 fa2=u'\u0641'
