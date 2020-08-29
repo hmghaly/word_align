@@ -13,6 +13,7 @@ def tok_uc(txt):
     return [v for v in re.split("\s+",txt) if v]
 
 #MAIN Arabic data and functions
+ar_letters="أاآإبتثجحخدذرزسشصضطظعغفقكلمنهويىءئؤ"
 alif_prefix=["أ"]
 alif_next_prefixes=["و","ف","س",""]
 seen_prefix=["س"]
