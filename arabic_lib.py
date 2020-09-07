@@ -69,6 +69,18 @@ laam_laam_combinations=[a+b for a in alif_laam_zero_prefixes for b in ll_prefix]
 seen_combinations=[a+b for a in alif_laam_zero_prefixes for b in seen_prefix]
 all_prefix_combinations=alif_combinations+simple_combinations+alif_laam_combinations+laam_laam_combinations+seen_combinations
 
+#now we get the codes for each NLP category, in latin letters
+prefixe_codes=[convert_ar2en(v) for v in all_prefix_combinations]
+ll0_prefixes=[]
+for cp in prefixe_codes:
+  if cp.endswith("ll"): ll0_prefixes.append(cp+"0")
+prefixe_codes.extend(ll0_prefixes)
+suffix_codes=[convert_ar2en(v) for v in suffixes]
+additions_codes=[convert_ar2en(v) for v in stem_additions]
+pos_tags_codes=[v[0] for v in pos_tags]
+
+
+
 def get_pre_suf_candidates(word1):
   valid_prefixes=[]
   valid_suffixes=[]
