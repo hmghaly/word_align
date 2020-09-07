@@ -12,6 +12,19 @@ def tok_uc(txt):
     txt=re.sub(r"(?u)(\W)",r" \1 ",txt)
     return [v for v in re.split("\s+",txt) if v]
 
+#Current POS tags in Arabic
+pos_tags=[("NN", "Noun"),
+          ("VB", "Verb"),
+          ("JJ", "Adjective"),
+          ("IN", "Preposition"),
+          ("DEM", "Demonstrative"),
+          ("C", "Complementizer"),
+          ("PRO", "Pronoun"),
+          ("O", "Other")] 
+
+pos_tags_label_dict=dict(iter(pos_tags))
+
+
 #MAIN Arabic data and functions
 ar_letters="أاآإبتثجحخدذرزسشصضطظعغفقكلمنهويىءئؤ"
 alif_prefix=["أ"]
