@@ -1,3 +1,8 @@
+import requests, re
+from urllib.parse import urljoin, urlsplit
+from bs4 import BeautifulSoup
+from lxml.html import parse
+
 class web_page:
   def __init__(self,url):
     self.url=url
