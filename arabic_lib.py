@@ -185,6 +185,28 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
   #   print(s)
   return sortable #[v[0] for v in sortable]
 
+def tok_ar(ar_words,input_ar_counter_dict):
+    final_list=[]
+    for arw in ar_words:
+        candidates=get_pre_suf_candidates(arw)
+        sorted_candiates=sort_filter(candidates,input_ar_counter_dict)
+        top_morph,wt=sorted_candiates[0]
+        pre,stem,suf,label=top_morph
+        cur_word_components=[]
+        if "ال" in pre:
+            stem="ال_"+stem
+            pre=pre.replace("ال","")
+        if "لل" in pre:
+            stem="ال_"+stem
+            pre=pre.replace("لل","ل")
+        for p0 in pre:
+            cur_word_components.append(p0)
+        cur_word_components.append(stem)
+        if suf: cur_word_components.append(suf)
+        final_list.extend(cur_word_components)
+    return final_list
+		
+	
 #Main Function
 def ar_pre_suf(ar_word,cur_ar_counter_dict={}): #THIS IS THE MOST IMPORTANT FUNCTION - it gives sorted combinations of possible candidates of prefixes and suffixes
   candidates=get_pre_suf_candidates(ar_word)
@@ -401,7 +423,7 @@ def morph_word(word,in_freq_dict): #split the word morphologically to different 
 	#print " ".join(final_tokens)
 
 
-def tok_ar(ar_sent_uc,in_freq_dict):
+def tok_ar_old(ar_sent_uc,in_freq_dict):
 	cleaned_sent=clean_ar(ar_sent_uc)
 	ar_tokens=tok_uc(cleaned_sent)
 	final_tokens=[]
