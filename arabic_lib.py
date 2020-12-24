@@ -162,11 +162,14 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
     pre,stem, suf,label = item
     if len(stem)<2: wt=0
     elif "ال" in pre and suf!="": wt=0
-    elif stem.startswith("ال") and not stem.startswith("الت") and not stem.startswith(tuple(alif_laam_words)) and not stem.startswith(alif_laam_taa_words): wt=0
-    elif stem.startswith("الت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words
-    elif stem.startswith("والت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words
-    elif stem.startswith("للت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words	
-    elif stem.startswith("وللت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words		
+    elif stem.startswith("ال"):
+	if stem.startswith(tuple(alif_laam_words)) or stem.startswith(alif_laam_taa_words): pass
+        else: wt=0
+    #elif stem.startswith("ال") and not stem.startswith("الت") and not stem.startswith(tuple(alif_laam_words)) and not stem.startswith(alif_laam_taa_words): wt=0
+#     elif stem.startswith("الت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words
+#     elif stem.startswith("والت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words
+#     elif stem.startswith("للت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words	
+#     elif stem.startswith("وللت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words		
     #elif stem.startswith("الت") and not stem.startswith(alif_laam_taa_words): wt=0     
     #elif stem.startswith("الت") and len(stem)>8: wt=0		
     #elif stem.startswith("الت") and cur_counter_dict.get("ال"+stem,0)>10: wt=0 #to eliminate words such as التنمية but not التزامات which have الالتزامات	
