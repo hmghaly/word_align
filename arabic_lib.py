@@ -63,6 +63,7 @@ pronouns=["أنا","نحن","أنت","أنتما","أنتم","أنتن","هو","
 
 stem_additions=["ان","ون","ين","ا","و","ي","ات","ة","وا","ت","ن",""] #for plural,dual and female, tanween, conjugations, to do basic stemming
 
+alif_laam_taa_words=("التزم","التزام","التحق","التحاق","التمس","التماس","التوى","التواء")
 laam_laam_words=[]
 laam_laam_dict={}
 laam_laam_dict["لله"]="الله"
@@ -161,7 +162,8 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
     if len(stem)<2: wt=0
     elif "ال" in pre and suf!="": wt=0
     elif stem.startswith("ال") and not stem.startswith("الت"): wt=0
-    elif stem.startswith("الت") and stem.endswith("ة"): wt=0	
+    elif stem.startswith("الت") and stem.endswith("ة"): wt=0	#additional_alif_laam_words
+    elif stem.startswith("الت") and not stem.startswith(alif_laam_taa_words): wt=0     
     elif stem.startswith("الت") and len(stem)>8: wt=0		
     elif stem.startswith("الت") and cur_counter_dict.get("ال"+stem,0)>10: wt=0 #to eliminate words such as التنمية but not التزامات which have الالتزامات	
     elif "س" in pre and not stem[0] in "سيتن": wt=0
