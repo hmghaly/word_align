@@ -186,10 +186,10 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
 #         wt+=cur_counter_dict.get("لل"+stem,0)
 #         wt+=cur_counter_dict.get("وال"+stem,0)	
 #         wt+=cur_counter_dict.get("ولل"+stem,0)		
-#     if "لل" in 	pre and wt>0: 	
-#         wt+=cur_counter_dict.get("ال"+stem,0)	
-#         wt+=cur_counter_dict.get("وال"+stem,0)	
-#         wt+=cur_counter_dict.get("ولل"+stem,0)		
+    if "لل" in 	pre and wt>0: 	
+        wt+=cur_counter_dict.get("ال"+stem,0)	
+        wt+=cur_counter_dict.get("وال"+stem,0)	
+        wt+=cur_counter_dict.get("ولل"+stem,0)		
 #     if pre in ["ل","ول"] and wt>0: 	
 #         wt+=cur_counter_dict.get("ال"+stem,0)	
 #         wt+=cur_counter_dict.get("لل"+stem,0)		
