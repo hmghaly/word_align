@@ -165,12 +165,12 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
     if len(stem)<2: wt=0
     elif "ال" in pre and suf!="": wt=0
     elif stem.startswith("ال"):
-        if stem.startswith(tuple(alif_laam_words)) or stem.startswith(alif_laam_taa_words): wt=cur_counter_dict.get(stem,0)
+        if stem.startswith(tuple(alif_laam_words)) or stem.startswith(alif_laam_taa_words): wt=cur_counter_dict.get(stem,1)
         else: wt=0
     elif stem.startswith("وال"):
         if stem.endswith("ة"): wt=0
         elif stem[1:].startswith(tuple(alif_laam_words)) or stem[1:].startswith(alif_laam_taa_words): wt=0 #والذي
-        elif len(stem)<6: wt=cur_counter_dict.get(stem,0) #والي والتر
+        elif len(stem)<6: wt=cur_counter_dict.get(stem,1) #والي والتر
         #elif stem.startswith("والا"): wt=cur_counter_dict.get(stem,0)	#والاشيا والاه	
         else: wt=0		
 
@@ -183,7 +183,7 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
     #elif stem.startswith("الت") and len(stem)>8: wt=0		
     #elif stem.startswith("الت") and cur_counter_dict.get("ال"+stem,0)>10: wt=0 #to eliminate words such as التنمية but not التزامات which have الالتزامات	
     elif "س" in pre and not stem[0] in "سيتن": wt=0
-    else: wt=cur_counter_dict.get(stem,0)
+    else: wt=cur_counter_dict.get(stem,1)
 #     if 	"ال" in pre and wt>0: 
 #         wt+=cur_counter_dict.get("لل"+stem,0)
 #         wt+=cur_counter_dict.get("وال"+stem,0)	
