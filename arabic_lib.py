@@ -167,7 +167,7 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
   sortable.sort(key=lambda x:-x[-1])
   # for s in sortable:
   #   print(s)
-  return [v[0] for v in sortable]
+  return sortable #[v[0] for v in sortable]
 
 #Main Function
 def ar_pre_suf(ar_word,cur_ar_counter_dict={}): #THIS IS THE MOST IMPORTANT FUNCTION - it gives sorted combinations of possible candidates of prefixes and suffixes
