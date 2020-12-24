@@ -204,9 +204,9 @@ def tok_ar(ar_words,input_ar_counter_dict):
             stem="ال_"+stem
             pre=pre.replace("لل","ل")
         for p0 in pre:
-            cur_word_components.append(p0)
+            cur_word_components.append(p0+"ـ")
         cur_word_components.append(stem)
-        if suf: cur_word_components.append(suf)
+        if suf: cur_word_components.append("ـ"+suf)
         final_list.extend(cur_word_components)
     return final_list
 		
