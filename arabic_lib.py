@@ -160,6 +160,7 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
     pre,stem, suf,label = item
     if len(stem)<2: wt=0
     elif "ال" in pre and suf!="": wt=0
+    elif stem.startswith("ال") and not stem.startswith("الت"): wt=0
     elif "س" in pre and not stem[0] in "سيتن": wt=0
     else: wt=cur_counter_dict.get(stem,0)
     sortable.append((item,wt))
