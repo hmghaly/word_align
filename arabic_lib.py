@@ -83,7 +83,8 @@ simple_combinations=[a+b for a in alif_laam_zero_prefixes for b in one_prefixes]
 alif_laam_combinations=[a+b+c for a in alif_laam_zero_prefixes for b in alif_laam_one_prefixes for c in al_prefix]
 laam_laam_combinations=[a+b for a in alif_laam_zero_prefixes for b in ll_prefix]
 seen_combinations=[a+b for a in alif_laam_zero_prefixes for b in seen_prefix]
-all_prefix_combinations=alif_combinations+simple_combinations+alif_laam_combinations+laam_laam_combinations+seen_combinations
+#all_prefix_combinations=alif_combinations+simple_combinations+alif_laam_combinations+laam_laam_combinations+seen_combinations
+all_prefix_combinations=simple_combinations+alif_laam_combinations+laam_laam_combinations+seen_combinations #remove alif combinations
 
 #now we get the codes for each NLP category, in latin letters
 cur_prefixes=[convert_ar2en(v) for v in all_prefix_combinations]
