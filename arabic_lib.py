@@ -167,7 +167,7 @@ def sort_filter(cur_candidates,cur_counter_dict={}): #preliminary sort of candid
         else: wt=0
     elif stem.startswith("وال"):
         if stem.endswith("ة"): wt=0
-	elif stem[1:].startswith(tuple(alif_laam_words)) or stem[1:].startswith(alif_laam_taa_words): wt=0 #والذي
+        elif stem[1:].startswith(tuple(alif_laam_words)) or stem[1:].startswith(alif_laam_taa_words): wt=0 #والذي
         elif len(stem)<6: wt=cur_counter_dict.get(stem,0) #والي والتر
         elif stem.startswith("والا"): wt=cur_counter_dict.get(stem,0)	#والاشيا والاه	
         else: wt=0		
