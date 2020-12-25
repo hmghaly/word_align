@@ -168,7 +168,7 @@ def remove_diactitics(ar_txt): #arabic unicode text - removes also tatweel
 def from_hindi(txt): #arabic unicode text
     for i in range(10):
         num_str=str(i)
-        hindi_str=unichr(i+1632)
+        hindi_str=chr(i+1632)
         txt=txt.replace(hindi_str,num_str)
     return txt
 
