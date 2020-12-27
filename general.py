@@ -76,9 +76,15 @@ def tok_uc(txt): #basic tokenization of unicode text - removes all punctuation
     txt=re.sub(r"(?u)(\W)",r" \1 ",txt)
     return [v for v in re.split("\s+",txt) if v]
 
-def tok_simple(txt): #this tokenization scheme splits around punctuation - preserving punctuation as tokens
+def tok_simple(txt,full=False): #this tokenization scheme splits around punctuation - preserving punctuation as tokens
     #txt=txt.replace(u'\x01'," ")
-    txt=re.sub("(?u)(\W)",r" \1 ", txt)
+    
+    if full: txt=re.sub("(?u)(\W)",r" \1 ", txt)
+    else: 
+        txt=re.sub("^(\W)",r" \1 ", txt)
+        txt=re.sub("(\W)$",r" \1 ", txt)	
+	txt=re.sub("\s(\W)",r" \1 ", txt)
+        txt=re.sub("(\W)\s",r" \1 ", txt)
     out=re.split("\s+",txt)
     return [v for v in out if v]
 
