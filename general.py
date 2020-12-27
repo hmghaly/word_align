@@ -81,11 +81,13 @@ def tok_simple(txt,full=False): #this tokenization scheme splits around punctuat
     
     if full: txt=re.sub("(?u)(\W)",r" \1 ", txt)
     else: 
-        txt=re.sub("^(\W)",r" \1 ", txt)
+        txt=txt.replace("://","__url__")
+	txt=re.sub("^(\W)",r" \1 ", txt)
         txt=re.sub("(\W)$",r" \1 ", txt)	
         txt=re.sub("\s(\W)",r" \1 ", txt)
         txt=re.sub("(\W)\s",r" \1 ", txt)
         txt=re.sub("(\W)(\W)",r" \1 \2", txt)	
+        txt=txt.replace("__url__","://")	
     out=re.split("\s+",txt)
     return [v for v in out if v]
 
