@@ -83,7 +83,7 @@ def tok_simple(txt,full=False): #this tokenization scheme splits around punctuat
     else: 
         txt=re.sub("^(\W)",r" \1 ", txt)
         txt=re.sub("(\W)$",r" \1 ", txt)	
-	txt=re.sub("\s(\W)",r" \1 ", txt)
+        txt=re.sub("\s(\W)",r" \1 ", txt)
         txt=re.sub("(\W)\s",r" \1 ", txt)
     out=re.split("\s+",txt)
     return [v for v in out if v]
