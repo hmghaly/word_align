@@ -91,7 +91,17 @@ def tok_simple(txt,full=False): #this tokenization scheme splits around punctuat
     out=re.split("\s+",txt)
     return [v for v in out if v]
 
-def tok(txt): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
+def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
+    replaced=[]
+    if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
+    if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
+    #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
+    repl_dict={}
+    for i0,u0 in enumerate(replaced):
+        key="__item%s__"%i0
+        repl_dict[key]=u0
+        txt=txt.replace(u0,key)
+
     #txt=txt.replace(u'\x01'," ")
     txt=txt.replace(u'\u2019',"'")
     
@@ -104,6 +114,8 @@ def tok(txt): #this is a tokenization scheme to preserve the punctuation also, b
     txt=txt.replace("_s ", " 's ")
     txt=txt.replace("_re "," 're ")
     txt=txt.replace("n_t "," n't ")
+    for a,b in repl_dict.items():
+        txt=txt.replace(a,b)
     
     out=re.split("\s+",txt)
     return [v for v in out if v]
