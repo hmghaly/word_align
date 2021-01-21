@@ -24,7 +24,7 @@ def is_punct(token):
 
 
 #Word Alignmnet pipeline
-def tok(txt):
+def tok_OLD(txt):
   #txt=txt.replace(u'\x01'," ")
   txt=txt.replace(u'\u2019',"'")
   
