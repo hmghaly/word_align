@@ -221,69 +221,69 @@ class conll: #we will use this one, so we can convert to PTB at some point
 			self.all_head_offsets.append(head_offset)
 			self.basic_dep_dict[cur_index]=depends_on
 
-			self.child_dict={} #recursively get all children and descendents
-			for dd in self.dep_dict:
-				all_children=recursive_dep(dd,self.dep_dict,[])
-				all_children=sorted(list(set(all_children)))
-				self.child_dict[dd]=all_children
-			phrase_label_counter={}
-			self.all_phrases=[]
-			for c2 in cur_conll_2d:
-				cur_ind,cur_word,cur_pos,cur_head=c2[0],c2[1],c2[3],c2[6]
-				direct_dependendents=conll_obj.dep_dict.get(cur_ind,[])
-				cur_children=self.child_dict.get(cur_ind,[])
-				if cur_children==[]: min_child_i,max_child_i=cur_ind,cur_ind
-				else: min_child_i,max_child_i=min(cur_children),max(cur_children)
+		self.child_dict={} #recursively get all children and descendents
+		for dd in self.dep_dict:
+			all_children=recursive_dep(dd,self.dep_dict,[])
+			all_children=sorted(list(set(all_children)))
+			self.child_dict[dd]=all_children
+		phrase_label_counter={}
+		self.all_phrases=[]
+		for c2 in self.conll_2d:
+			cur_ind,cur_word,cur_pos,cur_head=c2[0],c2[1],c2[3],c2[6]
+			direct_dependendents=self.dep_dict.get(cur_ind,[])
+			cur_children=self.child_dict.get(cur_ind,[])
+			if cur_children==[]: min_child_i,max_child_i=cur_ind,cur_ind
+			else: min_child_i,max_child_i=min(cur_children),max(cur_children)
 
-			  #give an ID to the current word, based on its POS
-				if not cur_pos[0].isalnum(): cur_pos="PUNCT"
-				if cur_pos.startswith("NN"): cur_pos="NN"
-				cur_phrase_count=phrase_label_counter.get(cur_pos,0)
-				cur_pos_id=cur_pos+str(cur_phrase_count+1)
-				phrase_label_counter[cur_pos]=cur_phrase_count+1
+		  #give an ID to the current word, based on its POS
+			if not cur_pos[0].isalnum(): cur_pos="PUNCT"
+			if cur_pos.startswith("NN"): cur_pos="NN"
+			cur_phrase_count=phrase_label_counter.get(cur_pos,0)
+			cur_pos_id=cur_pos+str(cur_phrase_count+1)
+			phrase_label_counter[cur_pos]=cur_phrase_count+1
 
-			  #give the phrase label to its projections
-			  #print(cur_ind,cur_word,cur_pos,cur_head,direct_dependendents,[min_child_i,max_child_i])
-				if cur_pos[0] in "VN": phrase_label=cur_pos[0].upper()+"P"
-				elif cur_pos=="JJ": phrase_label="AP"
-				elif cur_pos=="IN": phrase_label="PP"
-				elif cur_pos=="MD": phrase_label="VP"
-				else: phrase_label="XP"
+		  #give the phrase label to its projections
+		  #print(cur_ind,cur_word,cur_pos,cur_head,direct_dependendents,[min_child_i,max_child_i])
+			if cur_pos[0] in "VN": phrase_label=cur_pos[0].upper()+"P"
+			elif cur_pos=="JJ": phrase_label="AP"
+			elif cur_pos=="IN": phrase_label="PP"
+			elif cur_pos=="MD": phrase_label="VP"
+			else: phrase_label="XP"
 
-				dependents_before=sorted([v for v in direct_dependendents if v<cur_ind],reverse=True)
-				dependents_after=[v for v in direct_dependendents if v>cur_ind]
-				prejections=dependents_after+dependents_before
+			dependents_before=sorted([v for v in direct_dependendents if v<cur_ind],reverse=True)
+			dependents_after=[v for v in direct_dependendents if v>cur_ind]
+			prejections=dependents_after+dependents_before
 
 
-			  #print(cur_pos_id,cur_ind,[cur_ind])
+		  #print(cur_pos_id,cur_ind,[cur_ind])
+			tmp_phrase_obj={}
+			tmp_phrase_obj["id"]=cur_pos_id
+			tmp_phrase_obj["head"]=cur_ind
+			tmp_phrase_obj["terminal"]=True
+			tmp_phrase_obj["range"]=(cur_ind,cur_ind)
+			tmp_phrase_obj["text"]=cur_word
+			tmp_phrase_obj["n"]=1
+			self.all_phrases.append(tmp_phrase_obj)
+		  
+
+			all_children_so_far=[cur_ind]
+			for pr in prejections:
+				cur_phrase_count=phrase_label_counter.get(phrase_label,0)
+				cur_phrase_id=phrase_label+str(cur_phrase_count+1)
+				phrase_label_counter[phrase_label]=cur_phrase_count+1
+				tmp_children_of_the_attached_phrase=self.child_dict.get(pr,[pr])
+				all_children_so_far.extend(list(tmp_children_of_the_attached_phrase))
+				tmp_children_so_far=sorted(list(all_children_so_far))
+				phrase_range=(min(tmp_children_so_far),max(tmp_children_so_far))
+				words=[self.word_dict[v] for v in tmp_children_so_far]
 				tmp_phrase_obj={}
-				tmp_phrase_obj["id"]=cur_pos_id
+				tmp_phrase_obj["id"]=cur_phrase_id
 				tmp_phrase_obj["head"]=cur_ind
-				tmp_phrase_obj["terminal"]=True
-				tmp_phrase_obj["range"]=(cur_ind,cur_ind)
-				tmp_phrase_obj["text"]=cur_word
-				tmp_phrase_obj["n"]=1
+				tmp_phrase_obj["terminal"]=False
+				tmp_phrase_obj["range"]=phrase_range
+				tmp_phrase_obj["text"]=" ".join(words)
+				tmp_phrase_obj["n"]=len(words)
 				self.all_phrases.append(tmp_phrase_obj)
-			  
-
-				all_children_so_far=[cur_ind]
-				for pr in prejections:
-					cur_phrase_count=phrase_label_counter.get(phrase_label,0)
-					cur_phrase_id=phrase_label+str(cur_phrase_count+1)
-					phrase_label_counter[phrase_label]=cur_phrase_count+1
-					tmp_children_of_the_attached_phrase=self.child_dict.get(pr,[pr])
-					all_children_so_far.extend(list(tmp_children_of_the_attached_phrase))
-					tmp_children_so_far=sorted(list(all_children_so_far))
-					phrase_range=(min(tmp_children_so_far),max(tmp_children_so_far))
-					words=[conll_obj.word_dict[v] for v in tmp_children_so_far]
-					tmp_phrase_obj={}
-					tmp_phrase_obj["id"]=cur_phrase_id
-					tmp_phrase_obj["head"]=cur_ind
-					tmp_phrase_obj["terminal"]=False
-					tmp_phrase_obj["range"]=phrase_range
-					tmp_phrase_obj["text"]=" ".join(words)
-					tmp_phrase_obj["n"]=len(words)
-					self.all_phrases.append(tmp_phrase_obj)
 
 
 
