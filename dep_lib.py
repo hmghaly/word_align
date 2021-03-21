@@ -267,7 +267,9 @@ class conll: #we will use this one, so we can convert to PTB at some point
 		  
 
 			all_children_so_far=[cur_ind]
+			print(cur_ind, prejections)
 			for pr in prejections:
+				print(pr)
 				cur_phrase_count=phrase_label_counter.get(phrase_label,0)
 				cur_phrase_id=phrase_label+str(cur_phrase_count+1)
 				phrase_label_counter[phrase_label]=cur_phrase_count+1
