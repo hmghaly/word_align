@@ -262,7 +262,7 @@ class conll: #we will use this one, so we can convert to PTB at some point
 			tmp_phrase_obj["id"]=cur_pos_id
 			tmp_phrase_obj["head"]=cur_ind
 			tmp_phrase_obj["terminal"]=True
-			tmp_phrase_obj["range"]=(cur_ind,cur_ind)
+			tmp_phrase_obj["range"]=(cur_ind-1,cur_ind-1) #we want the range to be based on the actual indexes of the sentence words
 			tmp_phrase_obj["text"]=cur_word
 			tmp_phrase_obj["n"]=1
 			self.all_phrases.append(tmp_phrase_obj)
@@ -277,7 +277,7 @@ class conll: #we will use this one, so we can convert to PTB at some point
 				tmp_children_of_the_attached_phrase=self.child_dict.get(pr,[pr])
 				all_children_so_far.extend(list(tmp_children_of_the_attached_phrase))
 				tmp_children_so_far=sorted(list(all_children_so_far))
-				phrase_range=(min(tmp_children_so_far),max(tmp_children_so_far))
+				phrase_range=(min(tmp_children_so_far)-1,max(tmp_children_so_far)-1) #we want the range to be based on the actual indexes of the sentence words
 				#print("tmp_children_so_far",tmp_children_so_far,self.word_dict)
 				words=[self.word_dict[v] for v in tmp_children_so_far]
 				tmp_phrase_obj={}
