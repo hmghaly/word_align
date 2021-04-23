@@ -1,7 +1,7 @@
 import re, os, json
 from itertools import groupby
 import base64
-from string import letters, punctuation
+#from string import letters, punctuation
 
 from docx import Document
 from docx.oxml.table import CT_Tbl
