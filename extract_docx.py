@@ -14,8 +14,8 @@ from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 #from docx.enum.style import WD_STYLE_TYPE
 
-def get_docx_paras(docx_fpath):
-	document_obj = Document(docx_fpath)
+def get_docx_paras(document_obj):
+	#document_obj = Document(docx_fpath)
 	parent_elm = document_obj.element.body
 	all_parapgraphs=[]
 #	for child in parent_elm.iterchildren():
