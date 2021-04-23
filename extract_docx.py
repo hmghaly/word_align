@@ -188,14 +188,14 @@ if __name__=="__main__":
 	parent_elm = document_obj.element.body
 
 	cur_tables=get_tables_recursive(document_obj,parent_elm,all_tables=[],depth=0)
-	for ct in cur_tables:
-		print ct
-		#print ct._element.xml
-		print ct.alignment
-		ct.alignment = WD_TABLE_ALIGNMENT.RIGHT
-		print ct.alignment
-		#print ct.xml
-		print "========"
+	# for ct in cur_tables:
+	# 	print ct
+	# 	#print ct._element.xml
+	# 	print ct.alignment
+	# 	ct.alignment = WD_TABLE_ALIGNMENT.RIGHT
+	# 	print ct.alignment
+	# 	#print ct.xml
+	# 	print "========"
 
 
 	cur_paras=get_paras_recursive(document_obj,parent_elm,all_paras=[])
@@ -214,9 +214,9 @@ if __name__=="__main__":
 
 		
 		#if "align" in cur_xml:
-		print cur_xml
-		print cur_txt, [cur_txt]
-		print "======="
+		# print cur_xml
+		# print cur_txt, [cur_txt]
+		# print "======="
 		
 		only_letters="".join(re.findall("(?u)\w+",p.text))
 		english_letters=[v for v in only_letters if v in letters]
@@ -248,17 +248,18 @@ if __name__=="__main__":
 					#font = run.font
 					#font.rtl = True
 				except Exception,e: 
-					print str(e)
+					pass
+					# print str(e)
 			
 
 
 				
-			print "----"
-			#for ci,c in enumerate(cur_txt):
-			#	print ci, c, ord(c)
-			#en_parts=re.findall("[a-zA-Z\-\/]+",cur_txt)
-			print ">>>", cur_txt
-			#print "en_parts", en_parts
+			# print "----"
+			# #for ci,c in enumerate(cur_txt):
+			# #	print ci, c, ord(c)
+			# #en_parts=re.findall("[a-zA-Z\-\/]+",cur_txt)
+			# print ">>>", cur_txt
+			# #print "en_parts", en_parts
 
 
 			
