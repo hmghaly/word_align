@@ -236,20 +236,20 @@ if __name__=="__main__":
 				#print status, letter_check, cluster
 				#run=p.add_run()
 				#run.text=cluster
-				try:
-					#, style = "rtl"
-					#run=p.add_run(cluster, style = "rtl")
-					run=p.add_run(cluster)
-					#run.bold = True
-					run.rtl=True
+				# try:
+				# 	#, style = "rtl"
+				# 	#run=p.add_run(cluster, style = "rtl")
+				# 	run=p.add_run(cluster)
+				# 	#run.bold = True
+				# 	run.rtl=True
 
-					#pass
-					#run.style = style
-					#font = run.font
-					#font.rtl = True
-				except Exception,e: 
-					pass
-					# print str(e)
+				# 	#pass
+				# 	#run.style = style
+				# 	#font = run.font
+				# 	#font.rtl = True
+				# except Exception,e: 
+				# 	pass
+				# 	# print str(e)
 			
 
 
