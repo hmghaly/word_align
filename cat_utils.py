@@ -212,7 +212,7 @@ class docx:
 
 		extracted_dir=os.path.join(self.TEMP_FOLDER, main_dir)
 		for xml_fname in os.listdir(extracted_dir):
-			print(xml_fname)
+			#print(xml_fname)
 			skip_file=True
 			if xml_fname in ["document.xml", "footnotes.xml","endnotes.xml","sharedStrings.xml"]: skip_file=False
 			if xml_fname.startswith("slide"): skip_file=False
