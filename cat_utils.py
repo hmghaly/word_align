@@ -4,7 +4,7 @@ import shutil
 import zipfile
 import random, string
 
-from code_utils.general import *
+#from code_utils.general import *
 #from code_utils.extract_docx import *
 
 def str2key(str0):
