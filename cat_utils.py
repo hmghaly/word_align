@@ -1,0 +1,307 @@
+#!/usr/bin/python3
+import os, re, json
+import shutil
+import zipfile
+import random, string
+
+from code_utils.general import *
+#from code_utils.extract_docx import *
+
+def str2key(str0):
+  str0=htmlp.unescape(str0)
+  str0=str0.strip()
+  str0=re.sub("\W+","_",str0)
+  return str0
+
+def tsv2dict(tsv_fpath0,skip_first=False):
+  out_dict={}
+  fopen0=open(tsv_fpath0)
+  for line in fopen0:
+    line_split=line.strip("\n\r\t").split("\t")
+    if len(line_split)<2: continue
+    key=str2key(line_split[0])
+    out_dict[key]=line_split[1]
+  return out_dict
+
+def gen_para_id():
+  return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+w_p_exp=r"<w:p\b.*?>.*?</w:p>"
+w_t_exp=r"<w:t\b.*?>.*?</w:t>"
+w_t_inside_exp=r"<w:t\b.*?>(.*?)</w:t>"
+w_t_inside_outside_exp=r"(<w:t\b.*?>)(.*?)(</w:t>)"
+
+def get_xml_elements(xml_content0,el_name="w:p"):
+  open_tag="<"+el_name
+  closing_tag="</"+el_name+">"
+  all_split=re.split(r"%s\b"%open_tag,xml_content0)
+  #all_split=xml_content0.split(open_tag)
+  all_elements=[]
+  for as0 in all_split[1:]:
+    if not closing_tag in as0: continue
+    #if not as0[0] in " >": continue #if the first character after the open tag e.g. <w:r is not a space or >, it is a different tag
+    split_closing_tag=as0.split(closing_tag)
+    el_outer_xml=open_tag+split_closing_tag[0]+closing_tag
+    all_elements.append(el_outer_xml)
+  return all_elements
+
+def get_para_by_id(xml_fpath0,id0): #given the paragraph ID and path of the xml file, get the outer XML element 
+  fopen=open(xml_fpath0)
+  content=fopen.read()
+  fopen.close()
+  found_i=content.find(id0)
+  para_xml_i0=content[:found_i].rfind('<w:p')
+  para_xml_i1=found_i+content[found_i:].find('</w:p>')+len('</w:p>')
+  para_xml_slice=content[para_xml_i0:para_xml_i1]
+  return para_xml_slice
+
+def get_para_by_index(xml_fpath0,i0): #given the paragraph index and path of the xml file, get the outer XML element 
+  fopen=open(xml_fpath0)
+  xml_content0=fopen.read()
+  fopen.close()
+  cur_wps=get_xml_elements(xml_content0,el_name="w:p")
+  para_xml_slice=cur_wps[i0]
+  return para_xml_slice
+
+
+def save_tmp2docx(tmp_dir_path,new_docx_fpath): #convert the temp directory with them XML files making the original docx into a new docx file
+  if os.path.exists(new_docx_fpath): os.remove(new_docx_fpath) #remove any of these if already exists
+  shutil.make_archive(tmp_dir_path, 'zip', tmp_dir_path)
+  os.rename(tmp_dir_path+".zip", new_docx_fpath)
+
+def update_para(para_id0,xml_path0,new_text0,rtl=True,style={}): #get an xml element by ID, update it with new text and style, save the new XML with this updated element
+  fopen=open(xml_fpath0)
+  content=fopen.read()
+  fopen.close()
+  cur_slice=get_para_by_id(xml_fpath0,para_id0)
+  updated_slice=update_wr_text(cur_slice,new_text0)
+  if rtl: #
+    updated_slice=updated_slice.replace("<w:rtl/>","")  
+    updated_slice=updated_slice.replace("<w:lang ","<w:rtl/><w:lang ")
+    #updated_slice=updated_slice.replace('/></w:rPr>','w:bidi="ar-MA"/></w:rPr>')
+    
+  content=content.replace(cur_slice,updated_slice)
+  fopen1=open(xml_fpath0,"w")
+  fopen1.write(content)
+  fopen1.close()  
+  return updated_slice
+
+def update_para_by_index(para_i0,xml_path0,new_text0,rtl=True,style={}): #get an xml element by its index, update it with new text and style, save the new XML with this updated element
+  fopen=open(xml_fpath0)
+  content=fopen.read()
+  fopen.close()
+  cur_slice0=get_para_by_index(xml_fpath0,para_i0)
+  print(">>>> <<<???",cur_slice0)
+  updated_slice=update_wr_text(cur_slice0,new_text0)
+  if rtl: #
+    updated_slice=updated_slice.replace("<w:rtl/>","")  
+    updated_slice=updated_slice.replace("<w:lang ","<w:rtl/><w:lang ")
+    #updated_slice=updated_slice.replace('/></w:rPr>','w:bidi="ar-MA"/></w:rPr>')
+    
+  content=content.replace(cur_slice0,updated_slice)
+  fopen1=open(xml_fpath0,"w")
+  fopen1.write(content)
+  fopen1.close()  
+  return updated_slice
+  
+
+def get_xml_wrs(xml_content):
+	cur_chunks=find_iter_split(w_p_exp,xml_content)
+	return cur_chunks
+
+def safe_xml(txt):
+	txt=txt.replace("&","&amp;")
+	txt=txt.replace("<","&lt;")
+	txt=txt.replace(">","&gt;")
+	return txt  
+
+def find_iter_split(expression,text): #generic function to split a text (haystack) around a certain regex
+	split_text=[]
+	exp_applies={} #whether the current expression applies to the current segment of the split segments
+	found_objs=re.finditer(expression,text)
+	indexes=[0]
+	for fo in found_objs:
+		start,end=fo.start(), fo.end()
+		indexes.append(start)
+		indexes.append(end)
+		exp_applies[start]=True #in the split chunks, the regex criteria applies to some of them, and some are not, so we keep track of this
+	indexes.append(len(text))
+	if len(indexes)==2: return []
+	counter=0
+	for i0,i1 in zip(indexes,indexes[1:]):
+		applies=exp_applies.get(i0,False)
+		chunk=text[i0:i1] 
+		split_text.append((counter,applies,chunk))
+		counter+=1
+	return split_text  
+
+def get_wr_text(wr_chunk):
+	all_text=""
+	wt_chunks=find_iter_split(w_t_exp,wr_chunk)
+	for wt in wt_chunks:
+		wt_counter,wt_applies,wt_chunk=wt
+		wt_content=[""]
+		if wt_applies: wt_content=re.findall(w_t_inside_exp,wt_chunk)
+		elif "<w:br/>" in wt_chunk: wt_content=["\n"]
+		elif "<w:tab/>" in wt_chunk: wt_content=["\t"]
+		all_text+=wt_content[0]
+	return all_text
+
+def striphtml(data):
+	p = re.compile(r'<.*?>')
+	return p.sub('', data)
+
+def get_el_text(el_xml):
+	el_xml=el_xml.replace("<w:br/>","\n")
+	el_xml=el_xml.replace("<w:tab/>","\t")
+	text=striphtml(el_xml)
+	return text
+
+
+
+def update_wr_text(wr_xml,new_text):
+	 wt_chunks=find_iter_split(w_t_exp,wr_xml)
+	 new_text=safe_xml(new_text)
+	 new_wr_content=""
+	 replaced=False
+	 for wt in wt_chunks:
+	 	 wt_counter,wt_applies,wt_chunk=wt
+	 	 if wt_applies:
+	 	 	 first_tag=wt_chunk[:wt_chunk.find(">")+1]
+	 	 	 last_tag=wt_chunk[wt_chunk.rfind("<"):]
+	 	 	 if replaced==False: #we replace only the first wt 
+	 	 	 	 wt_content=first_tag+new_text+last_tag
+	 	 	 	 replaced=True
+	 	 	 else: wt_content=first_tag+last_tag
+	 	 	 new_wr_content+=wt_content
+	 	 else: new_wr_content+=wt_chunk#.decode("utf-8")
+	 return new_wr_content
+
+
+class docx:
+	def __init__(self,docx_fpath,keep_copy=True): #openning the docx file, by unzipping it
+		self.TEMP_DOCX = docx_fpath
+		self.closed=False
+		self.COPY_DOCX = docx_fpath+"2"
+		shutil.copy(self.TEMP_DOCX, self.COPY_DOCX) #keep a temp copy of out file, just in case
+		self.file_extension="."+docx_fpath.split(".")[-1]
+		self.TEMP_ZIP = docx_fpath.replace(self.file_extension,".zip")
+		self.TEMP_FOLDER = docx_fpath.replace(self.file_extension,"")
+		if os.path.exists(self.TEMP_ZIP):
+			os.remove(self.TEMP_ZIP)
+		if os.path.exists(self.TEMP_FOLDER):
+			shutil.rmtree(self.TEMP_FOLDER)
+		os.rename(self.TEMP_DOCX, self.TEMP_ZIP) #rename the original docx to zip extension
+		# unzip file zip to specific folder
+		z_open=zipfile.ZipFile(self.TEMP_ZIP, 'r')
+		z_open.extractall(self.TEMP_FOLDER)
+		z_open.close()
+		os.rename(self.COPY_DOCX, self.TEMP_DOCX) #keep the original file
+	def save_as(self,out_fpath):
+		if os.path.exists(out_fpath): #remove any of these if already exists
+			os.remove(out_fpath)
+		#self.OUT_ZIP = out_fpath.replace(".docx",".zip")
+		#shutil.make_archive(self.OUT_ZIP, 'zip', self.TEMP_FOLDER)
+		shutil.make_archive(self.TEMP_ZIP.replace(".zip", ""), 'zip', self.TEMP_FOLDER)
+		os.rename(self.TEMP_ZIP, out_fpath)
+	def extract_paras(self,cat_file_path=""): 
+		self.paras=[]
+		if self.TEMP_DOCX.lower().endswith(".docx"): main_dir="word"
+		if self.TEMP_DOCX.lower().endswith(".pptx"): main_dir="ppt/slides"
+		if self.TEMP_DOCX.lower().endswith(".xlsx"): main_dir="xl"
+
+		extracted_dir=os.path.join(self.TEMP_FOLDER, main_dir)
+		for xml_fname in os.listdir(extracted_dir):
+			print(xml_fname)
+			skip_file=True
+			if xml_fname in ["document.xml", "footnotes.xml","endnotes.xml","sharedStrings.xml"]: skip_file=False
+			if xml_fname.startswith("slide"): skip_file=False
+			if xml_fname.startswith("sheet"): skip_file=False
+			if xml_fname.startswith("header"): skip_file=False
+			if xml_fname.startswith("footer"): skip_file=False
+			if skip_file: continue
+			# if xml_fname in ["document.xml", "footnotes.xml","endnotes.xml"] or xml_fname.startswith("header") or xml_fname.startswith("footer"): pass
+			# else: continue
+			#if not xml_fname=="document.xml" and not xml_fname.startswith("header") and not xml_fname.startswith("footer"): continue
+			cur_xml_path=os.path.join(extracted_dir,xml_fname)
+			with open(cur_xml_path) as fopen:
+				xml_content=fopen.read()
+			cur_tag_name="w:p" #xml tag for docx files
+			if self.TEMP_DOCX.lower().endswith(".pptx"): cur_tag_name="a:p"
+			cur_wps=get_xml_elements(xml_content,el_name=cur_tag_name)
+			for i0,wp_xml in enumerate(cur_wps):
+				#wp_text=get_wr_text(wp_xml)
+				wp_text=get_el_text(wp_xml)        
+				para_obj=para()
+				para_obj.path=cur_xml_path
+				para_obj.xml=wp_xml
+				para_obj.text=wp_text
+				para_obj.i=i0
+				para_obj.tag_name=cur_tag_name        
+				found_ids=re.findall('paraId="(.+?)"',wp_xml) 
+				if found_ids: para_obj.id=  found_ids[0]
+				self.paras.append(para_obj)
+			if cat_file_path!="": #save paragraphs with their info to cat file
+				cat_fopen=open(cat_file_path,"w")
+				for p_obj in self.paras:
+					cur_text=p_obj.text.replace("\t"," <tab> ").replace("\n"," <br> ")
+					json_obj={}
+					json_obj["path"]=p_obj.path
+					json_obj["i"]=p_obj.i
+					json_obj["id"]=p_obj.id
+					json_obj["tag_name"]=p_obj.tag_name          
+					json_obj["text"]=cur_text
+					json_obj_str=json.dumps(json_obj) 
+					line=json_obj_str+"\n"
+					#line="%s\t%s\t%s\t%s\n"%(p_obj.path,p_obj.i,p_obj.id,cur_text)
+					cat_fopen.write(line)
+				cat_fopen.close()
+
+		return self.paras
+  
+
+	def update_tbl_rtl(self):
+		extracted_dir=os.path.join(self.TEMP_FOLDER, "word")
+		cur_xml_path=os.path.join(extracted_dir,"document.xml")
+		fopen_read=open(cur_xml_path)
+		xml_content=fopen_read.read()
+		fopen_read.close()
+		xml_content=xml_content.replace("<w:tblPr>","<w:tblPr><w:bidiVisual/>")
+		xml_content=xml_content.replace("<w:lang ","<w:rtl/><w:lang ")
+
+		
+		fopen_write=open(cur_xml_path, "wb")
+		fopen_write.write(xml_content)
+		fopen_write.close()
+
+
+	def close(self):
+		self.closed=True
+		os.remove(self.TEMP_ZIP)
+		shutil.make_archive(self.TEMP_ZIP.replace(".zip", ""), 'zip', self.TEMP_FOLDER)
+		os.rename(self.TEMP_ZIP, self.TEMP_DOCX)
+		shutil.rmtree(self.TEMP_FOLDER)
+  
+
+class para:
+  def __init__(self):
+    self.xml=""
+    self.text=""
+    self.path=""
+    self.id=""
+    self.tag_name=""
+    self.i=None
+  def update_text(self,new_text):
+    pass
+  def update_style(self,new_style):
+    pass
+
+if __name__=="__main__":
+  test_docx_obj=docx("docs/hlpf.docx")
+  paras=test_docx_obj.extract_paras("docs/hlpf-cat4.txt")
+  # test_pptx_obj=docx("docs/annex8.pptx")
+  # paras=test_pptx_obj.extract_paras("docs/annex8-cat.txt")
+
+  for p in paras:
+    print(p.id,p.path, p.i, p.text)  
+  pass
