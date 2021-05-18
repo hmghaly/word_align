@@ -1,8 +1,17 @@
 #!/usr/bin/python3
 import os, re, json
+import sys
 import shutil
 import zipfile
 import random, string
+
+ver=sys.version_info
+if ver[0]==3: 
+  import html
+  htmlp=html
+if ver[0]==2: 
+  import HTMLParser
+  HTMLParser.HTMLParser().unescape('Suzy &amp; John')  
 
 #from code_utils.general import *
 #from code_utils.extract_docx import *
@@ -69,16 +78,29 @@ def save_tmp2docx(tmp_dir_path,new_docx_fpath): #convert the temp directory with
   shutil.make_archive(tmp_dir_path, 'zip', tmp_dir_path)
   os.rename(tmp_dir_path+".zip", new_docx_fpath)
 
-def update_para(para_id0,xml_path0,new_text0,rtl=True,style={}): #get an xml element by ID, update it with new text and style, save the new XML with this updated element
+def update_para_OLD(para_id0,xml_path0,new_text0,rtl=True,style={}): #get an xml element by ID, update it with new text and style, save the new XML with this updated element
   fopen=open(xml_fpath0)
   content=fopen.read()
   fopen.close()
   cur_slice=get_para_by_id(xml_fpath0,para_id0)
   updated_slice=update_wr_text(cur_slice,new_text0)
   if rtl: #
-    updated_slice=updated_slice.replace("<w:rtl/>","")  
-    updated_slice=updated_slice.replace("<w:lang ","<w:rtl/><w:lang ")
-    #updated_slice=updated_slice.replace('/></w:rPr>','w:bidi="ar-MA"/></w:rPr>')
+    w_p_tag_exp=r"<w:p\b.*?>"
+    w_r_tag_exp=r"<w:r\b.*?>"
+    wp_tags=list(set(re.findall(w_p_tag_exp,updated_slice)))
+    wr_tags=list(set(re.findall(w_r_tag_exp,updated_slice)))
+    for wp0 in wp_tags:
+      updated_slice=updated_slice.replace(wp0,wp0+'<w:pPr><w:bidi/></w:pPr>')
+    for wr0 in wr_tags:
+      updated_slice=updated_slice.replace(wr0,wr0+'<w:rPr><w:rtl/></w:rPr>')
+
+
+
+
+    # wp_tags=re.findall(w_p_tag_exp,updated_slice)
+    # updated_slice=updated_slice.replace("<w:rtl/>","")  
+    # updated_slice=updated_slice.replace("<w:lang ","<w:rtl/><w:lang ")
+    # #updated_slice=updated_slice.replace('/></w:rPr>','w:bidi="ar-MA"/></w:rPr>')
     
   content=content.replace(cur_slice,updated_slice)
   fopen1=open(xml_fpath0,"w")
@@ -86,18 +108,26 @@ def update_para(para_id0,xml_path0,new_text0,rtl=True,style={}): #get an xml ele
   fopen1.close()  
   return updated_slice
 
-def update_para_by_index(para_i0,xml_path0,new_text0,rtl=True,style={}): #get an xml element by its index, update it with new text and style, save the new XML with this updated element
+def update_para_by_index(para_i0,xml_fpath0,new_text0,rtl=True,style={}): #get an xml element by its index, update it with new text and style, save the new XML with this updated element
   fopen=open(xml_fpath0)
   content=fopen.read()
   fopen.close()
   cur_slice0=get_para_by_index(xml_fpath0,para_i0)
-  print(">>>> <<<???",cur_slice0)
+  #print(">>>> <<<???",cur_slice0)
   updated_slice=update_wr_text(cur_slice0,new_text0)
   if rtl: #
-    updated_slice=updated_slice.replace("<w:rtl/>","")  
-    updated_slice=updated_slice.replace("<w:lang ","<w:rtl/><w:lang ")
+    # updated_slice=updated_slice.replace("<w:rtl/>","")  
+    # updated_slice=updated_slice.replace("<w:lang ","<w:rtl/><w:lang ")
     #updated_slice=updated_slice.replace('/></w:rPr>','w:bidi="ar-MA"/></w:rPr>')
-    
+    w_p_tag_exp=r"<w:p\b.*?>"
+    w_r_tag_exp=r"<w:r\b.*?>"
+    wp_tags=list(set(re.findall(w_p_tag_exp,updated_slice)))
+    wr_tags=list(set(re.findall(w_r_tag_exp,updated_slice)))
+    for wp0 in wp_tags:
+      updated_slice=updated_slice.replace(wp0,wp0+'<w:pPr><w:bidi/></w:pPr>')
+    for wr0 in wr_tags:
+      updated_slice=updated_slice.replace(wr0,wr0+'<w:rPr><w:rtl/></w:rPr>')
+    #print(updated_slice)
   content=content.replace(cur_slice0,updated_slice)
   fopen1=open(xml_fpath0,"w")
   fopen1.write(content)
@@ -296,12 +326,72 @@ class para:
   def update_style(self,new_style):
     pass
 
+def write(content0,path0):
+  fopen0=open(path0,"w")
+  fopen0.write(content0)
+  fopen0.close()
+def read(path0):
+  fopen0=open(path0)
+  content0=fopen0.read()
+  fopen0.close()
+  return content0
+
+def translate_doc(in_fpath,out_fpath,tsv_fpath,out_paras_fpath=""):
+  repl_dict=tsv2dict(tsv_fpath)
+  test_docx_obj=docx(in_fpath)
+  paras=test_docx_obj.extract_paras(out_paras_fpath)
+  for p in paras:
+    cur_xml_slice=p.xml
+    sents= ssplit(p.text) #need to load ssplit from general utils
+    eq_sents=[]
+    for sent0 in sents:
+      sent0_key=str2key(sent0)
+      equiv=repl_dict.get(sent0_key,sent0)
+      eq_sents.append(equiv)
+    eq_para_text=" ".join(eq_sents)
+    if eq_para_text.strip()=="": continue
+    cur_content=read(p.path)
+    cur_wps=get_xml_elements(cur_content,el_name="w:p")
+    update_para_by_index(p.i,p.path,eq_para_text,rtl=True,style={})
+  save_tmp2docx(test_docx_obj.TEMP_FOLDER,out_fpath)
+
+
+
 if __name__=="__main__":
-  test_docx_obj=docx("docs/hlpf.docx")
-  paras=test_docx_obj.extract_paras("docs/hlpf-cat4.txt")
+  # out_fpath="docs/hlpf-ar-test1.docx"
+  # test_docx_obj=docx("docs/hlpf.docx")
+  # paras=test_docx_obj.extract_paras("docs/hlpf-cat5.txt")
+  # tsv_fpath="docs/hlpf.tsv"
+  # repl_dict=tsv2dict(tsv_fpath)
   # test_pptx_obj=docx("docs/annex8.pptx")
   # paras=test_pptx_obj.extract_paras("docs/annex8-cat.txt")
+  from code_utils.general import *
+  in_fpath="docs/space.docx"
+  out_fpath="docs/space-ar.docx"
+  tsv_fpath="docs/space.tsv"
+  paras_fpath="docs/space-paras.txt"
+  translate_doc(in_fpath,out_fpath,tsv_fpath,out_paras_fpath="")
 
-  for p in paras:
-    print(p.id,p.path, p.i, p.text)  
-  pass
+
+  # for p in paras:
+  #   print(">>>>", p.id,p.path, p.i, p.text) 
+  #   cur_xml_slice=p.xml
+  #   sents= ssplit(p.text)
+  #   eq_sents=[]
+  #   for sent0 in sents:
+  #     sent0_key=str2key(sent0)
+  #     equiv=repl_dict.get(sent0_key,sent0)
+  #     eq_sents.append(equiv)
+  #   eq_para_text=" ".join(eq_sents)
+  #   if eq_para_text.strip()=="": continue
+  #   cur_content=read(p.path)
+  #   cur_wps=get_xml_elements(cur_content,el_name="w:p")
+  #   print(p.path,len(cur_wps))
+
+  # # cur_content=read(p.path)
+  # # updated_slice=update_wr_text(cur_xml_slice,eq_para_text)
+  #   update_para_by_index(p.i,p.path,eq_para_text,rtl=True,style={})
+  # save_tmp2docx(test_docx_obj.TEMP_FOLDER,out_fpath)
+
+
+
