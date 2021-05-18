@@ -138,11 +138,15 @@ def match_seq(list1,list2):
 
 
 #sentence tokenization
-
+multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."]
 def ssplit(txt):
     dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add"]
     for dw in dot_words:
         txt=txt.replace(dw+".",dw+"._")
+    for mdw in multi_dot_words:
+        mdw_no_dots=mdw.replace(".","_")      
+        txt=txt.replace(mdw,mdw_no_dots)
+
     #txt=re.sub("(?u)([\.\?\!\;\u061b])\s",r"\1\n",txt)
     txt=re.sub("(?u)([\.\?\!\;])\s",r"\1\n",txt)
     txt=txt.replace("\xd8\x9b ","\xd8\x9b\n")
@@ -151,6 +155,9 @@ def ssplit(txt):
     txt=txt.replace("\t","\n")
     
     txt=txt.replace("._",".")
+    for mdw in multi_dot_words:
+        mdw_no_dots=mdw.replace(".","_")      
+        txt=txt.replace(mdw_no_dots,mdw)
 
     cur_sents=[v.strip() for v in txt.split("\n")]
     cur_sents=[v for v in cur_sents if v]
