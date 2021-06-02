@@ -138,12 +138,13 @@ def match_seq(list1,list2):
 
 
 #sentence tokenization
-multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."]
+multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."," v."," vs."," v.s.", " et al."," etc."]
 def ssplit(txt):
     dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add"]
     for dw in dot_words:
         txt=txt.replace(dw+".",dw+"._")
     for mdw in multi_dot_words:
+        #mdw_no_dots=mdw.replace(".","_")  
         mdw_no_dots=mdw.replace(".","_")      
         txt=txt.replace(mdw,mdw_no_dots)
 
