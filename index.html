@@ -1,0 +1,508 @@
+<!doctype html>
+<html>
+<head>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-61484468-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-61484468-1');
+    </script>
+
+
+    <title>Alpha5 - ALIF Arabic Learning Platform</title>
+      <meta charset="UTF-8">
+      <meta name="description" content="Alif game - Arabic Learning is Fun - A web-based suite of apps to teach the foundation of Arabic reading, writing and listening. It teaches the names, shapes and sounds of the letters of the Arabic alphabet, in addition to the diacrticts (tashkeel/harakaat) and how to use Arabic keyboard and write letters and words and know the pronunciation of letters and words">
+      <meta name="keywords" content="Arabic alphabet letters reading writing listening games online web mobile androin ios fun app pronunciation diacritics tashkeel harakaat pronunciation">
+    
+
+<!-- Welcome to ZIM at http://zimjs.com - Code Interactive Media Pizzazz!             -->
+<!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS http://createjs.com -->
+<!-- Founded by Inventor Dan Zen - http://danzen.com - Canadian New Media Award Winner     -->
+<!-- ZIM is free to use. You can donate to help improve ZIM at http://zimjs.com/donate     -->
+
+<script src="https://zimjs.org/cdn/1.3.2/createjs.js"></script>
+<script src="https://zimjs.org/cdn/cat/00/zim.js"></script>
+
+<!--<script src="https://d309knd7es5f10.cloudfront.net/zim_10.3.0.js"></script>    -->
+    
+<!-- use zimjs.com/distill for minified individual functions! -->
+<!--<script src="https://zimjs.org/cdn/pizzazz_03.js"></script>-->
+<script src="https://zimjs.org/cdn/pizzazz_02.js"></script>    
+<script src="js/jquery.min.js"></script>
+<script src="pages/tutorial.js"></script>
+<script src="pages/zgame.js"></script>
+<script src="pages/zwrite.js"></script>  
+    
+<script src="pages/alphabet.js"></script>
+<script src="pages/sound_list.js"></script>
+<script src="pages/sound_tutorial.js"></script>  
+<script src="pages/write_menu.js"></script>      
+
+    
+<script src="js/script.js"></script>  
+<script src="js/canvas.js"></script>      
+
+<script>
+var quiz={}
+quiz.duration=300;
+var game_timer;
+var user={}
+var game_data={};
+var session={}
+
+
+var app_name="alif"
+var storage_name=app_name //where we store on local storage
+
+var game_name="alpha5" //the main app is ALIF, and the game name is the different individual games
+//var game_name="write5"
+//var game_name="read5"
+
+
+
+//create-assign a key for each user, based on a hash for the current timestamp
+checked_assigned_user_key=get_local_strorage(storage_name,"assigned_user_key")
+if (checked_assigned_user_key!=null)  assigned_user_key=checked_assigned_user_key
+else {
+    assigned_user_key=(+new Date).toString(36);
+    set_local_strorage(storage_name,"assigned_user_key",assigned_user_key)
+}
+
+    
+//create a session ID based on the hash of the timestamp
+var session={} //what is happending during this session
+assigned_session_key=(+new Date).toString(36);
+session.key=assigned_session_key
+session.user_key=assigned_user_key
+session.app=app_name
+session.game=game_name
+session.items=[]
+    
+// SCALING OPTIONS
+// scaling can have values as follows with full being the default
+// "fit"    sets canvas and stage to dimensions and scales to fit inside window size
+// "outside"    sets canvas and stage to dimensions and scales to fit outside window size
+// "full"    sets stage to window size with no scaling
+// "tagID"    add canvas to HTML tag of ID - set to dimensions if provided - no scaling
+
+var scaling = "fit"; // this will resize to fit inside the screen dimensions
+var width = 600;
+var height = 800;
+var color = light;
+var outerColor = darker;
+    
+//var pages
+//var after_game
+
+function init(){
+//    text_fname="../txt/arabic_data.json"
+//    fetch(text_fname)
+//      .then(function(res){ return res.json(); })
+//      .then(function(data){
+//        game_data=data
+//        console.log(data)
+//        
+//        //assets.json_loaded=true;
+//        //check_assets_loaded()
+//      })       
+}
+
+//for createjs applications
+function remove_el(el){
+    if (el==undefined ||el==null) return
+    el.parent.removeChild(el)
+}
+
+all_letter_ids=["alif", "hamzah", "alif_hamzah", "alif_hamzah_maksoorah", "alif_maddah", "baa2", "taa2", "thaa2", "jeem", "7aa2", "khaa2", "daal", "dhaal", "raa2", "zaay", "seen", "sheen", "ssaad", "ddaad", "ttaa2", "dhaa2", "3ayn", "ghayn", "faa2", "qaaf", "kaaf", "laam", "meem", "noon", "haa2", "waaw", "yaa2", "taa2_marbootah", "hamzah_waaw", "hamzah_nabra", "alif_layyenah", "laam_alif"]    
+    
+sound_ids_json_str='["aa","i","aa_layyenah","hamzah_2","hamzah_a","2a","2","2u","2i","2aa","2aa","b","ba","bb","bba","bi","bu","t","ta","ti","tta","tu","th","tha","thi","ththa","thu","j","ja","ji","jja","ju","7","77a","7a","7i","7u","kh","kha","khi","khkhi","khu","d","da","dd","dda","di","du","dh","dha","dhdha","dhi","dhu","r","ra","ri","rr","rra","ru","z","za","zu","zza","s","sa","si","su","sh","sha","shi","shsh","shu","ssaad_s","ssaad_ss","ssaad_sa","ssaad_si","ssaad_su","ddaad_d","ddaad_dda","ddaad_da","ddaad_di","ddaad_du","ttaa2_t","ttaa2_tta","ttaa2_ta","ttaa2_ti","dhaa2_dh","dhaa2_dhdh","dhaa2_dha","dhaa2_dhi","dhaa2_dhu","3","33a","3a","3i","3u","gh","gha","ghgha","ghi","ghu","f","fa","ffa","fi","fu","q","qa","qi","qqa","qqi","qu","k","ka","ki","kka","ku","l","la","li","ll","lla","lu","m","ma","mi","mm","mu","n","na","ni","nn","nna","nu","h","ha","hi","hu","oo","w","wa","wi","wwa","ee","y","ya","yu","yy","yya","yyi","h","waaw_2","waaw_2a","yaa2_2","yaa2_2i"]'
+all_sound_ids=JSON.parse(sound_ids_json_str)
+console.log(all_letter_ids)
+console.log(all_sound_ids)
+    
+//var assets = [{text:"game_data", src:"arabic_data.json"}]
+var assets = []
+if (game_name=="alpha5"){
+    for (const let_id of all_letter_ids){ //adding letter name sounds to assets
+        letter_name_sounds_dir="audio/game/alphabet/"
+        fpath=letter_name_sounds_dir+let_id+".mp3"
+        cur_asset={id:let_id, maxNum:1, src:fpath}
+        assets.push(cur_asset)
+    }    
+}
+
+if (game_name=="read5"){
+    for (const snd_id of all_sound_ids){ //adding actual letter sounds to assets
+        letter_sounds_dir="audio/letter-sounds/"
+        fpath=letter_sounds_dir+snd_id+".mp3"
+        cur_asset={id:snd_id, maxNum:1, src:fpath}
+        assets.push(cur_asset)
+    }      
+}    
+  
+//for (var tut_i=1;tut_i<=10;tut_i++){ //adding tutorials audio to assets
+//    tut_audio_id="tutorial"+tut_i
+//    tutorial_sounds_dir="../audio/alpha-tutorial/"
+//    fpath=tutorial_sounds_dir+tut_audio_id+".mp3"
+//    cur_asset={id:tut_audio_id, maxNum:1, src:fpath}
+//    assets.push(cur_asset)
+//}    
+    
+path=''
+var progress = new ProgressBar({foregroundColor:orange, backgroundColor:purple}).sca(2);
+    
+// as of ZIM 5.5.0 you do not need to put zim before ZIM functions and classes
+var frame = new Frame(scaling, width, height, color, outerColor,assets, path,progress);
+frame.on("ready", function() {
+    zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
+
+    var stage = frame.stage;
+    var stageW = frame.width;
+    var stageH = frame.height;
+    //console.log(game_data)
+    color1=orange
+    color2=green 
+    
+
+    if (game_name=="alpha5"){
+        main_title="Alpha5"
+        main_subtitle="Learn Arabic Alphabet"
+        guide_text="View All Alphabet Letters"
+        color1=orange
+        color2=green
+    }
+
+    if (game_name=="read5"){
+        main_title="Read5"
+        main_subtitle="Read Arabic letters and words"
+        guide_text="Sounds of Arabic Letters"
+        color1=blue
+        color2=orange        
+    }    
+
+    if (game_name=="write5"){
+        main_title="Write5"
+        main_subtitle="Learn Handwriting in Arabic"
+        guide_text="View All Alphabet Letters"
+        color1=green
+        color2=blue         
+    }    
+    
+    
+    //The loading page ///////////
+    var loading = new Page(stageW, stageH, blue, green);
+    //new Circle(200,dark).center(splash);
+    new Label({color:purple, text:"Loading", size:100,variant:true}).center(loading)
+    
+    //The splash page ///////////
+    var splash = new Page(stageW, stageH, color1, color2);
+    //new Circle(200,dark).center(splash);
+    //new Label("Alpha5").pos(0,100,CENTER,TOP,splash);
+    new Label({color:red, text:main_title, size:60,variant:true}).pos(0,100,CENTER,TOP,splash);
+    new Label({color:purple, text:main_subtitle, size:30,variant:true}).pos(0,-100,CENTER,CENTER,splash);
+    new Label({color:purple, text:"5 minutes a day!", size:30,variant:true}).pos(0,0,CENTER,CENTER,splash);
+    splash.go = new Button({width:140,height:140,backgroundColor:purple,rollBackgroundColor:orange,label:"GO",corner:70})
+    .pos(0,150,CENTER,BOTTOM,splash)    
+    splash.backing;
+    
+    list_str_color1=[["A","red"],["L","green"],["I","blue"],["F","magenta"]]
+    title_text=multicolor_txt(0,0,list_str_color1,ltr=true)     
+    test_zimify=zimify(title_text)
+    test_zimify.pos(0,20,CENTER,BOTTOM,splash)
+    zog(test_zimify)
+    
+//    var timer = new Timer({
+//       time:60,
+//       borderColor:dark,
+//       isometric:"left" // isometric for left side of board
+//    }).center(splash)
+
+    
+    //The tutorials page /////////
+    var tutorial = makeTutorial(stage);
+    
+    //The game page ///
+    var game = makeGame(stage);
+    
+    //The hand writing page ///
+    var writing_menu = makeWritingMenu(stage);
+    var writing_page = makeWriting(stage);
+    
+    
+    //The alphabet list page ///
+    var alphabet = makeAlphabet(stage);
+    //var alphabet2 =new Page(stageW, stageH, orange, blue);
+    
+    //The Sound list page ///
+    var sound_page = makeSoundPage(stage);
+ 
+    //The Sound list page ///
+    var sound_tutorial = makeSoundTutorial(stage);    
+    
+    
+    
+    //The menu page
+    var menu = new Page(stageW, stageH, orange, blue);
+    //new Circle(200,dark).center(splash);
+    title_label=new Label({color:purple, text:main_title+"\nMain Menu", size:50, variant:true, align:CENTER}).pos(0,100,CENTER,TOP,menu);
+    go2game_label=new Label({color:yellow, text:"Start\nGame", size:60, align:CENTER})
+    menu.go2game = new Button({width:200,height:200,backgroundColor:purple,rollBackgroundColor:orange,label:go2game_label,corner:100})
+    .pos(0,0,CENTER,CENTER,menu)   
+    go2tutorial_label=new Label({color:yellow, text:"Tutorial", size:30, variant:true, align:CENTER})
+    menu.go2tutorial = new Button({width:140,height:140,backgroundColor:purple,rollBackgroundColor:orange,label:go2tutorial_label,corner:70})
+    .pos(60,150,LEFT,BOTTOM,menu)    
+    go2pogress_label=new Label({color:yellow, text:"My\nProgress", size:30, variant:true, align:CENTER})
+    menu.go2pogress = new Button({width:140,height:140,backgroundColor:purple,rollBackgroundColor:orange,label:go2pogress_label,corner:70})
+    .pos(60,150,RIGHT,BOTTOM,menu)    
+
+    alphabet_label=new Label({color:yellow, text:guide_text, size:25, align:CENTER})
+    menu.go2guide = new Button({width:stageW*0.8,height:60,backgroundColor:blue.darken(0.5),rollBackgroundColor:orange,label:alphabet_label,corner:20})
+    .pos(0,20,CENTER,BOTTOM,menu)   
+
+ 
+    //The alphabet page
+//    var alphabet = new Page(stageW, stageH, orange, blue);
+//    go2tutorial_label=new Label({color:yellow, text:"Tutorial", size:30, variant:true, align:CENTER})
+//    alphabet.go2tutorial = new Button({width:140,height:140,backgroundColor:purple,rollBackgroundColor:orange,label:go2tutorial_label,corner:70})
+//    .pos(0,150,CENTER,BOTTOM,alphabet)    
+//    menu_label=new Label({color:yellow, text:"Menu >>", size:25, align:CENTER})
+//    alphabet.go2menu = new Button({width:140,height:60,backgroundColor:purple,rollBackgroundColor:orange,label:menu_label,corner:20})
+//    .pos(60,20,RIGHT,BOTTOM,alphabet)   
+
+    //The game ended page
+    after_game = new Page(stageW, stageH, yellow, blue);
+    //new Circle(200,dark).center(splash);
+    title_label=new Label({color:purple, text:"Game Ended", size:60, variant:true, align:CENTER}).pos(0,100,CENTER,TOP,after_game);
+    after_game.completion_label=new Label({color:purple, text:"Completion", size:40, variant:true, align:CENTER}).pos(0,200,CENTER,TOP,after_game);
+    after_game.accuracy_label=new Label({color:purple, text:"Accuracy", size:40, variant:true, align:CENTER}).pos(0,300,CENTER,TOP,after_game);
+    after_game.score_label=new Label({color:purple, text:"Score", size:40, variant:true, align:CENTER}).pos(0,400,CENTER,TOP,after_game);
+    after_game.score_explanation_label=new Label({color:purple, text:"Score reflects both\nhow many questions answered\nand the answer accuracy", size:30, align:CENTER}).pos(0,500,CENTER,TOP,after_game);
+
+    menu_label=new Label({color:yellow, text:"Menu", size:25, align:CENTER})
+    after_game.go2menu = new Button({width:stageW*.8,height:60,backgroundColor:purple,rollBackgroundColor:orange,label:menu_label,corner:20})
+    .pos(0,20,CENTER,BOTTOM,after_game)   
+
+    //The progress dashboard page
+    var dashboard = new Page(stageW, stageH, yellow, green);
+    //new Circle(200,dark).center(splash);
+    title_label=new Label({color:purple, text:"My Progress Dashboard\n Coming Soon", size:50, variant:true, align:CENTER}).pos(0,100,CENTER,TOP,dashboard);
+    menu_label=new Label({color:yellow, text:"Menu", size:25, align:CENTER})
+    dashboard.go2menu = new Button({width:140,height:60,backgroundColor:purple,rollBackgroundColor:orange,label:menu_label,corner:20})
+    .pos(0,20,CENTER,BOTTOM,dashboard)   
+    
+    
+
+    pages = new Pages([
+        {page:loading, swipe:[]},
+        {page:splash, swipe:[tutorial,null]},
+        {page:tutorial, swipe:[null,tutorial]},
+        {page:alphabet, swipe:[null,null,tutorial,null]},
+        {page:menu, swipe:[null,null,tutorial,null]},
+        {page:game, swipe:[]},
+        {page:after_game, swipe:[menu,null]},
+        {page:dashboard, swipe:[]}, 
+        {page:sound_page, swipe:[]}, 
+        {page:sound_tutorial, swipe:[]},
+        {page:writing_page, swipe:[]}, 
+        {page:writing_menu, swipe:[]},
+    ], new Emitter({num:10, height:stageW, angle:0, vertical:true, force:{min:3, max:10}}), .7, [
+        [splash, tutorial, "pixelZIM"],
+        [alphabet, tutorial, "pixelZIM"],
+        [menu, game, "explodeZIM"],
+    ]).addTo();
+    //console.log(pages)
+    
+    splash.go.on("mousedown", function () {
+        //pages.go(tutorial, "right"); ////// <<<<<----- for now
+        if (game_name=="alpha5" ) pages.go(tutorial, "right");
+        else if (game_name=="read5" ) pages.go(sound_tutorial, "right");
+        else if (game_name=="write5" ) pages.go(writing_menu, "right");
+        //pages.go(writing_page, "right");
+        
+    });
+    tutorial.go2alphabet.on("mousedown", function () {
+        pages.go(alphabet, "down");
+        //pages.go(sound_page, "down"); ////////////////////////////////
+        
+    });    
+    
+    sound_tutorial.go2menu.on("mousedown", function () {
+        pages.go(menu, "right");
+    });      
+    
+    sound_tutorial.go2sound_list.on("mousedown", function () {
+        pages.go(sound_page, "down");
+        //pages.go(sound_page, "down"); ////////////////////////////////
+    }); 
+    sound_page.go2tutorial.on("mousedown", function () {
+        pages.go(sound_tutorial, "up");
+    });    
+    sound_page.go2menu.on("mousedown", function () {
+        pages.go(menu, "right");
+    });   
+    
+//    writing_page.go2menu.on("mousedown", function () {
+//        pages.go(menu, "right");
+//    });    
+    
+    
+    
+    alphabet.go2tutorial.on("mousedown", function () {
+        pages.go(tutorial, "up");
+    });    
+    tutorial.go2menu.on("mousedown", function () {
+        pages.go(menu, "right");
+    });    
+    
+    alphabet.go2menu.on("mousedown", function () {
+        pages.go(menu, "right");
+    });    
+    
+    menu.go2guide.on("mousedown", function () {
+        if (game_name=="alpha5" ) pages.go(alphabet, "down");
+        else if (game_name=="read5" ) pages.go(sound_page, "right");
+        else if (game_name=="write5" ) pages.go(alphabet, "right");        
+        
+    });    
+    
+    menu.go2tutorial.on("mousedown", function () {
+        pages.go(tutorial, "left");
+    });  
+    menu.go2pogress.on("mousedown", function () {
+        pages.go(dashboard, "down");
+    });      
+
+    game.go2menu.on("mousedown", function () {
+        clearInterval(game_timer)
+        pages.go(menu, "left");
+    });      
+    
+    game.go2after_game.on("mousedown", function () {
+        pages.go(after_game, "down");
+    });      
+
+    after_game.go2menu.on("mousedown", function () {
+        pages.go(menu, "down");
+    });   
+    
+    dashboard.go2menu.on("mousedown", function () {
+        pages.go(menu, "up");
+    });      
+    
+    //transition from writing menu to start
+    //write_letter_shapes, write_letters, write_words,  page.prepare
+//    writing_menu.go2menu.on("mousedown", function () {
+//        pages.go(menu, "up");
+//    });     
+    
+    writing_page.go2menu.on("mousedown", function () {
+        pages.go(writing_menu, "up");
+    });   
+    
+    writing_menu.write_letters.on("mousedown", function () {
+        writing_menu.prepare("letters")
+        writing_page.i=0
+        writing_page.deploy()
+        pages.go(writing_page, "up");
+    });  
+    writing_menu.write_letter_shapes.on("mousedown", function () {
+        writing_menu.prepare("shapes")
+        writing_page.i=0
+        writing_page.deploy()
+        pages.go(writing_page, "up");
+    });  
+    writing_menu.write_words.on("mousedown", function () {
+        writing_menu.prepare("words")
+        writing_page.i=0
+        writing_page.deploy()
+        pages.go(writing_page, "up");
+    });      
+    
+    
+    
+    //transition from menu to game
+    menu.go2game.on("mousedown", function () {
+        //zog("Hello there")
+        pages.go(game, "right");
+//        if (game_name=="alpha5" ) pages.go(game, "down");
+//        else if (game_name=="read5" ) pages.go(sound_page, "right");
+//        else if (game_name=="write5" ) pages.go(alphabet, "right"); 
+        
+        //start a timer
+        //quiz.duration=60
+        game.timer.text="Timer"
+        game_timer = setInterval(myTimer, 1000);
+        quiz.remaining_time=quiz.duration
+        function myTimer() {
+            quiz.remaining_time-=1
+            n_seconds=quiz.remaining_time%60
+            n_minutes=(quiz.remaining_time-n_seconds)/60
+            n_minutes_str=""+n_minutes
+            n_seconds_str=""+n_seconds
+            if (n_seconds_str.length==1) n_seconds_str="0"+n_seconds_str
+            timer_str=n_minutes_str+":"+n_seconds_str
+            game.timer.text=timer_str
+            if (quiz.remaining_time<=0) {
+                pages.go(after_game, "right");
+                game_ended()
+//                accuracy_100=Math.round(100*quiz.accuracy)
+//                after_game.accuracy_label.text=""+accuracy_100+"%"
+                clearInterval(game_timer)
+            } 
+        }    
+        
+        //Setup accuracy tracking
+        quiz.accuracy=0
+        quiz.n_attempts=0
+        quiz.n_correct=0
+        accuracy_100=Math.round(100*quiz.accuracy)
+        game.accuracy.text=""+accuracy_100+"%"
+        
+        if (game_name=="alpha5" ) gen_shape_questions()
+        else if (game_name=="read5" ) gen_sound_questions()
+        else gen_shape_questions()
+        
+        
+        
+        //gen_sound_questions()
+        console.log(quiz)
+        //starting game
+        //quiz.questions=quiz.questions.slice(0,5) //till we put a timer
+        quiz.i=0
+        cur_q_obj=quiz.questions[quiz.i]
+        game.deploy_q(cur_q_obj)
+        
+        
+    }); 
+    text_fname="txt/arabic_data.json"
+    fetch(text_fname)
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        game_data=data
+        console.log(data)
+        pages.go(splash, "right");
+        gen_shape_questions()
+        console.log(quiz)   
+        alphabet.deploy_list()
+        sound_page.deploy_list()
+        
+        gen_sound_questions()
+        //assets.json_loaded=true;
+        //check_assets_loaded()
+      })       
+
+    
+})
+    </script>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+
+</head>
+
+<body onload="init()">
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+</body>
+</html>
