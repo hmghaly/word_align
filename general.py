@@ -9,6 +9,13 @@ else:
     htmlp = HTMLParser.HTMLParser() #To decode html entities in the tika output
 
 #from difflib import SequenceMatcher
+def unescape(text_with_html_entities):
+  if sys.version_info[0]==3:
+    import html
+    return html.unescape(text_with_html_entities)
+  else:
+    import HTMLParser
+    return HTMLParser.HTMLParser().unescape(text_with_html_entities)
 
 
 from difflib import SequenceMatcher
@@ -138,15 +145,16 @@ def match_seq(list1,list2):
 
 
 #sentence tokenization
-multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."," v."," vs."," v.s.", " et al."," etc."]
+multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."," v."," vs."," v.s.", " et al."," etc.", " al."]
 def ssplit(txt):
-    dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add"]
+    dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
     for dw in dot_words:
         txt=txt.replace(dw+".",dw+"._")
     for mdw in multi_dot_words:
         #mdw_no_dots=mdw.replace(".","_")  
         mdw_no_dots=mdw.replace(".","_")      
         txt=txt.replace(mdw,mdw_no_dots)
+    txt=re.sub(r"\b([A-Z])\. ([A-Z])",r"\1._ \2",txt) #James P. Sullivan
 
     #txt=re.sub("(?u)([\.\?\!\;\u061b])\s",r"\1\n",txt)
     txt=re.sub("(?u)([\.\?\!\;])\s",r"\1\n",txt)
