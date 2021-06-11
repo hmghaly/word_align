@@ -20,8 +20,8 @@ def unescape(text_with_html_entities):
 
 def str2key(str0):
   str0=unescape(str0)
-  str0=str0.strip()
-  str0=re.sub("\W+","_",str0)
+  str0=str0.lower().strip()
+  str0=re.sub("\W+","_",str0).strip("_")
   return str0
 from difflib import SequenceMatcher
 
