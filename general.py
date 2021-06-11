@@ -29,7 +29,9 @@ TAG_RE = re.compile(r'<[^>]+>')
 def remove_tags(text):
   return TAG_RE.sub('', text)
 
-
+def is_alpha(text):
+  removed=re.sub("[\W\d]","",text)
+  return removed!=""
 
 def html_bitext2list(bitext_path):
   fopen=open(bitext_path)
