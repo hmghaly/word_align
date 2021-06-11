@@ -32,7 +32,7 @@ def remove_tags(text):
 
 
 def html_bitext2list(bitext_path):
-  fopen=open(fpath)
+  fopen=open(bitext_path)
   content=fopen.read()
   fopen.close()
   tr_exp=r"<tr\b.*?>"
