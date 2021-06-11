@@ -30,6 +30,40 @@ def remove_tags(text):
   return TAG_RE.sub('', text)
 
 
+
+def html_bitext2list(bitext_path):
+  fopen=open(fpath)
+  content=fopen.read()
+  fopen.close()
+  tr_exp=r"<tr\b.*?>"
+  td_exp=r"<td\b.*?>"
+  all_trs=[]
+  split_content=re.split(tr_exp,content)
+  for sc in split_content[1:]:
+    tr=sc.split("</tr")[0]
+    if tr.count("</td>")!=2: continue
+    tr_split=re.split(td_exp,tr)
+    tds=[]
+    for tr_0 in tr_split[1:]:
+      cur_td=tr_0.split("</td>")[0]
+      cur_td_no_tags=remove_tags(cur_td)
+      tds.append(cur_td_no_tags)
+    #if not "</td>" in tr: continue
+    all_trs.append(tds)
+  return all_trs  
+
+def tsv_bitext2list(tsv_fpath):
+  items=[]
+  fopen=open(tsv_fpath)
+  for line in fopen:
+    line_split=line.strip("\n\r").split("\t")
+    if len(line_split)!=2: continue
+    src,trg=line_split
+    if src.strip()=="" or trg.strip()=="": continue
+    items.append([src,trg])
+  return items
+
+
 stop_words=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', 'couldn', 'didn', 'doesn', 'hadn', 'hasn', 'haven', 'isn', 'ma', 'mightn', 'mustn', 'needn', 'shan', 'shouldn', 'wasn', 'weren', 'won', 'wouldn',"would"]
 alef_lam=u'\u0627\u0644'
 waw=u'\u0648'
