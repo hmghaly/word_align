@@ -70,8 +70,8 @@ class RNN(nn.Module):
       return outs
   def init_hidden(self):
     #return torch.rand(self.num_layers, self.batch_size, self.hidden_size)
-    return (torch.rand(self.num_layers, self.batch_size, self.hidden_size).to(device),
-            torch.rand(self.num_layers, self.batch_size, self.hidden_size).to(device))
+    return (torch.zeros(self.num_layers, self.batch_size, self.hidden_size).to(device),
+            torch.zeros(self.num_layers, self.batch_size, self.hidden_size).to(device))
 
 #Now the functions needed to condition the output/labels
 def one_hot(item0,list0): #e.g. item "I" in list ["B","I","O"] gives [0,1,0]
