@@ -128,6 +128,13 @@ def tok_uc(txt): #basic tokenization of unicode text - removes all punctuation
     txt=re.sub(r"(?u)(\W)",r" \1 ",txt)
     return [v for v in re.split("\s+",txt) if v]
 
+def tok_zh(zh_txt0):
+    tmp_toks=[]
+    for n in re.findall(r'[\u4e00-\u9fff]|[^\u4e00-\u9fff]+', zh_txt0):
+        if len(n.strip())==1: tmp_toks.append(n.strip())
+        else: tmp_toks.extend(tok(n))
+    return tmp_toks
+
 def tok_simple(txt,full=False): #this tokenization scheme splits around punctuation - preserving punctuation as tokens
     #txt=txt.replace(u'\x01'," ")
     
