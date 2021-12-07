@@ -319,13 +319,40 @@ def walk_trie(cur_trie,items,terminal_item=""):
 
 
 #List functions
-def list_in_list(small,large): #retieves the spans of indexes where a small list exists in a big list
+import unicodedata
+def is_punct(token):
+    return unicodedata.category(token[0])[0]=="P"
+
+def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes where a small list exists in a big list
+    mapping_dict=dict(iter([(i0,i0) for i0 in range(len(large))]))
+    if skip_punc:
+        small=[v for v in small if not is_punct(v)]
+        large_toks_indexes=[(i,v) for i,v in enumerate(large) if not is_punct(v)]
+        large=[v[1] for v in large_toks_indexes]
+        large_indexes=[v[0] for v in large_toks_indexes]
+        mapping_dict=dict(iter(enumerate(large_indexes)))
+
     first=small[0]
     ranges=[]
     for idx, item in enumerate(large):
         if large[idx:idx+len(small)]==small:
-            ranges.append((idx,idx+len(small)-1))
+            #range0,range1=idx,idx+len(small)-1
+            range0,range1=idx,idx+len(small)
+            range0,range1=mapping_dict[range0],mapping_dict[range1]
+            ranges.append((range0,range1))
+
+            #ranges.append((idx,idx+len(small)-1))
     return ranges
+def is_in(small,large,skip_punc=True): 
+    return list_in_list(small,large,skip_punc=True)
+
+# def list_in_list(small,large): #retieves the spans of indexes where a small list exists in a big list
+#     first=small[0]
+#     ranges=[]
+#     for idx, item in enumerate(large):
+#         if large[idx:idx+len(small)]==small:
+#             ranges.append((idx,idx+len(small)-1))
+#     return ranges
 
 
 # ============= variable Storage (Pickling)
