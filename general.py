@@ -336,8 +336,8 @@ def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes whe
     ranges=[]
     for idx, item in enumerate(large):
         if large[idx:idx+len(small)]==small:
-            #range0,range1=idx,idx+len(small)-1
-            range0,range1=idx,idx+len(small)
+            range0,range1=idx,idx+len(small)-1
+            #range0,range1=idx,idx+len(small)
             range0,range1=mapping_dict[range0],mapping_dict[range1]
             ranges.append((range0,range1))
 
