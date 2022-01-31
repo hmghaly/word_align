@@ -85,7 +85,38 @@ def index_bitext(bitext_fpath,ignore_punc=True):
   trg_inverted=dict(iter(trg_grouped))
   return src_inverted, trg_inverted, all_src_sentences, all_trg_sentences
 
-
+class indexing: #get a list of sentences, outputs indexes
+  def __init__(self,raw_sentences0,tok_function=tok, lang="en",stop_words=[], ignore_punc=False,ignore_ar_pre_suf=False,remove_al=True,index_words=True,lower=True,stemming=False):
+    self.fwd_index=[]
+    self.all_tok_sentences=[]
+    self.all_tok_original_sentences=[]
+    self.all_mappings=[]
+    self.inv_index={}
+    for sent_i,sent0 in enumerate(raw_sentences0):
+      #if lower: sent0=sent0.lower()
+      tokens=tok_function(sent0)
+      tokens_original=list(tokens)
+      tokens_copy_enum=[(i,v) for i,v in enumerate(tokens_original)]
+      self.all_tok_original_sentences.append(tokens_original)
+      
+      #if lang=="ar": tokens=tok_ar(tokens,count_dict) #tok_ar(tokens)
+      if ignore_punc: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not is_punct(v)]
+      if ignore_ar_pre_suf: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not v.startswith("ـ") and not v.endswith("ـ")]
+      if stop_words: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not v.lower() in stop_words]
+      if remove_al: tokens_copy_enum=[(i,v.replace("ال_","")) for i,v in tokens_copy_enum if not v.lower() in stop_words]
+      tokens=[v[1] for v in tokens_copy_enum]
+      cur_mapping=[v[0] for v in tokens_copy_enum] #mapping of token locations to original after excluding some elements
+      self.all_mappings.append(cur_mapping)
+      
+      tokens_lower=[v.lower() for v in tokens]
+      if lower: enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens_lower)]
+      else: enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens)]
+      self.all_tok_sentences.append(tokens)
+      self.fwd_index.extend(enumerated_toks)
+    self.fwd_index.sort()
+    grouped=[(key,[v[1:] for v in list(group)]) for key,group in groupby(self.fwd_index,lambda x:x[0])]
+    self.inv_index=dict(iter(grouped))
+    
 def rtrv_idx(tokens,idx_dict): #get the indexes of a phrase - we can extend it to as many tokens as we want
     cur_indexes=idx_dict.get(tokens[0],[])
     for ti,ta in enumerate(tokens[1:]):
