@@ -93,7 +93,7 @@ class indexing: #get a list of sentences, outputs indexes
     self.all_mappings=[]
     self.inv_index={}
     for sent_i,sent0 in enumerate(raw_sentences0):
-      #if lower: sent0=sent0.lower()
+      if sent_i%5000==0: print(sent_i)
       tokens=tok_function(sent0)
       tokens_original=list(tokens)
       tokens_copy_enum=[(i,v) for i,v in enumerate(tokens_original)]
