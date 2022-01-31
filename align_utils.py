@@ -86,7 +86,7 @@ def index_bitext(bitext_fpath,ignore_punc=True):
   return src_inverted, trg_inverted, all_src_sentences, all_trg_sentences
 
 class indexing: #get a list of sentences, outputs indexes
-  def __init__(self,raw_sentences0,tok_function=tok, lang="en",stop_words=[], ignore_punc=False,ignore_ar_pre_suf=False,remove_al=True,index_words=True,lower=True,stemming=False):
+  def __init__(self,raw_sentences0,tok_function, lang="en",stop_words=[], ignore_punc=False,ignore_ar_pre_suf=False,remove_al=True,index_words=True,lower=True,stemming=False):
     self.fwd_index=[]
     self.all_tok_sentences=[]
     self.all_tok_original_sentences=[]
