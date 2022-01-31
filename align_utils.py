@@ -108,9 +108,9 @@ class indexing: #get a list of sentences, outputs indexes
       cur_mapping=[v[0] for v in tokens_copy_enum] #mapping of token locations to original after excluding some elements
       self.all_mappings.append(cur_mapping)
       
-      tokens_lower=[v.lower() for v in tokens]
-      if lower: enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens_lower)]
-      else: enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens)]
+      #tokens_lower=[v.lower() for v in tokens]
+      if lower: tokens=[v.lower() for v in tokens] #enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens_lower)]
+      enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens)]
       self.all_tok_sentences.append(tokens)
       self.fwd_index.extend(enumerated_toks)
     self.fwd_index.sort()
