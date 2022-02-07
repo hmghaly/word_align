@@ -321,8 +321,11 @@ def walk_trie(cur_trie,items,terminal_item=""):
 #List functions
 import unicodedata
 def is_punct(token):
-    if len(token)==0: return True	
-    return unicodedata.category(token[0])[0]=="P"
+    if len(token)==0: return True
+    unicode_check=unicodedata.category(token[0])
+    if len(unicode_check)>0: return unicode_check[0]=="P"
+    print(token, unicode_check)
+    return True
 
 def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes where a small list exists in a big list
     mapping_dict=dict(iter([(i0,i0) for i0 in range(len(large))]))
