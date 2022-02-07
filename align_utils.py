@@ -19,8 +19,12 @@ excluded_trg_tokens=["من","على","في","مع", "إلى","له","تم","إل
 
 from itertools import groupby
 import unicodedata
-# def is_punct(token):
-#   return unicodedata.category(token[0])[0]=="P"
+def is_punct(token):
+    if len(token)==0: return True
+    unicode_check=unicodedata.category(token[0])
+    if len(unicode_check)>0: return unicode_check[0]=="P"
+    print(token, unicode_check)
+    return True
 
 
 #Word Alignmnet pipeline
