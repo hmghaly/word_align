@@ -167,7 +167,7 @@ def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a 
     txt=txt.replace("'s ","_s ")
     txt=txt.replace("'re ","_re ")
     txt=txt.replace("can't ","cann_t ")
-    txt=txt.replace("cannot ","can not")
+    txt=txt.replace("cannot ","can not ")
     txt=txt.replace("n't ","n_t ")
     txt=re.sub("(?u)(\W)",r" \1 ", txt)
     txt=txt.replace("_s ", " 's ")
