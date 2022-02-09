@@ -89,6 +89,18 @@ def index_bitext(bitext_fpath,ignore_punc=True):
   trg_inverted=dict(iter(trg_grouped))
   return src_inverted, trg_inverted, all_src_sentences, all_trg_sentences
 
+def filter_tokens(token_list0, lang="en",stop_words=[], ignore_punc=False,ignore_ar_pre_suf=False,remove_al=True,index_words=True,lower=True,stemming=False):
+  tokens_original=list(token_list0)
+  tokens_copy_enum=[(i,v) for i,v in enumerate(tokens_original)]   
+  #if lang=="ar": tokens=tok_ar(tokens,count_dict) #tok_ar(tokens)
+  if ignore_punc: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not is_punct(v)]
+  if ignore_ar_pre_suf: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not v.startswith("ـ") and not v.endswith("ـ")]
+  if stop_words: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not v.lower() in stop_words]
+  if remove_al: tokens_copy_enum=[(i,v.replace("ال_","")) for i,v in tokens_copy_enum if not v.lower() in stop_words]
+  tokens_out=[v[1] for v in tokens_copy_enum]
+  if lower: tokens_out=[v.lower() for v in tokens_out]
+  cur_mapping=[v[0] for v in tokens_copy_enum]
+  return tokens_out,cur_mapping
 
 class indexing: #get a list of sentences, outputs indexes
   def __init__(self,raw_sentences0,tok_function, lang="en",stop_words=[], ignore_punc=False,ignore_ar_pre_suf=False,remove_al=True,index_words=True,lower=True,stemming=False):
@@ -100,21 +112,22 @@ class indexing: #get a list of sentences, outputs indexes
     for sent_i,sent0 in enumerate(raw_sentences0):
       if sent_i%5000==0: print(sent_i)
       tokens=tok_function(sent0)
-      tokens_original=list(tokens)
-      tokens_copy_enum=[(i,v) for i,v in enumerate(tokens_original)]
-      self.all_tok_original_sentences.append(tokens_original)
+#       tokens_original=list(tokens)
+#       tokens_copy_enum=[(i,v) for i,v in enumerate(tokens_original)]
+#       self.all_tok_original_sentences.append(tokens_original)
       
-      #if lang=="ar": tokens=tok_ar(tokens,count_dict) #tok_ar(tokens)
-      if ignore_punc: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not is_punct(v)]
-      if ignore_ar_pre_suf: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not v.startswith("ـ") and not v.endswith("ـ")]
-      if stop_words: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not v.lower() in stop_words]
-      if remove_al: tokens_copy_enum=[(i,v.replace("ال_","")) for i,v in tokens_copy_enum if not v.lower() in stop_words]
-      tokens=[v[1] for v in tokens_copy_enum]
-      cur_mapping=[v[0] for v in tokens_copy_enum] #mapping of token locations to original after excluding some elements
+#       #if lang=="ar": tokens=tok_ar(tokens,count_dict) #tok_ar(tokens)
+#       if ignore_punc: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not is_punct(v)]
+#       if ignore_ar_pre_suf: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not v.startswith("ـ") and not v.endswith("ـ")]
+#       if stop_words: tokens_copy_enum=[(i,v) for i,v in tokens_copy_enum if not v.lower() in stop_words]
+#       if remove_al: tokens_copy_enum=[(i,v.replace("ال_","")) for i,v in tokens_copy_enum if not v.lower() in stop_words]
+#       tokens=[v[1] for v in tokens_copy_enum]
+#       cur_mapping=[v[0] for v in tokens_copy_enum] #mapping of token locations to original after excluding some elements
+      tokens,cur_mapping=filter_tokens(tokens, lang,stop_words, ignore_punc,ignore_ar_pre_suf,remove_al,index_words,lower,stemming)
       self.all_mappings.append(cur_mapping)
       
       #tokens_lower=[v.lower() for v in tokens]
-      if lower: tokens=[v.lower() for v in tokens] #enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens_lower)]
+      #if lower: tokens=[v.lower() for v in tokens] #enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens_lower)]
       enumerated_toks=[(v,sent_i,s_i) for s_i,v in enumerate(tokens)]
       self.all_tok_sentences.append(tokens)
       self.fwd_index.extend(enumerated_toks)
