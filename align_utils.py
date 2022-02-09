@@ -89,6 +89,7 @@ def index_bitext(bitext_fpath,ignore_punc=True):
   trg_inverted=dict(iter(trg_grouped))
   return src_inverted, trg_inverted, all_src_sentences, all_trg_sentences
 
+
 class indexing: #get a list of sentences, outputs indexes
   def __init__(self,raw_sentences0,tok_function, lang="en",stop_words=[], ignore_punc=False,ignore_ar_pre_suf=False,remove_al=True,index_words=True,lower=True,stemming=False):
     self.fwd_index=[]
@@ -132,11 +133,12 @@ def rtrv_idx(tokens,idx_dict): #get the indexes of a phrase - we can extend it t
     cur_indexes=sorted(list(set(cur_indexes)))
     return cur_indexes
 
-def idx_match(idx1,idx2): #This function is to give a ratio of matching between the inverted indexes for two words
+def idx_match(idx1,idx2,min_common=5): #This function is to give a ratio of matching between the inverted indexes for two words
     if len(idx1)==0 or len(idx2)==0: return 0
     intersection=len(list(set(idx1).intersection(set(idx2))))
     union=len(idx1)+len(idx2)-intersection
     if union==0: return 0
+    if intersection<min_common: return 0    
     return float(intersection)/union
 
 def match_sentences_indexes(cur_src,cur_trg,src_inverted_index,trg_inverted_index):
