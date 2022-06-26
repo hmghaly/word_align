@@ -89,7 +89,7 @@ def index_bitext(bitext_fpath,ignore_punc=True):
   trg_inverted=dict(iter(trg_grouped))
   return src_inverted, trg_inverted, all_src_sentences, all_trg_sentences
 
-def filter_tokens(token_list0, lang="en",stop_words=[], ignore_punc=False,ignore_ar_pre_suf=False,remove_al=True,index_words=True,lower=True,stemming=False):
+def filter_tokens_OLD(token_list0, lang="en",stop_words=[], ignore_punc=False,ignore_ar_pre_suf=False,remove_al=True,index_words=True,lower=True,stemming=False):
   tokens_original=list(token_list0)
   tokens_copy_enum=[(i,v) for i,v in enumerate(token_list0)]   
   #if lang=="ar": tokens=tok_ar(tokens,count_dict) #tok_ar(tokens)
