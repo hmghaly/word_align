@@ -484,6 +484,48 @@ def get_key(txt): #normalize text by replacing non alpha items with _
   txt=txt.strip("_")
   return txt.lower()
 
+def encode_num(int_number,size=6,base=128):
+  num=int_number
+  encoded=""
+  while num>0:
+    div,rem=(int(num/base), num%base)
+    our_char=chr(rem)#.encode("utf-8")
+    num=div
+    encoded+=our_char
+  encoded+=chr(0)*(size-len(encoded))
+  return encoded
+
+def decode_num(encoded_str,base=128):
+  total=0
+  for i,c in enumerate(encoded_str):
+    total+=ord(c)*base**i
+  return total
+
+def number_file_lines(main_file_path,numbering_file_path):
+  if sys.version[0]=="2": file_locs_fopen=open(numbering_file_path,"w")
+  else: file_locs_fopen=open(numbering_file_path,"w",newline="")
+  
+  main_fopen=open(main_file_path,"r")
+  #i_=0
+  while True:
+    loc=main_fopen.tell()
+    line=main_fopen.readline()
+    encoded_loc=encode_num(loc)
+    file_locs_fopen.write(encoded_loc)
+    if line=="": break
+
+  main_fopen.close()
+  file_locs_fopen.close()
+
+def get_line(line_num, main_file_obj,locs_file_obj,str_size=6):
+  lookup_i=line_num*str_size
+  locs_file_obj.seek(lookup_i)
+  chars=locs_file_obj.read(str_size)
+  file_loc=decode_num(chars)
+  main_file_obj.seek(file_loc)
+  file_line=main_file_obj.readline()
+  return file_line
+
 if __name__=="__main__":
     print("Hello!")
     our_trie={}
