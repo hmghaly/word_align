@@ -4,7 +4,7 @@ import re
 
 
 if sys.version[0]=="3": 
-    import _pickle as cPickle
+    import pickle
     from html.parser import HTMLParser
     htmlp = HTMLParser() #To decode html entities in the tika output
 else: 
