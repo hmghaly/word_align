@@ -484,6 +484,13 @@ def get_key(txt): #normalize text by replacing non alpha items with _
   txt=txt.strip("_")
   return txt.lower()
 
+def file_len(fpath0): #get the number of lines in the cache file
+  if not os.path.exists(fpath0): return 0
+  with open(fpath0) as fopen:
+    for i0,f0 in enumerate(fopen): pass
+  return i0+1
+
+
 def encode_num(int_number,size=6,base=128):
   num=int_number
   encoded=""
