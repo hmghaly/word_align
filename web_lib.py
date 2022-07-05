@@ -57,7 +57,9 @@ class DOM:
       inter_text=self.content[start_i:tag_start] #intervening text since last tag
       last_open_tag=open_tags[-1]
       if len(inter_text)>0:
-        if not last_open_tag in ["script","style"]: self.text_items.append(inter_text)
+        if not last_open_tag.lower().split("_")[0] in ["script","style","noscript"]: 
+          inter_text_stripped=inter_text.strip('\r\n\t ').replace("&times;","")
+          if inter_text_stripped!="": self.text_items.append(inter_text)
         text_node_count=tag_counter_dict.get("text_node",0)
         text_node_id="text_node_%s"%text_node_count
         tag_counter_dict["text_node"]=text_node_count+1
@@ -132,7 +134,9 @@ class DOM:
         self.tag_dict[assigned_tag_id]=cur_el
         for cls0 in cur_class_list:
           self.class_id_dict[cls0]=self.class_id_dict.get(cls0,[])+[assigned_tag_id]
-          
+    self.text_items="".join(self.text_items).split("<br>")
+    self.text_items=[v for v in self.text_items if v]
+
   def get_html(self,assigned_tag_id0,html_content0=''):
     cur_el=self.tag_dict.get(assigned_tag_id0)
     if cur_el==None: return html_content0
@@ -212,6 +216,9 @@ class DOM:
       new_content=new_content.replace(a,b)
     return new_content
 
+
+  
+#End class  
 def create_open_tag(tag_name0,tag_attrs0={},self_closing=False):
   attr_items=[]
   for a,b in tag_attrs0.items():
