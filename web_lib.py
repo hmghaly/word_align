@@ -194,6 +194,16 @@ class DOM:
         repl_pairs.extend(self.apply_content_by_id(key0[1:],new_content0,new_attrs0))
       elif key0.startswith("."):
         repl_pairs.extend(self.apply_content_by_class(key0[1:],new_content0,new_attrs0))
+      elif key0=="title":
+        found_title=re.findall('(?i)<title.+?/title>',self.content)
+        new_title="<title>"+new_content0+"</title>" 
+        if len(found_title)>0: repl_pairs.append((found_title[0],new_title))
+      elif key0=="description":
+        found_description=re.findall('(?i)<meta name="description".+?>',self.content)
+        new_description='<meta name="description" content="%s">'%new_content0
+        if len(found_description)>0: repl_pairs.append((found_description[0],new_description))
+
+      #   old_title=re.findall('(?i)<title.+?/title>')
     return repl_pairs
   def replace(self,repl_dict0):
     new_content=str(self.content)
@@ -201,11 +211,6 @@ class DOM:
     for a,b in cur_repl_pairs:
       new_content=new_content.replace(a,b)
     return new_content
-  # def get_title(self):
-  #   title_str=""
-  #   title_el=self.tag_dict.get("title_0")
-  #   if title_el!=None: title_str= title_el.inner_html
-  #   return title_str
 
 def create_open_tag(tag_name0,tag_attrs0={},self_closing=False):
   attr_items=[]
@@ -215,8 +220,6 @@ def create_open_tag(tag_name0,tag_attrs0={},self_closing=False):
   if self_closing: final_open_tag='<%s %s/>'%(tag_name0,attr_str)
   else: final_open_tag='<%s %s>'%(tag_name0,attr_str)
   return final_open_tag
-
-
 def read_page(url, timeout0=5): #return requests obj
   op=requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout0)
   return op
