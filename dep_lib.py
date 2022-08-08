@@ -5,6 +5,26 @@ import itertools
 random.seed(0)
 
 
+def get_conll(sent_input):
+  #nlp = spacy.load("en_core_web_sm")
+  #if type(sent_input) is list: nlp.tokenizer=nlp.tokenizer.tokens_from_list
+  doc = nlp(sent_input)
+  conll_2d=[]
+  for token in doc:	
+    token_i = token.i+1
+    if token.i==token.head.i: head_i=0
+    else: head_i = token.head.i+1
+    items=[token_i,token.text, token.lemma_, token.tag_, token.pos_, "_", head_i, token.dep_,"_","_"]
+    conll_2d.append(items)
+  return conll_2d
+
+def get_pos_tags(sent_input):
+  doc = nlp(sent_input)
+  tmp_pos_tags=[]
+  for token in doc: tmp_pos_tags.append(token.tag_)
+  return tmp_pos_tags
+
+
 def consctv(list1): #to split a group of items into subgroups of contiguous/consecutive items
     grouped=[[v[1] for v in group] for key,group in groupby(enumerate(list1),lambda x:x[1]-x[0])]
     return grouped
@@ -1117,6 +1137,8 @@ test2="""
 
 if __name__ == "__main__":
 	#print("dep lib")
+	import spacy
+	nlp = spacy.load("en_core_web_sm")
 
 	# conll_obj=conll(cur_conll5)
 
