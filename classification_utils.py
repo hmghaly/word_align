@@ -43,12 +43,13 @@ def get_doc_vector(doc_fpath,wv_model):
   words=utils.simple_preprocess(content)
   return get_words_vector(words,wv_model)
 
-def get_words_vector(words,wv_model,excluded_words=[]):
+def get_words_vector(words,wv_model,excluded_words=[],top_n=500):
   wd_counter=Counter(words)
   flag=False
   total_count0=0
   wd_vector_dict={}
-  for wd0,wd0_n in wd_counter.items():
+  for wd0,wd0_n in wd_counter.most_common(top_n):
+  #for wd0,wd0_n in wd_counter.items():
     if wd0 in excluded_words: continue
     try: cur_vec0=wv_model[wd0]
     except: continue
