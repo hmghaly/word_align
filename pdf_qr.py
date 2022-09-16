@@ -30,7 +30,7 @@ def gen_pdf(pdf_fpath0,pdf_content0): #content is a list of items per page
   Story=[]  
   for cur_items in pdf_content0:
     for item0 in cur_items:
-      print(item0)
+      #print(item0)
       if item0.get("type")=="image":
         im = Image(item0["src"], item0.get("width",2)*inch, item0.get("height",2)*inch)
         Story.append(im)
