@@ -23,5 +23,18 @@ def get_wb_sheet_list(path1,sheet1,key_col1,val_col1):
   sheet_key_val_list1=get_sheet_list(sheet_obj1,key_col1,val_col1)
   return sheet_key_val_list1
 
+def get_xls_sheet_col_data(xls_fpath0,sheet_name0,col_names0,default_val0=0.,exclude_nan=False):
+  wb_obj0=get_workbook_obj(xls_fpath0)
+  pd_frame0=wb_obj0[sheet_name0]
+  all_col_data=[]
+  for index0,row_dict0 in pd_frame0.iterrows():
+    cur_list=[row_dict0.get(v,default_val0) for v in col_names0]
+    valid_row=True
+    for cl in cur_list: 
+      if exclude_nan and math.isnan(cl): valid_row=False
+    if not valid_row: continue
+    all_col_data.append(cur_list)
+  return all_col_data  
+
 if __name__=="__main__":
   print("Hello")
