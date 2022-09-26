@@ -116,6 +116,7 @@ def get_words_vector_test(words,wv_model,excluded_words=[]):
 
 #cosine similarity between word vectors
 def cos_sim(vector1,vector2):
+  if len(vector1)==0 or len(vector2)==0: return 0
   result = 1 - spatial.distance.cosine(vector1, vector2)
   return result
 
