@@ -154,7 +154,9 @@ def tok_simple(txt,full=False): #this tokenization scheme splits around punctuat
     out=re.split("\s+",txt)
     return [v for v in out if v]
 
-def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
+
+
+def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
     replaced=[]
     if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
     if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
@@ -199,11 +201,43 @@ def match_seq(list1,list2):
             output.append((cur_a,cur_b))
     return output
 
+#Word tokenization and sentence tokenization
+
+multi_dot_words=["e.g.","i.e.","u.s.a.","u.k.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
+dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
+
+def tok(text0): #sep 2022
+  non_space=text0.split() #simple split by space
+  all_tokens0=[]
+  for a in non_space:
+    leading0,trailing0="","" #get the leading and trailing non-alpha characters
+    max_val=min(len(a),3) #iterating a number of characters from the beginning and end of token
+    for i0 in range(1,max_val+1): 
+      if not a[-i0].isalnum():trailing0=a[-i0]+trailing0
+      else: break
+    for i0 in range(0,max_val): 
+      if not a[i0].isalnum():leading0+=a[i0]
+      else: break
+    main=a[len(leading0):len(a)-len(trailing0)]
+    main_trailing=main+trailing0 #combine main part of the token with the 
+    add_space_after,add_space_before=True,True #if we need to add space  between lead/main/trailing parts
+    if leading0!="" and leading0 in "#@": add_space_after=False #keep hashtags and mentions
+    if main in dot_words or main_trailing.lower() in multi_dot_words: add_space_before=False #things like e.g. U.S.A.
+    if main.isdigit() and trailing0 in ".-)(": add_space_before=False #For things like 1. 2) 
+    if len(main)==1: add_space_before=False #and A. B.
+    cur_items_str="" #start building the string
+    if leading0!="": cur_items_str+=" ".join(list(leading0)) #split the leading chars, add them to final str
+    if add_space_after: cur_items_str+=" " #if there is a space between leading and main
+    cur_items_str+=main #add the main part
+    if add_space_before: cur_items_str+=" " #if there is space between main and trailing
+    if trailing0!="": cur_items_str+=" ".join(list(trailing0)) #split trailing chars and add them
+    all_tokens0.extend(cur_items_str.split()) #split the final string and add it to the list of tokens
+  return all_tokens0
 
 #sentence tokenization
-multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."," v."," vs."," v.s.", " et al."," etc.", " al."]
+#multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."," v."," vs."," v.s.", " et al."," etc.", " al."]
 def ssplit(txt):
-    dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
+    #dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
     for dw in dot_words:
         txt=txt.replace(dw+".",dw+"._")
     for mdw in multi_dot_words:
