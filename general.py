@@ -21,6 +21,55 @@ def unescape(text_with_html_entities):
     import HTMLParser
     return HTMLParser.HTMLParser().unescape(text_with_html_entities)
 
+##################### LISTS ###########################
+#advanced list operations
+def flatten(l):
+  return [item for sublist in l for item in sublist]
+
+def split_train_test(all_data0,train_ratio=0.8):
+  train_size=int(len(all_data0)*train_ratio)
+  train_set0,tes_set0=all_data0[:train_size],all_data0[train_size:]
+  return train_set0,tes_set0
+
+def transpose(list1):
+  return list(map(list, zip(*list1)))
+
+def interval_split(list1,n_intervals): #gets the boundaries between segments when dividing a list into n intervals 
+  interval_size=int(len(list1)/(n_intervals-1))
+  boundary_elements=[]
+  for i0 in range(n_intervals-1):
+    cur_i=i0*interval_size
+    cur_el=list1[cur_i]
+    boundary_elements.append(cur_el)
+    #print(cur_i,cur_el)
+  boundary_elements=sorted(list(set(boundary_elements)))
+  return boundary_elements
+
+def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes where a small list exists in a big list
+    mapping_dict=dict(iter([(i0,i0) for i0 in range(len(large))]))
+    if skip_punc:
+        small=[v for v in small if not is_punct(v)]
+        if small==[]: return []
+        large_toks_indexes=[(i,v) for i,v in enumerate(large) if not is_punct(v)]
+        large=[v[1] for v in large_toks_indexes]
+        large_indexes=[v[0] for v in large_toks_indexes]
+        mapping_dict=dict(iter(enumerate(large_indexes)))
+
+    first=small[0]
+    ranges=[]
+    for idx, item in enumerate(large):
+        if large[idx:idx+len(small)]==small:
+            range0,range1=idx,idx+len(small)-1
+            #range0,range1=idx,idx+len(small)
+            range0,range1=mapping_dict[range0],mapping_dict[range1]
+            ranges.append((range0,range1))
+
+            #ranges.append((idx,idx+len(small)-1))
+    return ranges
+def is_in(small,large,skip_punc=True): 
+    return list_in_list(small,large,skip_punc=True)
+
+####################### STRINGS ###########################
 
 def str2key(str0):
   str0=unescape(str0)
@@ -36,60 +85,6 @@ def remove_tags(text):
 def is_alpha(text):
   removed=re.sub("[\W\d]","",text)
   return removed!=""
-
-def html_bitext2list(bitext_path):
-  fopen=open(bitext_path)
-  content=fopen.read()
-  fopen.close()
-  tr_exp=r"<tr\b.*?>"
-  td_exp=r"<td\b.*?>"
-  all_trs=[]
-  split_content=re.split(tr_exp,content)
-  for sc in split_content[1:]:
-    tr=sc.split("</tr")[0]
-    if tr.count("</td>")!=2: continue
-    tr_split=re.split(td_exp,tr)
-    tds=[]
-    for tr_0 in tr_split[1:]:
-      cur_td=tr_0.split("</td>")[0]
-      cur_td_no_tags=remove_tags(cur_td)
-      tds.append(cur_td_no_tags)
-    #if not "</td>" in tr: continue
-    all_trs.append(tds)
-  return all_trs  
-
-def tsv_bitext2list(tsv_fpath):
-  items=[]
-  fopen=open(tsv_fpath)
-  for line in fopen:
-    line_split=line.strip("\n\r").split("\t")
-    if len(line_split)!=2: continue
-    src,trg=line_split
-    if src.strip()=="" or trg.strip()=="": continue
-    items.append([src,trg])
-  return items
-
-
-stop_words=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', 'couldn', 'didn', 'doesn', 'hadn', 'hasn', 'haven', 'isn', 'ma', 'mightn', 'mustn', 'needn', 'shan', 'shouldn', 'wasn', 'weren', 'won', 'wouldn',"would"]
-alef_lam=u'\u0627\u0644'
-waw=u'\u0648'
-ba2=u'\u0628'
-lam=u'\u0644'
-kaf=u'\u0643'
-ta2=u'\u062a'
-qaf=u'\u0642'
-ya2=u'\u064a'
-alef_hamza=u'\u0623'
-alef_kasra=u'\u0625'
-alef=u'\u0627'
-
-#print "testing"
-
-def read(fpath):
-	file_open=open(fpath)
-	content=file_open.read()
-	file_open.close()
-	return content
 
 #string/text/unicode functions
 # Converting any string or list of strings into unicode    
@@ -110,97 +105,26 @@ def utf(w):
         output=w
     return output
 
-
-def match_seq(list1,list2):
-    output=[]
-    s = SequenceMatcher(None, list1, list2)
-    blocks=s.get_matching_blocks()
-    for bl in blocks:
-        #print(bl, bl.a, bl.b, bl.size)
-        for bi in range(bl.size):
-            cur_a=bl.a+bi
-            cur_b=bl.b+bi
-            output.append((cur_a,cur_b))
-    return output
-
 # Normalizing Unicode String
 def norm_unicode(s):
    return ''.join((c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn'))
 
-#different tokenization schemes
-def tok_uc(txt): #basic tokenization of unicode text - removes all punctuation
-    txt=re.sub(r"(?u)(\W)",r" \1 ",txt)
-    return [v for v in re.split("\s+",txt) if v]
-
-def tok_zh(zh_txt0):
-    tmp_toks=[]
-    for n in re.findall(r'[\u4e00-\u9fff]|[^\u4e00-\u9fff]+', zh_txt0):
-        if len(n.strip())==1: tmp_toks.append(n.strip())
-        else: tmp_toks.extend(tok(n))
-    return tmp_toks
-
-def tok_simple(txt,full=False): #this tokenization scheme splits around punctuation - preserving punctuation as tokens
-    #txt=txt.replace(u'\x01'," ")
-    
-    if full: txt=re.sub("(?u)(\W)",r" \1 ", txt)
-    else: 
-        txt=txt.replace("://","__url__")
-        txt=re.sub("^(\W)",r" \1 ", txt)
-        txt=re.sub("(\W)$",r" \1 ", txt)	
-        txt=re.sub("\s(\W)",r" \1 ", txt)
-        txt=re.sub("(\W)\s",r" \1 ", txt)
-        txt=re.sub("(\W)(\W)",r" \1 \2", txt)	
-        txt=txt.replace("__url__","://")	
-    out=re.split("\s+",txt)
-    return [v for v in out if v]
+import unicodedata
+def is_punct(token):
+    if len(token)==0: return True
+    unicode_check=unicodedata.category(token[0])
+    if len(unicode_check)>0: return unicode_check[0]=="P"
+    print(token, unicode_check)
+    return True
 
 
-
-def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
-    replaced=[]
-    if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
-    if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
-    #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
-    repl_dict={}
-    for i0,u0 in enumerate(replaced):
-        key="__item%s__"%i0
-        repl_dict[key]=u0
-        txt=txt.replace(u0,key)
-
-    #txt=txt.replace(u'\x01'," ")
-    txt=txt.replace(u'\u2019',"'")
-    
-    txt=txt.replace("'s ","_s ")
-    txt=txt.replace("'re ","_re ")
-    txt=txt.replace("can't ","cann_t ")
-    txt=txt.replace("cannot ","can not ")
-    txt=txt.replace("n't ","n_t ")
-    txt=re.sub("(?u)(\W)",r" \1 ", txt)
-    txt=txt.replace("_s ", " 's ")
-    txt=txt.replace("_re "," 're ")
-    txt=txt.replace("n_t "," n't ")
-    for a,b in repl_dict.items():
-        txt=txt.replace(a,b)
-    
-    out=re.split("\s+",txt)
-    return [v for v in out if v]
+def get_key(txt): #normalize text by replacing non alpha items with _
+  txt=re.sub("\W+","_",txt)
+  txt=txt.strip("_")
+  return txt.lower()
 
 
-
-
-
-def match_seq(list1,list2):
-    output=[]
-    s = SequenceMatcher(None, list1, list2)
-    blocks=s.get_matching_blocks()
-    for bl in blocks:
-        #print(bl, bl.a, bl.b, bl.size)
-        for bi in range(bl.size):
-            cur_a=bl.a+bi
-            cur_b=bl.b+bi
-            output.append((cur_a,cur_b))
-    return output
-
+####################### TOKENIZATION ####################
 #Word tokenization and sentence tokenization
 
 multi_dot_words=["e.g.","i.e.","u.s.a.","u.k.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
@@ -284,9 +208,114 @@ def split_sents(segs): #if we have already a list of segments, split each into s
             sents.append((seg_id,ls))
     return sents
 
+#different tokenization schemes
+def tok_uc(txt): #basic tokenization of unicode text - removes all punctuation
+    txt=re.sub(r"(?u)(\W)",r" \1 ",txt)
+    return [v for v in re.split("\s+",txt) if v]
+
+def tok_zh(zh_txt0):
+    tmp_toks=[]
+    for n in re.findall(r'[\u4e00-\u9fff]|[^\u4e00-\u9fff]+', zh_txt0):
+        if len(n.strip())==1: tmp_toks.append(n.strip())
+        else: tmp_toks.extend(tok(n))
+    return tmp_toks
+
+def tok_simple(txt,full=False): #this tokenization scheme splits around punctuation - preserving punctuation as tokens
+    #txt=txt.replace(u'\x01'," ")
+    
+    if full: txt=re.sub("(?u)(\W)",r" \1 ", txt)
+    else: 
+        txt=txt.replace("://","__url__")
+        txt=re.sub("^(\W)",r" \1 ", txt)
+        txt=re.sub("(\W)$",r" \1 ", txt)	
+        txt=re.sub("\s(\W)",r" \1 ", txt)
+        txt=re.sub("(\W)\s",r" \1 ", txt)
+        txt=re.sub("(\W)(\W)",r" \1 \2", txt)	
+        txt=txt.replace("__url__","://")	
+    out=re.split("\s+",txt)
+    return [v for v in out if v]
 
 
 
+def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
+    replaced=[]
+    if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
+    if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
+    #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
+    repl_dict={}
+    for i0,u0 in enumerate(replaced):
+        key="__item%s__"%i0
+        repl_dict[key]=u0
+        txt=txt.replace(u0,key)
+
+    #txt=txt.replace(u'\x01'," ")
+    txt=txt.replace(u'\u2019',"'")
+    
+    txt=txt.replace("'s ","_s ")
+    txt=txt.replace("'re ","_re ")
+    txt=txt.replace("can't ","cann_t ")
+    txt=txt.replace("cannot ","can not ")
+    txt=txt.replace("n't ","n_t ")
+    txt=re.sub("(?u)(\W)",r" \1 ", txt)
+    txt=txt.replace("_s ", " 's ")
+    txt=txt.replace("_re "," 're ")
+    txt=txt.replace("n_t "," n't ")
+    for a,b in repl_dict.items():
+        txt=txt.replace(a,b)
+    
+    out=re.split("\s+",txt)
+    return [v for v in out if v]
+
+
+######################## BITEXTS ########################
+
+def html_bitext2list(bitext_path):
+  fopen=open(bitext_path)
+  content=fopen.read()
+  fopen.close()
+  tr_exp=r"<tr\b.*?>"
+  td_exp=r"<td\b.*?>"
+  all_trs=[]
+  split_content=re.split(tr_exp,content)
+  for sc in split_content[1:]:
+    tr=sc.split("</tr")[0]
+    if tr.count("</td>")!=2: continue
+    tr_split=re.split(td_exp,tr)
+    tds=[]
+    for tr_0 in tr_split[1:]:
+      cur_td=tr_0.split("</td>")[0]
+      cur_td_no_tags=remove_tags(cur_td)
+      tds.append(cur_td_no_tags)
+    #if not "</td>" in tr: continue
+    all_trs.append(tds)
+  return all_trs  
+
+def tsv_bitext2list(tsv_fpath):
+  items=[]
+  fopen=open(tsv_fpath)
+  for line in fopen:
+    line_split=line.strip("\n\r").split("\t")
+    if len(line_split)!=2: continue
+    src,trg=line_split
+    if src.strip()=="" or trg.strip()=="": continue
+    items.append([src,trg])
+  return items
+
+###################### ARABIC - CLEANING ####################
+stop_words=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', 'couldn', 'didn', 'doesn', 'hadn', 'hasn', 'haven', 'isn', 'ma', 'mightn', 'mustn', 'needn', 'shan', 'shouldn', 'wasn', 'weren', 'won', 'wouldn',"would"]
+alef_lam=u'\u0627\u0644'
+waw=u'\u0648'
+ba2=u'\u0628'
+lam=u'\u0644'
+kaf=u'\u0643'
+ta2=u'\u062a'
+qaf=u'\u0642'
+ya2=u'\u064a'
+alef_hamza=u'\u0623'
+alef_kasra=u'\u0625'
+alef=u'\u0627'
+
+#print "testing"
 def remove_diactitics(ar_txt): #arabic unicode text - removes also tatweel
     output=re.sub(u'[\u064e\u064f\u0650\u0651\u0652\u064c\u064b\u064d\u0640\ufc62]','',ar_txt)
     return output
@@ -331,73 +360,17 @@ def clean_html(html_str):
     notags = re.sub("<.*?>", "  ", html) #remove tags
     return notags
 
-
-def segmenting(html_content):
-    segs=[v.strip() for v in re.findall('>([^<>]*?)<', html_content)]
-    segs=[v for v in segs if v]
-    return segs
-
-#dict-trie functions
-def add2trie(cur_trie,items,val,terminal_item=""):
-    new_trie=cur_trie
-    for it in items:
-        new_trie = new_trie.setdefault(it, {})
-    new_trie[terminal_item]=val
-    return cur_trie
+##################### FILES ##################
+def read(fpath):
+	file_open=open(fpath)
+	content=file_open.read()
+	file_open.close()
+	return content
 
 
-def walk_trie(cur_trie,items,terminal_item=""):
-    new_trie=cur_trie
-    for it in items:
-        test=new_trie.get(it)
-        if test==None: return None
-        new_trie = test
-    val=new_trie.get(terminal_item)
-    return val
 
 
-#List functions
-import unicodedata
-def is_punct(token):
-    if len(token)==0: return True
-    unicode_check=unicodedata.category(token[0])
-    if len(unicode_check)>0: return unicode_check[0]=="P"
-    print(token, unicode_check)
-    return True
-
-def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes where a small list exists in a big list
-    mapping_dict=dict(iter([(i0,i0) for i0 in range(len(large))]))
-    if skip_punc:
-        small=[v for v in small if not is_punct(v)]
-        if small==[]: return []
-        large_toks_indexes=[(i,v) for i,v in enumerate(large) if not is_punct(v)]
-        large=[v[1] for v in large_toks_indexes]
-        large_indexes=[v[0] for v in large_toks_indexes]
-        mapping_dict=dict(iter(enumerate(large_indexes)))
-
-    first=small[0]
-    ranges=[]
-    for idx, item in enumerate(large):
-        if large[idx:idx+len(small)]==small:
-            range0,range1=idx,idx+len(small)-1
-            #range0,range1=idx,idx+len(small)
-            range0,range1=mapping_dict[range0],mapping_dict[range1]
-            ranges.append((range0,range1))
-
-            #ranges.append((idx,idx+len(small)-1))
-    return ranges
-def is_in(small,large,skip_punc=True): 
-    return list_in_list(small,large,skip_punc=True)
-
-# def list_in_list(small,large): #retieves the spans of indexes where a small list exists in a big list
-#     first=small[0]
-#     ranges=[]
-#     for idx, item in enumerate(large):
-#         if large[idx:idx+len(small)]==small:
-#             ranges.append((idx,idx+len(small)-1))
-#     return ranges
-
-
+####################### PICKLE AND SHELVE ######################
 # ============= variable Storage (Pickling)
 # CPickle
 def cpk(var1,file1):
@@ -411,10 +384,6 @@ def lpk(file1):
     output=cPickle.load(fopen)
     fopen.close()
     return output
-
-
-
-
 #shelve functions
 def count_plus(counter_shelve_fpath,count_key="count"):
     shelve_fopen=shelve.open(counter_shelve_fpath)
@@ -425,13 +394,21 @@ def count_plus(counter_shelve_fpath,count_key="count"):
     return cur_count
 
 
-
+################## OS FUNCTIONS ##########################
 
 #OS functions
 def create_dir(dir_path):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
+def get_dir_files(dir_path0,extension="wav"):
+  all_files=[]
+  for root0,dir0,files0 in os.walk(dir_path0):
+    for fname in files0:
+      cur_fpath=os.path.join(root0,fname)
+      if not fname.endswith("."+extension): continue
+      all_files.append(cur_fpath)
+  return all_files
 
 #https://stackoverflow.com/questions/237079/how-to-get-file-creation-modification-date-times-in-python
 def creation_date(path_to_file):
@@ -491,12 +468,6 @@ def list_dir(dir_path, start_mtime=None, end_mtime=None, output_file='',file_typ
     return all_files
 
 
-
-def get_key(txt): #normalize text by replacing non alpha items with _
-  txt=re.sub("\W+","_",txt)
-  txt=txt.strip("_")
-  return txt.lower()
-
 def file_len(fpath0): #get the number of lines in the cache file
   if not os.path.exists(fpath0): return 0
   with open(fpath0) as fopen:
@@ -545,6 +516,86 @@ def get_line(line_num, main_file_obj,locs_file_obj,str_size=6):
   main_file_obj.seek(file_loc)
   file_line=main_file_obj.readline()
   return file_line
+
+
+
+########################## ZIP FILES ##################
+###Utilities - zip files functions copy to general soon
+
+import os, tempfile, json, zipfile
+
+def write_lines_tmp(line_item_list0):
+  tmp = tempfile.NamedTemporaryFile(delete=False)
+  cur_path0=""
+  try:
+    cur_path0=tmp.name
+    for it in line_item_list0:
+      if len(line_item_list0)==1: cur_str=it#"%s\n"%it
+      else: cur_str="%s\n"%it
+      tmp.write(cur_str.encode("utf-8"))
+  finally:
+    tmp.close()
+  return cur_path0
+
+def write_files2zip(zip_fpath0,file_content_list0):
+  zf0 = zipfile.ZipFile(zip_fpath0, "w",zipfile.ZIP_DEFLATED)
+  for f_name0,f_lines0 in file_content_list0:
+    tmp_fpath0=write_lines_tmp(f_lines0)
+    zf0.write(tmp_fpath0, "/%s"%f_name0)
+    os.remove(tmp_fpath0)
+  zf0.close()
+  print("zipped successfully:", zip_fpath0)
+
+def read_zip_file_full(zip_fpath0,zipped_file_name0):
+  archive0 = zipfile.ZipFile(zip_fpath0, 'r')
+  target_file = archive0.open(zipped_file_name0)
+  output=target_file.read()
+  archive0.close()
+  return output.decode("utf-8")
+
+def read_zip_lines(zip_fpath0,zipped_file_name0):
+  archive0 = zipfile.ZipFile(zip_fpath0, 'r')
+  target_file = archive0.open(zipped_file_name0)
+  for a in target_file:
+    yield a.decode("utf-8")
+  archive0.close()
+  return 
+
+#===================================
+####################### OTHERS #####################
+def match_seq(list1,list2):
+    output=[]
+    s = SequenceMatcher(None, list1, list2)
+    blocks=s.get_matching_blocks()
+    for bl in blocks:
+        #print(bl, bl.a, bl.b, bl.size)
+        for bi in range(bl.size):
+            cur_a=bl.a+bi
+            cur_b=bl.b+bi
+            output.append((cur_a,cur_b))
+    return output
+
+def segmenting(html_content):
+    segs=[v.strip() for v in re.findall('>([^<>]*?)<', html_content)]
+    segs=[v for v in segs if v]
+    return segs
+
+#dict-trie functions
+def add2trie(cur_trie,items,val,terminal_item=""):
+    new_trie=cur_trie
+    for it in items:
+        new_trie = new_trie.setdefault(it, {})
+    new_trie[terminal_item]=val
+    return cur_trie
+
+def walk_trie(cur_trie,items,terminal_item=""):
+    new_trie=cur_trie
+    for it in items:
+        test=new_trie.get(it)
+        if test==None: return None
+        new_trie = test
+    val=new_trie.get(terminal_item)
+    return val
 
 if __name__=="__main__":
     print("Hello!")
