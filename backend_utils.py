@@ -150,7 +150,7 @@ def save_audio():
             else: result["mp3_fpath"]=""
             
         result["success"]=True
-    except Exception,e:
+    except Exception as e:
         message=str(e)
         result["message"]=str(e)    
     return result    
