@@ -25,7 +25,7 @@ def add_item(item_json_info0,shelve_path0,overwrite=False,code_size=4,max_iters=
     return cur_code
 
 def add_item_simple(key0,shelve_path0,item_json_info0):
-    key0=key0.encode("utf-8")
+    #key0=key0.encode("utf-8")
     shelve_open0=shelve.open(shelve_path0)
     shelve_open0[key0]=item_json_info0
     shelve_open0.close()
@@ -33,7 +33,7 @@ def add_item_simple(key0,shelve_path0,item_json_info0):
 
 
 def lookup_item(item_id0,shelve_path0):
-    item_id0=item_id0.encode("utf-8")
+    #item_id0=item_id0.encode("utf-8")
     shelve_open0=shelve.open(shelve_path0)
     found=shelve_open0.get(item_id0,"{}")
     found_dict=json.loads(found)
@@ -42,7 +42,7 @@ def lookup_item(item_id0,shelve_path0):
 
 
 def append2item_list(item_id0,shelve_path0,val2append0):
-    item_id0=item_id0.encode("utf-8")
+    #item_id0=item_id0.encode("utf-8")
     shelve_open0=shelve.open(shelve_path0)
     found=shelve_open0.get(item_id0,"[]")
     found_list=json.loads(found)
