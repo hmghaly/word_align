@@ -24,7 +24,7 @@ def get_params(state_dict0): #get network parameters from state dict/understand 
   return params
 
 
-def numpy_lstm(data_input,state_dict0):
+def numpy_lstm(data_input,state_dict0, matching_in_out=False):
   #we can get the number of layers and number of hidden from the state dict
   cur_params=get_params(state_dict0)
   n_hidden=cur_params["n_hidden"]
@@ -70,13 +70,15 @@ def numpy_lstm(data_input,state_dict0):
                     Weights_hl, Bias_hl, Weights_xl, Bias_xl)
       c = cell_state(f,i)
       h = output_gate(eventx, h, Weights_ho, Bias_ho, Weights_xo, Bias_xo, c)
-      out_list.append(h)
+      if matching_in_out: out_list.append(h)
       #cur_output=model_output(h, fc_Weight, fc_Bias)
       #all_output.append(cur_output)
-    data_input=np.array(out_list)
+    if matching_in_out:  data_input=np.array(out_list)
+    else: data_input=np.array(h)
+    #data_input=np.array(out_list)
     #print(data_input)
   return  data_input
-def fully_connected(lstm_out,state_dict0):
+def fully_connected(lstm_out,state_dict0,apply_sigmoid=False):
   cur_params=get_params(state_dict0)
   fc_wt,fc_bias=cur_params["fc_weight"],cur_params["fc_bias"]
   try: fc_wt,fc_bias=fc_wt.numpy(),fc_bias.numpy()
@@ -85,7 +87,9 @@ def fully_connected(lstm_out,state_dict0):
   for lstm_item in lstm_out:
     cur_output=np.dot(fc_wt, lstm_item) + fc_bias
     all_output.append(cur_output)
-  return np.array(all_output)
+  res=np.array(all_output)
+  if apply_sigmoid: res=sigmoid(res)
+  return res
 
 def forget_gate(x, h, Weights_hf, Bias_hf, Weights_xf, Bias_xf, prev_cell_state):
     forget_hidden  = np.dot(Weights_hf, h) + Bias_hf
@@ -126,5 +130,4 @@ if __name__=="__main__":
   fc_output_sigmoid=sigmoid(fc_output) 
   fc_output_softmax=softmax(fc_output) 
   print("numpy LSTM output:", fc_output)
-
 
