@@ -3,7 +3,7 @@ from torch import nn
 import torch.optim as optim
 import random
 import dill as pickle
-import OrderedDict
+from collections import OrderedDict
 
 torch.manual_seed(1)
 random.seed(1)
