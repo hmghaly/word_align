@@ -4,6 +4,7 @@ import torch.optim as optim
 import random
 import dill as pickle
 from collections import OrderedDict
+import numpy as np
 
 torch.manual_seed(1)
 random.seed(1)
