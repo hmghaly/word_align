@@ -178,6 +178,13 @@ def get_qs():
     return qs_dict0
 
 
+def write_base64(base64_uploaded_str0,out_fpath0):
+    split_str=base64_uploaded_str0.split(";base64,")
+    file_data=split_str[-1]
+    with open(out_fpath0, "wb") as fh:
+        binary_content=file_data.decode('base64')
+        fh.write(binary_content)
+
 # file_type=".wav"
 # file_type=".mp3"
 # proj_name="alphabet"
