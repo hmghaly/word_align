@@ -1,4 +1,5 @@
 import os, sys, shelve, json, random, subprocess, tempfile, socket
+import base64
 
 def gen_hex(N=10):
     chars = '0123456789abcdef'
@@ -177,13 +178,13 @@ def get_qs():
         qs_dict0[key0]=val0
     return qs_dict0
 
-
+#save uploaded base64 string from javascript to binary form
 def write_base64(base64_uploaded_str0,out_fpath0):
-    split_str=base64_uploaded_str0.split(";base64,")
-    file_data=split_str[-1]
-    with open(out_fpath0, "wb") as fh:
-        binary_content=file_data.decode('base64')
-        fh.write(binary_content)
+  split_str=base64_uploaded_str0.split(";base64,")
+  file_data=split_str[-1]
+  with open(out_fpath0, "wb") as fh:
+    binary_content=base64.b64decode(file_data)
+    fh.write(binary_content)
 
 # file_type=".wav"
 # file_type=".mp3"
