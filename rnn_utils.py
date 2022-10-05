@@ -379,13 +379,13 @@ class model_pred:
     self.feature_extraction_params=self.checkpoint["feature_extraction_parameters"]
     self.standard_labels=self.checkpoint['output_labels']
     self.model_state_dict=self.checkpoint['model_state_dict']
-    self.use_rnn=False
+    self.use_torch=False
 
     try:
       self.rnn = RNN(self.n_input, self.n_hidden , self.n_output , self.n_layers , matching_in_out=self.matching_in_out,apply_sigmoid=self.apply_sigmoid,apply_softmax=self.apply_softmax).to(device)
       self.rnn.load_state_dict(self.model_state_dict)
       self.rnn.eval()
-      self.use_rnn=True
+      self.use_torch=True
     except:
       pass
   def inspect(self):
@@ -394,13 +394,14 @@ class model_pred:
       if "function" in k: continue
       print(k,v)
 
-  def predict(self,item_fpath,cur_feature_extraction_fn=None,time_seq=True): #time sequence - whether the feature extraction function yields times corresponding to features
+  def predict(self,item_fpath,cur_feature_extraction_fn=None,time_seq=True,cur_use_torch=True): #time sequence - whether the feature extraction function yields times corresponding to features
     #if self.feature_extraction_fn==None: self.feature_extraction_fn=feature_extraction_fn
     if cur_feature_extraction_fn!=None: self.feature_extraction_fn=cur_feature_extraction_fn
+    if cur_use_torch==False:  self.use_torch=False
     if time_seq: times,ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
     else:  ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
     
-    if self.use_rnn:
+    if self.use_torch:
       ft_tensor=torch.tensor(ft_vector,dtype=torch.float32)
       rnn_out= self.rnn(ft_tensor)
       
