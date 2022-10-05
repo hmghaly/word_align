@@ -388,6 +388,12 @@ class model_pred:
       self.use_rnn=True
     except:
       pass
+  def inspect(self):
+    for k,v in self.checkpoint.items():
+      if "dict" in k: continue
+      if "function" in k: continue
+      print(k,v)
+
   def predict(self,item_fpath,cur_feature_extraction_fn=None,time_seq=True): #time sequence - whether the feature extraction function yields times corresponding to features
     #if self.feature_extraction_fn==None: self.feature_extraction_fn=feature_extraction_fn
     if cur_feature_extraction_fn!=None: self.feature_extraction_fn=cur_feature_extraction_fn
