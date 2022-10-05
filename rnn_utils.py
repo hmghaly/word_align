@@ -89,7 +89,7 @@ def log_something(text0,fpath0):
   fopen0.write(text0+"\n")
   fopen0.close()
 
-  def split_train_test(all_data0,train_ratio=0.8):
+def split_train_test(all_data0,train_ratio=0.8):
   train_size=int(len(all_data0)*train_ratio)
   train_set0,tes_set0=all_data0[:train_size],all_data0[train_size:]
   return train_set0,tes_set0  
