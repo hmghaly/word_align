@@ -13,7 +13,7 @@ except:
   class nn_cls:
     def __init__(self):
       self.Module=None
-    nn=nn_cls()
+  nn=nn_cls()
 
 random.seed(1)
 
