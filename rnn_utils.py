@@ -238,75 +238,157 @@ def get_params(state_dict0): #get network parameters from state dict/understand 
   params["n_layers"]=len(all_layers)
   return params
 
+class np_lstm:
+  def __init__(self,state_dict0, matching_in_out0=False,apply_sigmoid=False,apply_softmax=False) -> None:
+    self.cur_params=get_params(state_dict0)
+    self.matching_in_out=matching_in_out0
+    self.apply_sigmoid=apply_sigmoid
+    self.apply_softmax=apply_softmax
+    self.n_hidden=self.cur_params["n_hidden"]
+    self.n_layers=self.cur_params["n_layers"]
+    self.fc_wt,self.fc_bias=self.cur_params["fc_weight"],self.cur_params["fc_bias"] #fully connected
+    new_stat_dict={}
+    for a,b in state_dict0.items(): #just to handle whether th state dict has torch tensors or numpy arrays
+      try: new_stat_dict[a]=b.numpy() #if torch tensors, convert to numpy
+      except: new_stat_dict[a]=b #otherwise, keep it
+    self.state_dict0=new_stat_dict
 
-def numpy_lstm(data_input,state_dict0, matching_in_out=False):
-  #we can get the number of layers and number of hidden from the state dict
-  cur_params=get_params(state_dict0)
-  n_hidden=cur_params["n_hidden"]
-  new_stat_dict={}
-  for a,b in state_dict0.items(): #just to handle whether th state dict has torch tensors or numpy arrays
-    try: new_stat_dict[a]=b.numpy() #if torch tensors, convert to numpy
-    except: new_stat_dict[a]=b #otherwise, keep it
-  state_dict0=new_stat_dict
-  for layer_i in range(cur_params["n_layers"]):
-    layer="l%s"%layer_i
-    #Event (x) Weights and Biases for all gates
-    Weights_xi = state_dict0['lstm.weight_ih_'+layer][0:n_hidden]  # shape  [h, x]
-    Weights_xf = state_dict0['lstm.weight_ih_'+layer][n_hidden:2*n_hidden]  # shape  [h, x]
-    Weights_xl = state_dict0['lstm.weight_ih_'+layer][2*n_hidden:3*n_hidden]  # shape  [h, x]
-    Weights_xo = state_dict0['lstm.weight_ih_'+layer][3*n_hidden:4*n_hidden] # shape  [h, x]
+  def forward(self,data_input):
+    n_hidden=self.n_hidden
+    n_layers=self.n_layers
+    state_dict0=self.state_dict0
+    #matching_in_out=self.matching_in_out
 
-    Bias_xi = state_dict0['lstm.bias_ih_'+layer][0:n_hidden]  #shape is [h, 1]
-    Bias_xf = state_dict0['lstm.bias_ih_'+layer][n_hidden:2*n_hidden]  #shape is [h, 1]
-    Bias_xl = state_dict0['lstm.bias_ih_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, 1]
-    Bias_xo = state_dict0['lstm.bias_ih_'+layer][3*n_hidden:4*n_hidden] #shape is [h, 1]
+    for layer_i in range(n_layers):
+      #print("layer_i",layer_i)
+      layer="l%s"%layer_i
+      #Event (x) Weights and Biases for all gates
+      Weights_xi = state_dict0['lstm.weight_ih_'+layer][0:n_hidden]  # shape  [h, x]
+      Weights_xf = state_dict0['lstm.weight_ih_'+layer][n_hidden:2*n_hidden]  # shape  [h, x]
+      Weights_xl = state_dict0['lstm.weight_ih_'+layer][2*n_hidden:3*n_hidden]  # shape  [h, x]
+      Weights_xo = state_dict0['lstm.weight_ih_'+layer][3*n_hidden:4*n_hidden] # shape  [h, x]
 
-    #Hidden state (h) Weights and Biases for all gates
-    Weights_hi = state_dict0['lstm.weight_hh_'+layer][0:n_hidden]  #shape is [h, h]
-    Weights_hf = state_dict0['lstm.weight_hh_'+layer][n_hidden:2*n_hidden]  #shape is [h, h]
-    Weights_hl = state_dict0['lstm.weight_hh_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, h]
-    Weights_ho = state_dict0['lstm.weight_hh_'+layer][3*n_hidden:4*n_hidden] #shape is [h, h]
+      Bias_xi = state_dict0['lstm.bias_ih_'+layer][0:n_hidden]  #shape is [h, 1]
+      Bias_xf = state_dict0['lstm.bias_ih_'+layer][n_hidden:2*n_hidden]  #shape is [h, 1]
+      Bias_xl = state_dict0['lstm.bias_ih_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, 1]
+      Bias_xo = state_dict0['lstm.bias_ih_'+layer][3*n_hidden:4*n_hidden] #shape is [h, 1]
 
-    Bias_hi = state_dict0['lstm.bias_hh_'+layer][0:n_hidden]  #shape is [h, 1]
-    Bias_hf = state_dict0['lstm.bias_hh_'+layer][n_hidden:2*n_hidden]  #shape is [h, 1]
-    Bias_hl = state_dict0['lstm.bias_hh_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, 1]
-    Bias_ho = state_dict0['lstm.bias_hh_'+layer][3*n_hidden:4*n_hidden] #shape is [h, 1]
+      #Hidden state (h) Weights and Biases for all gates
+      Weights_hi = state_dict0['lstm.weight_hh_'+layer][0:n_hidden]  #shape is [h, h]
+      Weights_hf = state_dict0['lstm.weight_hh_'+layer][n_hidden:2*n_hidden]  #shape is [h, h]
+      Weights_hl = state_dict0['lstm.weight_hh_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, h]
+      Weights_ho = state_dict0['lstm.weight_hh_'+layer][3*n_hidden:4*n_hidden] #shape is [h, h]
 
-    #Initialize cell and hidden states with zeroes
-    h = np.zeros(n_hidden)
-    c = np.zeros(n_hidden)
+      Bias_hi = state_dict0['lstm.bias_hh_'+layer][0:n_hidden]  #shape is [h, 1]
+      Bias_hf = state_dict0['lstm.bias_hh_'+layer][n_hidden:2*n_hidden]  #shape is [h, 1]
+      Bias_hl = state_dict0['lstm.bias_hh_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, 1]
+      Bias_ho = state_dict0['lstm.bias_hh_'+layer][3*n_hidden:4*n_hidden] #shape is [h, 1]
 
-    #Loop through data, updating the hidden and cell states after each pass
-    out_list=[]
-    all_output=[]
-    for eventx in data_input:
-      f = forget_gate(eventx, h, Weights_hf, Bias_hf, Weights_xf, Bias_xf, c)
-      i =  input_gate(eventx, h, Weights_hi, Bias_hi, Weights_xi, Bias_xi, 
-                    Weights_hl, Bias_hl, Weights_xl, Bias_xl)
-      c = cell_state(f,i)
-      h = output_gate(eventx, h, Weights_ho, Bias_ho, Weights_xo, Bias_xo, c)
-      if matching_in_out: out_list.append(h)
-      #cur_output=model_output(h, fc_Weight, fc_Bias)
-      #all_output.append(cur_output)
-    if matching_in_out:  data_input=np.array(out_list)
-    else: data_input=np.array(h)
-    #data_input=np.array(out_list)
-    #print(data_input)
-  return  data_input
-def fully_connected(lstm_out,state_dict0,apply_sigmoid=False,apply_softmax=False):
-  cur_params=get_params(state_dict0)
-  fc_wt,fc_bias=cur_params["fc_weight"],cur_params["fc_bias"]
-  try: fc_wt,fc_bias=fc_wt.numpy(),fc_bias.numpy()
-  except: pass
-  all_output=[]
-  for lstm_item in lstm_out:
-    cur_output=np.dot(fc_wt, lstm_item) + fc_bias
-    all_output.append(cur_output)
-  res=np.array(all_output)
-  if apply_sigmoid: res=sigmoid(res)
-  if apply_softmax: res=softmax(res)
+      #Initialize cell and hidden states with zeroes
+      h = np.zeros(n_hidden)
+      c = np.zeros(n_hidden)
 
-  return res
+      #Loop through data, updating the hidden and cell states after each pass
+      out_list=[]
+      all_output=[]
+      for eventx in data_input:
+        f = forget_gate(eventx, h, Weights_hf, Bias_hf, Weights_xf, Bias_xf, c)
+        i =  input_gate(eventx, h, Weights_hi, Bias_hi, Weights_xi, Bias_xi, 
+                      Weights_hl, Bias_hl, Weights_xl, Bias_xl)
+        c = cell_state(f,i)
+        h = output_gate(eventx, h, Weights_ho, Bias_ho, Weights_xo, Bias_xo, c)
+        if self.matching_in_out: out_list.append(h)
+        else: out_list=h
+      data_input=np.array(out_list)
+    lstm_out=data_input
+    if self.matching_in_out:
+      all_output=[]
+      for lstm_item in lstm_out:
+        cur_output=np.dot(self.fc_wt, lstm_item) + self.fc_bias
+        all_output.append(cur_output)
+      res=np.array(all_output)
+    else:
+      cur_output=np.dot(self.fc_wt, lstm_out) + self.fc_bias
+      res=np.array(cur_output)
+    if self.apply_sigmoid: res=sigmoid(res)
+    if self.apply_softmax: res=softmax(res)
+    return res    
+
+
+
+# def numpy_lstm(data_input,state_dict0, matching_in_out=False):
+#   #we can get the number of layers and number of hidden from the state dict
+#   cur_params=get_params(state_dict0)
+#   n_hidden=cur_params["n_hidden"]
+#   new_stat_dict={}
+#   for a,b in state_dict0.items(): #just to handle whether th state dict has torch tensors or numpy arrays
+#     try: new_stat_dict[a]=b.numpy() #if torch tensors, convert to numpy
+#     except: new_stat_dict[a]=b #otherwise, keep it
+#   state_dict0=new_stat_dict
+#   for layer_i in range(cur_params["n_layers"]):
+#     print("layer_i",layer_i)
+#     layer="l%s"%layer_i
+#     #Event (x) Weights and Biases for all gates
+#     Weights_xi = state_dict0['lstm.weight_ih_'+layer][0:n_hidden]  # shape  [h, x]
+#     Weights_xf = state_dict0['lstm.weight_ih_'+layer][n_hidden:2*n_hidden]  # shape  [h, x]
+#     Weights_xl = state_dict0['lstm.weight_ih_'+layer][2*n_hidden:3*n_hidden]  # shape  [h, x]
+#     Weights_xo = state_dict0['lstm.weight_ih_'+layer][3*n_hidden:4*n_hidden] # shape  [h, x]
+
+#     Bias_xi = state_dict0['lstm.bias_ih_'+layer][0:n_hidden]  #shape is [h, 1]
+#     Bias_xf = state_dict0['lstm.bias_ih_'+layer][n_hidden:2*n_hidden]  #shape is [h, 1]
+#     Bias_xl = state_dict0['lstm.bias_ih_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, 1]
+#     Bias_xo = state_dict0['lstm.bias_ih_'+layer][3*n_hidden:4*n_hidden] #shape is [h, 1]
+
+#     #Hidden state (h) Weights and Biases for all gates
+#     Weights_hi = state_dict0['lstm.weight_hh_'+layer][0:n_hidden]  #shape is [h, h]
+#     Weights_hf = state_dict0['lstm.weight_hh_'+layer][n_hidden:2*n_hidden]  #shape is [h, h]
+#     Weights_hl = state_dict0['lstm.weight_hh_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, h]
+#     Weights_ho = state_dict0['lstm.weight_hh_'+layer][3*n_hidden:4*n_hidden] #shape is [h, h]
+
+#     Bias_hi = state_dict0['lstm.bias_hh_'+layer][0:n_hidden]  #shape is [h, 1]
+#     Bias_hf = state_dict0['lstm.bias_hh_'+layer][n_hidden:2*n_hidden]  #shape is [h, 1]
+#     Bias_hl = state_dict0['lstm.bias_hh_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, 1]
+#     Bias_ho = state_dict0['lstm.bias_hh_'+layer][3*n_hidden:4*n_hidden] #shape is [h, 1]
+
+#     #Initialize cell and hidden states with zeroes
+#     h = np.zeros(n_hidden)
+#     c = np.zeros(n_hidden)
+
+#     #Loop through data, updating the hidden and cell states after each pass
+#     out_list=[]
+#     all_output=[]
+#     for eventx in data_input:
+#       f = forget_gate(eventx, h, Weights_hf, Bias_hf, Weights_xf, Bias_xf, c)
+#       i =  input_gate(eventx, h, Weights_hi, Bias_hi, Weights_xi, Bias_xi, 
+#                     Weights_hl, Bias_hl, Weights_xl, Bias_xl)
+#       c = cell_state(f,i)
+#       h = output_gate(eventx, h, Weights_ho, Bias_ho, Weights_xo, Bias_xo, c)
+#       if matching_in_out: out_list.append(h)
+#       #cur_output=model_output(h, fc_Weight, fc_Bias)
+#       #all_output.append(cur_output)
+#     if matching_in_out:  data_input=np.array(out_list)
+#     else: data_input=np.array(h)
+#     print("data_input",data_input.shape)
+#     #data_input=np.array(out_list)
+#     #print(data_input)
+#   return  data_input
+# def fully_connected(lstm_out,state_dict0,apply_sigmoid=False,apply_softmax=False):
+#   cur_params=get_params(state_dict0)
+#   fc_wt,fc_bias=cur_params["fc_weight"],cur_params["fc_bias"]
+#   try: fc_wt,fc_bias=fc_wt.numpy(),fc_bias.numpy()
+#   except: pass
+#   print("lstm_out",lstm_out.shape)
+#   print("fc_bias",fc_bias.shape)
+#   print("lstm_out",lstm_out.shape)
+#   all_output=[]
+#   for lstm_item in lstm_out:
+#     cur_output=np.dot(fc_wt, lstm_item) + fc_bias
+#     all_output.append(cur_output)
+#   res=np.array(all_output)
+#   if apply_sigmoid: res=sigmoid(res)
+#   if apply_softmax: res=softmax(res)
+
+#   return res
 
 def forget_gate(x, h, Weights_hf, Bias_hf, Weights_xf, Bias_xf, prev_cell_state):
     forget_hidden  = np.dot(Weights_hf, h) + Bias_hf
@@ -332,6 +414,58 @@ def output_gate(x, h, Weights_ho, Bias_ho, Weights_xo, Bias_xo, cell_state):
 
 
 #============= Prediction class
+class model_pred:
+  def __init__(self,model_fpath0) -> None:
+    self.checkpoint = dill_unpickle(model_fpath0)
+    self.n_input=self.checkpoint["n_input"]
+    self.n_hidden=self.checkpoint["n_hidden"]
+    self.n_output=self.checkpoint["n_output"]
+    self.n_layers=self.checkpoint["n_layers"]
+    self.matching_in_out=self.checkpoint.get("matching_in_out",False)
+    self.apply_sigmoid=self.checkpoint.get("apply_sigmoid",False)
+    self.apply_softmax=self.checkpoint.get("apply_softmax",False)
+
+    self.feature_extraction_fn=self.checkpoint.get("feature_extraction_function")
+    self.feature_extraction_params=self.checkpoint["feature_extraction_parameters"]
+    self.standard_labels=self.checkpoint['output_labels']
+    self.model_state_dict=self.checkpoint['model_state_dict']
+    self.use_torch=False
+    self.np_lstm_obj=None
+
+    try:
+      self.rnn = RNN(self.n_input, self.n_hidden , self.n_output , self.n_layers , matching_in_out=self.matching_in_out,apply_sigmoid=self.apply_sigmoid,apply_softmax=self.apply_softmax).to(device)
+      self.rnn.load_state_dict(self.model_state_dict)
+      self.rnn.eval()
+      self.use_torch=True
+    except Exception as ex:
+      self.np_lstm_obj=np_lstm(self.model_state_dict, self.matching_in_out,self.apply_sigmoid,self.apply_softmax)
+  def inspect(self):
+    for k,v in self.checkpoint.items():
+      if "dict" in k: continue
+      if "function" in k: continue
+      print(k,v)
+
+  def predict(self,item_fpath,cur_feature_extraction_fn=None,time_seq=True,cur_use_torch=True): #time sequence - whether the feature extraction function yields times corresponding to features
+    #if self.feature_extraction_fn==None: self.feature_extraction_fn=feature_extraction_fn
+    if cur_feature_extraction_fn!=None: self.feature_extraction_fn=cur_feature_extraction_fn
+    if cur_use_torch==False:  self.use_torch=False
+    else: self.use_torch=True
+    if time_seq: times,ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
+    else:  ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
+    if self.use_torch:
+      ft_tensor=torch.tensor(ft_vector,dtype=torch.float32)
+      rnn_out= self.rnn(ft_tensor)
+      rnn_out_flat=rnn_out.ravel()
+      rnn_out_flat=[v.item() for v in rnn_out_flat]
+    else:
+      if self.np_lstm_obj==None:
+        self.np_lstm_obj=np_lstm(self.model_state_dict, self.matching_in_out,self.apply_sigmoid,self.apply_softmax)
+      rnn_out=self.np_lstm_obj.forward(ft_vector)
+      rnn_out_flat=rnn_out.ravel()
+    preds0=out2labels(rnn_out_flat,self.standard_labels) 
+    return preds0  
+
+
 # class model_pred_NEW:
 #   def __init__(self,model_fpath0) -> None:
 #     # try: self.checkpoint = torch.load(model_fpath0)
@@ -362,62 +496,64 @@ def output_gate(x, h, Weights_ho, Bias_ho, Weights_xo, Bias_xo, cell_state):
 
 
 
-class model_pred:
-  def __init__(self,model_fpath0) -> None:
-    # try: self.checkpoint = torch.load(model_fpath0)
-    # except: self.checkpoint = dill_unpickle(model_fpath0)
-    self.checkpoint = dill_unpickle(model_fpath0)
-    self.n_input=self.checkpoint["n_input"]
-    self.n_hidden=self.checkpoint["n_hidden"]
-    self.n_output=self.checkpoint["n_output"]
-    self.n_layers=self.checkpoint["n_layers"]
-    self.matching_in_out=self.checkpoint.get("matching_in_out",False)
-    self.apply_sigmoid=self.checkpoint.get("apply_sigmoid",False)
-    self.apply_softmax=self.checkpoint.get("apply_softmax",False)
+# class model_pred:
+#   def __init__(self,model_fpath0) -> None:
+#     # try: self.checkpoint = torch.load(model_fpath0)
+#     # except: self.checkpoint = dill_unpickle(model_fpath0)
+#     self.checkpoint = dill_unpickle(model_fpath0)
+#     self.n_input=self.checkpoint["n_input"]
+#     self.n_hidden=self.checkpoint["n_hidden"]
+#     self.n_output=self.checkpoint["n_output"]
+#     self.n_layers=self.checkpoint["n_layers"]
+#     self.matching_in_out=self.checkpoint.get("matching_in_out",False)
+#     self.apply_sigmoid=self.checkpoint.get("apply_sigmoid",False)
+#     self.apply_softmax=self.checkpoint.get("apply_softmax",False)
 
-    self.feature_extraction_fn=self.checkpoint.get("feature_extraction_function")
-    self.feature_extraction_params=self.checkpoint["feature_extraction_parameters"]
-    self.standard_labels=self.checkpoint['output_labels']
-    self.model_state_dict=self.checkpoint['model_state_dict']
-    self.use_torch=False
+#     self.feature_extraction_fn=self.checkpoint.get("feature_extraction_function")
+#     self.feature_extraction_params=self.checkpoint["feature_extraction_parameters"]
+#     self.standard_labels=self.checkpoint['output_labels']
+#     self.model_state_dict=self.checkpoint['model_state_dict']
+#     self.use_torch=False
 
-    try:
-      self.rnn = RNN(self.n_input, self.n_hidden , self.n_output , self.n_layers , matching_in_out=self.matching_in_out,apply_sigmoid=self.apply_sigmoid,apply_softmax=self.apply_softmax).to(device)
-      self.rnn.load_state_dict(self.model_state_dict)
-      self.rnn.eval()
-      self.use_torch=True
-    except:
-      pass
-  def inspect(self):
-    for k,v in self.checkpoint.items():
-      if "dict" in k: continue
-      if "function" in k: continue
-      print(k,v)
+#     try:
+#       self.rnn = RNN(self.n_input, self.n_hidden , self.n_output , self.n_layers , matching_in_out=self.matching_in_out,apply_sigmoid=self.apply_sigmoid,apply_softmax=self.apply_softmax).to(device)
+#       self.rnn.load_state_dict(self.model_state_dict)
+#       self.rnn.eval()
+#       self.use_torch=True
+#     except:
+#       self.np_lstm_obj=np_lstm(self.model_state_dict, self.matching_in_out,self.apply_sigmoid,self.apply_softmax)
+#       pass
+#   def inspect(self):
+#     for k,v in self.checkpoint.items():
+#       if "dict" in k: continue
+#       if "function" in k: continue
+#       print(k,v)
 
-  def predict(self,item_fpath,cur_feature_extraction_fn=None,time_seq=True,cur_use_torch=True): #time sequence - whether the feature extraction function yields times corresponding to features
-    #if self.feature_extraction_fn==None: self.feature_extraction_fn=feature_extraction_fn
-    if cur_feature_extraction_fn!=None: self.feature_extraction_fn=cur_feature_extraction_fn
-    if cur_use_torch==False:  self.use_torch=False
-    if time_seq: times,ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
-    else:  ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
+#   def predict(self,item_fpath,cur_feature_extraction_fn=None,time_seq=True,cur_use_torch=True): #time sequence - whether the feature extraction function yields times corresponding to features
+#     #if self.feature_extraction_fn==None: self.feature_extraction_fn=feature_extraction_fn
+#     if cur_feature_extraction_fn!=None: self.feature_extraction_fn=cur_feature_extraction_fn
+#     if cur_use_torch==False:  self.use_torch=False
+#     if time_seq: times,ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
+#     else:  ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
     
-    if self.use_torch:
-      ft_tensor=torch.tensor(ft_vector,dtype=torch.float32)
-      rnn_out= self.rnn(ft_tensor)
+#     if self.use_torch:
+#       ft_tensor=torch.tensor(ft_vector,dtype=torch.float32)
+#       rnn_out= self.rnn(ft_tensor)
       
-    else:
-      np_lstm_output1=numpy_lstm(ft_vector,self.model_state_dict,matching_in_out=self.matching_in_out)
-      rnn_out=fully_connected(np_lstm_output1,self.model_state_dict,apply_sigmoid=self.apply_sigmoid,apply_softmax=self.apply_softmax)
-    preds0=out2labels(rnn_out.ravel(),self.standard_labels) 
+#     else:
+#       self.np_lstm_obj.forward(ft_vector)
+#       rnn_out=np_lstm_output1=numpy_lstm(ft_vector,self.model_state_dict,matching_in_out=self.matching_in_out)
+#       #rnn_out=fully_connected(np_lstm_output1,self.model_state_dict,apply_sigmoid=self.apply_sigmoid,apply_softmax=self.apply_softmax)
+#     preds0=out2labels(rnn_out.ravel(),self.standard_labels) 
 
 
 
 
-    # times_preds_list=[]
-    # for pr0,ti0 in zip(preds0,times):
-    #   pr0=[(v[0],v[1].item()) for v in pr0]
-    #   times_preds_list.append((ti0,pr0)) 
-    return preds0  
+#     # times_preds_list=[]
+#     # for pr0,ti0 in zip(preds0,times):
+#     #   pr0=[(v[0],v[1].item()) for v in pr0]
+#     #   times_preds_list.append((ti0,pr0)) 
+#     return preds0  
 
 # class np_model_pred:
 #   def __init__(self,model_fpath0) -> None:
