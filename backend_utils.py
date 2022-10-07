@@ -1,4 +1,4 @@
-import os, sys, shelve, json, random, subprocess, tempfile, socket
+import os, sys, shelve, json, random, subprocess, tempfile, socket, time
 import base64
 
 def gen_hex(N=10):
@@ -121,29 +121,36 @@ def create_tmp_json(json_data0):
         #os.unlink(tmp.name) 
     return tmp_fpath
 
+
 def save_audio():
     result={}
     result["message"]=""
-    result["success"]=False
+    
+    result["time"]=time.time()
+    #stdin_str=sys.stdin.read()
     try:
-        form = cgi.FieldStorage() 
-        fileitem = form['data']
-        for key0 in form.keys():
+        stdin_str=sys.stdin.read()
+        input_dict=json.loads(stdin_str)
+        #form =  cgi.FieldStorage() 
+        cur_base64_data = input_dict['data']
+        for key0 in input_dict.keys():
             if key0=="data": continue
-            result[key0]=form.getvalue(key0)
-        fname = form.getvalue('fname')
-        dir_path = form.getvalue('dir_path')
+            result[key0]=input_dict.get(key0)
+        fname = input_dict.get('fname')
+        dir_path = input_dict.get('dir_path')
         if dir_path==None: dir_path="/tmp"
         try: 
             if not os.path.exists(dir_path): os.makedirs(dir_path)
         except: dir_path="/tmp"
         if fname==None: fname=gen_hex(4)
         full_wav_fpath=os.path.join(dir_path,fname+".wav")
-        out=open(full_wav_fpath,'wb')
-        out.write(fileitem.file.read())
-        out.close()    
+        write_base64(cur_base64_data,full_wav_fpath)
+        full_json_fpath=os.path.join(dir_path,fname+".json")
+        full_json_fopen=open(full_json_fpath,"w")
+        json.dump(result,full_json_fopen)
+        full_json_fopen.close()
         result["wav_fpath"]=full_wav_fpath
-        if result.get("mp3","").lower()=="true":
+        if result.get("mp3",False) or result.get("mp3","").lower()=="true":
             mp3_path=full_wav_fpath.replace(".wav",".mp3")
             proc=subprocess.Popen("lame -V2 %s %s"%(full_wav_fpath,mp3_path),shell=True)
             proc.wait()
@@ -151,10 +158,46 @@ def save_audio():
             else: result["mp3_fpath"]=""
             
         result["success"]=True
-    except Exception as e:
+    except Exception,e:
         message=str(e)
+        result["success"]=False
         result["message"]=str(e)    
-    return result    
+    return result
+
+# def save_audio():
+#     result={}
+#     result["message"]=""
+#     result["success"]=False
+#     try:
+#         form = cgi.FieldStorage() 
+#         fileitem = form['data']
+#         for key0 in form.keys():
+#             if key0=="data": continue
+#             result[key0]=form.getvalue(key0)
+#         fname = form.getvalue('fname')
+#         dir_path = form.getvalue('dir_path')
+#         if dir_path==None: dir_path="/tmp"
+#         try: 
+#             if not os.path.exists(dir_path): os.makedirs(dir_path)
+#         except: dir_path="/tmp"
+#         if fname==None: fname=gen_hex(4)
+#         full_wav_fpath=os.path.join(dir_path,fname+".wav")
+#         out=open(full_wav_fpath,'wb')
+#         out.write(fileitem.file.read())
+#         out.close()    
+#         result["wav_fpath"]=full_wav_fpath
+#         if result.get("mp3","").lower()=="true":
+#             mp3_path=full_wav_fpath.replace(".wav",".mp3")
+#             proc=subprocess.Popen("lame -V2 %s %s"%(full_wav_fpath,mp3_path),shell=True)
+#             proc.wait()
+#             if os.path.exists(mp3_path): result["mp3_fpath"]=mp3_path
+#             else: result["mp3_fpath"]=""
+            
+#         result["success"]=True
+#     except Exception as e:
+#         message=str(e)
+#         result["message"]=str(e)    
+#     return result    
 
 import zipfile
 def zipdir(path, zip_fpath,file_type=""):
