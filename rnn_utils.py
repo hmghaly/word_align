@@ -12,7 +12,7 @@ try:
 except:
   class nn_cls:
     def __init__(self):
-      self.Module=None
+      self.Module="something"
   nn=nn_cls()
 
 random.seed(1)
