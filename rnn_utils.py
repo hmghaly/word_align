@@ -10,65 +10,69 @@ try:
   torch.manual_seed(1)
   device = torch.device('cpu')
 except:
-  class nn_cls:
-    def __init__(self):
-      pass
-    def Module(self,n1,n2):
-      return n1,n2
-  nn=nn_cls()
+  pass
+  # class nn_cls:
+  #   def __init__(self):
+  #     pass
+  #   def Module(self,n1,n2):
+  #     return n1,n2
+  # nn=nn_cls()
 
 random.seed(1)
 
-class RNN(nn.Module):
-  def __init__(self, input_size, hidden_size, output_size,num_layers, matching_in_out=False, init_val=None, apply_sigmoid=False, apply_softmax=False, batch_size=1):
-    super(RNN, self).__init__()
-    self.input_size = input_size
-    self.hidden_size = hidden_size
-    self.output_size = output_size
-    self.num_layers = num_layers
-    self.batch_size = batch_size
-    self.apply_softmax=apply_softmax
-    self.apply_sigmoid=apply_sigmoid
-    self.init_val=init_val
-    self.matching_in_out = matching_in_out #length of input vector matches the length of output vector 
-    self.lstm = nn.LSTM(input_size, hidden_size,num_layers)
-    self.hidden2out = nn.Linear(hidden_size, output_size)
-    if self.apply_softmax: self.softmax =nn.Softmax(dim=2)
-    if self.apply_sigmoid: self.sigmoid =nn.Sigmoid() 
-    
-    #self.sigmoid = torch.sigmoid(dim=1)
-    self.hidden = self.init_hidden()
-  def forward(self, feature_list):
-    self.hidden = self.init_hidden() ### check
-    feature_list=torch.tensor(feature_list)
-    feature_list=feature_list.to(device) #### <<<<<<<<<<<<<<<<< 
-    if self.matching_in_out:
-      lstm_out, _ = self.lstm( feature_list.view(len( feature_list), 1, -1))
-      output_scores = self.hidden2out(lstm_out.view(len( feature_list), -1))
-      if self.apply_sigmoid: output_scores=self.sigmoid(output_scores).to(device)
-      elif self.apply_softmax: output_scores=self.softmax(output_scores).to(device)
-      #output_scores = torch.sigmoid(output_space) #we'll need to check if we need this sigmoid
-      return output_scores #output_scores
-    else:
-      outs=[]
-      for i in range(len(feature_list)):
-        cur_ft_tensor=feature_list[i]#.view([1,1,self.input_size])
-        cur_ft_tensor=cur_ft_tensor.view([1,1,self.input_size])
-        lstm_out, self.hidden = self.lstm(cur_ft_tensor, self.hidden)
-        outs=self.hidden2out(lstm_out)
-        if self.apply_sigmoid: outs = self.sigmoid(outs).to(device) #self.sigmoid =nn.Sigmoid()
-        elif self.apply_softmax: outs = self.softmax(outs).to(device)
-        
-      return outs
-  def init_hidden(self):
-    #return torch.rand(self.num_layers, self.batch_size, self.hidden_size)
-    if self.init_val!=None:
-      h1=torch.ones(self.num_layers, self.batch_size, self.hidden_size)*self.init_val
-      h2=torch.ones(self.num_layers, self.batch_size, self.hidden_size)*self.init_val
-    else:
-      h1=torch.rand(self.num_layers, self.batch_size, self.hidden_size)
-      h2=torch.rand(self.num_layers, self.batch_size, self.hidden_size)
-    return (h1.to(device),h2.to(device))
+try: #to avoid environments without torch installation
+  class RNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size,num_layers, matching_in_out=False, init_val=None, apply_sigmoid=False, apply_softmax=False, batch_size=1):
+      super(RNN, self).__init__()
+      self.input_size = input_size
+      self.hidden_size = hidden_size
+      self.output_size = output_size
+      self.num_layers = num_layers
+      self.batch_size = batch_size
+      self.apply_softmax=apply_softmax
+      self.apply_sigmoid=apply_sigmoid
+      self.init_val=init_val
+      self.matching_in_out = matching_in_out #length of input vector matches the length of output vector 
+      self.lstm = nn.LSTM(input_size, hidden_size,num_layers)
+      self.hidden2out = nn.Linear(hidden_size, output_size)
+      if self.apply_softmax: self.softmax =nn.Softmax(dim=2)
+      if self.apply_sigmoid: self.sigmoid =nn.Sigmoid() 
+      
+      #self.sigmoid = torch.sigmoid(dim=1)
+      self.hidden = self.init_hidden()
+    def forward(self, feature_list):
+      self.hidden = self.init_hidden() ### check
+      feature_list=torch.tensor(feature_list)
+      feature_list=feature_list.to(device) #### <<<<<<<<<<<<<<<<< 
+      if self.matching_in_out:
+        lstm_out, _ = self.lstm( feature_list.view(len( feature_list), 1, -1))
+        output_scores = self.hidden2out(lstm_out.view(len( feature_list), -1))
+        if self.apply_sigmoid: output_scores=self.sigmoid(output_scores).to(device)
+        elif self.apply_softmax: output_scores=self.softmax(output_scores).to(device)
+        #output_scores = torch.sigmoid(output_space) #we'll need to check if we need this sigmoid
+        return output_scores #output_scores
+      else:
+        outs=[]
+        for i in range(len(feature_list)):
+          cur_ft_tensor=feature_list[i]#.view([1,1,self.input_size])
+          cur_ft_tensor=cur_ft_tensor.view([1,1,self.input_size])
+          lstm_out, self.hidden = self.lstm(cur_ft_tensor, self.hidden)
+          outs=self.hidden2out(lstm_out)
+          if self.apply_sigmoid: outs = self.sigmoid(outs).to(device) #self.sigmoid =nn.Sigmoid()
+          elif self.apply_softmax: outs = self.softmax(outs).to(device)
+          
+        return outs
+    def init_hidden(self):
+      #return torch.rand(self.num_layers, self.batch_size, self.hidden_size)
+      if self.init_val!=None:
+        h1=torch.ones(self.num_layers, self.batch_size, self.hidden_size)*self.init_val
+        h2=torch.ones(self.num_layers, self.batch_size, self.hidden_size)*self.init_val
+      else:
+        h1=torch.rand(self.num_layers, self.batch_size, self.hidden_size)
+        h2=torch.rand(self.num_layers, self.batch_size, self.hidden_size)
+      return (h1.to(device),h2.to(device))
+except:
+  pass
 
 def to_tensor(list1):
   return torch.tensor(list1,dtype=torch.float32)
