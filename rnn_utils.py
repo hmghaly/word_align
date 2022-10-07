@@ -164,7 +164,7 @@ def load_model_labels(model_fpath0): #load the model + expected output labels
   labels=checkpoint["output_labels"]
   return rnn0,labels
 
-def chk2pickle(chk_pt_fpath0,new_pickle_path0,skip_optimizer=True, skip_eval=True,skip_label=True): #convert torch checkpoint to pickle, and convert tensors to numpy arrays - to work independently from torch
+def chk2pickle(chk_pt_fpath0,new_pickle_path0,skip_function=False,skip_optimizer=True, skip_eval=True,skip_label=True): #convert torch checkpoint to pickle, and convert tensors to numpy arrays - to work independently from torch
   pickle_dict0={}
   try: checkpoint_dict = torch.load(chk_pt_fpath0)
   except: checkpoint_dict = dill_unpickle(chk_pt_fpath0)
@@ -173,6 +173,7 @@ def chk2pickle(chk_pt_fpath0,new_pickle_path0,skip_optimizer=True, skip_eval=Tru
     if skip_optimizer and a.lower()=="optimizer_state_dict": continue
     if skip_eval and a.lower()=="eval_function": continue
     if skip_label and a.lower()=="label_extraction_function": continue
+    if skip_function and "function" in a.lower(): continue
     if "state_dict" in a.lower():
       new_od0=OrderedDict()
       for a1,b1 in b.items():
