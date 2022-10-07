@@ -455,9 +455,10 @@ class model_pred:
       if "function" in k: continue
       print(k,v)
 
-  def predict(self,item_fpath,cur_feature_extraction_fn=None,time_seq=True,cur_use_torch=True): #time sequence - whether the feature extraction function yields times corresponding to features
+  def predict(self,item_fpath,cur_feature_extraction_fn=None,cur_feature_extraction_params=None,time_seq=True,cur_use_torch=True): #time sequence - whether the feature extraction function yields times corresponding to features
     #if self.feature_extraction_fn==None: self.feature_extraction_fn=feature_extraction_fn
     if cur_feature_extraction_fn!=None: self.feature_extraction_fn=cur_feature_extraction_fn
+    if cur_feature_extraction_params!=None: self.feature_extraction_params=cur_feature_extraction_params
     if cur_use_torch==False:  self.use_torch=False
     else: self.use_torch=True
     if time_seq: times,ft_vector=self.feature_extraction_fn(item_fpath,self.feature_extraction_params)
