@@ -13,8 +13,8 @@ except:
   class nn_cls:
     def __init__(self):
       pass
-    def Module(self,n):
-      return n
+    def Module(self,n1,n2):
+      return n1,n2
   nn=nn_cls()
 
 random.seed(1)
