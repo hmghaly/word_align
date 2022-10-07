@@ -13,7 +13,7 @@ except:
   class nn_cls:
     def __init__(self):
       pass
-    def Module(self,n)
+    def Module(self,n):
       return n
   nn=nn_cls()
 
