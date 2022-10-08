@@ -53,6 +53,41 @@ def read_gentle(gentle_out_fpath):
     #print("-------")
   return final_list
 
+
+def read_gentle_new(gentle_out_fpath):
+  final_list=[]
+  fopen=open(gentle_out_fpath)
+  json_obj=json.load(fopen)
+  fopen.close()
+  word_time_phn_list=[]
+  full_phn_list=[]
+  for w0 in json_obj["words"]:
+    word_str=w0["word"]
+    start_t0=w0["start"]
+    end_t0=w0["end"]
+    phones0=w0["phones"]
+    cur_word_obj={}
+    cur_word_obj["word"]=word_str
+    cur_word_obj["start"]=start_t0
+    cur_word_obj["end"]=end_t0
+
+    tmp_rel_phn_list=[]
+    rel_time=0
+    for ph0 in phones0:
+      ph_dur=ph0["duration"]
+      ph_str=ph0["phone"].split("_")[0]
+      cur_start_time=start_t0+rel_time
+      rel_start_time,rel_end_time=rel_time,rel_time+ph_dur
+      tmp_rel_phn_list.append((rel_start_time,rel_end_time,ph_str))
+      rel_time+=ph_dur
+      cur_end_time=start_t0+rel_time
+      full_phn_list.append((cur_start_time,cur_end_time,ph_str))
+      cur_start_time=cur_end_time
+
+    cur_word_obj["phones"]=tmp_rel_phn_list
+    word_time_phn_list.append(cur_word_obj)
+  return word_time_phn_list,full_phn_list
+
 def textgrid_2_dict(fpath,order_elements=False): #process the contents of textgrid file and return as a dictinoary 
 	#parameters: fpath = file path, order_elements = if we want elements (points and intervals) presented as an ordered list within each tier or as an unordered dictionary
 	open_item="" #identify which item/tier are we currently working with
