@@ -40,8 +40,10 @@ def read_gentle(gentle_out_fpath):
   fopen=open(gentle_out_fpath)
   json_obj=json.load(fopen)
   fopen.close()
-  for w0 in json_obj["words"]:
-    start_t0=w0["start"]
+  for w0 in json_obj.get("words",[]):
+    #start_t0=w0["start"]
+    start_t0=w0.get("start")
+    if start_t0==None: continue
     phones0=w0["phones"]
     #print("start_t0",start_t0)
     cur_start_time=start_t0
