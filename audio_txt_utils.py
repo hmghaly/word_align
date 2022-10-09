@@ -35,40 +35,41 @@ def read_phn(phn_fpath0,sample_rate=16000): #also works for wrd files
     phn_list.append((phone_t0,phone_t1,phone0))
   return phn_list
 
+# def read_gentle(gentle_out_fpath):
+#   final_list=[]
+#   fopen=open(gentle_out_fpath)
+#   json_obj=json.load(fopen)
+#   fopen.close()
+#   for w0 in json_obj.get("words",[]):
+#     #start_t0=w0["start"]
+#     start_t0=w0.get("start")
+#     if start_t0==None: continue
+#     phones0=w0["phones"]
+#     #print("start_t0",start_t0)
+#     cur_start_time=start_t0
+#     for ph0 in phones0:
+#       #print(ph0)
+#       ph_dur=ph0["duration"]
+#       ph_str=ph0["phone"].split("_")[0]
+#       cur_end_time=cur_start_time+ph_dur
+#       #print(ph_str,round(cur_start_time,2),round(cur_end_time,2))
+#       final_list.append((cur_start_time,cur_end_time,ph_str))
+#       cur_start_time=cur_end_time
+#     #print("-------")
+#   return final_list
+
+
 def read_gentle(gentle_out_fpath):
-  final_list=[]
-  fopen=open(gentle_out_fpath)
-  json_obj=json.load(fopen)
-  fopen.close()
-  for w0 in json_obj.get("words",[]):
-    #start_t0=w0["start"]
-    start_t0=w0.get("start")
-    if start_t0==None: continue
-    phones0=w0["phones"]
-    #print("start_t0",start_t0)
-    cur_start_time=start_t0
-    for ph0 in phones0:
-      #print(ph0)
-      ph_dur=ph0["duration"]
-      ph_str=ph0["phone"].split("_")[0]
-      cur_end_time=cur_start_time+ph_dur
-      #print(ph_str,round(cur_start_time,2),round(cur_end_time,2))
-      final_list.append((cur_start_time,cur_end_time,ph_str))
-      cur_start_time=cur_end_time
-    #print("-------")
-  return final_list
-
-
-def read_gentle_new(gentle_out_fpath):
   final_list=[]
   fopen=open(gentle_out_fpath)
   json_obj=json.load(fopen)
   fopen.close()
   word_time_phn_list=[]
   full_phn_list=[]
-  for w0 in json_obj["words"]:
+  for w0 in json_obj.get("words",[]):
     word_str=w0["word"]
-    start_t0=w0["start"]
+    start_t0=w0.get("start")
+    if start_t0==None: continue
     end_t0=w0["end"]
     phones0=w0["phones"]
     cur_word_obj={}
