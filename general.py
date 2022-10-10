@@ -561,6 +561,19 @@ def read_zip_lines(zip_fpath0,zipped_file_name0):
   archive0.close()
   return 
 
+def zip_files(file_paths,zip_fpath):
+  compression = zipfile.ZIP_DEFLATED
+  # create the zip file first parameter path/name, second mode
+  zf = zipfile.ZipFile(zip_fpath, mode="w")
+  try:
+    for fpath0 in file_paths:
+      fname=os.path.split(fpath0)[-1]
+      zf.write(fpath0, fname, compress_type=compression)
+  except FileNotFoundError:
+    print("An error occurred")
+  finally:
+    # Don't forget to close the file!
+    zf.close()
 #===================================
 ####################### OTHERS #####################
 def match_seq(list1,list2):
