@@ -72,6 +72,7 @@ import cmudict
 cur_cmu=cmudict.dict()
 
 def word2ipa(word0):
+  word0=word0.replace("’","'")
   arpabet_out=cur_cmu.get(word0.lower(),[""])[0]
   if arpabet_out=="": return []
   ipa_out0=[arpabet2ipa(v) for v in arpabet_out]
