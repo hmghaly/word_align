@@ -553,17 +553,23 @@ def read_zip_file_full(zip_fpath0,zipped_file_name0):
   archive0.close()
   return output.decode("utf-8")
 
-def read_zip_lines(zip_fpath0,zipped_file_name0,one_line0=False):
+def read_zip_lines(zip_fpath0,zipped_file_name0): #iterate line by line of a target zipped file
   archive0 = zipfile.ZipFile(zip_fpath0, 'r')
   target_file = archive0.open(zipped_file_name0)
   for a in target_file:
     output=a.decode("utf-8")
-    if one_line0:
-        archive0.close()
-        return output
     yield output #a.decode("utf-8")
   archive0.close()
   return 
+
+def read_zip_one_line(zip_fpath0,zipped_file_name0): #just the first line in the target zipped file
+  archive0 = zipfile.ZipFile(zip_fpath0, 'r')
+  target_file = archive0.open(zipped_file_name0)
+  for a in target_file:
+    output=a.decode("utf-8")
+    break
+  archive0.close()
+  return output
 
 def zip_files(file_paths,zip_fpath):
   compression = zipfile.ZIP_DEFLATED
