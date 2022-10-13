@@ -436,7 +436,7 @@ class model_pred:
     self.apply_softmax=self.checkpoint.get("apply_softmax",False)
 
     self.feature_extraction_fn=self.checkpoint.get("feature_extraction_function")
-    self.feature_extraction_params=self.checkpoint["feature_extraction_parameters"]
+    self.feature_extraction_params=self.checkpoint.get("feature_extraction_parameters")
     self.standard_labels=self.checkpoint['output_labels']
     self.model_state_dict=self.checkpoint['model_state_dict']
     self.use_torch=False
