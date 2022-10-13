@@ -437,7 +437,8 @@ class model_pred:
 
     self.feature_extraction_fn=self.checkpoint.get("feature_extraction_function")
     self.feature_extraction_params=self.checkpoint.get("feature_extraction_parameters")
-    self.standard_labels=self.checkpoint['output_labels']
+    self.standard_labels=self.checkpoint.get('output_labels')
+    if self.standard_labels==None: self.standard_labels=self.checkpoint.get('standard-labels',[])#params["standard-labels"]
     self.model_state_dict=self.checkpoint['model_state_dict']
     self.use_torch=False
     self.np_lstm_obj=None
