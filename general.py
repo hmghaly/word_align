@@ -23,6 +23,9 @@ def unescape(text_with_html_entities):
 
 ##################### LISTS ###########################
 #advanced list operations
+def avg(list1):
+  return float(sum(list1))/len(list1)	
+
 def flatten(l):
   return [item for sublist in l for item in sublist]
 
