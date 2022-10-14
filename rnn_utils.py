@@ -187,6 +187,13 @@ def chk2pickle(chk_pt_fpath0,new_pickle_path0,skip_function=False,skip_optimizer
   pickle_fopen.close()
 
 
+def state_dict2np(state_dict0):
+  new_od0=OrderedDict()
+  for a1,b1 in state_dict0.items():
+    new_od0[a1]=np.array(b1)
+  return new_od0
+
+
 def get_rnn_result_dict(rnn_out0,standard_labels0):
   flat_rnn_out0=rnn_out0.ravel()
   res_dict0={}
@@ -438,7 +445,7 @@ class model_pred:
     self.feature_extraction_fn=self.checkpoint.get("feature_extraction_function")
     self.feature_extraction_params=self.checkpoint.get("feature_extraction_parameters")
     self.standard_labels=self.checkpoint.get('output_labels')
-    if self.standard_labels==None: self.standard_labels=self.checkpoint.get('standard-labels',[])#params["standard-labels"]
+    if self.standard_labels==None: self.standard_labels=self.checkpoint.get('standard-labels')#params["standard-labels"]
     self.model_state_dict=self.checkpoint['model_state_dict']
     self.use_torch=False
     self.np_lstm_obj=None
