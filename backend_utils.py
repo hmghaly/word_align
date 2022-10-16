@@ -1,5 +1,48 @@
 import os, sys, shelve, json, random, subprocess, tempfile, socket, time
 import base64
+import smtplib #email libraries
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import make_msgid
+from smtplib import SMTP_SSL as SMTP
+import hashlib
+
+def hash_password(pwd0):
+    pwd0=pwd0.encode('utf-8')
+    return hashlib.sha256(pwd0).hexdigest()
+
+def send_email(email_to0,email_subject0,email_html0,email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
+    server = SMTP(server_name0)
+    server.set_debuglevel(False)
+    server.login(email_from0, email_password0)
+    # Create message container - the correct MIME type is multipart/alternative.
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = email_subject0 #"Registration Successful!"
+    email_from_full = "%s <%s>"%(from_name0,email_from0)
+    msg['From'] = email_from_full
+    msg['To'] = email_to0
+    msg['Message-ID'] = make_msgid()
+
+    email_txt0=email_html0.replace("<br>","\n")
+
+    # Record the MIME types of both parts - text/plain and text/html.
+    part1 = MIMEText(email_txt0, 'plain')
+    part2 = MIMEText(email_html0, 'html')
+
+    # Attach parts into message container.
+    # According to RFC 2046, the last part of a multipart message, in this case
+    # the HTML message, is best and preferred.
+    msg.attach(part1)
+    msg.attach(part2)
+
+    # Send the message via local SMTP server.
+    #s = smtplib.SMTP('localhost')
+    # sendmail function takes 3 arguments: sender's address, recipient's address
+    # and message to send - here it is sent as one string.
+    server.sendmail(email_from0, email_to0, msg.as_string())
+    server.quit()  
+    return str(msg)
+
 
 def gen_hex(N=10):
     chars = '0123456789abcdef'
