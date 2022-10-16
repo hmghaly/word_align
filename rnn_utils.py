@@ -22,7 +22,7 @@ random.seed(1)
 
 try: #to avoid environments without torch installation
   class RNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size,num_layers, matching_in_out=False, init_val=None, apply_sigmoid=False, apply_softmax=False, batch_size=1):
+    def __init__(self, input_size, hidden_size, output_size,num_layers, matching_in_out=False, apply_sigmoid=False, apply_softmax=False, init_val=None, batch_size=1):
       super(RNN, self).__init__()
       self.input_size = input_size
       self.hidden_size = hidden_size
@@ -274,10 +274,7 @@ class np_lstm:
     n_hidden=self.n_hidden
     n_layers=self.n_layers
     state_dict0=self.state_dict0
-    #matching_in_out=self.matching_in_out
-
     for layer_i in range(n_layers):
-      #print("layer_i",layer_i)
       layer="l%s"%layer_i
       #Event (x) Weights and Biases for all gates
       Weights_xi = state_dict0['lstm.weight_ih_'+layer][0:n_hidden]  # shape  [h, x]
@@ -314,10 +311,10 @@ class np_lstm:
                       Weights_hl, Bias_hl, Weights_xl, Bias_xl)
         c = cell_state(f,i)
         h = output_gate(eventx, h, Weights_ho, Bias_ho, Weights_xo, Bias_xo, c)
-        if self.matching_in_out: out_list.append(h)
-        else: out_list=h
+        out_list.append(h)
       data_input=np.array(out_list)
-    lstm_out=data_input
+    if self.matching_in_out:lstm_out=data_input
+    else: lstm_out=np.array(h)
     if self.matching_in_out:
       all_output=[]
       for lstm_item in lstm_out:
@@ -329,7 +326,83 @@ class np_lstm:
       res=np.array(cur_output)
     if self.apply_sigmoid: res=sigmoid(res)
     if self.apply_softmax: res=softmax(res)
-    return res    
+    return res 
+
+# class np_lstm:
+#   def __init__(self,state_dict0, matching_in_out0=False,apply_sigmoid=False,apply_softmax=False) -> None:
+#     self.cur_params=get_params(state_dict0)
+#     self.matching_in_out=matching_in_out0
+#     self.apply_sigmoid=apply_sigmoid
+#     self.apply_softmax=apply_softmax
+#     self.n_hidden=self.cur_params["n_hidden"]
+#     self.n_layers=self.cur_params["n_layers"]
+#     self.fc_wt,self.fc_bias=self.cur_params["fc_weight"],self.cur_params["fc_bias"] #fully connected
+#     new_stat_dict={}
+#     for a,b in state_dict0.items(): #just to handle whether th state dict has torch tensors or numpy arrays
+#       try: new_stat_dict[a]=b.numpy() #if torch tensors, convert to numpy
+#       except: new_stat_dict[a]=b #otherwise, keep it
+#     self.state_dict0=new_stat_dict
+
+#   def forward(self,data_input):
+#     n_hidden=self.n_hidden
+#     n_layers=self.n_layers
+#     state_dict0=self.state_dict0
+#     #matching_in_out=self.matching_in_out
+
+#     for layer_i in range(n_layers):
+#       #print("layer_i",layer_i)
+#       layer="l%s"%layer_i
+#       #Event (x) Weights and Biases for all gates
+#       Weights_xi = state_dict0['lstm.weight_ih_'+layer][0:n_hidden]  # shape  [h, x]
+#       Weights_xf = state_dict0['lstm.weight_ih_'+layer][n_hidden:2*n_hidden]  # shape  [h, x]
+#       Weights_xl = state_dict0['lstm.weight_ih_'+layer][2*n_hidden:3*n_hidden]  # shape  [h, x]
+#       Weights_xo = state_dict0['lstm.weight_ih_'+layer][3*n_hidden:4*n_hidden] # shape  [h, x]
+
+#       Bias_xi = state_dict0['lstm.bias_ih_'+layer][0:n_hidden]  #shape is [h, 1]
+#       Bias_xf = state_dict0['lstm.bias_ih_'+layer][n_hidden:2*n_hidden]  #shape is [h, 1]
+#       Bias_xl = state_dict0['lstm.bias_ih_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, 1]
+#       Bias_xo = state_dict0['lstm.bias_ih_'+layer][3*n_hidden:4*n_hidden] #shape is [h, 1]
+
+#       #Hidden state (h) Weights and Biases for all gates
+#       Weights_hi = state_dict0['lstm.weight_hh_'+layer][0:n_hidden]  #shape is [h, h]
+#       Weights_hf = state_dict0['lstm.weight_hh_'+layer][n_hidden:2*n_hidden]  #shape is [h, h]
+#       Weights_hl = state_dict0['lstm.weight_hh_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, h]
+#       Weights_ho = state_dict0['lstm.weight_hh_'+layer][3*n_hidden:4*n_hidden] #shape is [h, h]
+
+#       Bias_hi = state_dict0['lstm.bias_hh_'+layer][0:n_hidden]  #shape is [h, 1]
+#       Bias_hf = state_dict0['lstm.bias_hh_'+layer][n_hidden:2*n_hidden]  #shape is [h, 1]
+#       Bias_hl = state_dict0['lstm.bias_hh_'+layer][2*n_hidden:3*n_hidden]  #shape is [h, 1]
+#       Bias_ho = state_dict0['lstm.bias_hh_'+layer][3*n_hidden:4*n_hidden] #shape is [h, 1]
+
+#       #Initialize cell and hidden states with zeroes
+#       h = np.zeros(n_hidden)
+#       c = np.zeros(n_hidden)
+
+#       #Loop through data, updating the hidden and cell states after each pass
+#       out_list=[]
+#       all_output=[]
+#       for eventx in data_input:
+#         f = forget_gate(eventx, h, Weights_hf, Bias_hf, Weights_xf, Bias_xf, c)
+#         i =  input_gate(eventx, h, Weights_hi, Bias_hi, Weights_xi, Bias_xi, 
+#                       Weights_hl, Bias_hl, Weights_xl, Bias_xl)
+#         c = cell_state(f,i)
+#         h = output_gate(eventx, h, Weights_ho, Bias_ho, Weights_xo, Bias_xo, c)
+#         if self.matching_in_out: out_list.append(h)
+#         else: out_list=h
+#       data_input=np.array(out_list)
+#     lstm_out=data_input
+#     if self.matching_in_out:
+#       all_output=[]
+#       for lstm_item in lstm_out:
+#         cur_output=np.dot(self.fc_wt, lstm_item) + self.fc_bias
+#         all_output.append(cur_output)
+#       res=np.array(all_output)
+#     else:
+#       cur_output=np.dot(self.fc_wt, lstm_out) + self.fc_bias
+#       res=np.array(cur_output)
+#     if self.apply_sigmoid: res=sigmoid(res)
+#     if self.apply_softmax: res=softmax(res)
+#     return res    
 
 
 
