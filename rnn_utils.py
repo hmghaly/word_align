@@ -555,7 +555,11 @@ class model_pred:
       rnn_out=self.np_lstm_obj.forward(ft_vector)
       rnn_out_flat=rnn_out.ravel()
     preds0=out2labels(rnn_out_flat,self.standard_labels) 
-    return preds0  
+    all_pred_dicts=[]
+    for pr0 in preds0:
+    	cur_dict0=dict(iter(pr0))
+    	all_pred_dicts.append(cur_dict0)
+    return all_pred_dicts  
 
 
 # class model_pred_NEW:
