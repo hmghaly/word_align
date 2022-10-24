@@ -252,9 +252,10 @@ def check_pred_words(ipa_words0,preds0): #check the prediction weights for sever
   if len(preds0)==1: res_dict0=preds0[0]  
   final_list=[]
   for ipa_wd0 in ipa_words0:
+    cur_ph_wts0=[]
     cur_ph_dict0={}
-    for ph0 in ipa_wd0: cur_ph_dict0[ph0]=res_dict0.get(ph0,0)
-    final_list.append(cur_ph_dict0)
+    for ph0 in ipa_wd0: cur_ph_wts0.append((ph0,res_dict0.get(ph0,0))) #cur_ph_dict0[ph0]=res_dict0.get(ph0,0)
+    final_list.append(cur_ph_wts0)
   return final_list
 
 #================ numpy RNN implementation
