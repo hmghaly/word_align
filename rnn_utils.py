@@ -240,7 +240,7 @@ def check_pred_pair(ipa_pair0,preds0,correct0=None): #we want to check the predi
     for ph0,ph_wt0 in pair_wt_list0:
       is_correct=False
       if ph_wt0==max_wt0 and ph0==correct0: is_correct=True
-      new_pair_wt_list0.append(ph0,ph_wt0,is_correct)
+      new_pair_wt_list0.append((ph0,ph_wt0,is_correct))
     pair_wt_list0=new_pair_wt_list0
     
     
