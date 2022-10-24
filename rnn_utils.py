@@ -234,7 +234,7 @@ def check_pred_pair(ipa_pair0,preds0): #we want to check the predictions from rn
   if len(preds0)==1: res_dict0=preds0[0]
   pair_wt_list0=[]
   for ip0 in ipa_pair0: pair_wt_list0.append((ip0,round(res_dict0.get(ip0,0),4)))  
-  pair_wt_list0.sort(key=lambda x:-x[-1])
+  #pair_wt_list0.sort(key=lambda x:-x[-1])
   return pair_wt_list0
 
 def check_pred_words(ipa_words0,preds0): #check the prediction weights for several words based on their ipa phonemes
