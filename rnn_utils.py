@@ -229,11 +229,21 @@ def identify_wav(fpath0,rnn_obj0,params0,standard_labels0,word_list0=[],ph_pair0
   return out_dict  
 
 
-def check_pred_pair(ipa_pair0,preds0): #we want to check the predictions from rnn output for the weight of a pair of ipa phonemes
+def check_pred_pair(ipa_pair0,preds0,correct0=None): #we want to check the predictions from rnn output for the weight of a pair of ipa phonemes
   res_dict0={}
   if len(preds0)==1: res_dict0=preds0[0]
   pair_wt_list0=[]
   for ip0 in ipa_pair0: pair_wt_list0.append((ip0,round(res_dict0.get(ip0,0),4)))  
+  max_wt0=max([v[1] for v in pair_wt_list0])
+  if correct0!=None:
+    new_pair_wt_list0=[]
+    for ph0,ph_wt0 in pair_wt_list0:
+      is_correct=False
+      if ph_wt0==max_wt0 and ph0==correct0: is_correct=True
+      new_pair_wt_list0.append(ph0,ph_wt0,is_correct)
+    pair_wt_list0=new_pair_wt_list0
+    
+    
   #pair_wt_list0.sort(key=lambda x:-x[-1])
   return pair_wt_list0
 
