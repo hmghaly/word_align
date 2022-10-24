@@ -254,7 +254,9 @@ def check_pred_words(ipa_words0,preds0): #check the prediction weights for sever
   for ipa_wd0 in ipa_words0:
     cur_ph_wts0=[]
     cur_ph_dict0={}
-    for ph0 in ipa_wd0: cur_ph_wts0.append((ph0,res_dict0.get(ph0,0))) #cur_ph_dict0[ph0]=res_dict0.get(ph0,0)
+    for ph0 in ipa_wd0: 
+      ph_wt0=round(res_dict0.get(ph0,0),4)
+      cur_ph_wts0.append((ph0,ph_wt0)) #cur_ph_dict0[ph0]=res_dict0.get(ph0,0)
     final_list.append(cur_ph_wts0)
   return final_list
 
