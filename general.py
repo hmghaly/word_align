@@ -148,7 +148,7 @@ def tok1(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a
     txt=txt.replace(u'\u2019',"'")
     
     txt=txt.replace("'s ","__a__s ") #keep apostrophe 's
-    txt=re.sub("(\w)'(\w)",r'\1__a__\1',txt) #keep any apostrophe inside a word
+    txt=re.sub("(\w)'(\w)",r'\1__a__\2',txt) #keep any apostrophe inside a word
     # txt=txt.replace("'re ","_re ")
     # txt=txt.replace("can't ","cann_t ")
     # txt=txt.replace("cannot ","can not ")
