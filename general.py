@@ -133,6 +133,36 @@ def get_key(txt): #normalize text by replacing non alpha items with _
 multi_dot_words=["e.g.","i.e.","u.s.a.","u.k.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
 dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
 
+def tok1(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
+    replaced=[]
+    if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
+    if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
+    #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
+    repl_dict={}
+    for i0,u0 in enumerate(replaced):
+        key="__item%s__"%i0
+        repl_dict[key]=u0
+        txt=txt.replace(u0,key)
+
+    #txt=txt.replace(u'\x01'," ")
+    txt=txt.replace(u'\u2019',"'")
+    
+    txt=txt.replace("'s ","__a__s ") #keep apostrophe 's
+    txt=re.sub("(\w)'(\w)",r'\1__a__\1',txt) #keep any apostrophe inside a word
+    # txt=txt.replace("'re ","_re ")
+    # txt=txt.replace("can't ","cann_t ")
+    # txt=txt.replace("cannot ","can not ")
+    # txt=txt.replace("n't ","n_t ")
+    txt=re.sub("(?u)(\W)",r" \1 ", txt)
+    txt=txt.replace("__a__", "'")
+    # txt=txt.replace("_re "," 're ")
+    # txt=txt.replace("n_t "," n't ")
+    for a,b in repl_dict.items():
+        txt=txt.replace(a,b)
+    
+    out=re.split("\s+",txt)
+    return [v for v in out if v]
+
 def tok(text0): #sep 2022
   non_space=text0.split() #simple split by space
   all_tokens0=[]
@@ -160,6 +190,35 @@ def tok(text0): #sep 2022
     if trailing0!="": cur_items_str+=" ".join(list(trailing0)) #split trailing chars and add them
     all_tokens0.extend(cur_items_str.split()) #split the final string and add it to the list of tokens
   return all_tokens0
+
+def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
+    replaced=[]
+    if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
+    if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
+    #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
+    repl_dict={}
+    for i0,u0 in enumerate(replaced):
+        key="__item%s__"%i0
+        repl_dict[key]=u0
+        txt=txt.replace(u0,key)
+
+    #txt=txt.replace(u'\x01'," ")
+    txt=txt.replace(u'\u2019',"'")
+    
+    txt=txt.replace("'s ","_s ")
+    txt=txt.replace("'re ","_re ")
+    txt=txt.replace("can't ","cann_t ")
+    txt=txt.replace("cannot ","can not ")
+    txt=txt.replace("n't ","n_t ")
+    txt=re.sub("(?u)(\W)",r" \1 ", txt)
+    txt=txt.replace("_s ", " 's ")
+    txt=txt.replace("_re "," 're ")
+    txt=txt.replace("n_t "," n't ")
+    for a,b in repl_dict.items():
+        txt=txt.replace(a,b)
+    
+    out=re.split("\s+",txt)
+    return [v for v in out if v]
 
 #sentence tokenization
 #multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."," v."," vs."," v.s.", " et al."," etc.", " al."]
@@ -240,34 +299,7 @@ def tok_simple(txt,full=False): #this tokenization scheme splits around punctuat
 
 
 
-def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
-    replaced=[]
-    if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
-    if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
-    #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
-    repl_dict={}
-    for i0,u0 in enumerate(replaced):
-        key="__item%s__"%i0
-        repl_dict[key]=u0
-        txt=txt.replace(u0,key)
 
-    #txt=txt.replace(u'\x01'," ")
-    txt=txt.replace(u'\u2019',"'")
-    
-    txt=txt.replace("'s ","_s ")
-    txt=txt.replace("'re ","_re ")
-    txt=txt.replace("can't ","cann_t ")
-    txt=txt.replace("cannot ","can not ")
-    txt=txt.replace("n't ","n_t ")
-    txt=re.sub("(?u)(\W)",r" \1 ", txt)
-    txt=txt.replace("_s ", " 's ")
-    txt=txt.replace("_re "," 're ")
-    txt=txt.replace("n_t "," n't ")
-    for a,b in repl_dict.items():
-        txt=txt.replace(a,b)
-    
-    out=re.split("\s+",txt)
-    return [v for v in out if v]
 
 
 ######################## BITEXTS ########################
