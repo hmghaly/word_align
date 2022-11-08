@@ -614,7 +614,29 @@ def zip_files(file_paths,zip_fpath):
     # Don't forget to close the file!
     zf.close()
 #===================================
-####################### OTHERS #####################
+####################### Sequences - Paths OTHERS #####################
+def djk(pt0,pt1,transition_dict0,pt_list0=None):
+  path_wt_dict0={}
+  prev_dict0={}
+  if pt_list0==None: pt_list0=list(transition_dict0.keys())
+  for cur_pt in pt_list0:
+    following_dict0=transition_dict0.get(cur_pt,{})
+    found_cur_path_wt=path_wt_dict0.get(cur_pt,0)
+    for next_pt,next_wt in following_dict0.items():
+      combined_wt=found_cur_path_wt+next_wt
+      found_next_wt=path_wt_dict0.get(next_pt,0)
+      if combined_wt>found_next_wt:
+        path_wt_dict0[next_pt]=combined_wt
+        prev_dict0[next_pt]=cur_pt
+  cur_pt=pt1
+  out_path=[]
+  while cur_pt!=None:
+    out_path.append(cur_pt)
+    if cur_pt==pt0: break
+    cur_pt=prev_dict0.get(cur_pt)
+  out_path=list(reversed(out_path))
+  return out_path, path_wt_dict0.get(pt1)
+
 def match_seq(list1,list2):
     output=[]
     s = SequenceMatcher(None, list1, list2)
