@@ -1,4 +1,21 @@
 import time, json, shelve, os
+
+def filter_toks(tok_list0,params={}):
+  cur_excluded_words=params.get("excluded_words",[])
+  if params.get("lower",True): tok_list0=[v.lower() for v in tok_list0] #make all words lower case or not
+  if cur_excluded_words!=[]: tok_list0=[v if not v in cur_excluded_words else "" for v in tok_list0] #ignore stop words
+  if params.get("exclude_single_chars",False): tok_list0=[v if len(v)>1 else "" for v in tok_list0] #ignore single character tokens
+  if params.get("exclude_punc",True): tok_list0=[v if not is_punct(v) else "" for v in tok_list0] #ignore punctuation
+  
+  if params.get("ignore_ar_pre_suf",True): tok_list0=["" if v.startswith("ـ") or v.endswith("ـ") else v for v in tok_list0] #ignore arabic prefixes and suffixes
+  if params.get("remove_al",True): tok_list0=[v.replace("ال_","") for v in tok_list0] #remove alif laam for the beginning of Arabic words
+  if params.get("normalize_digits",False): tok_list0=["5"*len(v) if v.isdigit() else v for v in tok_list0] #normalize numbers to just the number of digits 1995 > 5555
+  #if params.get("stemming",False): tok_list0=[v else v for v in tok_list0] #stem each word or not
+  #remove_al=params0.get("remove_al", False) #remocve alif laam in Arabic
+
+  return tok_list0
+
+
 def go2line(fpath0,loc0,size0=None):
   fopen0=open(fpath0)
   fopen0.seek(loc0)
