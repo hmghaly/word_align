@@ -1,5 +1,8 @@
 import time, json, shelve, os, re, sys
 from itertools import groupby
+from math import log
+
+
 #from general import * 
 sys.path.append("code_utils")
 import general
@@ -16,9 +19,11 @@ def filter_toks(tok_list0,params={}):
   if params.get("normalize_digits",False): tok_list0=["5"*len(v) if v.isdigit() else v for v in tok_list0] #normalize numbers to just the number of digits 1995 > 5555
   #if params.get("stemming",False): tok_list0=[v else v for v in tok_list0] #stem each word or not
   #remove_al=params0.get("remove_al", False) #remocve alif laam in Arabic
-
   return tok_list0
 
+def get_size_factor(size0): #account for larger phrases - such as month names - by giving a small factor to increase their weight
+  factor0=log(10+size0)/2
+  return factor0
 
 def go2line(fpath0,loc0,size0=None):
   fopen0=open(fpath0)
@@ -263,6 +268,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   lang1=retr_align_params0.get("lang1","en")
   lang2=retr_align_params0.get("lang2","ar")
   exclude_numbers=retr_align_params0.get("exclude_numbers",False)
+  apply_size_factor=retr_align_params0.get("apply_size_factor",True)
   max_phrase_len=retr_align_params0.get("max_phrase_len",8) #when we get the phrases from a sentence
   max_phrase_dist=retr_align_params0.get("max_phrase_dist",10) #maximum distance when combining two phrases
   min_phrase_wt=retr_align_params0.get("min_phrase_wt",0.01)
@@ -317,6 +323,9 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
       if ratio1==0: continue
       if ratio1<min_phrase_wt: continue
       if intersection1<2: continue
+      if apply_size_factor: 
+        avg_size=(len(src_locs0)+len(trg_locs0))/2
+        ratio1=ratio1*get_size_factor(avg_size)
       matching_list.append((src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,min_locs_count,intersection1,ratio1))
 
   matching_list.sort(key=lambda x:-x[-1])
