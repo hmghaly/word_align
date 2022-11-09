@@ -1,5 +1,5 @@
 import time, json, shelve, os
-from general import * 
+#from general import * 
 
 def filter_toks(tok_list0,params={}):
   cur_excluded_words=params.get("excluded_words",[])
@@ -252,6 +252,8 @@ def split_path_chunks(path_list0,skip_last=False): #split a path e.g. cur_list=[
       path_chunks0.append(cur_chunk)
   return path_chunks0
 
+def temp_tok(txt): #temporary tokenization function
+  return re.findall("\w+",txt)
 
 def walign(src_sent0,trg_sent0,retr_align_params0={}):
   filter_params0=retr_align_params0.get("filter_params",{})
@@ -261,11 +263,13 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   max_phrase_len=retr_align_params0.get("max_phrase_len",8) #when we get the phrases from a sentence
   max_phrase_dist=retr_align_params0.get("max_phrase_dist",10) #maximum distance when combining two phrases
   min_phrase_wt=retr_align_params0.get("min_phrase_wt",0.01)
+  tok_fn=retr_align_params0.get("tok_fn",temp_tok)
   lang2_tok_fn=retr_align_params0.get("lang2_tok_fn")
+
   punc_pairs0=retr_align_params0.get("punc_pairs",{}) 
-  src_tokens=tok(src_sent0)
+  src_tokens=tok_fn(src_sent0)
   if lang2=="ar" and lang2_tok_fn!=None: trg_tokens=lang2_tok_fn(trg_sent0)
-  else: trg_tokens=tok(trg_sent0)
+  else: trg_tokens=tok_fn(trg_sent0)
   src_tokens_filtered=filter_toks(src_tokens,filter_params0)
   trg_tokens_filtered=filter_toks(trg_tokens,filter_params0) #need to make filter_tokens > OLD
   unique_src_tokens=list(set([v for v in src_tokens_filtered if v!=""]))
