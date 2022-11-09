@@ -269,7 +269,9 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   lang2=retr_align_params0.get("lang2","ar")
   exclude_numbers=retr_align_params0.get("exclude_numbers",False)
   apply_size_factor=retr_align_params0.get("apply_size_factor",True)
+  single_pass=retr_align_params0.get("single_pass",False)  #do only one djkestra pass on the elements
   max_phrase_len=retr_align_params0.get("max_phrase_len",8) #when we get the phrases from a sentence
+  max_sent_len=retr_align_params0.get("max_sent_len",30) #when we get the phrases from a sentence
   max_phrase_dist=retr_align_params0.get("max_phrase_dist",10) #maximum distance when combining two phrases
   min_phrase_wt=retr_align_params0.get("min_phrase_wt",0.01)
   tok_fn=retr_align_params0.get("tok_fn",general.tok)
@@ -279,6 +281,8 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   src_tokens=tok_fn(src_sent0)
   if lang2=="ar" and lang2_tok_fn!=None: trg_tokens=lang2_tok_fn(trg_sent0)
   else: trg_tokens=tok_fn(trg_sent0)
+
+
   src_tokens_filtered=filter_toks(src_tokens,filter_params0)
   trg_tokens_filtered=filter_toks(trg_tokens,filter_params0) #need to make filter_tokens > OLD
   unique_src_tokens=list(set([v for v in src_tokens_filtered if v!=""]))
@@ -289,6 +293,12 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   trg_tok_loc_dict=get_unigram_locs(trg_tokens_padded)
   src_tokens_filtered_padded=["<s>"]+src_tokens_filtered+["</s>"] #main list to be aligned
   trg_tokens_filtered_padded=["<s>"]+trg_tokens_filtered+["</s>"]
+
+  result_dict0={}
+  result_dict0["src"]=src_tokens_padded
+  result_dict0["trg"]=trg_tokens_padded
+
+  if len(src_tokens)>max_sent_len or len(trg_tokens)>max_sent_len: return result_dict0
 
   #Now we load the indexes for our tokens
   t0=time.time()
@@ -401,6 +411,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
           el_dict[combined_el]=chunk_wt
           el_child_dict[combined_el]=chunk_els
           new_el_counter+=1
+    if single_pass: break #if we only pass from top left to bottom right in one go
     #print("finished processing SE, new_el_counter:",new_el_counter)
     for cur_el,b in ne_transition_dict.items():
       next_els=list(b.keys())
@@ -431,9 +442,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   #   print(">>>", s_al, src_tokens_padded[s_al[0]:s_al[1]+1])
   #   print(">>>", t_al, trg_tokens_padded[t_al[0]:t_al[1]+1])
   #   print("----")
-  result_dict0={}
-  result_dict0["src"]=src_tokens_padded
-  result_dict0["trg"]=trg_tokens_padded
+
   result_dict0["align"]=align_list
   return result_dict0
 
