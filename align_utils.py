@@ -266,7 +266,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   max_phrase_len=retr_align_params0.get("max_phrase_len",8) #when we get the phrases from a sentence
   max_phrase_dist=retr_align_params0.get("max_phrase_dist",10) #maximum distance when combining two phrases
   min_phrase_wt=retr_align_params0.get("min_phrase_wt",0.01)
-  tok_fn=retr_align_params0.get("tok_fn",temp_tok)
+  tok_fn=retr_align_params0.get("tok_fn",general.tok)
   lang2_tok_fn=retr_align_params0.get("lang2_tok_fn")
 
   punc_pairs0=retr_align_params0.get("punc_pairs",{}) 
@@ -283,6 +283,8 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   trg_tok_loc_dict=get_unigram_locs(trg_tokens_padded)
   src_tokens_filtered_padded=["<s>"]+src_tokens_filtered+["</s>"] #main list to be aligned
   trg_tokens_filtered_padded=["<s>"]+trg_tokens_filtered+["</s>"]
+  print("src_tokens_filtered_padded",src_tokens_filtered_padded)
+  print("trg_tokens_filtered_padded",trg_tokens_filtered_padded)
 
   #Now we load the indexes for our tokens
   t0=time.time()
