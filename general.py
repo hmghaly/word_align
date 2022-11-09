@@ -1,4 +1,4 @@
-import re, os, shelve, unicodedata, sys
+import re, os, shelve, unicodedata, sys, json
 #import pandas as pd
 import re
 
@@ -395,6 +395,11 @@ def read(fpath):
 	content=file_open.read()
 	file_open.close()
 	return content
+
+def read_json(fpath):
+    with open(fpath) as file_open0:
+        cur_dict0=json.load(file_open0)
+    return cur_dict0
 
 
 
