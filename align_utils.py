@@ -377,7 +377,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
       next_els=list(b.keys())
       if len(next_els)<2: continue
       cur_pts=[cur_el]+next_els
-      cur_path,cur_path_wt=djk(cur_el,se_el,se_transition_dict,cur_pts)
+      cur_path,cur_path_wt=general.djk(cur_el,se_el,se_transition_dict,cur_pts)
       path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
       path_el_wts_chunks=split_path_chunks(path_el_wts)
       #print("se",cur_el,next_els)
@@ -397,7 +397,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
       next_els=list(b.keys())
       if len(next_els)<2: continue
       cur_pts=[cur_el]+next_els
-      cur_path,cur_path_wt=djk(cur_el,ne_el,ne_transition_dict,cur_pts)
+      cur_path,cur_path_wt=general.djk(cur_el,ne_el,ne_transition_dict,cur_pts)
       path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
       path_el_wts_chunks=split_path_chunks(path_el_wts)
       #print("ne",cur_el,next_els)
