@@ -283,8 +283,6 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   trg_tok_loc_dict=get_unigram_locs(trg_tokens_padded)
   src_tokens_filtered_padded=["<s>"]+src_tokens_filtered+["</s>"] #main list to be aligned
   trg_tokens_filtered_padded=["<s>"]+trg_tokens_filtered+["</s>"]
-  print("src_tokens_filtered_padded",src_tokens_filtered_padded)
-  print("trg_tokens_filtered_padded",trg_tokens_filtered_padded)
 
   #Now we load the indexes for our tokens
   t0=time.time()
