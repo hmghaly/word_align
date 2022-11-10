@@ -275,7 +275,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   lang1=retr_align_params0.get("lang1","en")
   lang2=retr_align_params0.get("lang2","ar")
   exclude_numbers=retr_align_params0.get("exclude_numbers",False)
-  apply_size_factor=retr_align_params0.get("apply_size_factor",True)
+  apply_size_factor=retr_align_params0.get("apply_size_factor",False)
   single_pass=retr_align_params0.get("single_pass",False)  #do only one djkestra pass on the elements
   max_phrase_len=retr_align_params0.get("max_phrase_len",8) #when we get the phrases from a sentence
   max_sent_len=retr_align_params0.get("max_sent_len",30) #when we get the phrases from a sentence
@@ -334,7 +334,8 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
     src_locs0,src_indexes0=src_indexes_locs
     for trg_phrase_str,trg_indexes_locs in trg_output.items():
       trg_locs0,trg_indexes0=trg_indexes_locs
-      if src_phrase_str==trg_phrase_str: ratio1,intersection1=0.5, 1000
+      if src_phrase_str==trg_phrase_str: 
+        ratio1,intersection1=0.5, 1000
       else: ratio1,intersection1=get_index_match_ratio_count(src_indexes0,trg_indexes0)
       min_locs_count=min(len(src_locs0),len(trg_locs0)) #we subtract from the number of locs of each phrase the minimum
       if ratio1==0: continue
@@ -353,6 +354,16 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
       new_matching_list.append((src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,intersection1,ratio1))
     phrase_count_src_dict[src_phrase_str]=phrase_count_src_dict[src_phrase_str]-min_locs_count #subtract the minimum count of instances from both src and trg
     phrase_count_trg_dict[trg_phrase_str]=phrase_count_trg_dict[trg_phrase_str]-min_locs_count
+
+  for excluded_src_tok0,excluded_src_locs0 in src_tok_loc_dict.items(): #check matching tokens with their src/trg locs from the filtered out tokens
+    if excluded_src_tok0 in src_tokens_filtered_padded: continue
+    excluded_trg_locs0=trg_tok_loc_dict.get(excluded_src_tok0,[])
+    if excluded_trg_locs0==[]: continue
+    ex_src_locs=[[v] for v in excluded_src_locs0]
+    ex_trg_locs=[[v] for v in excluded_trg_locs0]
+    ratio1,intersection1=0.5, 1000
+    new_matching_list.append((excluded_src_tok0,excluded_src_tok0,ex_src_locs,ex_trg_locs,intersection1,ratio1))
+
   
   for src_punc0,trg_punc0 in punc_pairs0.items(): #now let's match punctuation from the original tokens
     punc_src_locs=src_tok_loc_dict.get(src_punc0,[])
