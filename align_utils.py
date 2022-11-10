@@ -246,10 +246,10 @@ def get_ne_se_dict(all_elements0): #elements are pairs of src/trg spans
         if trg_span1[1]<trg_span0[0]: #going north east
           direction="ne"
           ne_transition_dict0[el0][el1]=el_wt0
-      if src_span1==src_span0 and trg_span1[0]>trg_span0[1] and src_span0[1]-src_span0[0]<3: #vertical: multiple target words/phrase corresponding to one source phrase
+      if src_span1==src_span0 and trg_span1[0]>trg_span0[1] and src_span0[1]-src_span0[0]<2: #vertical: multiple target words/phrase corresponding to one source phrase
         direction="south"
         se_transition_dict0[el0][el1]=el_wt0
-      if trg_span1==trg_span0 and src_span1[0]>src_span0[1] and trg_span0[1]-trg_span0[0]<3: #horizontal: multiple source words/phrases corresponding to one target phrase
+      if trg_span1==trg_span0 and src_span1[0]>src_span0[1] and trg_span0[1]-trg_span0[0]<2: #horizontal: multiple source words/phrases corresponding to one target phrase
         direction="east"
         ne_list.append((el1,el_wt1))
         se_transition_dict0[el0][el1]=el_wt0
