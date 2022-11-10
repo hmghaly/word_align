@@ -226,27 +226,34 @@ def get_rec_el_children(el0,el_child_dict0,el_list0=[]):
 
 def get_ne_se_dict(all_elements0): #elements are pairs of src/trg spans
   se_transition_dict0,ne_transition_dict0={},{} #identify the possible transitions from one element to another - southeast or northeast
+  #test_transition_dict0={}
   for el0,el_wt0 in all_elements0:
-    #print(el0,el_wt0)
     src_span0,trg_span0=el0
     se_transition_dict0[el0]={}
     ne_transition_dict0[el0]={}
+    #test_transition_dict0[el0]={}
     ne_list,se_list=[],[]
     for el1,el_wt1 in all_elements0:
+      if el0==el1: continue
       src_span1,trg_span1=el1
-      if src_span0==src_span1 or trg_span0==trg_span1: continue
-      if src_span1[0]<=src_span0[1]: continue
       src_span_dist=get_span_dist(src_span0,src_span1)
       trg_span_dist=get_span_dist(trg_span0,trg_span1)
       direction=None
-      if trg_span1[0]>trg_span0[1]: 
-        direction="se"
-        se_list.append((el1,el_wt1))
+      if src_span1[0]>src_span0[1]:
+        if trg_span1[0]>trg_span0[1]: #going south east
+          direction="se"
+          se_transition_dict0[el0][el1]=el_wt0
+        if trg_span1[1]<trg_span0[0]: #going north east
+          direction="ne"
+          ne_transition_dict0[el0][el1]=el_wt0
+      if src_span1==src_span0 and trg_span1[0]>trg_span0[1] and src_span0[1]-src_span0[0]<3: #vertical: multiple target words/phrase corresponding to one source phrase
+        direction="south"
         se_transition_dict0[el0][el1]=el_wt0
-      if trg_span1[1]<trg_span0[0]: 
-        direction="ne"
+      if trg_span1==trg_span0 and src_span1[0]>src_span0[1] and trg_span0[1]-trg_span0[0]<3: #horizontal: multiple source words/phrases corresponding to one target phrase
+        direction="east"
         ne_list.append((el1,el_wt1))
-        ne_transition_dict0[el0][el1]=el_wt0
+        se_transition_dict0[el0][el1]=el_wt0
+
       if direction==None: continue
   return se_transition_dict0, ne_transition_dict0
 
