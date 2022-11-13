@@ -457,7 +457,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
     #print("full_el",full_el,"cur_full_wt",cur_full_wt)
     if cur_full_wt>0 and cur_full_wt==top_wt: break
     top_wt=cur_full_wt
-  align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children0)
+  align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children0)
   align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]
   # for s_al,t_al in align_list:
   #   print(">>>", s_al, src_tokens_padded[s_al[0]:s_al[1]+1])
