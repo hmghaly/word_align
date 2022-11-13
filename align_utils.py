@@ -216,11 +216,12 @@ def get_span_dist(span1,span2):
   d_total=max_x-min_x
   return d_total-d1-d2
 
-def get_rec_el_children(el0,el_child_dict0,el_list0=[]):
+def get_rec_el_children(el0,el_child_dict0,el_list0=[],only_without_children=False):
   cur_children0=el_child_dict0.get(el0,[])
-  if cur_children0==[]: el_list0.append(el0)
+  if only_without_children and cur_children0==[]: el_list0.append(el0)
+  else: el_list0.append(el0)
   for ch0 in cur_children0:
-    el_list0=get_rec_el_children(ch0,el_child_dict0,el_list0)
+    el_list0=get_rec_el_children(ch0,el_child_dict0,el_list0,only_without_children)
   return el_list0
 
 
@@ -283,6 +284,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   min_phrase_wt=retr_align_params0.get("min_phrase_wt",0.01)
   tok_fn=retr_align_params0.get("tok_fn",general.tok)
   lang2_tok_fn=retr_align_params0.get("lang2_tok_fn")
+  only_without_children0=retr_align_params0.get("only_without_children",False) #get only the elements without children 
 
   punc_pairs0=retr_align_params0.get("punc_pairs",{}) 
   src_tokens=tok_fn(src_sent0)
@@ -455,7 +457,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
     #print("full_el",full_el,"cur_full_wt",cur_full_wt)
     if cur_full_wt>0 and cur_full_wt==top_wt: break
     top_wt=cur_full_wt
-  align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[])
+  align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children0)
   align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]
   # for s_al,t_al in align_list:
   #   print(">>>", s_al, src_tokens_padded[s_al[0]:s_al[1]+1])
