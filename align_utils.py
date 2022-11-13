@@ -285,6 +285,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   tok_fn=retr_align_params0.get("tok_fn",general.tok)
   lang2_tok_fn=retr_align_params0.get("lang2_tok_fn")
   only_without_children0=retr_align_params0.get("only_without_children",False) #get only the elements without children 
+  reward_combined_phrases=retr_align_params0.get("reward_combined_phrases",True)
 
   punc_pairs0=retr_align_params0.get("punc_pairs",{}) 
   src_tokens=tok_fn(src_sent0)
@@ -448,8 +449,9 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
         found_wt=el_dict.get(combined_el,0)
         found_children=el_child_dict.get(combined_el,[])
         if chunk_wt>found_wt:
+          if reward_combined_phrases: chunk_wt+=0.00000001 #give advantage to combined phrases
           #print("combined_el",combined_el,"chunk_wt",chunk_wt,"found_wt",found_wt,"found_children",found_children)
-          el_dict[combined_el]=chunk_wt
+          el_dict[combined_el]=chunk_wt#+0.00000001
           el_child_dict[combined_el]=chunk_els
           new_el_counter+=1
     #print("finished processing NE, new_el_counter:",new_el_counter)
