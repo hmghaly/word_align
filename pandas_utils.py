@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 
 def get_sheet_list(sheet_obj,key_col0,val_col0): #pandas get conversion dicts
   #tmp_sheet_dict={}
@@ -35,6 +36,23 @@ def get_xls_sheet_col_data(xls_fpath0,sheet_name0,col_names0,default_val0=0.,exc
     if not valid_row: continue
     all_col_data.append(cur_list)
   return all_col_data  
+
+def get_sheets_cols(wb_obj0,sheet_names0,col_names0,apply_str=True,exclude_nan=True, exclude_empty=True,default_val0=""):
+  all_col_data=[]
+  for sh0 in sheet_names0:
+    cur_sheet0=wb_obj0[sh0]
+    for index0,row_dict0 in cur_sheet0.iterrows():
+      cur_list=[row_dict0.get(v,default_val0) for v in col_names0]
+      valid_row=True
+      for cl in cur_list: 
+        if apply_str: cl=str(cl)
+        #print(cl, type(cl))
+        #if not type(cl) is str: cl=str(cl) 
+        #if exclude_nan and math.isnan(cl): valid_row=False
+        if exclude_empty and cl=="": valid_row=False
+      if not valid_row: continue
+      all_col_data.append(cur_list)
+  return all_col_data
 
 if __name__=="__main__":
   print("Hello")
