@@ -274,6 +274,9 @@ def temp_tok(txt): #temporary tokenization function
 
 def walign(src_sent0,trg_sent0,retr_align_params0={}):
   filter_params0=retr_align_params0.get("filter_params",{})
+  extra_src_index_dict0=retr_align_params0.get("extra_src_index",{})
+  extra_trg_index_dict0=retr_align_params0.get("extra_trg_index",{})
+
   lang1=retr_align_params0.get("lang1","en")
   lang2=retr_align_params0.get("lang2","ar")
   exclude_numbers=retr_align_params0.get("exclude_numbers",False)
@@ -318,9 +321,11 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   for ut in unique_src_tokens: 
     if ut.isdigit() and exclude_numbers: continue
     src_index_dict[ut]=get_word_indexes(ut,"src",retr_align_params0)
+    src_index_dict[ut]["extra"]=extra_src_index_dict0.get(ut,[])
   for ut in unique_trg_tokens: 
     if ut.isdigit() and exclude_numbers: continue
     trg_index_dict[ut]=get_word_indexes(ut,"trg",retr_align_params0)
+    trg_index_dict[ut]["extra"]=extra_trg_index_dict0.get(ut,[])
   elapsed=time.time()-t0
   #print("src:",len(unique_src_tokens),"trg:",len(unique_trg_tokens),"elapsed:",round(elapsed,4))
   #print("now mtaching src -trg tokens/phrases")
@@ -481,7 +486,7 @@ def tok_bitext(list0,params0={}):
       trg_toks0=general.tok(trg0)
       if params0.get("lang2")=="ar": trg_toks0=arabic_lib.tok_ar(trg_toks0,cur_ar_counter_dict)
     except Exception as ex: 
-    	print(ex,src0,trg0)
+    	print("tokenization error:", ex,src0,trg0)
     	continue
     tokenized_bitext_list0.append((cur_loc,src_toks0,trg_toks0))
   return tokenized_bitext_list0
