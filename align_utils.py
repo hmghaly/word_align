@@ -6,6 +6,7 @@ from math import log
 #from general import * 
 sys.path.append("code_utils")
 import general
+import arabic_lib
 
 def filter_toks(tok_list0,params={}):
   cur_excluded_words=params.get("excluded_words",[])
@@ -469,6 +470,39 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   result_dict0["align"]=align_list_wt
   return result_dict0
 
+
+def tok_bitext(list0,params0={}):
+  cur_ar_counter_dict=params0.get("ar_counter_dict",{})
+  tokenized_bitext_list0=[]
+  for cur_loc,src_trg in enumerate(list0):
+    src0,trg0=src_trg
+    try:
+      src_toks0=tok(src0)
+      if params0.get("lang")=="ar": trg_toks0=arabic_lib.tok_ar(trg0,cur_ar_counter_dict)
+      else: trg_toks0=tok(trg0)
+    except: continue
+    tokenized_bitext_list0.append((cur_loc,src_toks0,trg_toks0))
+  return tokenized_bitext_list0
+
+def index_bitext_list(list0,params0={}): #each list item = (loc/sent_id,src_tokens,trg_tokens)
+  max_sent_n_tokens=params0.get("max_sent_n_tokens",1000)
+  t_bitext0=tok_bitext(list0,params0={})
+  src_fwd_index0,trg_fwd_index0=[],[]
+  for cur_loc,src_toks0,trg_toks0 in t_bitext0:
+    #src_toks0,trg_toks0=t_pair0
+    filtered_src0=filter_toks(src_toks0,params0)
+    filtered_trg0=filter_toks(trg_toks0,params0)
+    indexed_src0=[(v,cur_loc+vi/max_sent_n_tokens) for vi,v in enumerate(filtered_src0) if vi<max_sent_n_tokens and v!=""]
+    indexed_trg0=[(v,cur_loc+vi/max_sent_n_tokens) for vi,v in enumerate(filtered_trg0) if vi<max_sent_n_tokens and v!=""]
+    src_fwd_index0.extend(indexed_src0)
+    trg_fwd_index0.extend(indexed_trg0) 
+  src_fwd_index0.sort()
+  trg_fwd_index0.sort()
+  grouped_src=[(key,[v[1] for v in list(group)]) for key,group in groupby(src_fwd_index0,lambda x:x[0])]
+  grouped_trg=[(key,[v[1] for v in list(group)]) for key,group in groupby(trg_fwd_index0,lambda x:x[0])]
+  inverted_src0=dict(iter(grouped_src))  
+  inverted_trg0=dict(iter(grouped_trg))  
+  return inverted_src0,  inverted_trg0
 
 if __name__=="__main__":
   index_dir="indexes/un/exp3"
