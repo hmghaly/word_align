@@ -12,8 +12,8 @@ def get_sheet_list(sheet_obj,key_col0,val_col0): #pandas get conversion dicts
     #tmp_sheet_dict[cur_key]=cur_val
   return tmp_sheet_list
 
-def get_workbook_obj(path0):
-  return pd.read_excel(path0, None,keep_default_na=False)
+def get_workbook_obj(path0,dtype0=str):
+  return pd.read_excel(path0, None,keep_default_na=False,dtype=dtype0)
 
 def get_sheet_obj(wb_obj,sheet):
   return wb_obj[sheet]

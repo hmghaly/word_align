@@ -481,7 +481,7 @@ def tok_bitext(list0,params0={}):
       trg_toks0=general.tok(trg0)
       if params0.get("lang2")=="ar": trg_toks0=arabic_lib.tok_ar(trg_toks0,cur_ar_counter_dict)
     except Exception as ex: 
-    	print(ex)
+    	print(ex,src0,trg0)
     	continue
     tokenized_bitext_list0.append((cur_loc,src_toks0,trg_toks0))
   return tokenized_bitext_list0
