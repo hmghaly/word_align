@@ -477,8 +477,8 @@ def tok_bitext(list0,params0={}):
   for cur_loc,src_trg in enumerate(list0):
     src0,trg0=src_trg
     try:
-      src_toks0=tok(src0)
-      trg_toks0=tok(trg0)
+      src_toks0=general.tok(src0)
+      trg_toks0=general.tok(trg0)
       if params0.get("lang2")=="ar": trg_toks0=arabic_lib.tok_ar(trg_toks0,cur_ar_counter_dict)
     except Exception as ex: 
     	print(ex)
