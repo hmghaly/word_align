@@ -132,11 +132,16 @@ def get_key(txt): #normalize text by replacing non alpha items with _
 
 multi_dot_words=["e.g.","i.e.","u.s.a.","u.k.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
 dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
+diac=u'\u064e\u064f\u0650\u0651\u0652\u064c\u064b\u064d\ufc62'
 
-def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
+def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False,keep_diacritics=True): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
     replaced=[]
     if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
     if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
+    if keep_diacritics:
+        for d0 in diac: 
+            if d0 in txt: replaced.append(d0)
+
     #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
     repl_dict={}
     for i0,u0 in enumerate(replaced):
