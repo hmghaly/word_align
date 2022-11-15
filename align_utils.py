@@ -520,11 +520,11 @@ def apply_trie(src_toks0,trg_toks0,trie0):
     for i1 in range(i0,len(src_toks0)):
       src_span0=(i0,i1)
       items=src_toks0[i0:i1+1]+[""]
-      cur_val=walk_trie(trie0,items,terminal_item="")
+      cur_val=general.walk_trie(trie0,items,terminal_item="")
       if cur_val==None: continue
       for val0 in cur_val:
         trg_phrase0,trg_ratio0,trg_freq0=val0
-        trg_locs=is_in(trg_phrase0,trg_toks0)
+        trg_locs=general.is_in(trg_phrase0,trg_toks0)
         for trg_span0 in trg_locs:
           match_item=(src_span0,trg_span0,trg_ratio0,trg_freq0)
           match_list0.append(match_item)
@@ -624,7 +624,7 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,min_freq_without_penalty0=20
   align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children0)
   align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]  
   return align_list_wt
-  
+
 
 if __name__=="__main__":
   index_dir="indexes/un/exp3"
