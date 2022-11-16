@@ -490,8 +490,10 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
 def tok_bitext(list0,params0={}):
   cur_ar_counter_dict=params0.get("ar_counter_dict",{})
   tokenized_bitext_list0=[]
-  for cur_loc,src_trg in enumerate(list0):
-    src0,trg0=src_trg
+  if len(list0[0])==2: list0=[(vi,v[0],v[1]) for vi,v in enumerate(list0)] #if it is just list of src/trg sentences - else the list should be loc,src,trg 
+  #for cur_loc,src_trg in enumerate(list0):
+  for cur_loc,src0,trg0 in list0:
+    #src0,trg0=src_trg
     try:
       src_toks0=general.tok(src0)
       trg_toks0=general.tok(trg0)
