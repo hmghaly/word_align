@@ -395,17 +395,13 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
     punc_trg_locs=[[v] for v in punc_trg_locs]
     new_matching_list.append((src_punc0,trg_punc0,punc_src_locs,punc_trg_locs,intersection1,ratio1))
 
-
-
-
-
   new_matching_list.sort(key=lambda x:-x[-1])
   elapsed=time.time()-t0
   span_matching_list=[]
   #print("finished matching words and phrases:", elapsed)
   #Now we have the matching list - let's align
-  el_dict={} #weight of each element
-  el_child_dict={} #children of each element
+  # el_dict={} #weight of each element
+  # el_child_dict={} #children of each element
   for a in new_matching_list:
     #print(a)
     src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,intersection1,ratio1=a
@@ -419,88 +415,88 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
         
 
         #src_span0,trg_span0,ratio0,freq0
-        el0=((s_min,s_max) ,(t_min,t_max))
-        el_dict[el0]=ratio1
+        # el0=((s_min,s_max) ,(t_min,t_max))
+        # el_dict[el0]=ratio1
 
   align_list_wt0=get_aligned_path(src_tokens_padded,trg_tokens_padded,span_matching_list)
   result_dict0["align"]=align_list_wt0
   return result_dict0
 
   
-  first_src_span,first_trg_span=(0,0),(0,0)
-  last_src_span=(len(src_tokens_padded)-1,len(src_tokens_padded)-1)
-  last_trg_span=(len(trg_tokens_padded)-1,len(trg_tokens_padded)-1)
-  ne_el=(last_src_span,first_trg_span) #north eastern element - uppermost rightmost, so we go diagonally up to the right
-  se_el=(last_src_span,last_trg_span)
-  el_dict[ne_el]=0
-  top_wt=0
-  full_src_span0=(0,len(src_tokens_padded)-1)
-  full_trg_span0=(0,len(trg_tokens_padded)-1)
-  full_el=(full_src_span0,full_trg_span0)
+  # first_src_span,first_trg_span=(0,0),(0,0)
+  # last_src_span=(len(src_tokens_padded)-1,len(src_tokens_padded)-1)
+  # last_trg_span=(len(trg_tokens_padded)-1,len(trg_tokens_padded)-1)
+  # ne_el=(last_src_span,first_trg_span) #north eastern element - uppermost rightmost, so we go diagonally up to the right
+  # se_el=(last_src_span,last_trg_span)
+  # el_dict[ne_el]=0
+  # top_wt=0
+  # full_src_span0=(0,len(src_tokens_padded)-1)
+  # full_trg_span0=(0,len(trg_tokens_padded)-1)
+  # full_el=(full_src_span0,full_trg_span0)
 
-  #start iteration here
-  n_epochs=10
-  for epoch0 in range(n_epochs):
-    #print("epoch0",epoch0)
-    all_elements=list(el_dict.items())
-    all_elements.sort()
-    se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements)
-    new_el_counter=0
-    for cur_el,b in se_transition_dict.items():
-      next_els=list(b.keys())
-      if len(next_els)<2: continue
-      cur_pts=[cur_el]+next_els
-      cur_path,cur_path_wt=general.djk(cur_el,se_el,se_transition_dict,cur_pts)
-      path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
-      path_el_wts_chunks=split_path_chunks(path_el_wts)
-      #print("se",cur_el,next_els)
-      for chunk in path_el_wts_chunks:
-        chunk_wt=sum([v[1] for v in chunk])
-        chunk_els=[v[0] for v in chunk]
-        combined_el=combine_els(chunk_els[0],chunk_els[-1])
-        found_wt=el_dict.get(combined_el,0)
-        found_children=el_child_dict.get(combined_el,[])
-        if chunk_wt>found_wt:
-          #print("combined_el",combined_el,"chunk_wt",chunk_wt,"found_wt",found_wt,"found_children",found_children)
-          el_dict[combined_el]=chunk_wt
-          el_child_dict[combined_el]=chunk_els
-          new_el_counter+=1
-    if single_pass: break #if we only pass from top left to bottom right in one go
-    #print("finished processing SE, new_el_counter:",new_el_counter)
-    for cur_el,b in ne_transition_dict.items():
-      next_els=list(b.keys())
-      if len(next_els)<2: continue
-      cur_pts=[cur_el]+next_els
-      cur_path,cur_path_wt=general.djk(cur_el,ne_el,ne_transition_dict,cur_pts)
-      path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
-      path_el_wts_chunks=split_path_chunks(path_el_wts)
-      #print("ne",cur_el,next_els)
-      for chunk in path_el_wts_chunks:
-        chunk_wt=sum([v[1] for v in chunk])
-        chunk_els=[v[0] for v in chunk]
-        combined_el=combine_els(chunk_els[0],chunk_els[-1])
-        found_wt=el_dict.get(combined_el,0)
-        found_children=el_child_dict.get(combined_el,[])
-        if chunk_wt>found_wt:
-          if reward_combined_phrases: chunk_wt+=0.00000001 #give advantage to combined phrases
-          #print("combined_el",combined_el,"chunk_wt",chunk_wt,"found_wt",found_wt,"found_children",found_children)
-          el_dict[combined_el]=chunk_wt#+0.00000001
-          el_child_dict[combined_el]=chunk_els
-          new_el_counter+=1
-    #print("finished processing NE, new_el_counter:",new_el_counter)
-    cur_full_wt=el_dict.get(full_el,0)
-    #print("full_el",full_el,"cur_full_wt",cur_full_wt)
-    if cur_full_wt>0 and cur_full_wt==top_wt: break
-    top_wt=cur_full_wt
-  align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children0)
-  align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]
-  # for s_al,t_al in align_list:
-  #   print(">>>", s_al, src_tokens_padded[s_al[0]:s_al[1]+1])
-  #   print(">>>", t_al, trg_tokens_padded[t_al[0]:t_al[1]+1])
-  #   print("----")
+  # #start iteration here
+  # n_epochs=10
+  # for epoch0 in range(n_epochs):
+  #   #print("epoch0",epoch0)
+  #   all_elements=list(el_dict.items())
+  #   all_elements.sort()
+  #   se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements)
+  #   new_el_counter=0
+  #   for cur_el,b in se_transition_dict.items():
+  #     next_els=list(b.keys())
+  #     if len(next_els)<2: continue
+  #     cur_pts=[cur_el]+next_els
+  #     cur_path,cur_path_wt=general.djk(cur_el,se_el,se_transition_dict,cur_pts)
+  #     path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
+  #     path_el_wts_chunks=split_path_chunks(path_el_wts)
+  #     #print("se",cur_el,next_els)
+  #     for chunk in path_el_wts_chunks:
+  #       chunk_wt=sum([v[1] for v in chunk])
+  #       chunk_els=[v[0] for v in chunk]
+  #       combined_el=combine_els(chunk_els[0],chunk_els[-1])
+  #       found_wt=el_dict.get(combined_el,0)
+  #       found_children=el_child_dict.get(combined_el,[])
+  #       if chunk_wt>found_wt:
+  #         #print("combined_el",combined_el,"chunk_wt",chunk_wt,"found_wt",found_wt,"found_children",found_children)
+  #         el_dict[combined_el]=chunk_wt
+  #         el_child_dict[combined_el]=chunk_els
+  #         new_el_counter+=1
+  #   if single_pass: break #if we only pass from top left to bottom right in one go
+  #   #print("finished processing SE, new_el_counter:",new_el_counter)
+  #   for cur_el,b in ne_transition_dict.items():
+  #     next_els=list(b.keys())
+  #     if len(next_els)<2: continue
+  #     cur_pts=[cur_el]+next_els
+  #     cur_path,cur_path_wt=general.djk(cur_el,ne_el,ne_transition_dict,cur_pts)
+  #     path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
+  #     path_el_wts_chunks=split_path_chunks(path_el_wts)
+  #     #print("ne",cur_el,next_els)
+  #     for chunk in path_el_wts_chunks:
+  #       chunk_wt=sum([v[1] for v in chunk])
+  #       chunk_els=[v[0] for v in chunk]
+  #       combined_el=combine_els(chunk_els[0],chunk_els[-1])
+  #       found_wt=el_dict.get(combined_el,0)
+  #       found_children=el_child_dict.get(combined_el,[])
+  #       if chunk_wt>found_wt:
+  #         if reward_combined_phrases: chunk_wt+=0.00000001 #give advantage to combined phrases
+  #         #print("combined_el",combined_el,"chunk_wt",chunk_wt,"found_wt",found_wt,"found_children",found_children)
+  #         el_dict[combined_el]=chunk_wt#+0.00000001
+  #         el_child_dict[combined_el]=chunk_els
+  #         new_el_counter+=1
+  #   #print("finished processing NE, new_el_counter:",new_el_counter)
+  #   cur_full_wt=el_dict.get(full_el,0)
+  #   #print("full_el",full_el,"cur_full_wt",cur_full_wt)
+  #   if cur_full_wt>0 and cur_full_wt==top_wt: break
+  #   top_wt=cur_full_wt
+  # align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children0)
+  # align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]
+  # # for s_al,t_al in align_list:
+  # #   print(">>>", s_al, src_tokens_padded[s_al[0]:s_al[1]+1])
+  # #   print(">>>", t_al, trg_tokens_padded[t_al[0]:t_al[1]+1])
+  # #   print("----")
 
-  result_dict0["align"]=align_list_wt
-  return result_dict0
+  # result_dict0["align"]=align_list_wt
+  # return result_dict0
 
 
 def tok_bitext(list0,params0={}):
