@@ -18,7 +18,7 @@ def filter_toks(tok_list0,params={}):
   if params.get("ignore_ar_pre_suf",True): tok_list0=["" if v.startswith("ـ") or v.endswith("ـ") else v for v in tok_list0] #ignore arabic prefixes and suffixes
   if params.get("remove_ar_diacritics",True): tok_list0=[general.remove_diactitics(v) for v in tok_list0] #remove Arabic diacritics
   if params.get("remove_al",True): tok_list0=[v.replace("ال_","") for v in tok_list0] #remove alif laam for the beginning of Arabic words
-  if params.get("normalize_taa2_marbootah",True): tok_list0=[v[:-1]+"ت"  if v.endswith("ة") else v for v in tok_list0] #normalize numbers to just the number of digits 1995 > 5555
+  if params.get("normalize_taa2_marbootah",True): tok_list0=[v[:-1]+"ت"  if v.endswith("ة") else v for v in tok_list0] #normalize taa2 marbootah
   if params.get("normalize_digits",False): tok_list0=["5"*len(v) if v.isdigit() else v for v in tok_list0] #normalize numbers to just the number of digits 1995 > 5555
   #if params.get("stemming",False): tok_list0=[v else v for v in tok_list0] #stem each word or not
   #remove_al=params0.get("remove_al", False) #remocve alif laam in Arabic
@@ -276,6 +276,9 @@ def temp_tok(txt): #temporary tokenization function
 
 def walign(src_sent0,trg_sent0,retr_align_params0={}):
   filter_params0=retr_align_params0.get("filter_params",{})
+  src_index_dict0=retr_align_params0.get("src_index",{})
+  trg_index_dict0=retr_align_params0.get("trg_index",{})
+
   extra_src_index_dict0=retr_align_params0.get("extra_src_index",{})
   extra_trg_index_dict0=retr_align_params0.get("extra_trg_index",{})
   phrase_trie_dict0=retr_align_params0.get("phrase_trie_dict",{})
@@ -323,11 +326,15 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   src_retr_dict={}
   for ut in unique_src_tokens: 
     if ut.isdigit() and exclude_numbers: continue
-    src_index_dict[ut]=get_word_indexes(ut,"src",retr_align_params0)
+    #src_index_dict[ut]=get_word_indexes(ut,"src",retr_align_params0)
+    src_index_dict[ut]={}
+    src_index_dict[ut]["main"]=src_index_dict0.get(ut,[])
     src_index_dict[ut]["extra"]=extra_src_index_dict0.get(ut,[])
   for ut in unique_trg_tokens: 
     if ut.isdigit() and exclude_numbers: continue
-    trg_index_dict[ut]=get_word_indexes(ut,"trg",retr_align_params0)
+    #trg_index_dict[ut]=get_word_indexes(ut,"trg",retr_align_params0)
+    trg_index_dict[ut]={}
+    trg_index_dict[ut]["main"]=trg_index_dict0.get(ut,[])
     trg_index_dict[ut]["extra"]=extra_trg_index_dict0.get(ut,[])
   elapsed=time.time()-t0
   #print("src:",len(unique_src_tokens),"trg:",len(unique_trg_tokens),"elapsed:",round(elapsed,4))
