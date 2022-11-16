@@ -395,8 +395,13 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
     punc_trg_locs=[[v] for v in punc_trg_locs]
     new_matching_list.append((src_punc0,trg_punc0,punc_src_locs,punc_trg_locs,intersection1,ratio1))
 
+
+
+
+
   new_matching_list.sort(key=lambda x:-x[-1])
   elapsed=time.time()-t0
+  span_matching_list=[]
   #print("finished matching words and phrases:", elapsed)
   #Now we have the matching list - let's align
   el_dict={} #weight of each element
@@ -406,10 +411,21 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
     src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,intersection1,ratio1=a
     for sl0 in src_locs0:
       s_min,s_max=sl0[0],sl0[-1]
+      src_span0=(s_min,s_max)
       for tl0 in trg_locs0:
         t_min,t_max=tl0[0],tl0[-1]
+        trg_span0=(t_min,t_max)
+        span_matching_list.append((src_span0,trg_span0,ratio1,intersection1))
+        
+
+        #src_span0,trg_span0,ratio0,freq0
         el0=((s_min,s_max) ,(t_min,t_max))
         el_dict[el0]=ratio1
+
+  align_list_wt0=get_aligned_path(src_tokens_padded,trg_tokens_padded,span_matching_list)
+  result_dict0["align"]=align_list_wt
+  return result_dict0
+
   
   first_src_span,first_trg_span=(0,0),(0,0)
   last_src_span=(len(src_tokens_padded)-1,len(src_tokens_padded)-1)
