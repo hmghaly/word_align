@@ -423,7 +423,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
         el_dict[el0]=ratio1
 
   align_list_wt0=get_aligned_path(src_tokens_padded,trg_tokens_padded,span_matching_list)
-  result_dict0["align"]=align_list_wt
+  result_dict0["align"]=align_list_wt0
   return result_dict0
 
   
