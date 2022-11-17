@@ -1,6 +1,7 @@
 import time, json, shelve, os, re, sys
 from itertools import groupby
 from math import log
+import random
 
 
 #from general import * 
