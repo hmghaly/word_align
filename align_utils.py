@@ -649,7 +649,7 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,min_freq_without_penalty0=20
   return align_list_wt
 
 
-def align_words_phrases_classes(src0,trg0,aligned0,sent_class0="sent0"):
+def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",max_aligned_phrase_len=6):
   src_open_dict,src_close_dict={},{}
   trg_open_dict,trg_close_dict={},{}
   final_src_tokens,final_trg_tokens=[],[]
@@ -659,14 +659,19 @@ def align_words_phrases_classes(src0,trg0,aligned0,sent_class0="sent0"):
     src_span0,trg_span0=al0
     src_i0,src_i1=src_span0
     trg_i0,trg_i1=trg_span0
-    src_phrase0=src0[src_i0:src_i1+1]
-    trg_phrase0=trg0[trg_i0:trg_i1+1]
-    if len(src_phrase0)>6: continue
-    src_open_dict[src_i0]=src_open_dict.get(src_i0,[])+[span_name]
-    src_close_dict[src_i1]=src_close_dict.get(src_i1,[])+[span_name]
-    trg_open_dict[trg_i0]=trg_open_dict.get(trg_i0,[])+[span_name]
-    trg_close_dict[trg_i1]=trg_close_dict.get(trg_i1,[])+[span_name]
-  for tok_i,src_tok0 in enumerate(src0):
+    src_phrase0=aligned_src0[src_i0:src_i1+1]
+    trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
+    if len(src_phrase0)>max_aligned_phrase_len: continue
+    src_open_dict[src_i0]=[span_name]+src_open_dict.get(src_i0,[])
+    src_close_dict[src_i1]=[span_name]+src_close_dict.get(src_i1,[])
+    trg_open_dict[trg_i0]=[span_name]+trg_open_dict.get(trg_i0,[])
+    trg_close_dict[trg_i1]=[span_name]+trg_close_dict.get(trg_i1,[])
+    # src_open_dict[src_i0]=src_open_dict.get(src_i0,[])+[span_name]
+    # src_close_dict[src_i1]=src_close_dict.get(src_i1,[])+[span_name]
+    # trg_open_dict[trg_i0]=trg_open_dict.get(trg_i0,[])+[span_name]
+    # trg_close_dict[trg_i1]=trg_close_dict.get(trg_i1,[])+[span_name]
+
+  for tok_i,src_tok0 in enumerate(aligned_src0):
     if src_tok0 in ["<s>","</s>"]: continue
     open_classes=src_open_dict.get(tok_i,[])
     close_classes=src_close_dict.get(tok_i,[])
@@ -675,7 +680,7 @@ def align_words_phrases_classes(src0,trg0,aligned0,sent_class0="sent0"):
     cur_str+=src_tok0
     for class0 in close_classes: cur_str+='</span>'
     final_src_tokens.append((cur_str,src_tok0))
-  for tok_i,trg_tok0 in enumerate(trg0):
+  for tok_i,trg_tok0 in enumerate(aligned_trg0):
     if trg_tok0 in ["<s>","</s>"]: continue
     open_classes=trg_open_dict.get(tok_i,[])
     close_classes=trg_close_dict.get(tok_i,[])
