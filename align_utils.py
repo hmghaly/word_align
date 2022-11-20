@@ -253,11 +253,13 @@ def get_ne_se_dict(all_elements0): #elements are pairs of src/trg spans
           ne_transition_dict0[el0][el1]=el_wt0
       if src_span1==src_span0 and trg_span1[0]>trg_span0[1] and src_span0[1]-src_span0[0]<2: #vertical: multiple target words/phrase corresponding to one source phrase
         direction="south"
-        se_transition_dict0[el0][el1]=el_wt0
+        #se_transition_dict0[el0][el1]=el_wt0
+        ne_transition_dict0[el0][el1]=el_wt0
       if trg_span1==trg_span0 and src_span1[0]>src_span0[1] and trg_span0[1]-trg_span0[0]<2: #horizontal: multiple source words/phrases corresponding to one target phrase
         direction="east"
-        ne_list.append((el1,el_wt1))
-        se_transition_dict0[el0][el1]=el_wt0
+        #ne_list.append((el1,el_wt1))
+        #se_transition_dict0[el0][el1]=el_wt0
+        ne_transition_dict0[el0][el1]=el_wt0
 
       if direction==None: continue
   return se_transition_dict0, ne_transition_dict0
@@ -605,25 +607,6 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,min_freq_without
     all_elements.sort()
     se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements)
     new_el_counter=0
-    for cur_el,b in se_transition_dict.items():
-      next_els=list(b.keys())
-      #print("se_transition_dict", "cur_el", cur_el,"next_els",next_els)
-      if len(next_els)<2: continue
-      cur_pts=[cur_el]+next_els
-      cur_path,cur_path_wt=general.djk(cur_el,se_el,se_transition_dict,cur_pts)
-      path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
-      path_el_wts_chunks=split_path_chunks(path_el_wts)
-      for chunk in path_el_wts_chunks:
-        chunk_wt=sum([v[1] for v in chunk])
-        chunk_els=[v[0] for v in chunk]
-        combined_el=combine_els(chunk_els[0],chunk_els[-1])
-        found_wt=el_dict.get(combined_el,0)
-        found_children=el_child_dict.get(combined_el,[])
-        if chunk_wt>found_wt:
-          el_dict[combined_el]=chunk_wt
-          el_child_dict[combined_el]=chunk_els
-          new_el_counter+=1
-    #if single_pass: break
     for cur_el,b in ne_transition_dict.items():
       next_els=list(b.keys())
       #print("ne_transition_dict", "cur_el", cur_el,"next_els",next_els)
@@ -643,6 +626,31 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,min_freq_without
           el_dict[combined_el]=chunk_wt#+0.00000001
           el_child_dict[combined_el]=chunk_els
           new_el_counter+=1
+
+    all_elements=list(el_dict.items())
+    all_elements.sort()
+    se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements)
+
+    for cur_el,b in se_transition_dict.items():
+      next_els=list(b.keys())
+      #print("se_transition_dict", "cur_el", cur_el,"next_els",next_els)
+      if len(next_els)<2: continue
+      cur_pts=[cur_el]+next_els
+      cur_path,cur_path_wt=general.djk(cur_el,se_el,se_transition_dict,cur_pts)
+      path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
+      path_el_wts_chunks=split_path_chunks(path_el_wts)
+      for chunk in path_el_wts_chunks:
+        chunk_wt=sum([v[1] for v in chunk])
+        chunk_els=[v[0] for v in chunk]
+        combined_el=combine_els(chunk_els[0],chunk_els[-1])
+        found_wt=el_dict.get(combined_el,0)
+        found_children=el_child_dict.get(combined_el,[])
+        if chunk_wt>found_wt:
+          if reward_combined_phrases: chunk_wt+=0.00000001
+          el_dict[combined_el]=chunk_wt
+          el_child_dict[combined_el]=chunk_els
+          new_el_counter+=1
+    #if single_pass: break
     cur_full_wt=el_dict.get(full_el,0)
     if cur_full_wt>0 and cur_full_wt==top_wt: break
     top_wt=cur_full_wt
