@@ -22,7 +22,7 @@ def filter_toks(tok_list0,params={}):
   if params.get("normalize_taa2_marbootah",False): tok_list0=[v[:-1]+"ت"  if v.endswith("ة") else v for v in tok_list0] #normalize taa2 marbootah
   if params.get("normalize_digits",False): tok_list0=["5"*len(v) if v.isdigit() else v for v in tok_list0] #normalize numbers to just the number of digits 1995 > 5555
   #if params.get("stemming",False): tok_list0=[v else v for v in tok_list0] #stem each word or not
-  #remove_al=params0.get("remove_al", False) #remocve alif laam in Arabic
+  #remove_al=params0.get("remove_al", False) #remocve alif laam in Arabic 
   return tok_list0
 
 def get_size_factor(size0): #account for larger phrases - such as month names - by giving a small factor to increase their weight
