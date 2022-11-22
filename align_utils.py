@@ -822,10 +822,23 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     if cur_full_wt>0 and cur_full_wt==top_wt: break
     top_wt=cur_full_wt
   align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children)
-  for a in align_list:
-    el_children=el_child_dict.get(a)
-    print(a, el_children)
+  #Now filling the unaligned parts
+  used_xs,used_ys=[],[]
+  src_span_dict,trg_span_dict={},{}
+  new_align_list=[]
+  for el0 in align_list:
+    src_span0,trg_span0=el0
+    el_children=el_child_dict.get(el0)
+    src_span_dict[src_span0]=el0
+    trg_span_dict[trg_span0]=el0
+    if el_children!=None: continue
+    new_align_list.append(el0)
+    used_xs.extend(list(range(src_span0[0],src_span0[1]+1)))
+    used_ys.extend(list(range(trg_span0[0],trg_span0[1]+1)))
+    print(el0, el_children)
   align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]  
+  print("used_xs",used_xs)
+  print("used_ys",used_ys)
   return align_list_wt
 
 
