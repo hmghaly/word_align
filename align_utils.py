@@ -453,7 +453,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   new_matching_list=[] #exclude src/trg phrases used more than the count of either
   for ml in matching_list:
     src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,min_locs_count,intersection1,ratio1=ml
-    if len(trg_phrase_str)>1: print(">>>",ml)
+    #if len(trg_phrase_str)>1: print(">>>",ml)
     # if phrase_count_src_dict[src_phrase_str]>=-1 or phrase_count_trg_dict[trg_phrase_str]>=-1:
     #   print(">>>",ml)
     if phrase_count_src_dict[src_phrase_str]>0 or phrase_count_trg_dict[trg_phrase_str]>0:
@@ -512,7 +512,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   t0=time.time()
 
 
-  align_list_wt0=get_aligned_path(src_tokens_padded,trg_tokens_padded,span_matching_list, n_epochs=n_epochs0)
+  align_list_wt0=get_aligned_path(src_tokens_padded,trg_tokens_padded,span_matching_list, n_epochs=n_epochs0, only_without_children=only_without_children0)
   analysis_dict["obtained aligned path"]=time.time()-t0
   t0=time.time()  
   result_dict0["align"]=align_list_wt0
