@@ -839,7 +839,7 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
 
   all_elements=list(el_dict.items())
   all_elements.sort(key=lambda x:-x[-1])
-  for el1,el_wt1 in all_elements[:500]:
+  for el1,el_wt1 in all_elements:
     src_span0,trg_span0=el1
     skip=False
     for x0 in range(src_span0[0],src_span0[1]+1):
@@ -854,12 +854,13 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     print("not used:", el1, el_wt1)
     used_xs.extend(list(range(src_span0[0],src_span0[1]+1)))
     used_ys.extend(list(range(trg_span0[0],trg_span0[1]+1)))
+    new_align_list.append(el1)
 
        
 
-  align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]  
-  print("used_xs",used_xs)
-  print("used_ys",used_ys)
+  align_list_wt=[(v,el_dict.get(v,0)) for v in new_align_list]  
+  #print("used_xs",used_xs)
+  #print("used_ys",used_ys)
   return align_list_wt
 
 
