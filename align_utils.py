@@ -606,7 +606,7 @@ def match_exact_tokens(src_toks0,trg_toks0):
   return match_list0
           
 
-def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,min_freq_without_penalty0=20,penalty0=0.25,reward_combined_phrases=True,only_without_children0=False): #we apply penalty for less frequent pairs
+def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=False,min_freq_without_penalty0=20,penalty0=0.25,reward_combined_phrases=True,only_without_children0=False): #we apply penalty for less frequent pairs
   match_list=sorted(list(set(match_list)))
   #Now we have the matching list - let's align
   el_dict={} #weight of each element
@@ -637,7 +637,7 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,min_freq_without
     #print("epoch0",epoch0)
     all_elements=list(el_dict.items())
     all_elements.sort()
-    se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements)
+    se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements,allow_ortho)
     new_el_counter=0
     for cur_el,b in ne_transition_dict.items():
       next_els=list(b.keys())
@@ -661,7 +661,7 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,min_freq_without
 
     all_elements=list(el_dict.items())
     all_elements.sort()
-    se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements)
+    se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements,allow_ortho)
 
     for cur_el,b in se_transition_dict.items():
       next_els=list(b.keys())
