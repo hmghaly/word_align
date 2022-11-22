@@ -741,7 +741,7 @@ def match_exact_tokens(src_toks0,trg_toks0):
   return match_list0
           
 
-def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=False,min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children0=False): #we apply penalty for less frequent pairs
+def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=False,min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
   match_list=sorted(list(set(match_list)))
   #Now we have the matching list - let's align
   el_dict={} #weight of each element
@@ -821,7 +821,7 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     cur_full_wt=el_dict.get(full_el,0)
     if cur_full_wt>0 and cur_full_wt==top_wt: break
     top_wt=cur_full_wt
-  align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children0)
+  align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children)
   align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]  
   return align_list_wt
 
