@@ -76,13 +76,13 @@ def get_tok_indexes(cur_tok,cur_index_dict): #retrieving inverted index for a to
 def retr(phrase_tokens,inv_index): #retrieve a phrase
     out_dict={}
     final_indexes=get_tok_indexes(phrase_tokens[0],inv_index)
-    cur_phrase=tuple([phrase_tokens0[0]])
+    cur_phrase=tuple([phrase_tokens[0]])
     out_dict[cur_phrase]=final_indexes
     for token_i,cur_token in enumerate(phrase_tokens):
         if token_i==0: continue
         if cur_token=="": continue
         #if token_i>max_phrase_len: continue
-        cur_phrase=tuple(phrase_tokens0[:token_i+1])
+        cur_phrase=tuple(phrase_tokens[:token_i+1])
         cur_token_indexes=get_tok_indexes(cur_token,inv_index)
         cur_token_indexes_offset=offset_results(cur_token_indexes,token_i)
         final_indexes=get_index_intersection(final_indexes,cur_token_indexes_offset)
