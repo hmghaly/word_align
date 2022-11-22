@@ -64,6 +64,45 @@ def offset_results(result_dict0,offset0,max_sent_size0=1000):
     new_dict0[a]=new_b
   return new_dict0
 
+def offset_indexes(index_list0,offset0,max_sent_size0=1000):
+  return [v-(offset0/max_sent_size0) for v in index_list0]  
+
+def get_tok_indexes(cur_tok,cur_index_dict): #retrieving inverted index for a token from a multi-inverted index dict
+    output={}
+    for index_id,inv_index_dict in cur_index_dict.items():
+        output[index_id]=inv_index_dict.get(cur_tok,[])
+    return output
+
+def retr(phrase_tokens,inv_index): #retrieve a phrase
+    out_dict={}
+    final_indexes=get_tok_indexes(phrase_tokens[0],inv_index)
+    cur_phrase=tuple([phrase_tokens0[0]])
+    out_dict[cur_phrase]=final_indexes
+    for token_i,cur_token in enumerate(phrase_tokens):
+        if token_i==0: continue
+        if cur_token=="": continue
+        #if token_i>max_phrase_len: continue
+        cur_phrase=tuple(phrase_tokens0[:token_i+1])
+        cur_token_indexes=get_tok_indexes(cur_token,inv_index)
+        cur_token_indexes_offset=offset_results(cur_token_indexes,token_i)
+        final_indexes=get_index_intersection(final_indexes,cur_token_indexes_offset)
+        if final_indexes=={}: continue
+        out_dict[cur_phrase]=final_indexes
+        #if final_indexes==None: final_indexes=inv_index0.get(cur_token)
+    return out_dict
+
+
+def get_index_intersection(index_dict1,offset_index_dict2): #when we are getting phrase indexes of multiple tokens
+  combined_dict0={}
+  for index_id,cur_indexes in index_dict1.items():
+    offset_indexes=offset_index_dict2.get(index_id,[])
+    intersection0=list(set(cur_indexes).intersection(set(offset_indexes)))
+    if len(intersection0)==0: continue
+    combined_dict0[index_id]=intersection0
+  return combined_dict0
+
+
+
 #we start here, getting from the meta shelve the locations of the indexes of this word in each of the inverted index text files
 def get_word_indexes(word1,index_prefix1,retr_params1): #index_prefix is either src/trg
   index_dir1=retr_params1.get("index_dir") #main directory where the inverted index text files are stored
@@ -116,13 +155,6 @@ def get_result_lines(result_dict1,bitext_fpath1,n_results1=20,n_items_per_meta1=
     final_src_trg_items.append((src0,trg0,ind0,index_id))  
   return final_src_trg_items
 
-def get_index_intersection(index_dict1,offset_index_dict2): #when we are getting phrase indexes of multiple tokens
-  combined_dict0={}
-  for index_id,cur_indexes in index_dict1.items():
-    offset_indexes=offset_index_dict2.get(index_id,[])
-    intersection0=list(set(cur_indexes).intersection(set(offset_indexes)))
-    combined_dict0[index_id]=intersection0
-  return combined_dict0
 
 def get_index_match_ratio_count(index_dict1,index_dict2): #match src/trg indexes
   index1_count,index2_count,intersection_count=0,0,0
@@ -229,7 +261,7 @@ def get_rec_el_children(el0,el_child_dict0,el_list0=[],only_without_children=Fal
   return el_list0
 
 
-def get_ne_se_dict(all_elements0,allow_ortho=False): #elements are pairs of src/trg spans - allow othogonal - vertical horizontal spans
+def get_ne_se_dict(all_elements0,allow_ortho=True): #elements are pairs of src/trg spans - allow othogonal - vertical horizontal spans
   se_transition_dict0,ne_transition_dict0={},{} #identify the possible transitions from one element to another - southeast or northeast
   #test_transition_dict0={}
   for el0,el_wt0 in all_elements0:
@@ -514,8 +546,8 @@ def tok_bitext(list0,params0={}):
       trg_toks0=general.tok(trg0)
       if params0.get("lang2")=="ar": trg_toks0=arabic_lib.tok_ar(trg_toks0,cur_ar_counter_dict)
     except Exception as ex: 
-    	print("tokenization error:", ex,src0,trg0)
-    	continue
+        print("tokenization error:", ex,src0,trg0)
+        continue
     tokenized_bitext_list0.append((cur_loc,src_toks0,trg_toks0))
   return tokenized_bitext_list0
 
