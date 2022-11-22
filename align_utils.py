@@ -839,12 +839,18 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
 
   all_elements=list(el_dict.items())
   all_elements.sort(key=lambda x:-x[-1])
-  for el1,el_wt1 in all_elements[:50]:
+  for el1,el_wt1 in all_elements[:500]:
     src_span0,trg_span0=el1
+    skip=False
     for x0 in range(src_span0[0],src_span0[1]+1):
-        if x0 in used_xs: continue
+        if x0 in used_xs: 
+            skip=True
+            break
     for y0 in range(trg_span0[0],trg_span0[1]+1):
-        if y0 in used_ys: continue
+        if y0 in used_ys: 
+            skip=True
+            break
+    if skip: continue
     print("not used:", el1, el_wt1)
     used_xs.extend(list(range(src_span0[0],src_span0[1]+1)))
     used_ys.extend(list(range(trg_span0[0],trg_span0[1]+1)))
