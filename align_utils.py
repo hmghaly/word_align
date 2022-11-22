@@ -823,7 +823,8 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     top_wt=cur_full_wt
   align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children)
   for a in align_list:
-    print(a, el_child_dict[a])
+    el_children=el_child_dict.get(a)
+    print(a, el_children)
   align_list_wt=[(v,el_dict.get(v,0)) for v in align_list]  
   return align_list_wt
 
