@@ -553,7 +553,7 @@ def tok_bitext(list0,params0={}):
 
 def index_bitext_list(list0,params0={}): #each list item = (loc/sent_id,src_tokens,trg_tokens)
   max_sent_n_tokens=params0.get("max_sent_n_tokens",1000)
-  t_bitext0=tok_bitext(list0,params0={})
+  t_bitext0=tok_bitext(list0,params0)
   src_fwd_index0,trg_fwd_index0=[],[]
   for cur_loc,src_toks0,trg_toks0 in t_bitext0:
     #src_toks0,trg_toks0=t_pair0
