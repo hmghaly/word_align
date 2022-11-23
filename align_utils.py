@@ -759,8 +759,8 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
   for k0,grp0 in all_elements_grouped:
     if len(grp0)<2: continue
     print(k0,grp0)
-  all_elements.sort(key=lambda x:x[0][0])
-  all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][0])]
+  all_elements.sort(key=lambda x:x[0][1])
+  all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][1])]
   for k0,grp0 in all_elements_grouped:
     if len(grp0)<2: continue
     print(k0,grp0)
