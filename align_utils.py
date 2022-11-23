@@ -758,6 +758,16 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
   all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][0])]
   for k0,grp0 in all_elements_grouped:
     if len(grp0)<2: continue
+    for el_i,el_item0 in enumerate(grp0):
+        cur_el0,cur_el_wt0=el_item0
+        next_items=grp0[el_i+1:]
+        for el_item1 in next_items:
+            src_span0,trg_span0=cur_el0
+            src_span1,trg_span1=cur_el1
+            src_span_dist=get_span_dist(src_span0,src_span1)
+            trg_span_dist=get_span_dist(trg_span0,trg_span1)
+            print("cur_el0",cur_el0,"cur_el1",cur_el1,"src_span_dist",src_span_dist,trg_span_dist)
+
     print(k0,grp0)
   all_elements.sort(key=lambda x:x[0][1])
   all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][1])]
