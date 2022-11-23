@@ -753,6 +753,14 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     found_ratio=el_dict.get(el0,0)
     if ratio0>found_ratio: el_dict[el0]=ratio0
     #print("el0",el0,"ratio0",ratio0)
+  all_elements=list(el_dict.items()) #let's get horizontal and vertical spans
+  all_elements.sort(key=lambda x:x[0][0])
+  all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][0])]
+  for k0,grp0 in all_elements_grouped:
+    print(k0,grp0)
+
+  all_elements.sort(key=lambda x:x[0][0])
+
   
   first_src_span,first_trg_span=(0,0),(0,0)
   last_src_span=(len(src_toks0)-1,len(src_toks0)-1)
