@@ -741,6 +741,152 @@ def match_exact_tokens(src_toks0,trg_toks0):
   return match_list0
           
 
+# def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=False,min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
+#   match_list=sorted(list(set(match_list)))
+#   #Now we have the matching list - let's align
+#   el_dict={} #weight of each element
+#   el_child_dict={} #children of each element
+#   for a in match_list:
+#     src_span0,trg_span0,ratio0,freq0=a
+#     if freq0<min_freq_without_penalty: ratio0=ratio0*penalty
+#     el0=(src_span0,trg_span0)
+#     found_ratio=el_dict.get(el0,0)
+#     if ratio0>found_ratio: el_dict[el0]=ratio0
+#     #print("el0",el0,"ratio0",ratio0)
+#   all_elements=list(el_dict.items()) #let's get horizontal and vertical spans
+#   all_elements.sort(key=lambda x:x[0][0])
+#   all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][0])]
+#   for k0,grp0 in all_elements_grouped:
+#     if len(grp0)<2: continue
+#     for el_i,el_item0 in enumerate(grp0):
+#         cur_el0,cur_el_wt0=el_item0
+#         next_items=grp0[el_i+1:]
+#         for el_item1 in next_items:
+#             cur_el1,cur_el_wt1=el_item1
+#             src_span0,trg_span0=cur_el0
+#             src_span1,trg_span1=cur_el1
+#             src_span_dist=get_span_dist(src_span0,src_span1)
+#             trg_span_dist=get_span_dist(trg_span0,trg_span1)
+#             print("cur_el0",cur_el0,"cur_el1",cur_el1,"src_span_dist",src_span_dist,trg_span_dist)
+
+#     print(k0,grp0)
+#   all_elements.sort(key=lambda x:x[0][1])
+#   all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][1])]
+#   for k0,grp0 in all_elements_grouped:
+#     if len(grp0)<2: continue
+#     print(k0,grp0)
+
+  
+#   first_src_span,first_trg_span=(0,0),(0,0)
+#   last_src_span=(len(src_toks0)-1,len(src_toks0)-1)
+#   last_trg_span=(len(trg_toks0)-1,len(trg_toks0)-1)
+#   ne_el=(last_src_span,first_trg_span) #north eastern element - uppermost rightmost, so we go diagonally up to the right
+#   se_el=(last_src_span,last_trg_span)
+#   #print("ne_el",ne_el, "se_el",se_el)
+#   el_dict[ne_el]=0
+#   top_wt=0
+#   full_src_span0=(0,len(src_toks0)-1)
+#   full_trg_span0=(0,len(trg_toks0)-1)
+#   full_el=(full_src_span0,full_trg_span0)
+
+#   #start iteration here
+  
+#   for epoch0 in range(n_epochs):
+#     #print("epoch0",epoch0)
+#     all_elements=list(el_dict.items())
+#     all_elements.sort()
+#     se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements,allow_ortho)
+#     new_el_counter=0
+#     for cur_el,b in ne_transition_dict.items():
+#       next_els=list(b.keys())
+#       #print("ne_transition_dict", "cur_el", cur_el,"next_els",next_els)
+#       if len(next_els)<2: continue
+#       cur_pts=[cur_el]+next_els
+#       cur_path,cur_path_wt=general.djk(cur_el,ne_el,ne_transition_dict,cur_pts)
+#       path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
+#       path_el_wts_chunks=split_path_chunks(path_el_wts)
+#       for chunk in path_el_wts_chunks:
+#         chunk_wt=sum([v[1] for v in chunk])
+#         chunk_els=[v[0] for v in chunk]
+#         combined_el=combine_els(chunk_els[0],chunk_els[-1])
+#         found_wt=el_dict.get(combined_el,0)
+#         found_children=el_child_dict.get(combined_el,[])
+#         if chunk_wt>found_wt:
+#           if reward_combined_phrases: chunk_wt+=0.00000001 #give advantage to combined phrases
+#           el_dict[combined_el]=chunk_wt#+0.00000001
+#           el_child_dict[combined_el]=chunk_els
+#           new_el_counter+=1
+
+#     all_elements=list(el_dict.items())
+#     all_elements.sort()
+#     se_transition_dict,ne_transition_dict=get_ne_se_dict(all_elements,allow_ortho)
+
+#     for cur_el,b in se_transition_dict.items():
+#       next_els=list(b.keys())
+#       #print("se_transition_dict", "cur_el", cur_el,"next_els",next_els)
+#       if len(next_els)<2: continue
+#       cur_pts=[cur_el]+next_els
+#       cur_path,cur_path_wt=general.djk(cur_el,se_el,se_transition_dict,cur_pts)
+#       path_el_wts=[(v, el_dict.get(v,0)) for v in cur_path]
+#       path_el_wts_chunks=split_path_chunks(path_el_wts)
+#       for chunk in path_el_wts_chunks:
+#         chunk_wt=sum([v[1] for v in chunk])
+#         chunk_els=[v[0] for v in chunk]
+#         combined_el=combine_els(chunk_els[0],chunk_els[-1])
+#         found_wt=el_dict.get(combined_el,0)
+#         found_children=el_child_dict.get(combined_el,[])
+#         if chunk_wt>found_wt:
+#           if reward_combined_phrases: chunk_wt+=0.00000001
+#           el_dict[combined_el]=chunk_wt
+#           el_child_dict[combined_el]=chunk_els
+#           new_el_counter+=1
+#     #if single_pass: break
+#     cur_full_wt=el_dict.get(full_el,0)
+#     if cur_full_wt>0 and cur_full_wt==top_wt: break
+#     top_wt=cur_full_wt
+#   align_list=get_rec_el_children(full_el,el_child_dict,el_list0=[],only_without_children=only_without_children)
+#   #Now filling the unaligned parts
+#   used_xs,used_ys=[],[]
+#   src_span_dict,trg_span_dict={},{}
+#   new_align_list=[]
+#   for el0 in align_list:
+#     src_span0,trg_span0=el0
+#     el_children=el_child_dict.get(el0)
+#     src_span_dict[src_span0]=el0
+#     trg_span_dict[trg_span0]=el0
+#     if el_children!=None: continue
+#     new_align_list.append(el0)
+#     used_xs.extend(list(range(src_span0[0],src_span0[1]+1)))
+#     used_ys.extend(list(range(trg_span0[0],trg_span0[1]+1)))
+#     print(el0, el_children)
+
+#   all_elements=list(el_dict.items())
+#   all_elements.sort(key=lambda x:-x[-1])
+#   for el1,el_wt1 in all_elements:
+#     src_span0,trg_span0=el1
+#     skip=False
+#     for x0 in range(src_span0[0],src_span0[1]+1):
+#         if x0 in used_xs: 
+#             skip=True
+#             break
+#     for y0 in range(trg_span0[0],trg_span0[1]+1):
+#         if y0 in used_ys: 
+#             skip=True
+#             break
+#     if skip: continue
+#     print("not used:", el1, el_wt1)
+#     used_xs.extend(list(range(src_span0[0],src_span0[1]+1)))
+#     used_ys.extend(list(range(trg_span0[0],trg_span0[1]+1)))
+#     new_align_list.append(el1)
+
+       
+
+#   align_list_wt=[(v,el_dict.get(v,0)) for v in new_align_list]  
+#   #print("used_xs",used_xs)
+#   #print("used_ys",used_ys)
+#   return align_list_wt
+
+
 def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=False,min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
   match_list=sorted(list(set(match_list)))
   #Now we have the matching list - let's align
@@ -752,7 +898,6 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     el0=(src_span0,trg_span0)
     found_ratio=el_dict.get(el0,0)
     if ratio0>found_ratio: el_dict[el0]=ratio0
-    #print("el0",el0,"ratio0",ratio0)
   all_elements=list(el_dict.items()) #let's get horizontal and vertical spans
   all_elements.sort(key=lambda x:x[0][0])
   all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][0])]
@@ -760,28 +905,51 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     if len(grp0)<2: continue
     for el_i,el_item0 in enumerate(grp0):
         cur_el0,cur_el_wt0=el_item0
+        if cur_el_wt0<0.01: continue
         next_items=grp0[el_i+1:]
         for el_item1 in next_items:
+            cur_el1,cur_el_wt1=el_item1
+            if cur_el_wt1<0.01: continue
             src_span0,trg_span0=cur_el0
             src_span1,trg_span1=cur_el1
             src_span_dist=get_span_dist(src_span0,src_span1)
             trg_span_dist=get_span_dist(trg_span0,trg_span1)
-            print("cur_el0",cur_el0,"cur_el1",cur_el1,"src_span_dist",src_span_dist,trg_span_dist)
-
-    print(k0,grp0)
+            if trg_span_dist>3: break
+            if trg_span_dist<1: continue
+            new_cur_el0=combine_els(cur_el0,cur_el1)
+            combined_wt=cur_el_wt0+cur_el_wt1
+            found_wt=el_dict.get(new_cur_el0,0)
+            if combined_wt>found_wt: 
+              el_dict[new_cur_el0]=combined_wt
+              el_child_dict[new_cur_el0]=(cur_el0,cur_el1)
   all_elements.sort(key=lambda x:x[0][1])
   all_elements_grouped=[(key,list(group)) for key,group in groupby(all_elements,lambda x:x[0][1])]
   for k0,grp0 in all_elements_grouped:
     if len(grp0)<2: continue
-    print(k0,grp0)
-
+    #print(k0,grp0)
+    for el_i,el_item0 in enumerate(grp0):
+        cur_el0,cur_el_wt0=el_item0
+        next_items=grp0[el_i+1:]
+        for el_item1 in next_items:
+            cur_el1,cur_el_wt1=el_item1
+            src_span0,trg_span0=cur_el0
+            src_span1,trg_span1=cur_el1
+            src_span_dist=get_span_dist(src_span0,src_span1)
+            trg_span_dist=get_span_dist(trg_span0,trg_span1)
+            if src_span_dist>3: break
+            if src_span_dist<1: continue
+            new_cur_el0=combine_els(cur_el0,cur_el1)
+            combined_wt=cur_el_wt0+cur_el_wt1
+            found_wt=el_dict.get(new_cur_el0,0)
+            if combined_wt>found_wt: 
+              el_dict[new_cur_el0]=combined_wt
+              el_child_dict[new_cur_el0]=(cur_el0,cur_el1)
   
   first_src_span,first_trg_span=(0,0),(0,0)
   last_src_span=(len(src_toks0)-1,len(src_toks0)-1)
   last_trg_span=(len(trg_toks0)-1,len(trg_toks0)-1)
   ne_el=(last_src_span,first_trg_span) #north eastern element - uppermost rightmost, so we go diagonally up to the right
   se_el=(last_src_span,last_trg_span)
-  #print("ne_el",ne_el, "se_el",se_el)
   el_dict[ne_el]=0
   top_wt=0
   full_src_span0=(0,len(src_toks0)-1)
@@ -798,7 +966,6 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     new_el_counter=0
     for cur_el,b in ne_transition_dict.items():
       next_els=list(b.keys())
-      #print("ne_transition_dict", "cur_el", cur_el,"next_els",next_els)
       if len(next_els)<2: continue
       cur_pts=[cur_el]+next_els
       cur_path,cur_path_wt=general.djk(cur_el,ne_el,ne_transition_dict,cur_pts)
@@ -839,7 +1006,6 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
           el_dict[combined_el]=chunk_wt
           el_child_dict[combined_el]=chunk_els
           new_el_counter+=1
-    #if single_pass: break
     cur_full_wt=el_dict.get(full_el,0)
     if cur_full_wt>0 and cur_full_wt==top_wt: break
     top_wt=cur_full_wt
@@ -857,7 +1023,7 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
     new_align_list.append(el0)
     used_xs.extend(list(range(src_span0[0],src_span0[1]+1)))
     used_ys.extend(list(range(trg_span0[0],trg_span0[1]+1)))
-    print(el0, el_children)
+    #print(el0, el_children)
 
   all_elements=list(el_dict.items())
   all_elements.sort(key=lambda x:-x[-1])
@@ -873,7 +1039,7 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
             skip=True
             break
     if skip: continue
-    print("not used:", el1, el_wt1)
+    #print("not used:", el1, el_wt1)
     used_xs.extend(list(range(src_span0[0],src_span0[1]+1)))
     used_ys.extend(list(range(trg_span0[0],trg_span0[1]+1)))
     new_align_list.append(el1)
@@ -884,7 +1050,6 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
   #print("used_xs",used_xs)
   #print("used_ys",used_ys)
   return align_list_wt
-
 
 def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",max_aligned_phrase_len=6):
   src_open_dict,src_close_dict={},{}
