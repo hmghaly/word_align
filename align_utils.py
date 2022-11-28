@@ -333,7 +333,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   allow_ortho0=retr_align_params0.get("allow_ortho",False) 
   min_freq_without_penalty0=retr_align_params0.get("min_freq_without_penalty",10)
   penalty0=retr_align_params0.get("penalty",0.25)
-  top_ratios_reward0=retr_align_params0.get("top_ratios_reward",0.2)
+  top_ratios_reward0=retr_align_params0.get("top_ratios_reward",0)
 
   max_phrase_len=retr_align_params0.get("max_phrase_len",8) #when we get the phrases from a sentence
   max_sent_len=retr_align_params0.get("max_sent_len",30) #when we get the phrases from a sentence
