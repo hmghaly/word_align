@@ -1169,6 +1169,56 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
     final_trg_tokens.append((cur_str,trg_tok0))
   return final_src_tokens, final_trg_tokens
 
+
+def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12):
+  used_xs,used_ys=[],[]
+  all_single_pts=[]
+  results0=[]
+  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+    src_span0,trg_span0=el0
+    src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
+    used_xs.extend(src_range0)
+    used_ys.extend(trg_range0)
+    for a in src_range0:
+      for b in trg_range0: all_single_pts.append((a,b)) #identifying single points (not elements)
+  aligned_elements.sort()
+  for src_i0 in range(0,len(src_tokens)+1):
+    for src_i1 in range(src_i0,len(src_tokens)+1): #identifying a source range
+      if src_i1-src_i0>max_phrase_size: continue
+      elements_inside=[]
+      trg_max_i,trg_min_i=0,len(trg_tokens)+1
+      for el0,el_wt0 in aligned_elements:
+        src_span0,trg_span0=el0
+        src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
+        if src_span0[0]>=src_i0 and src_span0[1]<=src_i1:
+          cur_min_trg_i,cur_max_trg_i=min(trg_span0),max(trg_span0)
+          if cur_min_trg_i<trg_min_i: trg_min_i=cur_min_trg_i
+          if cur_max_trg_i>trg_max_i: trg_max_i=cur_max_trg_i
+          elements_inside.append((el0,el_wt0))
+      valid=True
+      cur_wt=0
+      if len(elements_inside)>0: cur_wt=sum([v[1] for v in elements_inside])
+      for a,b in all_single_pts: #check if there is any point that violates consistency
+        if (b>=trg_min_i and b<=trg_max_i) and (a <src_i0 or a>src_i1): 
+          valid=False
+          break
+      if cur_wt==0 or valid==False: continue #exclude src ranges with no elements or if invalid
+      new_el_src=src_i0,src_i1
+      new_el_trg=trg_min_i,trg_max_i
+      new_el=(new_el_src,new_el_trg)
+      src_phrase=src_tokens[src_i0:src_i1+1]
+      trg_phrase=trg_tokens[trg_min_i:trg_max_i+1]
+      results0.append((src_phrase,trg_phrase,cur_wt))
+      for inc0 in range(1,10):
+        trg_start=trg_min_i-inc0
+        if trg_start in used_ys or trg_start<0: break
+        for inc1 in range(1,10):
+          trg_end=trg_max_i+inc1
+          if trg_end in used_ys or trg_end>len(trg_tokens): break
+          trg_phrase=trg_tokens[trg_start:trg_end+1]
+          results0.append((src_phrase,trg_phrase,cur_wt))
+  return results0
+
 if __name__=="__main__":
   index_dir="indexes/un/exp3"
   params_fpath=os.path.join(index_dir,"params.json")
