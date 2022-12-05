@@ -13,8 +13,8 @@ tika_url= "http://archive.apache.org/dist/tika/tika-app-1.11.jar"
     
         
         
-# host_name=socket.gethostname()
-# port_number=12345
+host_name=socket.gethostname()
+port_number=12345
 # shell_command='java -jar %s -h --encoding=utf-8  --server --port %s'%(tika_fname,port_number)
 # try:
 #     proc=subprocess.Popen(shell_command,shell=True)
