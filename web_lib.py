@@ -1,6 +1,8 @@
 #a librry for all the utilities we need for scraping data from the web
-import requests, re
+import requests, re, sys
 from urllib.parse import urljoin, urlsplit
+sys.path.append("code_utils")
+import general
 #from bs4 import BeautifulSoup
 #from lxml.html import parse
 
@@ -319,6 +321,21 @@ class web_page_OLD:
       self.all_links.append(cur_link)
       if self.tld in cur_link: self.internal_links.append(cur_link)
       else: self.external_links.append(cur_link)
+
+def html2sents(html_fpath):
+  all_sents=[]
+  fopen=open(html_fpath)
+  content0=fopen.read()
+  fopen.close()
+  dom_obj0=DOM(content0)
+  dom_text_items=dom_obj0.text_items
+  for a in dom_text_items:
+    para0=general.unescape(a)
+    para_items=para0.split("\t")
+    for p0 in para_items: 
+      cur_sents=general.ssplit(p0)
+      all_sents.extend(cur_sents)
+  return all_sents
 
 # page_obj=web_page(url)
 # #print(page_obj.title)
