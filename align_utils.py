@@ -227,6 +227,20 @@ def get_phrase_locs_indexes(tokens0,res_dict0,max_phrase_len=8):
     
   return new_dict
 
+def get_unigrams_bigrams(token_list, exclude_numbers=True,exclude_single_chars=True):
+  list_unigrams_bigrams0=[]
+  for uni0 in list(set(token_list)):
+    if exclude_numbers and uni0.isdigit():continue
+    if exclude_single_chars and len(uni0)<2: continue
+    if not uni0 in list_unigrams_bigrams0:list_unigrams_bigrams0.append(uni0)
+  for i0 in range(len(token_list)-1):
+    bi0,bi1=token_list[i0],token_list[i0+1]
+    if exclude_numbers and (bi0.isdigit() or bi1.isdigit()): continue
+    if exclude_single_chars and (len(bi0)<2 or len(bi1)<2): continue
+    bigram0="%s %s"%(bi0,bi1)
+    if not bigram0 in list_unigrams_bigrams0: list_unigrams_bigrams0.append(bigram0)
+  return list_unigrams_bigrams0
+
 def combine_els(el1,el2):
   src_span1,trg_span1=el1
   src_span2,trg_span2=el2
