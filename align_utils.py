@@ -1443,10 +1443,16 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
 #   #print("used_ys",used_ys)
 #   return align_list_wt
 
-def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",max_aligned_phrase_len=6):
+def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",max_aligned_phrase_len=6,include_chunk_boundaries=True):
   src_open_dict,src_close_dict={},{}
   trg_open_dict,trg_close_dict={},{}
   final_src_tokens,final_trg_tokens=[],[]
+  chunk_boundaries0=[]
+  if include_chunk_boundaries: chunk_boundaries0=get_aligned_chunks(aligned0)
+  chunk_xs=[v[0] for v in chunk_boundaries0]
+  chunk_ys=[v[1] for v in chunk_boundaries0]
+
+
   for align_i,align_item in enumerate(aligned0):
     span_name="walign-%s"%(align_i)
     al0,al_wt=align_item
@@ -1473,6 +1479,7 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
     for class0 in open_classes: cur_str+='<span class="%s %s">'%(sent_class0, class0)
     cur_str+=src_tok0
     for class0 in close_classes: cur_str+='</span>'
+    if tok_i in chunk_xs: cur_str+="<br>"
     final_src_tokens.append((cur_str,src_tok0))
   for tok_i,trg_tok0 in enumerate(aligned_trg0):
     if trg_tok0 in ["<s>","</s>"]: continue
@@ -1482,6 +1489,7 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
     for class0 in open_classes: cur_str+='<span class="%s %s">'%(sent_class0, class0)
     cur_str+=trg_tok0
     for class0 in close_classes: cur_str+='</span>'
+    if tok_i in chunk_ys: cur_str+="<br>"
     final_trg_tokens.append((cur_str,trg_tok0))
   return final_src_tokens, final_trg_tokens
 
@@ -1561,7 +1569,7 @@ def get_aligned_chunks(aligned_elements,min_phrase_len=5):
     if valid: chunk_boundaries.append((last_x,last_y))
   cur_x,cur_y=0,0
   new_chunk_boundaries=[]
-  new_chunk_boundaries.append((cur_x,cur_y))
+  #new_chunk_boundaries.append((cur_x,cur_y))
   for cb_x,cb_y in chunk_boundaries:
     if cb_x-cur_x<min_phrase_len: continue
     if cb_y-cur_y<min_phrase_len: continue
