@@ -1443,12 +1443,12 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=Fals
 #   #print("used_ys",used_ys)
 #   return align_list_wt
 
-def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",max_aligned_phrase_len=6,include_chunk_boundaries=True):
+def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",min_chunk_size=None,max_aligned_phrase_len=6):
   src_open_dict,src_close_dict={},{}
   trg_open_dict,trg_close_dict={},{}
   final_src_tokens,final_trg_tokens=[],[]
   chunk_boundaries0=[]
-  if include_chunk_boundaries: chunk_boundaries0=get_aligned_chunks(aligned0)
+  if min_chunk_size!=None: chunk_boundaries0=get_aligned_chunks(aligned0,min_chunk_size)
   chunk_xs=[v[0] for v in chunk_boundaries0]
   chunk_ys=[v[1] for v in chunk_boundaries0]
 
