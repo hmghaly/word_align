@@ -328,6 +328,7 @@ def temp_tok(txt): #temporary tokenization function
 def walign(src_sent0,trg_sent0,retr_align_params0={}):
   analysis_dict={}
   t0=time.time()
+  initial_time=time.time()
   filter_params0=retr_align_params0.get("filter_params",{})
   src_index_dict0=retr_align_params0.get("src_index",{})
   trg_index_dict0=retr_align_params0.get("trg_index",{})
@@ -335,6 +336,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   extra_src_index_dict0=retr_align_params0.get("extra_src_index",{})
   extra_trg_index_dict0=retr_align_params0.get("extra_trg_index",{})
   phrase_trie_dict0=retr_align_params0.get("phrase_trie_dict",{})
+  phrase_start_dict0=retr_align_params0.get("phrase_start_dict",{})
 
   lang1=retr_align_params0.get("lang1","en")
   lang2=retr_align_params0.get("lang2","ar")
@@ -363,6 +365,8 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   if lang2=="ar" and lang2_tok_fn!=None: trg_tokens=lang2_tok_fn(trg_sent0)
   else: trg_tokens=tok_fn(trg_sent0)
   analysis_dict["params loading time"]=time.time()-t0
+  src_tokens_lower=[v.lower() for v in src_tokens]
+  trg_tokens_lower=[v.lower() for v in trg_tokens]
   t0=time.time()
 
   analysis_dict["src_tokens"]=len(src_tokens)
@@ -508,6 +512,31 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
     new_matching_list.append((src_punc0,trg_punc0,punc_src_locs,punc_trg_locs,intersection1,ratio1))
 
   analysis_dict["added custom punc/prep items"]=time.time()-t0
+
+  if phrase_start_dict0!={}: #if we have a phrase start dict (with keys for unigrams and bigrams)
+    cur_unigrams_bigrams=list(set(get_unigrams_bigrams(src_tokens_lower)))
+    for a in cur_unigrams_bigrams:
+      res_list=cur_phrase_dict.get(a,[])
+      for res0 in res_list:
+        res_src_phrase0,res_corr_dict=res0
+        res_src_phrase_split=res_src_phrase0.split(" ")
+        src_phrase_locs=is_in(res_src_phrase_split,src_tokens_lower)
+        if src_phrase_locs:
+          for corr_trg_str0,corr_trg_vals in res_corr_dict.items():
+            corr_trg_str_split=corr_trg_str0.split(" ")
+            trg_freq0,trg_ratio0=corr_trg_vals
+            trg_phrase_locs=is_in(corr_trg_str_split,trg_tokens_lower)
+            if trg_phrase_locs:
+              new_matching_list.append((res_src_phrase0,corr_trg_str0,src_phrase_locs,trg_phrase_locs,trg_freq0,trg_ratio0))  
+
+      # if is_in(res_src_phrase_split,cur_src0_lower):
+      #   for corr_trg_str0,corr_trg_vals in res_corr_dict.items():
+      #     corr_trg_str_split=corr_trg_str0.split(" ")
+      #     if is_in(corr_trg_str_split,cur_trg0_lower):
+      #       print(res_src_phrase0, corr_trg_str0, corr_trg_vals)
+
+
+
   t0=time.time()
 
 
