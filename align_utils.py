@@ -1486,7 +1486,7 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
   return final_src_tokens, final_trg_tokens
 
 
-def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12):
+def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12, discard_empty_phrases=True):
   used_xs,used_ys=[],[]
   all_single_pts=[]
   results0=[]
@@ -1518,11 +1518,17 @@ def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12):
         if (b>=trg_min_i and b<=trg_max_i) and (a <src_i0 or a>src_i1): 
           valid=False
           break
-      if cur_wt==0 or valid==False: continue #exclude src ranges with no elements or if invalid
+      if valid==False: continue #exclude src ranges if invalid    
+      if discard_empty_phrases and cur_wt==0: continue #exclude src ranges with no elements and when discarding 
       new_el_src=src_i0,src_i1
+      src_phrase=src_tokens[src_i0:src_i1+1]      
+      if cur_wt==0:
+        trg_phrase=""
+        results0.append((src_phrase,trg_phrase,cur_wt))
+
       new_el_trg=trg_min_i,trg_max_i
       new_el=(new_el_src,new_el_trg)
-      src_phrase=src_tokens[src_i0:src_i1+1]
+
       trg_phrase=trg_tokens[trg_min_i:trg_max_i+1]
       results0.append((src_phrase,trg_phrase,cur_wt))
       for inc0 in range(1,10):
@@ -1534,6 +1540,35 @@ def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12):
           trg_phrase=trg_tokens[trg_start:trg_end+1]
           results0.append((src_phrase,trg_phrase,cur_wt))
   return results0
+
+
+def get_aligned_chunks(aligned_elements,min_phrase_len=5):
+  all_single_pts=[]
+  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+    src_span0,trg_span0=el0
+    src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
+    for a in src_range0:
+      for b in trg_range0: all_single_pts.append((a,b)) #identifying single points (not elements)
+  chunk_boundaries=[]
+  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+    src_span0,trg_span0=el0
+    last_x,last_y=src_span0[-1],trg_span0[-1]
+    valid=True
+    for x0,y0 in all_single_pts:
+      if x0<last_x and y0> last_y: valid=False 
+      if x0>last_x and y0< last_y: valid=False
+      if not valid: break
+    if valid: chunk_boundaries.append((last_x,last_y))
+  cur_x,cur_y=0,0
+  new_chunk_boundaries=[]
+  new_chunk_boundaries.append((cur_x,cur_y))
+  for cb_x,cb_y in chunk_boundaries:
+    if cb_x-cur_x<min_phrase_len: continue
+    if cb_y-cur_y<min_phrase_len: continue
+    new_chunk_boundaries.append((cb_x,cb_y))
+    cur_x,cur_y=cb_x,cb_y
+  return new_chunk_boundaries
+
 
 if __name__=="__main__":
   index_dir="indexes/un/exp3"
