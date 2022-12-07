@@ -507,7 +507,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   if phrase_start_dict0!={}: #if we have a phrase start dict (with keys for unigrams and bigrams)
     cur_unigrams_bigrams=list(set(get_unigrams_bigrams(src_tokens_lower)))
     for a in cur_unigrams_bigrams:
-      res_list=cur_phrase_dict.get(a,[])
+      res_list=phrase_start_dict0.get(a,[])
       for res0 in res_list:
         res_src_phrase0,res_corr_dict=res0
         res_src_phrase_split=res_src_phrase0.split(" ")
