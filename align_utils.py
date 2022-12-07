@@ -799,6 +799,8 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
 #   result_dict0["analysis_dict"]=analysis_dict
 #   return result_dict0
 
+#Visual presentation of alignment
+
 def present_aligned(aligned_results):
     final_list0=[]
     src_tokens0=aligned_results.get("src",[])
@@ -812,6 +814,32 @@ def present_aligned(aligned_results):
         cur_trg_phrase=" ".join(cur_trg_phrase)
         final_list0.append((cur_src_phrase,cur_trg_phrase,el0,el_wt0))
     return final_list0
+
+
+def random_color():
+  rand = lambda: random.randint(100, 255)
+  return '#%02X%02X%02X' % (rand(), rand(), rand())
+
+def create_color_classes_css(n_classes=100):
+  chars = '0123456789ABCDEF'
+  css_str0='<style>\n'
+  for class_i in range(n_classes):
+    class_name="walign-%s"%(class_i)
+    cur_color=random_color() #'#'+''.join(random.sample(chars,6))
+    cur_css_line='.%s {background: %s;}\n'%(class_name,cur_color)
+    css_str0+=cur_css_line
+  css_str0+='</style>\n'
+  return css_str0
+
+def create_align_html_table(list_aligned_classed0):
+  table_str0='<table border="1">'
+  for item0 in list_aligned_classed0:
+    src_cell0,trg_cell0=item0[:2]
+    tr0='<tr><td>%s</td><td dir="rtl">%s</td></tr>'%(src_cell0,trg_cell0)
+    table_str0+=tr0
+  table_str0+='</table>'
+  return table_str0
+
 
 # def walign(src_sent0,trg_sent0,retr_align_params0={}):
 #   analysis_dict={}
