@@ -324,7 +324,6 @@ def temp_tok(txt): #temporary tokenization function
   return re.findall("\w+",txt)
 
 
-
 def walign(src_sent0,trg_sent0,retr_align_params0={}):
   analysis_dict={}
   t0=time.time()
@@ -365,8 +364,7 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   if lang2=="ar" and lang2_tok_fn!=None: trg_tokens=lang2_tok_fn(trg_sent0)
   else: trg_tokens=tok_fn(trg_sent0)
   analysis_dict["params loading time"]=time.time()-t0
-  src_tokens_lower=[v.lower() for v in src_tokens]
-  trg_tokens_lower=[v.lower() for v in trg_tokens]
+
   t0=time.time()
 
   analysis_dict["src_tokens"]=len(src_tokens)
@@ -383,6 +381,9 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   trg_tok_loc_dict=get_unigram_locs(trg_tokens_padded)
   src_tokens_filtered_padded=["<s>"]+src_tokens_filtered+["</s>"] #main list to be aligned
   trg_tokens_filtered_padded=["<s>"]+trg_tokens_filtered+["</s>"]
+
+  src_tokens_lower=[v.lower() for v in src_tokens_padded]
+  trg_tokens_lower=[v.lower() for v in trg_tokens_padded]
 
   result_dict0={}
   result_dict0["src"]=src_tokens_padded
@@ -425,16 +426,6 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   phrase_count_src_dict,phrase_count_trg_dict={},{} #how many instances of each src/trg phrases
   for src_phrase_str,src_indexes_locs in src_output.items(): phrase_count_src_dict[src_phrase_str]=len(src_indexes_locs[0])
   for trg_phrase_str,trg_indexes_locs in trg_output.items(): phrase_count_trg_dict[trg_phrase_str]=len(trg_indexes_locs[0])
-
-  # phrase_count_src_dict_items=list(phrase_count_src_dict.items())
-  # phrase_count_src_dict_items.sort(key=lambda x:-len(x[0]))
-  # for a in phrase_count_src_dict_items[:20]:
-  #   print(a)
-  # for trg_phrase_str,trg_indexes_locs in trg_output.items():
-  #   trg_locs0,trg_indexes0=trg_indexes_locs
-  #   cur_indexes=trg_indexes0.get("main",[])
-  #   #print(trg_indexes0.keys())
-  #   print("trg: >>", trg_phrase_str,trg_locs0, len(cur_indexes), cur_indexes[:5])
 
 
   match_item_counter=0
@@ -528,13 +519,8 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
             trg_phrase_locs=general.is_in(corr_trg_str_split,trg_tokens_lower)
             if trg_phrase_locs:
               new_matching_list.append((res_src_phrase0,corr_trg_str0,src_phrase_locs,trg_phrase_locs,trg_freq0,trg_ratio0))  
-
-      # if is_in(res_src_phrase_split,cur_src0_lower):
-      #   for corr_trg_str0,corr_trg_vals in res_corr_dict.items():
-      #     corr_trg_str_split=corr_trg_str0.split(" ")
-      #     if is_in(corr_trg_str_split,cur_trg0_lower):
-      #       print(res_src_phrase0, corr_trg_str0, corr_trg_vals)
-
+              #print(res_src_phrase0,corr_trg_str0,src_phrase_locs,trg_phrase_locs,trg_freq0,trg_ratio0)
+              
 
 
   t0=time.time()
@@ -567,6 +553,265 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
   result_dict0["align"]=align_list_wt0
   result_dict0["analysis_dict"]=analysis_dict
   return result_dict0
+
+
+# def walign(src_sent0,trg_sent0,retr_align_params0={}):
+#   analysis_dict={}
+#   t0=time.time()
+#   initial_time=time.time()
+#   filter_params0=retr_align_params0.get("filter_params",{})
+#   src_index_dict0=retr_align_params0.get("src_index",{})
+#   trg_index_dict0=retr_align_params0.get("trg_index",{})
+
+#   extra_src_index_dict0=retr_align_params0.get("extra_src_index",{})
+#   extra_trg_index_dict0=retr_align_params0.get("extra_trg_index",{})
+#   phrase_trie_dict0=retr_align_params0.get("phrase_trie_dict",{})
+#   phrase_start_dict0=retr_align_params0.get("phrase_start_dict",{})
+
+#   lang1=retr_align_params0.get("lang1","en")
+#   lang2=retr_align_params0.get("lang2","ar")
+#   exclude_numbers=retr_align_params0.get("exclude_numbers",False)
+#   apply_size_factor=retr_align_params0.get("apply_size_factor",False)
+#   single_pass0=retr_align_params0.get("single_pass",False)  #do only one djkestra pass on the elements
+#   n_epochs0=retr_align_params0.get("n_epochs",10)
+#   min_intersection_count0=retr_align_params0.get("min_intersection_count",10)
+#   min_n_indexes_per_token0=retr_align_params0.get("min_n_indexes_per_token",10)
+#   allow_ortho0=retr_align_params0.get("allow_ortho",False) 
+#   min_freq_without_penalty0=retr_align_params0.get("min_freq_without_penalty",10)
+#   penalty0=retr_align_params0.get("penalty",0.25)
+#   top_ratios_reward0=retr_align_params0.get("top_ratios_reward",0)
+
+#   max_phrase_len=retr_align_params0.get("max_phrase_len",8) #when we get the phrases from a sentence
+#   max_sent_len=retr_align_params0.get("max_sent_len",30) #when we get the phrases from a sentence
+#   max_phrase_dist=retr_align_params0.get("max_phrase_dist",10) #maximum distance when combining two phrases
+#   min_phrase_wt=retr_align_params0.get("min_phrase_wt",0.01)
+#   tok_fn=retr_align_params0.get("tok_fn",general.tok)
+#   lang2_tok_fn=retr_align_params0.get("lang2_tok_fn")
+#   only_without_children0=retr_align_params0.get("only_without_children",False) #get only the elements without children 
+#   reward_combined_phrases=retr_align_params0.get("reward_combined_phrases",True)
+
+#   punc_pairs0=retr_align_params0.get("punc_pairs",{}) 
+#   src_tokens=tok_fn(src_sent0)
+#   if lang2=="ar" and lang2_tok_fn!=None: trg_tokens=lang2_tok_fn(trg_sent0)
+#   else: trg_tokens=tok_fn(trg_sent0)
+#   analysis_dict["params loading time"]=time.time()-t0
+#   src_tokens_lower=[v.lower() for v in src_tokens]
+#   trg_tokens_lower=[v.lower() for v in trg_tokens]
+#   t0=time.time()
+
+#   analysis_dict["src_tokens"]=len(src_tokens)
+#   analysis_dict["trg_tokens"]=len(trg_tokens)
+
+
+#   src_tokens_filtered=filter_toks(src_tokens,filter_params0)
+#   trg_tokens_filtered=filter_toks(trg_tokens,filter_params0) #need to make filter_tokens > OLD
+#   unique_src_tokens=list(set([v for v in src_tokens_filtered if v!=""]))
+#   unique_trg_tokens=list(set([v for v in trg_tokens_filtered if v!=""]))
+#   src_tokens_padded=["<s>"]+src_tokens+["</s>"] #filter_toks(self.src_tokens,filter_params0)
+#   trg_tokens_padded=["<s>"]+trg_tokens+["</s>"]
+#   src_tok_loc_dict=get_unigram_locs(src_tokens_padded)
+#   trg_tok_loc_dict=get_unigram_locs(trg_tokens_padded)
+#   src_tokens_filtered_padded=["<s>"]+src_tokens_filtered+["</s>"] #main list to be aligned
+#   trg_tokens_filtered_padded=["<s>"]+trg_tokens_filtered+["</s>"]
+
+#   result_dict0={}
+#   result_dict0["src"]=src_tokens_padded
+#   result_dict0["trg"]=trg_tokens_padded
+#   analysis_dict["tokenization and processing time"]=time.time()-t0
+
+#   if len(src_tokens)>max_sent_len or len(trg_tokens)>max_sent_len: n_epochs0=1#return result_dict0
+
+#   #Now we load the indexes for our tokens
+#   t0=time.time()
+#   src_index_dict,trg_index_dict={},{}
+#   src_retr_dict={}
+#   for ut in unique_src_tokens: 
+#     if ut.isdigit() and exclude_numbers: continue
+#     #src_index_dict[ut]=get_word_indexes(ut,"src",retr_align_params0)
+#     src_index_dict[ut]={}
+#     src_index_dict[ut]["main"]=src_index_dict0.get(ut,[])
+#     src_index_dict[ut]["extra"]=extra_src_index_dict0.get(ut,[])
+#   for ut in unique_trg_tokens: 
+#     if ut.isdigit() and exclude_numbers: continue
+#     #trg_index_dict[ut]=get_word_indexes(ut,"trg",retr_align_params0)
+#     trg_index_dict[ut]={}
+#     trg_index_dict[ut]["main"]=trg_index_dict0.get(ut,[])
+#     trg_index_dict[ut]["extra"]=extra_trg_index_dict0.get(ut,[])
+#   elapsed=time.time()-t0
+#   elapsed_loading_indexes=time.time()-t0
+#   analysis_dict["loaded indexes time"]=elapsed_loading_indexes
+#   #print("elapsed_loading_indexes",elapsed_loading_indexes)
+
+#   #print("src:",len(unique_src_tokens),"trg:",len(unique_trg_tokens),"elapsed:",round(elapsed,4))
+#   #print("now mtaching src -trg tokens/phrases")
+#   #Now we start the matching between src/trg tokens
+#   t0=time.time()
+
+#   src_output=get_phrase_locs_indexes(src_tokens_filtered_padded,src_index_dict,max_phrase_len)
+#   trg_output=get_phrase_locs_indexes(trg_tokens_filtered_padded,trg_index_dict,max_phrase_len)
+#   analysis_dict["get locs indexes"]=time.time()-t0
+#   t0=time.time()
+#   matching_list=[]
+#   phrase_count_src_dict,phrase_count_trg_dict={},{} #how many instances of each src/trg phrases
+#   for src_phrase_str,src_indexes_locs in src_output.items(): phrase_count_src_dict[src_phrase_str]=len(src_indexes_locs[0])
+#   for trg_phrase_str,trg_indexes_locs in trg_output.items(): phrase_count_trg_dict[trg_phrase_str]=len(trg_indexes_locs[0])
+
+#   # phrase_count_src_dict_items=list(phrase_count_src_dict.items())
+#   # phrase_count_src_dict_items.sort(key=lambda x:-len(x[0]))
+#   # for a in phrase_count_src_dict_items[:20]:
+#   #   print(a)
+#   # for trg_phrase_str,trg_indexes_locs in trg_output.items():
+#   #   trg_locs0,trg_indexes0=trg_indexes_locs
+#   #   cur_indexes=trg_indexes0.get("main",[])
+#   #   #print(trg_indexes0.keys())
+#   #   print("trg: >>", trg_phrase_str,trg_locs0, len(cur_indexes), cur_indexes[:5])
+
+
+#   match_item_counter=0
+
+#   for src_phrase_str,src_indexes_locs in src_output.items():
+#     src_locs0,src_indexes0=src_indexes_locs
+#     #if len(src_indexes0)<min_n_indexes_per_token0: continue
+#     for trg_phrase_str,trg_indexes_locs in trg_output.items():
+#       trg_locs0,trg_indexes0=trg_indexes_locs
+#       #if len(src_indexes0)<min_n_indexes_per_token0: continue
+#       if src_phrase_str==trg_phrase_str: 
+#         ratio1,intersection1=0.5, 1000
+#       else: 
+#         match_item_counter+=1
+#         ratio1,intersection1=get_index_match_ratio_count(src_indexes0,trg_indexes0)
+#       min_locs_count=min(len(src_locs0),len(trg_locs0)) #we subtract from the number of locs of each phrase the minimum
+#       if ratio1==0: continue
+#       if ratio1<min_phrase_wt: continue
+#       if intersection1<min_intersection_count0: continue
+#       if apply_size_factor: 
+#         avg_size=(len(src_locs0)+len(trg_locs0))/2
+#         ratio1=ratio1*get_size_factor(avg_size)
+#       matching_list.append((src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,min_locs_count,intersection1,ratio1))
+#   # sorted_matching_list=sorted(matching_list,key=lambda x:x[-2])
+#   # for a in sorted_matching_list[:10]: print(a)
+
+#   matching_list.sort(key=lambda x:-x[-1])
+#   analysis_dict["match_item_counter"]=match_item_counter
+#   elapsed_got_matching_list=time.time()-t0
+#   analysis_dict["got matching list"]=elapsed_got_matching_list
+#   t0=time.time()
+#   # for ml1 in matching_list:
+#   #   src_phrase_str1,trg_phrase_str1,src_locs1,trg_locs1,min_locs_count1,intersection1,ratio1=ml1
+#   #   if " ".join(src_phrase_str1)=="multilateral": print(ml1)
+  
+#   new_matching_list=[] #exclude src/trg phrases used more than the count of either
+#   for ml in matching_list:
+#     src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,min_locs_count,intersection1,ratio1=ml
+#     #if len(trg_phrase_str)>1: print(">>>",ml)
+#     # if phrase_count_src_dict[src_phrase_str]>=-1 or phrase_count_trg_dict[trg_phrase_str]>=-1:
+#     #   print(">>>",ml)
+#     if phrase_count_src_dict[src_phrase_str]>0 and phrase_count_trg_dict[trg_phrase_str]>0:
+#       ratio1+=top_ratios_reward0 #reward unique matching elements
+
+
+#     if phrase_count_src_dict[src_phrase_str]>0 or phrase_count_trg_dict[trg_phrase_str]>0:
+#       new_matching_list.append((src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,intersection1,ratio1))
+#     phrase_count_src_dict[src_phrase_str]=phrase_count_src_dict[src_phrase_str]-min_locs_count #subtract the minimum count of instances from both src and trg
+#     phrase_count_trg_dict[trg_phrase_str]=phrase_count_trg_dict[trg_phrase_str]-min_locs_count
+
+#   analysis_dict["excluded used src/trg phrases"]=time.time()-t0
+#   t0=time.time()
+
+#   for excluded_src_tok0,excluded_src_locs0 in src_tok_loc_dict.items(): #check matching tokens with their src/trg locs from the filtered out tokens
+#     if excluded_src_tok0 in src_tokens_filtered_padded: continue
+#     excluded_trg_locs0=trg_tok_loc_dict.get(excluded_src_tok0,[])
+#     if excluded_trg_locs0==[]: continue
+#     ex_src_locs=[[v] for v in excluded_src_locs0]
+#     ex_trg_locs=[[v] for v in excluded_trg_locs0]
+#     ratio1,intersection1=0.5, 1000
+#     new_matching_list.append((excluded_src_tok0,excluded_src_tok0,ex_src_locs,ex_trg_locs,intersection1,ratio1))
+#   analysis_dict["added exact match tokens"]=time.time()-t0
+#   t0=time.time()
+
+  
+#   for src_punc0,trg_punc0 in punc_pairs0.items(): #now let's match punctuation from the original tokens
+#     punc_src_locs=src_tok_loc_dict.get(src_punc0,[])
+#     if punc_src_locs==[]: continue
+#     punc_trg_locs=trg_tok_loc_dict.get(trg_punc0,[])
+#     if punc_trg_locs==[]: continue
+#     ratio1,intersection1=0.2, 100
+#     src_punc0,trg_punc0=tuple([src_punc0]),tuple([trg_punc0])
+#     punc_src_locs=[[v] for v in punc_src_locs]
+#     punc_trg_locs=[[v] for v in punc_trg_locs]
+#     new_matching_list.append((src_punc0,trg_punc0,punc_src_locs,punc_trg_locs,intersection1,ratio1))
+
+#   analysis_dict["added custom punc/prep items"]=time.time()-t0
+
+#   if phrase_start_dict0!={}: #if we have a phrase start dict (with keys for unigrams and bigrams)
+#     cur_unigrams_bigrams=list(set(get_unigrams_bigrams(src_tokens_lower)))
+#     for a in cur_unigrams_bigrams:
+#       res_list=cur_phrase_dict.get(a,[])
+#       for res0 in res_list:
+#         res_src_phrase0,res_corr_dict=res0
+#         res_src_phrase_split=res_src_phrase0.split(" ")
+#         src_phrase_locs=general.is_in(res_src_phrase_split,src_tokens_lower)
+#         if src_phrase_locs:
+#           for corr_trg_str0,corr_trg_vals in res_corr_dict.items():
+#             corr_trg_str_split=corr_trg_str0.split(" ")
+#             trg_freq0,trg_ratio0=corr_trg_vals
+#             trg_phrase_locs=general.is_in(corr_trg_str_split,trg_tokens_lower)
+#             if trg_phrase_locs:
+#               new_matching_list.append((res_src_phrase0,corr_trg_str0,src_phrase_locs,trg_phrase_locs,trg_freq0,trg_ratio0))  
+
+
+#       # if is_in(res_src_phrase_split,cur_src0_lower):
+#       #   for corr_trg_str0,corr_trg_vals in res_corr_dict.items():
+#       #     corr_trg_str_split=corr_trg_str0.split(" ")
+#       #     if is_in(corr_trg_str_split,cur_trg0_lower):
+#       #       print(res_src_phrase0, corr_trg_str0, corr_trg_vals)
+
+
+
+#   t0=time.time()
+
+
+#   new_matching_list.sort(key=lambda x:-x[-1])
+#   #elapsed=time.time()-t0
+#   span_matching_list=[]
+#   #print("finished matching words and phrases:", elapsed)
+#   #Now we have the matching list - let's align
+#   # el_dict={} #weight of each element
+#   # el_child_dict={} #children of each element
+#   for a in new_matching_list:
+#     #print(a)
+#     src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,intersection1,ratio1=a
+#     for sl0 in src_locs0:
+#       s_min,s_max=sl0[0],sl0[-1]
+#       src_span0=(s_min,s_max)
+#       for tl0 in trg_locs0:
+#         t_min,t_max=tl0[0],tl0[-1]
+#         trg_span0=(t_min,t_max)
+#         span_matching_list.append((src_span0,trg_span0,ratio1,intersection1))
+#   analysis_dict["processed matching items to get aligned path"]=time.time()-t0
+#   t0=time.time()
+
+
+#   align_list_wt0=get_aligned_path(src_tokens_padded,trg_tokens_padded,span_matching_list, n_epochs=n_epochs0, only_without_children=only_without_children0)
+#   analysis_dict["obtained aligned path"]=time.time()-t0
+#   t0=time.time()  
+#   result_dict0["align"]=align_list_wt0
+#   result_dict0["analysis_dict"]=analysis_dict
+#   return result_dict0
+
+def present_aligned(aligned_res):
+    final_list0=[]
+    src_tokens0=aligned_res.get("src",[])
+    trg_tokens0=aligned_res.get("trg",[])
+    align_list0=aligned_res.get("align",[])
+    for el0,el_wt0 in align_list0:
+        src_span0,trg_span0=el0
+        cur_src_phrase=src_tokens0[src_span0[0]:src_span0[1]+1]
+        cur_trg_phrase=trg_tokens0[trg_span0[0]:trg_span0[1]+1]
+        cur_src_phrase=" ".join(cur_src_phrase)
+        cur_trg_phrase=" ".join(cur_trg_phrase)
+        final_list0.append((cur_src_phrase,cur_trg_phrase,el0,el_wt0))
+    return final_list0
 
 # def walign(src_sent0,trg_sent0,retr_align_params0={}):
 #   analysis_dict={}
