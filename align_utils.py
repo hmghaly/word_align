@@ -799,11 +799,11 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
 #   result_dict0["analysis_dict"]=analysis_dict
 #   return result_dict0
 
-def present_aligned(aligned_res):
+def present_aligned(aligned_results):
     final_list0=[]
-    src_tokens0=aligned_res.get("src",[])
-    trg_tokens0=aligned_res.get("trg",[])
-    align_list0=aligned_res.get("align",[])
+    src_tokens0=aligned_results.get("src",[])
+    trg_tokens0=aligned_results.get("trg",[])
+    align_list0=aligned_results.get("align",[])
     for el0,el_wt0 in align_list0:
         src_span0,trg_span0=el0
         cur_src_phrase=src_tokens0[src_span0[0]:src_span0[1]+1]
