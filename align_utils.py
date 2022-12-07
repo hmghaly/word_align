@@ -835,7 +835,7 @@ def create_align_html_table(list_aligned_classed0):
   table_str0='<table border="1" style="width:100%;table-layout:fixed;">'
   for item0 in list_aligned_classed0:
     src_cell0,trg_cell0=item0[:2]
-    tr0='<tr><td style="max-width:50%;width:50%;">%s</td><td dir="rtl" style="max-width:50%;width:50%;">%s</td></tr>'%(src_cell0,trg_cell0)
+    tr0='<tr><td style="max-width:50%%;width:50%%;">%s</td><td dir="rtl" style="max-width:50%%;width:50%%;">%s</td></tr>'%(src_cell0,trg_cell0)
     table_str0+=tr0
   table_str0+='</table>'
   return table_str0
