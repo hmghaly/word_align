@@ -598,6 +598,8 @@ def random_color():
 def create_color_classes_css(n_classes=100):
   chars = '0123456789ABCDEF'
   css_str0='<style>\n'
+  aligned_transparent_cls='.aligned-transparent {opacity: 0.25};\n'
+  css_str0+=aligned_transparent_cls
   for class_i in range(n_classes):
     class_name="walign-%s"%(class_i)
     cur_color=random_color() #'#'+''.join(random.sample(chars,6))
@@ -1251,7 +1253,7 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
     open_classes=src_open_dict.get(tok_i,[])
     close_classes=src_close_dict.get(tok_i,[])
     cur_str=""
-    for class0 in open_classes: cur_str+='<span class="%s %s">'%(sent_class0, class0)
+    for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
     cur_str+=src_tok0
     for class0 in close_classes: cur_str+='</span>'
     if tok_i in chunk_xs: cur_str+="<br>"
@@ -1261,7 +1263,7 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
     open_classes=trg_open_dict.get(tok_i,[])
     close_classes=trg_close_dict.get(tok_i,[])
     cur_str=""
-    for class0 in open_classes: cur_str+='<span class="%s %s">'%(sent_class0, class0)
+    for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
     cur_str+=trg_tok0
     for class0 in close_classes: cur_str+='</span>'
     if tok_i in chunk_ys: cur_str+="<br>"
