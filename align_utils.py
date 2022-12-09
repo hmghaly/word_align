@@ -245,7 +245,7 @@ def get_matching_phrases_locs(phrase_start_dict,src_tokens,trg_tokens): # key: u
   new_matching_list0=[]
   cur_unigrams_bigrams=list(set(get_unigrams_bigrams(src_tokens)))
   for a in cur_unigrams_bigrams:
-    res_list=phrase_start_dict0.get(a,[])
+    res_list=phrase_start_dict.get(a,[])
     for res0 in res_list:
       res_src_phrase0,res_corr_dict=res0
       res_src_phrase_split=res_src_phrase0.split(" ")
