@@ -227,7 +227,7 @@ def get_phrase_locs_indexes(tokens0,res_dict0,max_phrase_len=8):
     
   return new_dict
 
-def get_unigrams_bigrams(token_list, exclude_numbers=True,exclude_single_chars=True):
+def get_unigrams_bigrams(token_list, exclude_numbers=True,exclude_single_chars=True): #for a list of tokens, identify all unigrams and bigrams
   list_unigrams_bigrams0=[]
   for uni0 in list(set(token_list)):
     if exclude_numbers and uni0.isdigit():continue
@@ -241,23 +241,22 @@ def get_unigrams_bigrams(token_list, exclude_numbers=True,exclude_single_chars=T
     if not bigram0 in list_unigrams_bigrams0: list_unigrams_bigrams0.append(bigram0)
   return list_unigrams_bigrams0
 
-def get_matching_phrases_locs(phrase_start_dict,src_tokens,trg_tokens):
+def get_matching_phrases_locs(phrase_start_dict,src_tokens,trg_tokens): # key: unigram-bigram string - value list of src phrases and a dict of corresponding trg phrases and their weights/freq
   new_matching_list0=[]
-  if phrase_start_dict0!={}: #if we have a phrase start dict (with keys for unigrams and bigrams)
-    cur_unigrams_bigrams=list(set(get_unigrams_bigrams(src_tokens)))
-    for a in cur_unigrams_bigrams:
-      res_list=phrase_start_dict0.get(a,[])
-      for res0 in res_list:
-        res_src_phrase0,res_corr_dict=res0
-        res_src_phrase_split=res_src_phrase0.split(" ")
-        src_phrase_locs=general.is_in(res_src_phrase_split,src_tokens)
-        if src_phrase_locs:
-          for corr_trg_str0,corr_trg_vals in res_corr_dict.items():
-            corr_trg_str_split=corr_trg_str0.split(" ")
-            trg_freq0,trg_ratio0=corr_trg_vals
-            trg_phrase_locs=general.is_in(corr_trg_str_split,trg_tokens)
-            if trg_phrase_locs:
-              new_matching_list0.append((res_src_phrase0,corr_trg_str0,src_phrase_locs,trg_phrase_locs,trg_freq0,trg_ratio0))  
+  cur_unigrams_bigrams=list(set(get_unigrams_bigrams(src_tokens)))
+  for a in cur_unigrams_bigrams:
+    res_list=phrase_start_dict0.get(a,[])
+    for res0 in res_list:
+      res_src_phrase0,res_corr_dict=res0
+      res_src_phrase_split=res_src_phrase0.split(" ")
+      src_phrase_locs=general.is_in(res_src_phrase_split,src_tokens)
+      if src_phrase_locs:
+        for corr_trg_str0,corr_trg_vals in res_corr_dict.items():
+          corr_trg_str_split=corr_trg_str0.split(" ")
+          trg_freq0,trg_ratio0=corr_trg_vals
+          trg_phrase_locs=general.is_in(corr_trg_str_split,trg_tokens)
+          if trg_phrase_locs:
+            new_matching_list0.append((res_src_phrase0,corr_trg_str0,src_phrase_locs,trg_phrase_locs,trg_freq0,trg_ratio0))  
   return new_matching_list0
 
 def combine_els(el1,el2):
@@ -294,7 +293,7 @@ def get_rec_el_children(el0,el_child_dict0,el_list0=[],only_without_children=Fal
   return el_list0
 
 
-def get_ne_se_dict(all_elements0,allow_ortho=True): #elements are pairs of src/trg spans - allow othogonal - vertical horizontal spans
+def get_ne_se_dict(all_elements0,allow_ortho=False): #elements are pairs of src/trg spans - allow othogonal - vertical horizontal spans
   se_transition_dict0,ne_transition_dict0={},{} #identify the possible transitions from one element to another - southeast or northeast
   #test_transition_dict0={}
   for el0,el_wt0 in all_elements0:
