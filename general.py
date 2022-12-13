@@ -240,6 +240,8 @@ def ssplit(txt):
     txt=txt.replace("\xd8\x9f ","\xd8\x9f\n")
     txt=txt.replace("\r","\n")
     txt=txt.replace("\t","\n")
+    txt=txt.replace("؛","؛\n")
+    txt=txt.replace("؟","؟\n")
     
     txt=txt.replace("._",".")
     for mdw in multi_dot_words:
