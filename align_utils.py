@@ -618,217 +618,6 @@ def create_align_html_table(list_aligned_classed0):
   return table_str0
 
 
-# def walign(src_sent0,trg_sent0,retr_align_params0={}):
-#   analysis_dict={}
-#   t0=time.time()
-#   filter_params0=retr_align_params0.get("filter_params",{})
-#   src_index_dict0=retr_align_params0.get("src_index",{})
-#   trg_index_dict0=retr_align_params0.get("trg_index",{})
-
-#   extra_src_index_dict0=retr_align_params0.get("extra_src_index",{})
-#   extra_trg_index_dict0=retr_align_params0.get("extra_trg_index",{})
-#   phrase_trie_dict0=retr_align_params0.get("phrase_trie_dict",{})
-
-#   lang1=retr_align_params0.get("lang1","en")
-#   lang2=retr_align_params0.get("lang2","ar")
-#   exclude_numbers=retr_align_params0.get("exclude_numbers",False)
-#   apply_size_factor=retr_align_params0.get("apply_size_factor",False)
-#   single_pass0=retr_align_params0.get("single_pass",False)  #do only one djkestra pass on the elements
-#   n_epochs0=retr_align_params0.get("n_epochs",10)
-#   min_intersection_count0=retr_align_params0.get("min_intersection_count",10)
-#   min_n_indexes_per_token0=retr_align_params0.get("min_n_indexes_per_token",10)
-#   allow_ortho0=retr_align_params0.get("allow_ortho",False) 
-#   min_freq_without_penalty0=retr_align_params0.get("min_freq_without_penalty",10)
-#   penalty0=retr_align_params0.get("penalty",0.25)
-
-#   max_phrase_len=retr_align_params0.get("max_phrase_len",8) #when we get the phrases from a sentence
-#   max_sent_len=retr_align_params0.get("max_sent_len",30) #when we get the phrases from a sentence
-#   max_phrase_dist=retr_align_params0.get("max_phrase_dist",10) #maximum distance when combining two phrases
-#   min_phrase_wt=retr_align_params0.get("min_phrase_wt",0.01)
-#   tok_fn=retr_align_params0.get("tok_fn",general.tok)
-#   lang2_tok_fn=retr_align_params0.get("lang2_tok_fn")
-#   only_without_children0=retr_align_params0.get("only_without_children",False) #get only the elements without children 
-#   reward_combined_phrases=retr_align_params0.get("reward_combined_phrases",True)
-
-#   punc_pairs0=retr_align_params0.get("punc_pairs",{}) 
-#   src_tokens=tok_fn(src_sent0)
-#   if lang2=="ar" and lang2_tok_fn!=None: trg_tokens=lang2_tok_fn(trg_sent0)
-#   else: trg_tokens=tok_fn(trg_sent0)
-#   analysis_dict["params loading time"]=time.time()-t0
-#   t0=time.time()
-
-#   analysis_dict["src_tokens"]=len(src_tokens)
-#   analysis_dict["trg_tokens"]=len(trg_tokens)
-
-
-#   src_tokens_filtered=filter_toks(src_tokens,filter_params0)
-#   trg_tokens_filtered=filter_toks(trg_tokens,filter_params0) #need to make filter_tokens > OLD
-#   unique_src_tokens=list(set([v for v in src_tokens_filtered if v!=""]))
-#   unique_trg_tokens=list(set([v for v in trg_tokens_filtered if v!=""]))
-#   src_tokens_padded=["<s>"]+src_tokens+["</s>"] #filter_toks(self.src_tokens,filter_params0)
-#   trg_tokens_padded=["<s>"]+trg_tokens+["</s>"]
-#   src_tok_loc_dict=get_unigram_locs(src_tokens_padded)
-#   trg_tok_loc_dict=get_unigram_locs(trg_tokens_padded)
-#   src_tokens_filtered_padded=["<s>"]+src_tokens_filtered+["</s>"] #main list to be aligned
-#   trg_tokens_filtered_padded=["<s>"]+trg_tokens_filtered+["</s>"]
-
-#   result_dict0={}
-#   result_dict0["src"]=src_tokens_padded
-#   result_dict0["trg"]=trg_tokens_padded
-#   analysis_dict["tokenization and processing time"]=time.time()-t0
-
-#   if len(src_tokens)>max_sent_len or len(trg_tokens)>max_sent_len: n_epochs0=1#return result_dict0
-
-#   #Now we load the indexes for our tokens
-#   t0=time.time()
-#   src_index_dict,trg_index_dict={},{}
-#   src_retr_dict={}
-#   for ut in unique_src_tokens: 
-#     if ut.isdigit() and exclude_numbers: continue
-#     #src_index_dict[ut]=get_word_indexes(ut,"src",retr_align_params0)
-#     src_index_dict[ut]={}
-#     src_index_dict[ut]["main"]=src_index_dict0.get(ut,[])
-#     src_index_dict[ut]["extra"]=extra_src_index_dict0.get(ut,[])
-#   for ut in unique_trg_tokens: 
-#     if ut.isdigit() and exclude_numbers: continue
-#     #trg_index_dict[ut]=get_word_indexes(ut,"trg",retr_align_params0)
-#     trg_index_dict[ut]={}
-#     trg_index_dict[ut]["main"]=trg_index_dict0.get(ut,[])
-#     trg_index_dict[ut]["extra"]=extra_trg_index_dict0.get(ut,[])
-#   elapsed=time.time()-t0
-#   elapsed_loading_indexes=time.time()-t0
-#   analysis_dict["loaded indexes time"]=elapsed_loading_indexes
-#   #print("elapsed_loading_indexes",elapsed_loading_indexes)
-
-#   #print("src:",len(unique_src_tokens),"trg:",len(unique_trg_tokens),"elapsed:",round(elapsed,4))
-#   #print("now mtaching src -trg tokens/phrases")
-#   #Now we start the matching between src/trg tokens
-#   t0=time.time()
-
-#   src_output=get_phrase_locs_indexes(src_tokens_filtered_padded,src_index_dict,max_phrase_len)
-#   trg_output=get_phrase_locs_indexes(trg_tokens_filtered_padded,trg_index_dict,max_phrase_len)
-#   analysis_dict["get locs indexes"]=time.time()-t0
-#   t0=time.time()
-#   matching_list=[]
-#   phrase_count_src_dict,phrase_count_trg_dict={},{} #how many instances of each src/trg phrases
-#   for src_phrase_str,src_indexes_locs in src_output.items(): phrase_count_src_dict[src_phrase_str]=len(src_indexes_locs[0])
-#   for trg_phrase_str,trg_indexes_locs in trg_output.items(): phrase_count_trg_dict[trg_phrase_str]=len(trg_indexes_locs[0])
-
-#   # phrase_count_src_dict_items=list(phrase_count_src_dict.items())
-#   # phrase_count_src_dict_items.sort(key=lambda x:-len(x[0]))
-#   # for a in phrase_count_src_dict_items[:20]:
-#   #   print(a)
-#   # for trg_phrase_str,trg_indexes_locs in trg_output.items():
-#   #   trg_locs0,trg_indexes0=trg_indexes_locs
-#   #   cur_indexes=trg_indexes0.get("main",[])
-#   #   #print(trg_indexes0.keys())
-#   #   print("trg: >>", trg_phrase_str,trg_locs0, len(cur_indexes), cur_indexes[:5])
-
-
-#   match_item_counter=0
-
-#   for src_phrase_str,src_indexes_locs in src_output.items():
-#     src_locs0,src_indexes0=src_indexes_locs
-#     #if len(src_indexes0)<min_n_indexes_per_token0: continue
-#     for trg_phrase_str,trg_indexes_locs in trg_output.items():
-#       trg_locs0,trg_indexes0=trg_indexes_locs
-#       #if len(src_indexes0)<min_n_indexes_per_token0: continue
-#       if src_phrase_str==trg_phrase_str: 
-#         ratio1,intersection1=0.5, 1000
-#       else: 
-#         match_item_counter+=1
-#         ratio1,intersection1=get_index_match_ratio_count(src_indexes0,trg_indexes0)
-#       min_locs_count=min(len(src_locs0),len(trg_locs0)) #we subtract from the number of locs of each phrase the minimum
-#       if ratio1==0: continue
-#       if ratio1<min_phrase_wt: continue
-#       if intersection1<min_intersection_count0: continue
-#       if apply_size_factor: 
-#         avg_size=(len(src_locs0)+len(trg_locs0))/2
-#         ratio1=ratio1*get_size_factor(avg_size)
-#       matching_list.append((src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,min_locs_count,intersection1,ratio1))
-#   # sorted_matching_list=sorted(matching_list,key=lambda x:x[-2])
-#   # for a in sorted_matching_list[:10]: print(a)
-
-#   matching_list.sort(key=lambda x:-x[-1])
-#   analysis_dict["match_item_counter"]=match_item_counter
-#   elapsed_got_matching_list=time.time()-t0
-#   analysis_dict["got matching list"]=elapsed_got_matching_list
-#   t0=time.time()
-#   # for ml1 in matching_list:
-#   #   src_phrase_str1,trg_phrase_str1,src_locs1,trg_locs1,min_locs_count1,intersection1,ratio1=ml1
-#   #   if " ".join(src_phrase_str1)=="multilateral": print(ml1)
-  
-#   new_matching_list=[] #exclude src/trg phrases used more than the count of either
-#   for ml in matching_list:
-#     src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,min_locs_count,intersection1,ratio1=ml
-#     #if len(trg_phrase_str)>1: print(">>>",ml)
-#     # if phrase_count_src_dict[src_phrase_str]>=-1 or phrase_count_trg_dict[trg_phrase_str]>=-1:
-#     #   print(">>>",ml)
-#     if phrase_count_src_dict[src_phrase_str]>0 or phrase_count_trg_dict[trg_phrase_str]>0:
-#       new_matching_list.append((src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,intersection1,ratio1))
-#     phrase_count_src_dict[src_phrase_str]=phrase_count_src_dict[src_phrase_str]-min_locs_count #subtract the minimum count of instances from both src and trg
-#     phrase_count_trg_dict[trg_phrase_str]=phrase_count_trg_dict[trg_phrase_str]-min_locs_count
-
-#   analysis_dict["excluded used src/trg phrases"]=time.time()-t0
-#   t0=time.time()
-
-#   for excluded_src_tok0,excluded_src_locs0 in src_tok_loc_dict.items(): #check matching tokens with their src/trg locs from the filtered out tokens
-#     if excluded_src_tok0 in src_tokens_filtered_padded: continue
-#     excluded_trg_locs0=trg_tok_loc_dict.get(excluded_src_tok0,[])
-#     if excluded_trg_locs0==[]: continue
-#     ex_src_locs=[[v] for v in excluded_src_locs0]
-#     ex_trg_locs=[[v] for v in excluded_trg_locs0]
-#     ratio1,intersection1=0.5, 1000
-#     new_matching_list.append((excluded_src_tok0,excluded_src_tok0,ex_src_locs,ex_trg_locs,intersection1,ratio1))
-#   analysis_dict["added exact match tokens"]=time.time()-t0
-#   t0=time.time()
-
-  
-#   for src_punc0,trg_punc0 in punc_pairs0.items(): #now let's match punctuation from the original tokens
-#     punc_src_locs=src_tok_loc_dict.get(src_punc0,[])
-#     if punc_src_locs==[]: continue
-#     punc_trg_locs=trg_tok_loc_dict.get(trg_punc0,[])
-#     if punc_trg_locs==[]: continue
-#     ratio1,intersection1=0.2, 100
-#     src_punc0,trg_punc0=tuple([src_punc0]),tuple([trg_punc0])
-#     punc_src_locs=[[v] for v in punc_src_locs]
-#     punc_trg_locs=[[v] for v in punc_trg_locs]
-#     new_matching_list.append((src_punc0,trg_punc0,punc_src_locs,punc_trg_locs,intersection1,ratio1))
-
-#   analysis_dict["added custom punc/prep items"]=time.time()-t0
-#   t0=time.time()
-
-
-#   new_matching_list.sort(key=lambda x:-x[-1])
-#   #elapsed=time.time()-t0
-#   span_matching_list=[]
-#   #print("finished matching words and phrases:", elapsed)
-#   #Now we have the matching list - let's align
-#   # el_dict={} #weight of each element
-#   # el_child_dict={} #children of each element
-#   for a in new_matching_list:
-#     #print(a)
-#     src_phrase_str,trg_phrase_str,src_locs0,trg_locs0,intersection1,ratio1=a
-#     for sl0 in src_locs0:
-#       s_min,s_max=sl0[0],sl0[-1]
-#       src_span0=(s_min,s_max)
-#       for tl0 in trg_locs0:
-#         t_min,t_max=tl0[0],tl0[-1]
-#         trg_span0=(t_min,t_max)
-#         span_matching_list.append((src_span0,trg_span0,ratio1,intersection1))
-#   analysis_dict["processed matching items to get aligned path"]=time.time()-t0
-#   t0=time.time()
-
-
-#   align_list_wt0=get_aligned_path(src_tokens_padded,trg_tokens_padded,span_matching_list, n_epochs=n_epochs0, only_without_children=only_without_children0)
-#   analysis_dict["obtained aligned path"]=time.time()-t0
-#   t0=time.time()  
-#   result_dict0["align"]=align_list_wt0
-#   result_dict0["analysis_dict"]=analysis_dict
-#   return result_dict0
-
-
-
 
 def tok_bitext(list0,params0={}):
   cur_ar_counter_dict=params0.get("ar_counter_dict",{})
@@ -885,6 +674,9 @@ def apply_trie(src_toks0,trg_toks0,trie0):
   match_list0=sorted(list(set(match_list0)))
   return match_list0
 
+
+
+#16 Dec 2022
 def match_exact_tokens(src_toks0,trg_toks0):
   src_tok_loc_dict=get_unigram_locs(src_toks0)
   trg_tok_loc_dict=get_unigram_locs(trg_toks0)
@@ -902,8 +694,101 @@ def match_exact_tokens(src_toks0,trg_toks0):
   return match_list0
           
 
+#16 Dec 2022
+def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=True,max_dist=5,min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
+  match_list=sorted(list(set(match_list)))
+  #Now we have the matching list - let's align
+  el_dict={} #weight of each element
+  el_child_dict={} #children of each element
+  for a in match_list:
+    src_span0,trg_span0,ratio0,freq0=a
+    #if freq0<min_freq_without_penalty: ratio0=ratio0*penalty
+    el0=(src_span0,trg_span0)
+    found_ratio=el_dict.get(el0,0)
+    if ratio0>found_ratio: el_dict[el0]=ratio0
+  all_elements=list(el_dict.items()) #let's get horizontal and vertical spans
+  
+  elements_list1,elements_list2=all_elements,all_elements
+  #epoch
+  for i in range(n_epochs):
+    #print("epoch",i)
+    new_elements=[]
+    for cur_el0,cur_el_wt0 in elements_list1:
+      src_span0,trg_span0=cur_el0
+      for cur_el1,cur_el_wt1 in elements_list2:
+        valid_el_pair=check_el_pair(cur_el0,cur_el1,allow_ortho=allow_ortho,max_dist=max_dist)
+        if not valid_el_pair: continue
+        #print("cur_el0",cur_el0,"cur_el1",cur_el1,"valid_el_pair",valid_el_pair )
+        combined_el01=combine_els(cur_el0,cur_el1)
+        combined_wt=cur_el_wt0+cur_el_wt1
+        found_wt=el_dict.get(combined_el01,0)
+        
+        if combined_wt>found_wt:
+          el_dict[combined_el01]= combined_wt
+          el_child_dict[combined_el01]=(cur_el0,cur_el1)
+          new_elements.append((combined_el01,combined_wt))
+          # print("cur_el0",cur_el0,"cur_el1",cur_el1)
+          # print("combined_el01",combined_el01,"combined_wt",combined_wt,"found_wt",found_wt)
+          
+          # print("----")
+    if new_elements==[]: break
+    elements_list1=new_elements
+    elements_list2=list(el_dict.items())
+  
+  all_elements=list(el_dict.items())
+  all_elements.sort(key=lambda x:-x[-1])
+  final_elements=[]
+  used_xs,used_ys=[],[]
+  for cur_el0,el_wt0 in all_elements:
+    src_span0,trg_span0=cur_el0
+    src_range0=list(range(src_span0[0],src_span0[1]+1))
+    trg_range0=list(range(trg_span0[0],trg_span0[1]+1))
+    if any([v in used_xs for v in src_range0]): continue
+    if any([v in used_ys for v in trg_range0]): continue
+    used_xs.extend(src_range0)
+    used_ys.extend(trg_range0)
+    cur_children=get_rec_el_children(cur_el0,el_child_dict,el_list0=[])
+    for ch0 in cur_children:
+      child_check=el_child_dict.get(ch0)
+      ch0_wt=el_dict.get(ch0,0)
+      if child_check!=None: continue
+      final_elements.append((ch0,ch0_wt))
+  return final_elements
 
-def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=False,min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
+
+#16 Dec 2022
+def add_padding(token_list):
+  return ["<s>"]+token_list+["</s>"]
+
+#16 Dec 2022
+def check_el_pair(el0,el1,allow_ortho=True,max_dist=None, max_ortho_span=2): #check if two elements can be combined -if they do not overlap, with ortho and dist requirements
+  if el0==el1: return False
+  src_span0,trg_span0=el0
+  src_span1,trg_span1=el1
+  cur_src_dist=get_span_dist(src_span0,src_span1)
+  cur_trg_dist=get_span_dist(trg_span0,trg_span1)    
+  if not allow_ortho: #check ortho cases -vertical/horizontal co-inciding spans
+    if src_span0==src_span1 or trg_span0==trg_span1: return False
+  else:
+    if src_span0==src_span1:
+      if src_span0[1]-src_span0[0]>max_ortho_span: return False #if els have same src span, but it is large e.g. (5,10),(5,10)
+      elif cur_trg_dist<1: return False #if overlap
+      elif max_dist!=None and cur_trg_dist>max_dist: return False #if further than max distance
+      else: return True
+    elif trg_span0==trg_span1:
+      if trg_span0[1]-trg_span0[0]>max_ortho_span: return False
+      elif cur_src_dist<1: return False
+      elif max_dist!=None and cur_src_dist>max_dist: return False
+      else: return True
+  if cur_src_dist<1: return False
+  if max_dist!=None and cur_src_dist>max_dist: return False
+  if cur_trg_dist<1: return False
+  if max_dist!=None and cur_trg_dist>max_dist: return False  
+  return True
+
+
+
+def get_aligned_path_OLD(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=False,min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
   match_list=sorted(list(set(match_list)))
   #Now we have the matching list - let's align
   el_dict={} #weight of each element
