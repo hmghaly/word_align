@@ -267,7 +267,8 @@ def get_qs():
         qs_dict0[key0]=val0
     return qs_dict0
 
-def parse_qs(qs):
+def parse_wsgi_qs():
+    qs=environ["QUERY_STRING"]
     qs_dict0={}
     split_qs=qs.split("&")
     for item0 in split_qs:
@@ -276,6 +277,26 @@ def parse_qs(qs):
         key0,val0=eq_split
         qs_dict0[key0]=val0
     return qs_dict0
+
+def get_wsgi_posted_data():
+  posted_data=""
+  posted_data_dict={}
+  if environ['REQUEST_METHOD'] == 'POST': 
+    posted_data=environ['wsgi.input'].read().decode("utf-8")
+    posted_data_dict=json.loads(posted_data)
+  return posted_data_dict
+
+def get_wsgi_cookie():
+  cookie_str=environ.get("HTTP_COOKIE","")
+  cookie_split=cookie_str.split(";")
+  cookie_dict={}
+  for sp in cookie_split:
+      key_val=sp.split("=")
+      if len(key_val)!=2: continue
+      key,val=key_val
+      key,val=key.strip(),val.strip()
+      cookie_dict[key]=val
+  return cookie_dict
 
 def generate_uuid():
     return uuid.uuid4().hex
