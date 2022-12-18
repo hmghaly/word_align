@@ -6,6 +6,9 @@ from email.mime.text import MIMEText
 from email.utils import make_msgid
 from smtplib import SMTP_SSL as SMTP
 import hashlib
+import datetime
+
+
 
 def hash_password(pwd0):
     pwd0=pwd0.encode('utf-8')
@@ -263,6 +266,64 @@ def get_qs():
         key0,val0=eq_split
         qs_dict0[key0]=val0
     return qs_dict0
+
+def parse_qs(qs):
+    qs_dict0={}
+    split_qs=qs.split("&")
+    for item0 in split_qs:
+        eq_split=item0.split("=")
+        if len(eq_split)!=2: continue
+        key0,val0=eq_split
+        qs_dict0[key0]=val0
+    return qs_dict0
+
+def generate_uuid():
+    return uuid.uuid4().hex
+
+def read_file(fpath0):
+    fopen0=open(fpath0)
+    content0=fopen0.read()
+    fopen0.close()
+    return content0
+
+def split_list(l, n): #split a list into equally sized sublists
+    grp_size=math.ceil(len(l)/n)
+    for i0 in range(n): yield l[i0*grp_size:(i0+1)*grp_size]
+
+def create_selection_options(list_vals_labels,selected0=None): # create selection drop down from a list of labels and vals
+    cur_dropdown_content=''
+    for val0,label0 in list_vals_labels:
+        cur_op_tag='<option value="%s">%s</option>'%(val0,label0)
+        if val0==selected0: cur_op_tag='<option value="%s" selected>%s</option>'%(val0,label0)
+        cur_dropdown_content+=cur_op_tag
+    return cur_dropdown_content 
+
+def create_time_str(time_tuple):
+    time_str="%s/%s/%s - %s:%s:%s"%(time_tuple[0],time_tuple[1],time_tuple[2],time_tuple[3],time_tuple[4],time_tuple[5])
+    return time_str
+
+
+def log_something(environ0,log_fpath0,log_content_dict0={}):
+    user_ip=environ0.get("REMOTE_ADDR","IP")
+    cur_log_dict=dict(log_content_dict0)
+    cur_log_dict["IP"]=user_ip
+    now = datetime.datetime.now()
+    cur_log_dict["time"]=(now.year, now.month, now.day, now.hour, now.minute, now.second)
+    log_dir0,log_fname0=os.path.split(log_fpath0)
+    if not os.path.exists(log_dir0): os.makedirs(log_dir0)
+    log_fopen0=open(log_fpath0,"a")
+    log_fopen0.write(json.dumps(cur_log_dict)+"\n")
+    log_fopen0.close()
+    return True
+
+# def hash_password(pwd0):
+#     pwd0=pwd0.encode('utf-8')
+#     return hashlib.sha256(pwd0).hexdigest()
+
+def get_time_tuple():
+    now = datetime.datetime.now()
+    return (now.year, now.month, now.day, now.hour, now.minute, now.second) 
+
 
 #save uploaded base64 string from javascript to binary form
 def write_base64(base64_uploaded_str0,out_fpath0):
