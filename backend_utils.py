@@ -267,7 +267,7 @@ def get_qs():
         qs_dict0[key0]=val0
     return qs_dict0
 
-def get_wsgi_qs():
+def get_wsgi_qs(environ):
     qs=environ["QUERY_STRING"]
     qs_dict0={}
     split_qs=qs.split("&")
@@ -278,7 +278,7 @@ def get_wsgi_qs():
         qs_dict0[key0]=val0
     return qs_dict0
 
-def get_wsgi_posted_data():
+def get_wsgi_posted_data(environ):
   posted_data=""
   posted_data_dict={}
   if environ['REQUEST_METHOD'] == 'POST': 
@@ -286,7 +286,7 @@ def get_wsgi_posted_data():
     posted_data_dict=json.loads(posted_data)
   return posted_data_dict
 
-def get_wsgi_cookie():
+def get_wsgi_cookie(environ):
   cookie_str=environ.get("HTTP_COOKIE","")
   cookie_split=cookie_str.split(";")
   cookie_dict={}
