@@ -620,7 +620,7 @@ def create_align_html_table(list_aligned_classed0):
 
 
 def tok_bitext(list0,params0={}):
-  cur_ar_counter_dict=params0.get("ar_counter_dict",{})
+  #cur_ar_counter_dict=params0.get("ar_counter_dict",{})
   tokenized_bitext_list0=[]
   if len(list0[0])==2: list0=[(vi,v[0],v[1]) for vi,v in enumerate(list0)] #if it is just list of src/trg sentences - else the list should be loc,src,trg 
   #for cur_loc,src_trg in enumerate(list0):
@@ -628,8 +628,12 @@ def tok_bitext(list0,params0={}):
     #src0,trg0=src_trg
     try:
       src_toks0=general.tok(src0)
-      trg_toks0=general.tok(trg0)
-      if params0.get("lang2")=="ar": trg_toks0=arabic_lib.tok_ar(trg_toks0,cur_ar_counter_dict)
+      #trg_toks0=general.tok(trg0)
+      lang2_tok_fn=params0.get("lang2_tok_fn")
+      if lang2_tok_fn==None: trg_toks0=general.tok(trg0)
+      else: trg_toks0=lang2_tok_fn(trg0)
+      #if  retr_params["lang2_tok_fn"]=cur_ar_tok_fn
+      #if params0.get("lang2")=="ar": trg_toks0=arabic_lib.tok_ar(trg_toks0,cur_ar_counter_dict)
     except Exception as ex: 
         print("tokenization error:", ex,src0,trg0)
         continue
