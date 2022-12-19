@@ -631,7 +631,9 @@ def tok_bitext(list0,params0={}):
       #trg_toks0=general.tok(trg0)
       lang2_tok_fn=params0.get("lang2_tok_fn")
       if lang2_tok_fn==None: trg_toks0=general.tok(trg0)
-      else: trg_toks0=lang2_tok_fn(trg0)
+      else: 
+      	print("tokenizing with lang2 function")
+      	trg_toks0=lang2_tok_fn(trg0)
       #if  retr_params["lang2_tok_fn"]=cur_ar_tok_fn
       #if params0.get("lang2")=="ar": trg_toks0=arabic_lib.tok_ar(trg_toks0,cur_ar_counter_dict)
     except Exception as ex: 
