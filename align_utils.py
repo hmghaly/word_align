@@ -751,8 +751,9 @@ def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=True
     for ch0 in cur_children:
       child_check=el_child_dict.get(ch0)
       ch0_wt=el_dict.get(ch0,0)
-      if child_check!=None: continue
-      final_elements.append((ch0,ch0_wt))
+      has_children=False
+      if child_check!=None: has_children=True
+      final_elements.append((ch0,ch0_wt,child_check))
   return final_elements
 
 
