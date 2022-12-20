@@ -119,8 +119,10 @@ def get_src_trg_intersection(src_list0,trg_list0):
 
 
 #16 Dec 2022
-def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=True,max_dist=5,min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
+def get_aligned_path(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=True,max_dist=5,max_sent_len=40, min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
+
   match_list=sorted(list(set(match_list)))
+  if len(src_toks0)>max_sent_len or len(trg_toks0)>max_sent_len: n_epochs=1
   #Now we have the matching list - let's align
   el_dict={} #weight of each element
   el_child_dict={} #children of each element
