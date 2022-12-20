@@ -469,6 +469,7 @@ def create_align_html_table(list_aligned_classed0):
 def create_align_html_content(aligned_html_sent_pairs):
     css_content=create_color_classes_css()
     res_html_table=create_align_html_table(aligned_html_sent_pairs)
+    phrase_analysis_table=""
 
     cur_srcipt="""
     function handle(e){
