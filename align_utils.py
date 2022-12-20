@@ -55,7 +55,7 @@ def get_index_matching_list(src_tokens0,trg_tokens0,src_index0,trg_index0): #mat
   return final_matching_list
 
 
-def retr_sent_phrase_indexes(sent_toks,inv_index,max_phrase_length=4,min_index_size=5):
+def retr_sent_phrase_indexes(sent_toks,inv_index,max_phrase_length=4,min_index_size=5): #get the indexes of the phrases of the tokenized sentence, together with their location info
   phrase_index_dict={}
   phrase_loc_dict={}
   tmp_inv_index={}
@@ -332,13 +332,94 @@ def index_bitext_list(list0,params0={}): #each list item = (loc/sent_id,src_toke
   return inverted_src0,  inverted_trg0
 
 
+#Working on phrases and chunks
+def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12, discard_empty_phrases=True):
+  used_xs,used_ys=[],[]
+  all_single_pts=[]
+  results0=[]
+  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+    src_span0,trg_span0=el0
+    src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
+    used_xs.extend(src_range0)
+    used_ys.extend(trg_range0)
+    for a in src_range0:
+      for b in trg_range0: all_single_pts.append((a,b)) #identifying single points (not elements)
+  aligned_elements.sort()
+  for src_i0 in range(0,len(src_tokens)+1):
+    for src_i1 in range(src_i0,len(src_tokens)+1): #identifying a source range
+      if src_i1-src_i0>max_phrase_size: continue
+      elements_inside=[]
+      trg_max_i,trg_min_i=0,len(trg_tokens)+1
+      for el0,el_wt0 in aligned_elements:
+        src_span0,trg_span0=el0
+        src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
+        if src_span0[0]>=src_i0 and src_span0[1]<=src_i1:
+          cur_min_trg_i,cur_max_trg_i=min(trg_span0),max(trg_span0)
+          if cur_min_trg_i<trg_min_i: trg_min_i=cur_min_trg_i
+          if cur_max_trg_i>trg_max_i: trg_max_i=cur_max_trg_i
+          elements_inside.append((el0,el_wt0))
+      valid=True
+      cur_wt=0
+      if len(elements_inside)>0: cur_wt=sum([v[1] for v in elements_inside])
+      for a,b in all_single_pts: #check if there is any point that violates consistency
+        if (b>=trg_min_i and b<=trg_max_i) and (a <src_i0 or a>src_i1): 
+          valid=False
+          break
+      if valid==False: continue #exclude src ranges if invalid    
+      if discard_empty_phrases and cur_wt==0: continue #exclude src ranges with no elements and when discarding 
+      new_el_src=src_i0,src_i1
+      src_phrase=src_tokens[src_i0:src_i1+1]      
+      if cur_wt==0:
+        trg_phrase=""
+        results0.append((src_phrase,trg_phrase,cur_wt))
+
+      new_el_trg=trg_min_i,trg_max_i
+      new_el=(new_el_src,new_el_trg)
+
+      trg_phrase=trg_tokens[trg_min_i:trg_max_i+1]
+      results0.append((src_phrase,trg_phrase,cur_wt))
+      for inc0 in range(1,10):
+        trg_start=trg_min_i-inc0
+        if trg_start in used_ys or trg_start<0: break
+        for inc1 in range(1,10):
+          trg_end=trg_max_i+inc1
+          if trg_end in used_ys or trg_end>len(trg_tokens): break
+          trg_phrase=trg_tokens[trg_start:trg_end+1]
+          results0.append((src_phrase,trg_phrase,cur_wt))
+  return results0
+
+
+def get_aligned_chunks(aligned_elements,min_phrase_len=5): #to split a sentence into contiguous aligned chunks, based on alignment information
+  all_single_pts=[]
+  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+    src_span0,trg_span0=el0
+    src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
+    for a in src_range0:
+      for b in trg_range0: all_single_pts.append((a,b)) #identifying single points (not elements)
+  chunk_boundaries=[]
+  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+    src_span0,trg_span0=el0
+    last_x,last_y=src_span0[-1],trg_span0[-1]
+    valid=True
+    for x0,y0 in all_single_pts:
+      if x0<last_x and y0> last_y: valid=False 
+      if x0>last_x and y0< last_y: valid=False
+      if not valid: break
+    if valid: chunk_boundaries.append((last_x,last_y))
+  cur_x,cur_y=0,0
+  new_chunk_boundaries=[]
+  #new_chunk_boundaries.append((cur_x,cur_y))
+  for cb_x,cb_y in chunk_boundaries:
+    if cb_x-cur_x<min_phrase_len: continue
+    if cb_y-cur_y<min_phrase_len: continue
+    new_chunk_boundaries.append((cb_x,cb_y))
+    cur_x,cur_y=cb_x,cb_y
+  return new_chunk_boundaries
+
 
 #Visual presentation of alignment
-def present_aligned(aligned_results):
+def present_aligned(src_tokens0,trg_tokens0,align_list0):
     final_list0=[]
-    src_tokens0=aligned_results.get("src",[])
-    trg_tokens0=aligned_results.get("trg",[])
-    align_list0=aligned_results.get("align",[])
     for el0,el_wt0,has_children in align_list0:
         src_span0,trg_span0=el0
         cur_src_phrase=src_tokens0[src_span0[0]:src_span0[1]+1]
@@ -347,6 +428,13 @@ def present_aligned(aligned_results):
         cur_trg_phrase=" ".join(cur_trg_phrase)
         final_list0.append((cur_src_phrase,cur_trg_phrase,el0,el_wt0))
     return final_list0
+
+def present_walign_results(aligned_results): #if the output is in the form of a dict results["src"]=..., results["trg"]=..., results["align"]=...
+    src_tokens0=aligned_results.get("src",[])
+    trg_tokens0=aligned_results.get("trg",[])
+    align_list0=aligned_results.get("align",[])
+    return present_aligned(src_tokens0,trg_tokens0,align_list0)
+
 
 
 def random_color():
@@ -376,6 +464,61 @@ def create_align_html_table(list_aligned_classed0):
   return table_str0
 
 
+def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",min_chunk_size=None,max_aligned_phrase_len=6):
+  src_open_dict,src_close_dict={},{}
+  trg_open_dict,trg_close_dict={},{}
+  final_src_tokens,final_trg_tokens=[],[]
+  chunk_boundaries0=[]
+  if min_chunk_size!=None: chunk_boundaries0=get_aligned_chunks(aligned0,min_chunk_size)
+  chunk_xs=[v[0] for v in chunk_boundaries0]
+  chunk_ys=[v[1] for v in chunk_boundaries0]
+
+
+  for align_i,align_item in enumerate(aligned0):
+    span_name="walign-%s"%(align_i)
+    al0,al_wt=align_item
+    src_span0,trg_span0=al0
+    src_i0,src_i1=src_span0
+    trg_i0,trg_i1=trg_span0
+    src_phrase0=aligned_src0[src_i0:src_i1+1]
+    trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
+    if len(src_phrase0)>max_aligned_phrase_len: continue
+    src_open_dict[src_i0]=[span_name]+src_open_dict.get(src_i0,[])
+    src_close_dict[src_i1]=[span_name]+src_close_dict.get(src_i1,[])
+    trg_open_dict[trg_i0]=[span_name]+trg_open_dict.get(trg_i0,[])
+    trg_close_dict[trg_i1]=[span_name]+trg_close_dict.get(trg_i1,[])
+    # src_open_dict[src_i0]=src_open_dict.get(src_i0,[])+[span_name]
+    # src_close_dict[src_i1]=src_close_dict.get(src_i1,[])+[span_name]
+    # trg_open_dict[trg_i0]=trg_open_dict.get(trg_i0,[])+[span_name]
+    # trg_close_dict[trg_i1]=trg_close_dict.get(trg_i1,[])+[span_name]
+
+  for tok_i,src_tok0 in enumerate(aligned_src0):
+    if src_tok0 in ["<s>","</s>"]: continue
+    open_classes=src_open_dict.get(tok_i,[])
+    close_classes=src_close_dict.get(tok_i,[])
+    cur_str=""
+    for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
+    cur_str+=src_tok0
+    for class0 in close_classes: cur_str+='</span>'
+    if tok_i in chunk_xs: cur_str+="<br>"
+    final_src_tokens.append((cur_str,src_tok0))
+  for tok_i,trg_tok0 in enumerate(aligned_trg0):
+    if trg_tok0 in ["<s>","</s>"]: continue
+    open_classes=trg_open_dict.get(tok_i,[])
+    close_classes=trg_close_dict.get(tok_i,[])
+    cur_str=""
+    for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
+    cur_str+=trg_tok0
+    for class0 in close_classes: cur_str+='</span>'
+    if tok_i in chunk_ys: cur_str+="<br>"
+    final_trg_tokens.append((cur_str,trg_tok0))
+  return final_src_tokens, final_trg_tokens
+
+
+
+
+
+
 
 #retrieve line from a text file given the position at the file
 def go2line(fpath0,loc0,size0=None):
@@ -391,6 +534,23 @@ def go2line(fpath0,loc0,size0=None):
 #Maybe needed
 def temp_tok(txt): #temporary tokenization function
   return re.findall("\w+",txt)
+
+def apply_trie(src_toks0,trg_toks0,trie0):
+  match_list0=[]
+  for i0 in range(len(src_toks0)):
+    for i1 in range(i0,len(src_toks0)):
+      src_span0=(i0,i1)
+      items=src_toks0[i0:i1+1]+[""]
+      cur_val=general.walk_trie(trie0,items,terminal_item="")
+      if cur_val==None: continue
+      for val0 in cur_val:
+        trg_phrase0,trg_ratio0,trg_freq0=val0
+        trg_locs=general.is_in(trg_phrase0,trg_toks0)
+        for trg_span0 in trg_locs:
+          match_item=(src_span0,trg_span0,trg_ratio0,trg_freq0)
+          match_list0.append(match_item)
+  match_list0=sorted(list(set(match_list0)))
+  return match_list0
 
 
 
@@ -888,22 +1048,6 @@ def walign(src_sent0,trg_sent0,retr_align_params0={}):
 
 
 
-def apply_trie(src_toks0,trg_toks0,trie0):
-  match_list0=[]
-  for i0 in range(len(src_toks0)):
-    for i1 in range(i0,len(src_toks0)):
-      src_span0=(i0,i1)
-      items=src_toks0[i0:i1+1]+[""]
-      cur_val=general.walk_trie(trie0,items,terminal_item="")
-      if cur_val==None: continue
-      for val0 in cur_val:
-        trg_phrase0,trg_ratio0,trg_freq0=val0
-        trg_locs=general.is_in(trg_phrase0,trg_toks0)
-        for trg_span0 in trg_locs:
-          match_item=(src_span0,trg_span0,trg_ratio0,trg_freq0)
-          match_list0.append(match_item)
-  match_list0=sorted(list(set(match_list0)))
-  return match_list0
 
 
 
@@ -1228,139 +1372,7 @@ def get_aligned_path_OLD(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=
 #   #print("used_ys",used_ys)
 #   return align_list_wt
 
-def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",min_chunk_size=None,max_aligned_phrase_len=6):
-  src_open_dict,src_close_dict={},{}
-  trg_open_dict,trg_close_dict={},{}
-  final_src_tokens,final_trg_tokens=[],[]
-  chunk_boundaries0=[]
-  if min_chunk_size!=None: chunk_boundaries0=get_aligned_chunks(aligned0,min_chunk_size)
-  chunk_xs=[v[0] for v in chunk_boundaries0]
-  chunk_ys=[v[1] for v in chunk_boundaries0]
 
-
-  for align_i,align_item in enumerate(aligned0):
-    span_name="walign-%s"%(align_i)
-    al0,al_wt=align_item
-    src_span0,trg_span0=al0
-    src_i0,src_i1=src_span0
-    trg_i0,trg_i1=trg_span0
-    src_phrase0=aligned_src0[src_i0:src_i1+1]
-    trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
-    if len(src_phrase0)>max_aligned_phrase_len: continue
-    src_open_dict[src_i0]=[span_name]+src_open_dict.get(src_i0,[])
-    src_close_dict[src_i1]=[span_name]+src_close_dict.get(src_i1,[])
-    trg_open_dict[trg_i0]=[span_name]+trg_open_dict.get(trg_i0,[])
-    trg_close_dict[trg_i1]=[span_name]+trg_close_dict.get(trg_i1,[])
-    # src_open_dict[src_i0]=src_open_dict.get(src_i0,[])+[span_name]
-    # src_close_dict[src_i1]=src_close_dict.get(src_i1,[])+[span_name]
-    # trg_open_dict[trg_i0]=trg_open_dict.get(trg_i0,[])+[span_name]
-    # trg_close_dict[trg_i1]=trg_close_dict.get(trg_i1,[])+[span_name]
-
-  for tok_i,src_tok0 in enumerate(aligned_src0):
-    if src_tok0 in ["<s>","</s>"]: continue
-    open_classes=src_open_dict.get(tok_i,[])
-    close_classes=src_close_dict.get(tok_i,[])
-    cur_str=""
-    for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
-    cur_str+=src_tok0
-    for class0 in close_classes: cur_str+='</span>'
-    if tok_i in chunk_xs: cur_str+="<br>"
-    final_src_tokens.append((cur_str,src_tok0))
-  for tok_i,trg_tok0 in enumerate(aligned_trg0):
-    if trg_tok0 in ["<s>","</s>"]: continue
-    open_classes=trg_open_dict.get(tok_i,[])
-    close_classes=trg_close_dict.get(tok_i,[])
-    cur_str=""
-    for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
-    cur_str+=trg_tok0
-    for class0 in close_classes: cur_str+='</span>'
-    if tok_i in chunk_ys: cur_str+="<br>"
-    final_trg_tokens.append((cur_str,trg_tok0))
-  return final_src_tokens, final_trg_tokens
-
-
-def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12, discard_empty_phrases=True):
-  used_xs,used_ys=[],[]
-  all_single_pts=[]
-  results0=[]
-  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
-    src_span0,trg_span0=el0
-    src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
-    used_xs.extend(src_range0)
-    used_ys.extend(trg_range0)
-    for a in src_range0:
-      for b in trg_range0: all_single_pts.append((a,b)) #identifying single points (not elements)
-  aligned_elements.sort()
-  for src_i0 in range(0,len(src_tokens)+1):
-    for src_i1 in range(src_i0,len(src_tokens)+1): #identifying a source range
-      if src_i1-src_i0>max_phrase_size: continue
-      elements_inside=[]
-      trg_max_i,trg_min_i=0,len(trg_tokens)+1
-      for el0,el_wt0 in aligned_elements:
-        src_span0,trg_span0=el0
-        src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
-        if src_span0[0]>=src_i0 and src_span0[1]<=src_i1:
-          cur_min_trg_i,cur_max_trg_i=min(trg_span0),max(trg_span0)
-          if cur_min_trg_i<trg_min_i: trg_min_i=cur_min_trg_i
-          if cur_max_trg_i>trg_max_i: trg_max_i=cur_max_trg_i
-          elements_inside.append((el0,el_wt0))
-      valid=True
-      cur_wt=0
-      if len(elements_inside)>0: cur_wt=sum([v[1] for v in elements_inside])
-      for a,b in all_single_pts: #check if there is any point that violates consistency
-        if (b>=trg_min_i and b<=trg_max_i) and (a <src_i0 or a>src_i1): 
-          valid=False
-          break
-      if valid==False: continue #exclude src ranges if invalid    
-      if discard_empty_phrases and cur_wt==0: continue #exclude src ranges with no elements and when discarding 
-      new_el_src=src_i0,src_i1
-      src_phrase=src_tokens[src_i0:src_i1+1]      
-      if cur_wt==0:
-        trg_phrase=""
-        results0.append((src_phrase,trg_phrase,cur_wt))
-
-      new_el_trg=trg_min_i,trg_max_i
-      new_el=(new_el_src,new_el_trg)
-
-      trg_phrase=trg_tokens[trg_min_i:trg_max_i+1]
-      results0.append((src_phrase,trg_phrase,cur_wt))
-      for inc0 in range(1,10):
-        trg_start=trg_min_i-inc0
-        if trg_start in used_ys or trg_start<0: break
-        for inc1 in range(1,10):
-          trg_end=trg_max_i+inc1
-          if trg_end in used_ys or trg_end>len(trg_tokens): break
-          trg_phrase=trg_tokens[trg_start:trg_end+1]
-          results0.append((src_phrase,trg_phrase,cur_wt))
-  return results0
-
-
-def get_aligned_chunks(aligned_elements,min_phrase_len=5):
-  all_single_pts=[]
-  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
-    src_span0,trg_span0=el0
-    src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
-    for a in src_range0:
-      for b in trg_range0: all_single_pts.append((a,b)) #identifying single points (not elements)
-  chunk_boundaries=[]
-  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
-    src_span0,trg_span0=el0
-    last_x,last_y=src_span0[-1],trg_span0[-1]
-    valid=True
-    for x0,y0 in all_single_pts:
-      if x0<last_x and y0> last_y: valid=False 
-      if x0>last_x and y0< last_y: valid=False
-      if not valid: break
-    if valid: chunk_boundaries.append((last_x,last_y))
-  cur_x,cur_y=0,0
-  new_chunk_boundaries=[]
-  #new_chunk_boundaries.append((cur_x,cur_y))
-  for cb_x,cb_y in chunk_boundaries:
-    if cb_x-cur_x<min_phrase_len: continue
-    if cb_y-cur_y<min_phrase_len: continue
-    new_chunk_boundaries.append((cb_x,cb_y))
-    cur_x,cur_y=cb_x,cb_y
-  return new_chunk_boundaries
 
 
 if __name__=="__main__":
