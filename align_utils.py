@@ -33,10 +33,10 @@ def get_index_matching_list(src_tokens0,trg_tokens0,src_index0,trg_index0,skip_i
   for src_phrase0,src_locs_indexes0 in src_phrase_index_loc_dict.items():
     src_locs0,src_indexes0=src_locs_indexes0
     for trg_phrase0,trg_locs_indexes0 in trg_phrase_index_loc_dict.items():
+      trg_locs0,trg_indexes0=trg_locs_indexes0
       if skip_identical and src_phrase0==trg_phrase0: ratio1,intersection1=0.5,100 #we do not match indexes for identical phrases, but assign them arbitrary values
-      else:
-        trg_locs0,trg_indexes0=trg_locs_indexes0
-        ratio1,intersection1=get_src_trg_intersection(src_indexes0,trg_indexes0)
+      else: ratio1,intersection1=get_src_trg_intersection(src_indexes0,trg_indexes0)
+
       #print("src_phrase0",src_phrase0,"trg_phrase0",trg_phrase0,round(ratio1,4),intersection1)
       matching_list.append((src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,round(ratio1,4)))
 
