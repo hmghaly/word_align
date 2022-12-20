@@ -304,7 +304,7 @@ def tok_bitext(list0,params0={}):
       lang2_tok_fn=params0.get("lang2_tok_fn")
       if lang2_tok_fn==None: trg_toks0=general.tok(trg0)
       else: 
-      	trg_toks0=lang2_tok_fn(trg0)
+        trg_toks0=lang2_tok_fn(trg0)
       #if  retr_params["lang2_tok_fn"]=cur_ar_tok_fn
       #if params0.get("lang2")=="ar": trg_toks0=arabic_lib.tok_ar(trg_toks0,cur_ar_counter_dict)
     except Exception as ex: 
@@ -466,6 +466,37 @@ def create_align_html_table(list_aligned_classed0):
   return table_str0
 
 
+def create_align_html_file(aligned_html_sent_pairs):
+    css_content=create_color_classes_css()
+    res_html_table=create_align_html_table(aligned_html_sent_pairs)
+
+    cur_srcipt="""
+    function handle(e){
+            if(e.keyCode === 13){
+                e.preventDefault(); // Ensure it is only this code that runs
+                //alert("Enter was pressed was presses");
+                $(".aligned").toggleClass("aligned-transparent");
+            }
+        }
+    """
+
+    html_main_content="""
+    <html>
+    <head>
+    %s
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <script>%s</script>
+    </head>
+    <body onkeypress="handle(event)">
+    %s
+
+    <h2>Phrase Matching Analysis</h2>
+    %s
+    </body>
+    </html>
+    """%(css_content,cur_srcipt,res_html_table,phrase_analysis_table)
+    return html_main_content
+
 def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",min_chunk_size=None,max_aligned_phrase_len=6):
   src_open_dict,src_close_dict={},{}
   trg_open_dict,trg_close_dict={},{}
@@ -478,7 +509,7 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
 
   for align_i,align_item in enumerate(aligned0):
     span_name="walign-%s"%(align_i)
-    al0,al_wt=align_item
+    al0,al_wt=align_item[:2]
     src_span0,trg_span0=al0
     src_i0,src_i1=src_span0
     trg_i0,trg_i1=trg_span0
