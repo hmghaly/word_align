@@ -466,7 +466,7 @@ def create_align_html_table(list_aligned_classed0):
   return table_str0
 
 
-def create_align_html_file(aligned_html_sent_pairs):
+def create_align_html_content(aligned_html_sent_pairs):
     css_content=create_color_classes_css()
     res_html_table=create_align_html_table(aligned_html_sent_pairs)
 
