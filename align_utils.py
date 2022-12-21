@@ -518,6 +518,11 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
     src_span0,trg_span0=al0
     src_i0,src_i1=src_span0
     trg_i0,trg_i1=trg_span0
+    src_phrase0=aligned_src0[src_i0:src_i1+1]
+    trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
+    if len(src_phrase0)>max_aligned_phrase_len: continue
+
+
     src_range0=list(range(src_i0,src_i1+1))
     trg_range0=list(range(trg_i0,trg_i1+1))
     if any([v in used_xs for v in src_range0]): continue
@@ -525,9 +530,6 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
     used_xs.extend(src_range0)
     used_ys.extend(trg_range0)
 
-    src_phrase0=aligned_src0[src_i0:src_i1+1]
-    trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
-    if len(src_phrase0)>max_aligned_phrase_len: continue
     src_open_dict[src_i0]=[span_name]+src_open_dict.get(src_i0,[])
     src_close_dict[src_i1]=[span_name]+src_close_dict.get(src_i1,[])
     trg_open_dict[trg_i0]=[span_name]+trg_open_dict.get(trg_i0,[])
