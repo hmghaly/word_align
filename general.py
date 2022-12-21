@@ -506,12 +506,12 @@ def create_dir(dir_path):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-def get_dir_files(dir_path0,extension="wav"):
+def get_dir_files(dir_path0,extension=None):
   all_files=[]
   for root0,dir0,files0 in os.walk(dir_path0):
     for fname in files0:
       cur_fpath=os.path.join(root0,fname)
-      if not fname.endswith("."+extension): continue
+      if extension!=None and not fname.endswith("."+extension): continue
       all_files.append(cur_fpath)
   return all_files
 
