@@ -508,6 +508,8 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
   if min_chunk_size!=None: chunk_boundaries0=get_aligned_chunks(aligned0,min_chunk_size)
   chunk_xs=[v[0] for v in chunk_boundaries0]
   chunk_ys=[v[1] for v in chunk_boundaries0]
+  aligned0.sort(key=lambda x:-x[1])
+  used_xs,used_ys=[],[]
 
 
   for align_i,align_item in enumerate(aligned0):
@@ -516,6 +518,13 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
     src_span0,trg_span0=al0
     src_i0,src_i1=src_span0
     trg_i0,trg_i1=trg_span0
+    src_range0=list(range(src_i0,src_i1+1))
+    trg_range0=list(range(trg_i0,trg_i1+1))
+    if any([v in used_xs for v in src_range0]): continue
+    if any([v in used_ys for v in trg_range0]): continue
+    used_xs.extend(src_range0)
+    used_ys.extend(trg_range0)
+
     src_phrase0=aligned_src0[src_i0:src_i1+1]
     trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
     if len(src_phrase0)>max_aligned_phrase_len: continue
