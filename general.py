@@ -131,8 +131,8 @@ def get_chars(start_i,end_i,include_diacritics=False): #generate list of chars d
   return char_list
 
 
-ar_chars=get_ar_chars(start_i=1560,end_i=1646,include_diacritics=False)
-ascii_chars=get_ar_chars(start_i=0,end_i=500,include_diacritics=False)
+ar_chars=get_chars(start_i=1560,end_i=1646,include_diacritics=False)
+ascii_chars=get_chars(start_i=0,end_i=500,include_diacritics=False)
 
 
 
