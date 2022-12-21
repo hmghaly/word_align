@@ -121,6 +121,21 @@ def is_punct(token):
     return True
 
 
+def get_chars(start_i,end_i,include_diacritics=False): #generate list of chars depending on the range - ar 1568,1646 
+  char_list=[]
+  for i in range(start_i,end_i):
+    ch0=chr(i)
+    ch_type=unicodedata.category(ch0)
+    if include_diacritics==False and not (ch_type.startswith("Ll") or ch_type.startswith("Lo")): continue
+    char_list.append(ch0)
+  return char_list
+
+
+ar_chars=get_ar_chars(start_i=1560,end_i=1646,include_diacritics=False)
+ascii_chars=get_ar_chars(start_i=0,end_i=500,include_diacritics=False)
+
+
+
 def get_key(txt): #normalize text by replacing non alpha items with _
   txt=re.sub("\W+","_",txt)
   txt=txt.strip("_")
@@ -307,6 +322,28 @@ def tok_simple(txt,full=False): #this tokenization scheme splits around punctuat
 
 
 ######################## BITEXTS ########################
+# 21 Dec 2022
+def get_html_els(content,tag_name): #identify pairs of html tags for easy and quick matching - would break if number of closing/open tags mismatch - works maily for tr/td tags 
+  all_str_list=[]
+  el_open_list=list(re.finditer(r'<%s\b.*?>'%tag_name,content))
+  el_close_list=list(re.finditer(r'</%s>'%tag_name,content))
+  for a0,b0 in zip(el_open_list,el_close_list):
+    str0=content[a0.start():b0.end()]
+    all_str_list.append(str0)
+  return all_str_list
+
+def get_bitext(html_content): #get tr/td and extract bitext
+  all_trs=get_html_els(html_content,"tr")
+  all_pairs0=[]
+  for tr0 in all_trs:
+    td_list=get_html_els(tr0,"td")
+    pair0=[]
+    for td0 in td_list:
+      pair0.append(remove_html(td0))
+    if len(pair0)!=2: continue
+    all_pairs0.append(pair0)
+  return all_pairs0
+
 
 def html_bitext2list(bitext_path):
   fopen=open(bitext_path)
@@ -389,7 +426,11 @@ def clean_digit_comma(en_txt): #unicode - to normalize all numbers to their valu
     output=en_txt
     return output
 
-def clean_html(html_str):
+def remove_html(el_outer_html): #remove html tags
+  inner=re.sub('<([^<>]*?)>',"",el_outer_html)
+  return inner
+
+def clean_html_OLD(html_str):
     html = re.sub("[\n\r\t]+", " ", html_str)
     html=htmlp.unescape(html.decode("utf-8")) #remove html entities
     html=html.encode("utf-8")
@@ -398,6 +439,8 @@ def clean_html(html_str):
     html = re.sub('(?i)<style.*?</style>', '', html) #remove css
     notags = re.sub("<.*?>", "  ", html) #remove tags
     return notags
+
+
 
 ##################### FILES ##################
 def read(fpath):
