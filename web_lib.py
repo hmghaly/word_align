@@ -229,11 +229,19 @@ def create_open_tag(tag_name0,tag_attrs0={},self_closing=False):
   if self_closing: final_open_tag='<%s %s/>'%(tag_name0,attr_str)
   else: final_open_tag='<%s %s>'%(tag_name0,attr_str)
   return final_open_tag
+
 def read_page(url, timeout0=5): #return requests obj
   op=requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout0)
   return op
 #   status_code=op.status_code
 #   html_content=op.text
+def get_page_content(url0):
+  page_obj=read_page(url0)
+  content0=page_obj.text
+  content0=general.unescape(content0)  
+  #content0=unescape(content0)  
+  return content0
+
       
 class web_page_OLD:
   def __init__(self,url):

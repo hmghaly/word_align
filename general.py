@@ -345,6 +345,24 @@ def get_bitext(html_content): #get tr/td and extract bitext
   return all_pairs0
 
 
+def create_tsv(tsv_fpath,list_2d):
+  tsv_fopen=open(tsv_fpath,"w")
+  for item0 in list_2d:
+    line="\t".join([str(v) for v in item0])+"\n"
+    tsv_fopen.write(line)
+  tsv_fopen.close()
+
+
+def read_tsv(tsv_fpath):
+  out_list=[]  
+  tsv_fopen=open(tsv_fpath)
+  for line in tsv_fopen:
+    items=line.strip().split("\t")
+    out_list.append(items)
+  tsv_fopen.close()
+  return out_list
+
+
 def html_bitext2list(bitext_path):
   fopen=open(bitext_path)
   content=fopen.read()
