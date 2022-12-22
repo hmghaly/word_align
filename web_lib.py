@@ -98,7 +98,7 @@ class DOM:
           
             
           open_tags=open_tags[:-1]
-        else: print("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,"inter_text",inter_text)
+        else: print("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
       else:
         self.tag_id_list.append(assigned_tag_id)
         cur_el=element()
