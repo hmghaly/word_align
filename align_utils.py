@@ -563,6 +563,70 @@ def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="
 
 
 
+#Phonemeic Matching for proper nouns written in latin 
+t8_dict={'a': {'any': ['ا', ''], 'start': ['أ', 'ع', 'عا'], 'end': ['ى', 'ة']}, 'b': {'any': ['ب'], 'start': [], 'end': []}, 'c': {'any': ['س', 'ك', 'تش', 'ث'], 'start': [], 'end': []}, 'd': {'any': ['د', 'ض'], 'start': [], 'end': []}, 'e': {'any': ['ي', 'ا', ''], 'start': ['إ', 'ا'], 'end': ['ه', '']}, 'f': {'any': ['ف'], 'start': [], 'end': []}, 'g': {'any': ['ج', 'غ'], 'start': [], 'end': []}, 'h': {'any': ['ه', 'ح', ''], 'start': [], 'end': ['ة']}, 'i': {'any': ['ي', 'اي', ''], 'start': ['إ', 'ا', 'إي', 'ع'], 'end': []}, 'j': {'any': ['ج', 'خ', 'ي', 'ه'], 'start': [], 'end': []}, 'k': {'any': ['ك', 'ق'], 'start': [], 'end': []}, 'l': {'any': ['ل', ''], 'start': [], 'end': []}, 'm': {'any': ['م'], 'start': [], 'end': []}, 'n': {'any': ['ن'], 'start': [], 'end': []}, 'o': {'any': ['و', ''], 'start': ['أ', 'أو'], 'end': []}, 'p': {'any': ['ب'], 'start': [], 'end': []}, 'q': {'any': ['ك', 'ق', 'تش'], 'start': [], 'end': []}, 'r': {'any': ['ر'], 'start': [], 'end': []}, 's': {'any': ['س', 'ش', 'ز', 'ص'], 'start': [], 'end': []}, 't': {'any': ['ت', 'ط'], 'start': [], 'end': []}, 'u': {'any': ['و', 'ا', ''], 'start': ['أ', 'أو'], 'end': []}, 'v': {'any': ['ف'], 'start': [], 'end': []}, 'w': {'any': ['و', 'ف'], 'start': [], 'end': []}, 'x': {'any': ['كس', 'ز', 'ه'], 'start': [], 'end': []}, 'y': {'any': ['ي', 'اي'], 'start': [], 'end': ['يا']}, 'z': {'any': ['ز', 'س', 'تس', 'ث', 'ش'], 'start': [], 'end': []}, 'sh': {'any': ['ش'], 'start': [], 'end': []}, 'ch': {'any': ['تش', 'ش', 'خ', 'ك'], 'start': [], 'end': []}, 'th': {'any': ['ث', 'ذ', 'ت', 'تح'], 'start': [], 'end': []}, 'dh': {'any': ['ذ', 'ظ'], 'start': [], 'end': []}, 'gh': {'any': ['غ', 'ج', ''], 'start': [], 'end': []}, 'kh': {'any': ['خ', 'ك'], 'start': [], 'end': []}, 'sch': {'any': ['ش', 'سك'], 'start': [], 'end': []}, 'zh': {'any': ['ج'], 'start': [], 'end': []}, 'ck': {'any': ['ك'], 'start': [], 'end': []}, 'ae': {'any': ['اي', 'ائ', 'ي', ''], 'start': [], 'end': []}, 'oi': {'any': ['وا'], 'start': [], 'end': []}, 'll': {'any': ['ل', 'ج', 'ي', 'لل'], 'start': [], 'end': []}, 'é': {'any': ['ي', ''], 'start': [], 'end': ['يه']}, 'et': {'any': ['ت', 'يت'], 'start': [], 'end': ['يه']}, 'que': {'any': ['ك'], 'start': [], 'end': []}, 'ph': {'any': ['ف'], 'start': [], 'end': []}, 'aa': {'any': ['ا'], 'start': [], 'end': ['اء']}, 'el': {'any': ['ل', 'يل'], 'start': ['ال'], 'end': []}, 'al': {'any': ['ل', 'ال'], 'start': ['ال'], 'end': []}, 'ç': {'any': ['س'], 'start': [], 'end': []}, 'ce': {'any': ['سي', 'س', 'ثي', 'ث', 'تشي', 'تش'], 'start': [], 'end': []}, 'ci': {'any': ['سي', 'س', 'ثي', 'ث', 'تشي', 'تش'], 'start': [], 'end': []}, 'ñ': {'any': ['ني'], 'start': [], 'end': []}}
+
+
+def gen_ts8(name): #generate transliteration
+  found_items=[]
+  for a,equiv_dict in t8_dict.items():
+    locs=is_in(a,name)
+    if locs==[]: continue
+    for span0 in locs:
+      cur_equiv=[]
+      equiv_any,equiv_start,equiv_end=equiv_dict.get("any",[]),equiv_dict.get("start",[]),equiv_dict.get("end",[])
+      if span0[0]==0 and equiv_start!=[]: cur_equiv=equiv_start
+      elif span0[-1]==len(name)-1 and equiv_end!=[]: cur_equiv=list(set(equiv_any+equiv_end))
+      else: cur_equiv=equiv_any
+      found_items.append((a,cur_equiv, span0))
+  for i0 in range(len(name)-1):
+    if name[i0]==name[i0+1]:
+      equiv_dict=t8_dict.get(name[i0],{})
+      equiv=equiv_dict.get("any",[])
+      if i0==0: equiv=equiv_dict.get("start",[])
+      #double_equiv=[v+v for v in equiv]
+      double_equiv=[]
+      full_equiv=list(set(equiv+double_equiv))
+      span0=(i0,i0+1)#[]
+      found_items.append((name[i0:i0+2],full_equiv,span0))
+  found_items.sort(key=lambda x:-len(x[0]))
+  used_locs=[]
+  final=[]
+  for fi in found_items:
+    src0,equiv0,span0=fi
+    span_range=list(range(span0[0],span0[1]+1))
+    if any([v in used_locs for v in span_range]): continue
+    used_locs.extend(span_range)
+    final.append((span0,equiv0))
+  final.sort()
+  candidates=[""]
+  for f_locs,f_equivs in final:
+    print(f_locs,f_equivs)
+    new_candidates=[]
+    for cd0 in candidates:
+      for eq0 in f_equivs: new_candidates.append(cd0+eq0)
+    candidates=new_candidates
+  return list(set(candidates))
+
+
+#=============== This is how we reload the transliteration dict
+# from code_utils.pandas_utils import *
+
+# transliteration_link='https://docs.google.com/spreadsheets/d/e/2PACX-1vTeFLaZRLK3v2b65mxY7fiqvk4a8IRdmkPOHFStk15DEVhU8LuBsaqBalHhgY3G7T51beZYzyzbTtEN/pub?output=xlsx'
+# t8_wb_obj=get_workbook_obj(transliteration_link)
+# cols=["en","ar-any","ar-start","ar-end"]
+# t8_data=get_sheets_cols(t8_wb_obj,["Sheet1"],cols,exclude_empty=False)
+# t8_dict={}
+# for item0 in t8_data:
+#   en0,ar_any0,ar_start0,ar_end0=item0
+#   if ar_any0.strip()=="": continue
+#   tmp_dict={}
+#   tmp_dict["any"]=[v if v!="-" else "" for v in ar_any0.split()]
+#   tmp_dict["start"]=[v if v!="-" else "" for v in ar_start0.split()]
+#   tmp_dict["end"]=[v if v!="-" else "" for v in ar_end0.split()]
+#   #ar_split=[v if v!="-" else "" for v in ar0.split()]
+#   t8_dict[en0]=tmp_dict
+
 
 
 
