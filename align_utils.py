@@ -601,7 +601,7 @@ def gen_ts8(name): #generate transliteration
   final.sort()
   candidates=[""]
   for f_locs,f_equivs in final:
-    print(f_locs,f_equivs)
+    #print(f_locs,f_equivs)
     new_candidates=[]
     for cd0 in candidates:
       for eq0 in f_equivs: new_candidates.append(cd0+eq0)
