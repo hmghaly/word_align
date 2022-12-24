@@ -570,7 +570,7 @@ t8_dict={'a': {'any': ['ا', ''], 'start': ['أ', 'ع', 'عا'], 'end': ['ى', '
 def gen_ts8(name): #generate transliteration
   found_items=[]
   for a,equiv_dict in t8_dict.items():
-    locs=is_in(a,name)
+    locs=general.is_in(a,name)
     if locs==[]: continue
     for span0 in locs:
       cur_equiv=[]
