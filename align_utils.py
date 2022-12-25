@@ -26,7 +26,7 @@ def filter_toks(tok_list0,params={}):
   return tok_list0
 
 #Most important functions
-def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_length=5): #match src/trg phrase based on index matching intersection/ratio
+def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_length=5,min_intersection_count=5): #match src/trg phrase based on index matching intersection/ratio
   src_phrase_index_loc_dict=retr_sent_phrase_indexes(src_tokens0,src_index0,max_phrase_length=max_phrase_length)
   trg_phrase_index_loc_dict=retr_sent_phrase_indexes(trg_tokens0,trg_index0,max_phrase_length=max_phrase_length)  
   matching_list=[]
@@ -36,6 +36,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       trg_locs0,trg_indexes0=trg_locs_indexes0
       if src_phrase0==trg_phrase0: ratio1,intersection1=0.5,100 #we do not match indexes for identical phrases, but assign them arbitrary values
       else: ratio1,intersection1=get_src_trg_intersection(src_indexes0,trg_indexes0)
+      if intersection1<min_intersection_count: continue
 
       #print("src_phrase0",src_phrase0,"trg_phrase0",trg_phrase0,round(ratio1,4),intersection1)
       adj_ratio=ratio1
