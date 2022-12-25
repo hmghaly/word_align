@@ -50,32 +50,37 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   src_used_counter_dict,trg_used_counter_dict={},{}
   for a in matching_list:
     src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
-    min_n_locs=min(len(src_locs0),len(trg_locs0))
-    # src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
-    # trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
-    src_check=src_used_counter_dict.get(src_phrase0)
-    trg_check=trg_used_counter_dict.get(trg_phrase0)
-    # if src_check==None or trg_check==None: #either phrase is the top phrase/not used before
-    #     if not a in final_matching_list: final_matching_list.append(a)
-    if src_check==None: src_check=len(src_locs0)
-    if trg_check==None: trg_check=len(trg_locs0)
+    # min_n_locs=min(len(src_locs0),len(trg_locs0))
+    # # src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
+    # # trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
+    # src_check=src_used_counter_dict.get(src_phrase0)
+    # trg_check=trg_used_counter_dict.get(trg_phrase0)
+    # # if src_check==None or trg_check==None: #either phrase is the top phrase/not used before
+    # #     if not a in final_matching_list: final_matching_list.append(a)
+    # if src_check==None: src_check=len(src_locs0)
+    # if trg_check==None: trg_check=len(trg_locs0)
 
 
-    # valid=False
-    # if src_check==len(src_locs0) or trg_check==len(trg_locs0): valid=True
-    # elif src_check>0 and trg_check>0: valid=True #final_matching_list.append(a)
-    # if not valid: continue
-    # print(src_check,trg_check,a)
-    src_used_counter_dict[src_phrase0]=src_check-min_n_locs
-    trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
-    # final_matching_list.append(a)
-    # #if src_phrase0=='document': print(a)
+    # # valid=False
+    # # if src_check==len(src_locs0) or trg_check==len(trg_locs0): valid=True
+    # # elif src_check>0 and trg_check>0: valid=True #final_matching_list.append(a)
+    # # if not valid: continue
+    # # print(src_check,trg_check,a)
+    # src_used_counter_dict[src_phrase0]=src_check-min_n_locs
+    # trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
+    # # final_matching_list.append(a)
+    # # #if src_phrase0=='document': print(a)
     if src_phrase0 in used_src_phrases: continue
     if trg_phrase0 in used_trg_phrases: continue
     used_src_phrases.append(src_phrase0)
     used_trg_phrases.append(trg_phrase0)
     #final_matching_list.append(a)
     if not a in final_matching_list: final_matching_list.append(a)
+  matching_list.sort(key=lambda x:x[0])
+  matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[0])]
+  for grp0 in matching_list_grouped:
+    grp0.sort(key=lambda x:-x[-1])
+    if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
     # for s1 in src_locs0:
     #   for t1 in trg_locs0:
     #     final_matching_list.append((s1,t1,ratio1,intersection1))
