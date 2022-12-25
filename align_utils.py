@@ -51,9 +51,10 @@ def get_index_matching_list(src_tokens0,trg_tokens0,src_index0,trg_index0,max_ph
     if trg_phrase0 in used_trg_phrases: continue
     used_src_phrases.append(src_phrase0)
     used_trg_phrases.append(trg_phrase0)
-    for s1 in src_locs0:
-      for t1 in trg_locs0:
-        final_matching_list.append((s1,t1,ratio1,intersection1))
+    final_matching_list.append(a)
+    # for s1 in src_locs0:
+    #   for t1 in trg_locs0:
+    #     final_matching_list.append((s1,t1,ratio1,intersection1))
   return final_matching_list
 
 
