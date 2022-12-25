@@ -44,13 +44,20 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   used_src_phrases=[]
   used_trg_phrases=[]
   final_matching_list=[]
+  src_used_counter_dict,trg_used_counter_dict={},{}
   for a in matching_list:
     src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
-    #if src_phrase0=='document': print(a)
-    if src_phrase0 in used_src_phrases: continue
-    if trg_phrase0 in used_trg_phrases: continue
-    used_src_phrases.append(src_phrase0)
-    used_trg_phrases.append(trg_phrase0)
+    min_n_locs=min(len(src_locs0),len(trg_locs0))
+    src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
+    trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
+    if src_check<=0 and trg_check<=0: continue
+    src_used_counter_dict[src_phrase0]=src_check-min_n_locs
+    trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
+    # #if src_phrase0=='document': print(a)
+    # if src_phrase0 in used_src_phrases: continue
+    # if trg_phrase0 in used_trg_phrases: continue
+    # used_src_phrases.append(src_phrase0)
+    # used_trg_phrases.append(trg_phrase0)
     final_matching_list.append(a)
     # for s1 in src_locs0:
     #   for t1 in trg_locs0:
