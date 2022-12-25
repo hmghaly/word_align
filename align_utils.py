@@ -53,8 +53,10 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     min_n_locs=min(len(src_locs0),len(trg_locs0))
     # src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
     # trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
-    # # src_check=src_used_counter_dict.get(src_phrase0)
-    # # trg_check=trg_used_counter_dict.get(trg_phrase0)
+    src_check=src_used_counter_dict.get(src_phrase0)
+    trg_check=trg_used_counter_dict.get(trg_phrase0)
+    if src_check==None or trg_check==None: #either phrase is the top phrase/not used before
+        if not a in final_matching_list: final_matching_list.append(a)
 
     # valid=False
     # if src_check==len(src_locs0) or trg_check==len(trg_locs0): valid=True
@@ -69,7 +71,8 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     if trg_phrase0 in used_trg_phrases: continue
     used_src_phrases.append(src_phrase0)
     used_trg_phrases.append(trg_phrase0)
-    final_matching_list.append(a)
+    #final_matching_list.append(a)
+    if not a in final_matching_list: final_matching_list.append(a)
     # for s1 in src_locs0:
     #   for t1 in trg_locs0:
     #     final_matching_list.append((s1,t1,ratio1,intersection1))
