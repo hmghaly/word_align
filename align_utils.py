@@ -13,7 +13,7 @@ def filter_toks(tok_list0,params={}):
   cur_excluded_words=params.get("excluded_words",[])
   if params.get("lower",True): tok_list0=[v.lower() for v in tok_list0] #make all words lower case or not
   if cur_excluded_words!=[]: tok_list0=[v if not v in cur_excluded_words else "" for v in tok_list0] #ignore stop words
-  if params.get("exclude_single_chars",False): tok_list0=[v if len(v)>1 else "" for v in tok_list0] #ignore single character tokens
+  if params.get("exclude_single_chars",True): tok_list0=[v if len(v)>1 else "" for v in tok_list0] #ignore single character tokens
   if params.get("exclude_punc",True): tok_list0=[v if not general.is_punct(v) else "" for v in tok_list0] #ignore punctuation
   
   if params.get("ignore_ar_pre_suf",True): tok_list0=["" if v.startswith("ـ") or v.endswith("ـ") else v for v in tok_list0] #ignore arabic prefixes and suffixes
@@ -26,7 +26,7 @@ def filter_toks(tok_list0,params={}):
   return tok_list0
 
 #Most important functions
-def get_index_matching_list(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_length=5): #match src/trg phrase based on index matching intersection/ratio
+def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_length=5): #match src/trg phrase based on index matching intersection/ratio
   src_phrase_index_loc_dict=retr_sent_phrase_indexes(src_tokens0,src_index0,max_phrase_length=max_phrase_length)
   trg_phrase_index_loc_dict=retr_sent_phrase_indexes(trg_tokens0,trg_index0,max_phrase_length=max_phrase_length)  
   matching_list=[]
