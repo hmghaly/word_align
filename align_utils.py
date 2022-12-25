@@ -38,6 +38,8 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       else: ratio1,intersection1=get_src_trg_intersection(src_indexes0,trg_indexes0)
 
       #print("src_phrase0",src_phrase0,"trg_phrase0",trg_phrase0,round(ratio1,4),intersection1)
+      adj_ratio=ratio1
+      if len(intersection1)<100: adj_ratio=adj_ratio*(0.01*intersection1)
       matching_list.append((src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,round(ratio1,4)))
 
   matching_list.sort(key=lambda x:-x[-1])
@@ -50,7 +52,9 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     min_n_locs=min(len(src_locs0),len(trg_locs0))
     src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
     trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
-    if src_check<=0 and trg_check<=0: continue
+    #if src_check<=0 and trg_check<=0: continue
+    if src_check<0: continue
+    if trg_check<0: continue
     print(src_check,trg_check,a)
     src_used_counter_dict[src_phrase0]=src_check-min_n_locs
     trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
