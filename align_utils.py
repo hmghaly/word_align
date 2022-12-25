@@ -52,11 +52,12 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     min_n_locs=min(len(src_locs0),len(trg_locs0))
     src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
     trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
+    if len(src_tokens0)<10: print(src_check,trg_check,a)
     #if src_check<=0 and trg_check<=0: continue
     if src_check<0: continue
     if trg_check<0: continue
     if trg_check==src_check==0: continue
-    print(src_check,trg_check,a)
+    
     src_used_counter_dict[src_phrase0]=src_check-min_n_locs
     trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
     # #if src_phrase0=='document': print(a)
