@@ -63,8 +63,8 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     # elif src_check>0 and trg_check>0: valid=True #final_matching_list.append(a)
     # if not valid: continue
     # print(src_check,trg_check,a)
-    # src_used_counter_dict[src_phrase0]=src_check-min_n_locs
-    # trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
+    src_used_counter_dict[src_phrase0]=src_check-min_n_locs
+    trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
     # final_matching_list.append(a)
     # #if src_phrase0=='document': print(a)
     if src_phrase0 in used_src_phrases: continue
