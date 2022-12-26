@@ -92,7 +92,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   # new_matching_dict_items.sort(key=lambda x:-x[-1])
   # for a in new_matching_dict_items[:20]:
   #   print(">>>",a,child_dict.get(a[0]))
-  matching_list.sort(key=lambda x:-x[-1])
+  matching_list.sort(key=lambda x:(-round(x[-1],1),-x[-2]))
   used_src_phrases=[]
   used_trg_phrases=[]
   final_matching_list=[]
