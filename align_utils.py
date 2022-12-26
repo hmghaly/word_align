@@ -32,8 +32,12 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   matching_list=[]
   for src_phrase0,src_locs_indexes0 in src_phrase_index_loc_dict.items():
     src_locs0,src_indexes0=src_locs_indexes0
+    src_n_tokens=len(src_phrase0.split())
     for trg_phrase0,trg_locs_indexes0 in trg_phrase_index_loc_dict.items():
       trg_locs0,trg_indexes0=trg_locs_indexes0
+      trg_n_tokens=len(trg_phrase0.split())
+      if trg_n_tokens<2 and src_n_tokens>3: continue #avoid pairs where the source is much longer than target
+
       if src_phrase0==trg_phrase0: ratio1,intersection1=0.5,100 #we do not match indexes for identical phrases, but assign them arbitrary values
       else: ratio1,intersection1=get_src_trg_intersection(src_indexes0,trg_indexes0)
       # test_phrase="united nations"
