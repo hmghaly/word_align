@@ -82,18 +82,24 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
         if tok0=="": continue
         candidate_child_pairs=first_dict.get(tok0,[])
         for cd_pair,cd_wt in candidate_child_pairs:
+            if cd_pair==pair: continue
             cd_src,cd_trg=cd_pair
             if general.is_in(cd_src,src_tuple0) and general.is_in(cd_trg,trg_tuple0):
-                print("pair:", pair)
-                print("cd_pair",cd_pair)
+                # print("pair:", pair)
+                # print("cd_pair",cd_pair)
                 final_wt+=cd_wt
                 new_matching_dict[pair]=final_wt
+                child_dict[pair]=child_dict.get(pair,[])+[cd_pair]
 
 
         # corr_items=
 
   # for k0,grp0 in grouped[:20]:
   #   print(">>>>", k0,len(grp0),grp0[:10])
+  new_matching_dict_items=list(new_matching_dict.items())
+  new_matching_dict_items.sort(key=lambda x:-x[-1])
+  for a in new_matching_dict_items[:20]:
+    print(">>>",a)
   matching_list.sort(key=lambda x:-x[-1])
   used_src_phrases=[]
   used_trg_phrases=[]
