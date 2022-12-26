@@ -55,6 +55,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   used_trg_phrases=[]
   final_matching_list=[]
   src_used_counter_dict,trg_used_counter_dict={},{}
+  print("matching_list",len(matching_list))
   for a in matching_list:
     src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
     # min_n_locs=min(len(src_locs0),len(trg_locs0))
