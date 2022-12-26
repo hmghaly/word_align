@@ -30,12 +30,17 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   src_phrase_index_loc_dict=retr_sent_phrase_indexes(src_tokens0,src_index0,max_phrase_length=max_phrase_length)
   trg_phrase_index_loc_dict=retr_sent_phrase_indexes(trg_tokens0,trg_index0,max_phrase_length=max_phrase_length)  
   matching_list=[]
+  matching_dict={}
   for src_phrase0,src_locs_indexes0 in src_phrase_index_loc_dict.items():
     src_locs0,src_indexes0=src_locs_indexes0
-    src_n_tokens=len(src_phrase0.split())
+    
+    src_key=tuple(src_phrase0.split())
+    src_n_tokens=len(src_key)
     for trg_phrase0,trg_locs_indexes0 in trg_phrase_index_loc_dict.items():
       trg_locs0,trg_indexes0=trg_locs_indexes0
-      trg_n_tokens=len(trg_phrase0.split())
+      #trg_n_tokens=len(trg_phrase0.split())
+      trg_key=tuple(trg_phrase0.split())
+      trg_n_tokens=len(trg_key)      
       if trg_n_tokens<2 and src_n_tokens>3: continue #avoid pairs where the source is much longer than target
 
       if src_phrase0==trg_phrase0: ratio1,intersection1=0.5,100 #we do not match indexes for identical phrases, but assign them arbitrary values
@@ -44,6 +49,8 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       # test_phrase="united nations"
       # if src_phrase0==test_phrase: print(src_phrase0,trg_phrase0, ratio1,intersection1)
       if intersection1<min_intersection_count: continue
+      matching_key=(src_key,trg_key)
+      matching_dict[matching_key]=adj_ratio
 
       #print("src_phrase0",src_phrase0,"trg_phrase0",trg_phrase0,round(ratio1,4),intersection1)
       # len_diff=abs(len(src_phrase0.split())-len(trg_phrase0.split()))
@@ -51,7 +58,13 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       adj_ratio=ratio1
       #if intersection1<100: adj_ratio=adj_ratio*(0.01*intersection1)
       matching_list.append((src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,adj_ratio))
-
+  child_dict={}
+  combined_first_matched_list=[]
+  for a,b in matching_dict.items():
+    first_src=a[0][0]
+    combined_first_matched_list.append((first_src,a,b))
+  for a in combined_first_matched_list[:20]:
+    print(">>>>", a)
   matching_list.sort(key=lambda x:-x[-1])
   used_src_phrases=[]
   used_trg_phrases=[]
@@ -86,23 +99,23 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     used_trg_phrases.append(trg_phrase0)
     #final_matching_list.append(a)
     if not a in final_matching_list: final_matching_list.append(a)
-  matching_list.sort(key=lambda x:x[0]) #group for source phrase
-  matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[0])]
-  for grp0 in matching_list_grouped:
-    grp0.sort(key=lambda x:-x[-1])
-    if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
-    for a in grp0:
-        if a in final_matching_list: continue
-        final_matching_list.append(a)
-        break
-  matching_list.sort(key=lambda x:x[1]) #group for target phrase
-  matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[1])]
-  for grp0 in matching_list_grouped:
-    grp0.sort(key=lambda x:-x[-1])
-    if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
-    for a in grp0:
-        if a in final_matching_list: continue
-        final_matching_list.append(a)
+  # matching_list.sort(key=lambda x:x[0]) #group for source phrase
+  # matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[0])]
+  # for grp0 in matching_list_grouped:
+  #   grp0.sort(key=lambda x:-x[-1])
+  #   if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
+  #   for a in grp0:
+  #       if a in final_matching_list: continue
+  #       final_matching_list.append(a)
+  #       break
+  # matching_list.sort(key=lambda x:x[1]) #group for target phrase
+  # matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[1])]
+  # for grp0 in matching_list_grouped:
+  #   grp0.sort(key=lambda x:-x[-1])
+  #   if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
+  #   for a in grp0:
+  #       if a in final_matching_list: continue
+  #       final_matching_list.append(a)
         break
     # for s1 in src_locs0:
     #   for t1 in trg_locs0:
