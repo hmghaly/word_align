@@ -26,7 +26,7 @@ def filter_toks(tok_list0,params={}):
   return tok_list0
 
 #Most important functions
-def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_length=5,min_intersection_count=10): #match src/trg phrase based on index matching intersection/ratio
+def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_length=3,min_intersection_count=10): #match src/trg phrase based on index matching intersection/ratio
   src_phrase_index_loc_dict=retr_sent_phrase_indexes(src_tokens0,src_index0,max_phrase_length=max_phrase_length)
   trg_phrase_index_loc_dict=retr_sent_phrase_indexes(trg_tokens0,trg_index0,max_phrase_length=max_phrase_length)  
   matching_list=[]
