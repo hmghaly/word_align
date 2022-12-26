@@ -36,8 +36,8 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       trg_locs0,trg_indexes0=trg_locs_indexes0
       if src_phrase0==trg_phrase0: ratio1,intersection1=0.5,100 #we do not match indexes for identical phrases, but assign them arbitrary values
       else: ratio1,intersection1=get_src_trg_intersection(src_indexes0,trg_indexes0)
-      test_phrase="united nations"
-      if src_phrase0==test_phrase: print(src_phrase0,trg_phrase0, ratio1,intersection1)
+      # test_phrase="united nations"
+      # if src_phrase0==test_phrase: print(src_phrase0,trg_phrase0, ratio1,intersection1)
       if intersection1<min_intersection_count: continue
 
       #print("src_phrase0",src_phrase0,"trg_phrase0",trg_phrase0,round(ratio1,4),intersection1)
@@ -78,24 +78,24 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     used_trg_phrases.append(trg_phrase0)
     #final_matching_list.append(a)
     if not a in final_matching_list: final_matching_list.append(a)
-  matching_list.sort(key=lambda x:x[0]) #group for source phrase
-  matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[0])]
-  for grp0 in matching_list_grouped:
-    grp0.sort(key=lambda x:-x[-1])
-    if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
-    for a in grp0:
-        if a in final_matching_list: continue
-        final_matching_list.append(a)
-        break
-  matching_list.sort(key=lambda x:x[1]) #group for target phrase
-  matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[1])]
-  for grp0 in matching_list_grouped:
-    grp0.sort(key=lambda x:-x[-1])
-    if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
-    for a in grp0:
-        if a in final_matching_list: continue
-        final_matching_list.append(a)
-        break
+  # matching_list.sort(key=lambda x:x[0]) #group for source phrase
+  # matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[0])]
+  # for grp0 in matching_list_grouped:
+  #   grp0.sort(key=lambda x:-x[-1])
+  #   if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
+  #   for a in grp0:
+  #       if a in final_matching_list: continue
+  #       final_matching_list.append(a)
+  #       break
+  # matching_list.sort(key=lambda x:x[1]) #group for target phrase
+  # matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[1])]
+  # for grp0 in matching_list_grouped:
+  #   grp0.sort(key=lambda x:-x[-1])
+  #   if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
+  #   for a in grp0:
+  #       if a in final_matching_list: continue
+  #       final_matching_list.append(a)
+  #       break
     # for s1 in src_locs0:
     #   for t1 in trg_locs0:
     #     final_matching_list.append((s1,t1,ratio1,intersection1))
