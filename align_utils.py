@@ -60,52 +60,44 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       #if intersection1<100: adj_ratio=adj_ratio*(0.01*intersection1)
       matching_list.append((src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,adj_ratio))
   
-  combined_first_matched_list=[]
-  for a,b in matching_dict.items():
-    first_src=a[0][0]
-    combined_first_matched_list.append((first_src,a,b))
-  combined_first_matched_list.sort(key=lambda x:x[0])
-  grouped=[(key,[v[1:] for v in list(group)]) for key,group in groupby(combined_first_matched_list,lambda x:x[0])]
-  first_dict=dict(iter(grouped))
-  child_dict={}
-  new_matching_dict={} #dict(matching_dict)
-  all_matching_items=list(matching_dict.items())
-  all_matching_items.sort(key=lambda x:len(x[0][0]+x[0][1]))
-  for pair,wt in all_matching_items:
+  # combined_first_matched_list=[]
+  # for a,b in matching_dict.items():
+  #   first_src=a[0][0]
+  #   combined_first_matched_list.append((first_src,a,b))
+  # combined_first_matched_list.sort(key=lambda x:x[0])
+  # grouped=[(key,[v[1:] for v in list(group)]) for key,group in groupby(combined_first_matched_list,lambda x:x[0])]
+  # first_dict=dict(iter(grouped))
+  # child_dict={}
+  # new_matching_dict={} #dict(matching_dict)
+  # all_matching_items=list(matching_dict.items())
+  # all_matching_items.sort(key=lambda x:len(x[0][0]+x[0][1]))
+  # for pair,wt in all_matching_items:
     
-    final_wt=wt
-    new_matching_dict[pair]=final_wt
-    src_tuple0,trg_tuple0=pair
-    #if len(src_tuple0)==1 and len(trg_tuple0)==1: continue
-    #print(">>>>",pair,wt)
-    for tok0 in src_tuple0:
-        if tok0=="": continue
-        candidate_child_pairs=first_dict.get(tok0,[])
-        for cd_pair,cd_wt in candidate_child_pairs:
-            if cd_pair==pair: continue
-            cd_src,cd_trg=cd_pair
-            if general.is_in(cd_src,src_tuple0) and general.is_in(cd_trg,trg_tuple0):
-                # print("pair:", pair)
-                # print("cd_pair",cd_pair)
-                final_wt+=cd_wt
-                new_matching_dict[pair]=final_wt
-                child_dict[pair]=child_dict.get(pair,[])+[cd_pair]
-
-
-        # corr_items=
-
-  # for k0,grp0 in grouped[:20]:
-  #   print(">>>>", k0,len(grp0),grp0[:10])
-  new_matching_dict_items=list(new_matching_dict.items())
-  new_matching_dict_items.sort(key=lambda x:-x[-1])
-  for a in new_matching_dict_items[:20]:
-    print(">>>",a,child_dict.get(a[0]))
+  #   final_wt=wt
+  #   new_matching_dict[pair]=final_wt
+  #   src_tuple0,trg_tuple0=pair
+  #   #if len(src_tuple0)==1 and len(trg_tuple0)==1: continue
+  #   #print(">>>>",pair,wt)
+  #   for tok0 in src_tuple0:
+  #       if tok0=="": continue
+  #       candidate_child_pairs=first_dict.get(tok0,[])
+  #       for cd_pair,cd_wt in candidate_child_pairs:
+  #           if cd_pair==pair: continue
+  #           cd_src,cd_trg=cd_pair
+  #           if general.is_in(cd_src,src_tuple0) and general.is_in(cd_trg,trg_tuple0):
+  #               final_wt+=cd_wt
+  #               new_matching_dict[pair]=final_wt
+  #               child_dict[pair]=child_dict.get(pair,[])+[cd_pair]
+  # new_matching_dict_items=list(new_matching_dict.items())
+  # new_matching_dict_items.sort(key=lambda x:-x[-1])
+  # for a in new_matching_dict_items[:20]:
+  #   print(">>>",a,child_dict.get(a[0]))
   matching_list.sort(key=lambda x:-x[-1])
   used_src_phrases=[]
   used_trg_phrases=[]
   final_matching_list=[]
   src_used_counter_dict,trg_used_counter_dict={},{}
-  print("matching_list",len(matching_list))
+  #print("matching_list",len(matching_list))
   for a in matching_list:
     src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
     # min_n_locs=min(len(src_locs0),len(trg_locs0))
