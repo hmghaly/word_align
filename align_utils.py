@@ -40,6 +40,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
 
       if src_phrase0==trg_phrase0: ratio1,intersection1=0.5,100 #we do not match indexes for identical phrases, but assign them arbitrary values
       else: ratio1,intersection1=get_src_trg_intersection(src_indexes0,trg_indexes0)
+      if int(round(ratio1))==1 and (src_n_tokens>1 or trg_n_tokens>1): continue #avoid coincidences of cooccurence of some phrases
       # test_phrase="united nations"
       # if src_phrase0==test_phrase: print(src_phrase0,trg_phrase0, ratio1,intersection1)
       if intersection1<min_intersection_count: continue
