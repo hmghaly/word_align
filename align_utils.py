@@ -128,7 +128,10 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     if not a in final_matching_list: final_matching_list.append(a)
   for a in matching_list:
     src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
-    if not src_phrase0 in used_src_phrases or not trg_phrase0 in used_trg_phrases:
+    valid=False
+    if not src_phrase0 in used_src_phrases: valid=True
+    if not trg_phrase0 in used_trg_phrases: valid=True
+    if valid:
         used_src_phrases.append(src_phrase0)
         used_trg_phrases.append(trg_phrase0)
         if not a in final_matching_list: final_matching_list.append(a)
