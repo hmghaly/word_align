@@ -59,15 +59,28 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       
       #if intersection1<100: adj_ratio=adj_ratio*(0.01*intersection1)
       matching_list.append((src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,adj_ratio))
-  child_dict={}
+  
   combined_first_matched_list=[]
   for a,b in matching_dict.items():
     first_src=a[0][0]
     combined_first_matched_list.append((first_src,a,b))
   combined_first_matched_list.sort(key=lambda x:x[0])
   grouped=[(key,[v[1:] for v in list(group)]) for key,group in groupby(combined_first_matched_list,lambda x:x[0])]
-  for k0,grp0 in grouped[:20]:
-    print(">>>>", k0,len(grp0),grp0[:10])
+  first_dict=dict(iter(grouped))
+  child_dict={}
+  new_matching_dict={} #dict(matching_dict)
+  all_matching_items=list(matching_dict.items())
+  all_matching_items.sort(key=lambda x:len(x[0][0]+x[0][1]))
+  for pair,wt in all_matching_items[:20]:
+    print(">>>>",pair,wt)
+    final_wt=wt
+    src_tuple0,trg_tuple0=pair
+    for tok0 in src_tuple0:
+        if tok0=="": continue
+        # corr_items=
+
+  # for k0,grp0 in grouped[:20]:
+  #   print(">>>>", k0,len(grp0),grp0[:10])
   matching_list.sort(key=lambda x:-x[-1])
   used_src_phrases=[]
   used_trg_phrases=[]
