@@ -41,7 +41,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       if intersection1<min_intersection_count: continue
 
       #print("src_phrase0",src_phrase0,"trg_phrase0",trg_phrase0,round(ratio1,4),intersection1)
-      len_diff=abs(len(src_phrase0)-len(trg_phrase0))
+      len_diff=abs(len(src_phrase0.split())-len(trg_phrase0.split()))
       adj_ratio=ratio1-0.00001*len_diff
       #if intersection1<100: adj_ratio=adj_ratio*(0.01*intersection1)
       matching_list.append((src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,adj_ratio))
