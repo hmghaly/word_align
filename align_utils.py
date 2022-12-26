@@ -71,14 +71,19 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   new_matching_dict={} #dict(matching_dict)
   all_matching_items=list(matching_dict.items())
   all_matching_items.sort(key=lambda x:len(x[0][0]+x[0][1]))
-  for pair,wt in all_matching_items[:200]:
+  for pair,wt in all_matching_items:
     
     final_wt=wt
     src_tuple0,trg_tuple0=pair
     if len(src_tuple0)==1 and len(trg_tuple0)==1: continue
-    print(">>>>",pair,wt)
+    #print(">>>>",pair,wt)
     for tok0 in src_tuple0:
         if tok0=="": continue
+        candidate_child_pairs=first_dict.get(tok0,[])
+        for cd_pair,cd_wt in candidate_child_pairs:
+            cd_src,cd_trg=cd_pair
+            if general.is_in(cd_src,src_tuple0) and general.is_in(cd_trg,trg_tuple0):
+                print(pair,cd_pair)
 
         # corr_items=
 
