@@ -74,6 +74,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   for pair,wt in all_matching_items:
     
     final_wt=wt
+    new_matching_dict[pair]=final_wt
     src_tuple0,trg_tuple0=pair
     if len(src_tuple0)==1 and len(trg_tuple0)==1: continue
     #print(">>>>",pair,wt)
@@ -83,7 +84,11 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
         for cd_pair,cd_wt in candidate_child_pairs:
             cd_src,cd_trg=cd_pair
             if general.is_in(cd_src,src_tuple0) and general.is_in(cd_trg,trg_tuple0):
-                print(pair,cd_pair)
+                print("pair:", pair)
+                print("cd_pair",cd_pair)
+                final_wt+=cd_wt
+                new_matching_dict[pair]=final_wt
+
 
         # corr_items=
 
