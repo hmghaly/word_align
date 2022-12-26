@@ -76,7 +76,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     final_wt=wt
     new_matching_dict[pair]=final_wt
     src_tuple0,trg_tuple0=pair
-    if len(src_tuple0)==1 and len(trg_tuple0)==1: continue
+    #if len(src_tuple0)==1 and len(trg_tuple0)==1: continue
     #print(">>>>",pair,wt)
     for tok0 in src_tuple0:
         if tok0=="": continue
