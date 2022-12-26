@@ -64,8 +64,10 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   for a,b in matching_dict.items():
     first_src=a[0][0]
     combined_first_matched_list.append((first_src,a,b))
-  for a in combined_first_matched_list[:20]:
-    print(">>>>", a)
+  combined_first_matched_list.sort(key=lambda x:x[0])
+  grouped=[(key,v[1:] for v in list(group)) for key,group in groupby(combined_first_matched_list,lambda x:x[0])]
+  for k0,grp0 in grouped[:20]:
+    print(">>>>", k0,len(grp0),grp0[:10])
   matching_list.sort(key=lambda x:-x[-1])
   used_src_phrases=[]
   used_trg_phrases=[]
