@@ -52,6 +52,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       adj_ratio=ratio1
       matching_key=(src_key,trg_key)
       matching_dict[matching_key]=adj_ratio
+      intersection1=10*int(intersection1*0.1)
 
       #print("src_phrase0",src_phrase0,"trg_phrase0",trg_phrase0,round(ratio1,4),intersection1)
       # len_diff=abs(len(src_phrase0.split())-len(trg_phrase0.split()))
@@ -92,7 +93,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   # new_matching_dict_items.sort(key=lambda x:-x[-1])
   # for a in new_matching_dict_items[:20]:
   #   print(">>>",a,child_dict.get(a[0]))
-  matching_list.sort(key=lambda x:(-round(x[-1],1),-x[-2]))
+  matching_list.sort(key=lambda x:(-round(x[-1],1),-x[-2],-len(x[0])-len(x[1])))
   used_src_phrases=[]
   used_trg_phrases=[]
   final_matching_list=[]
