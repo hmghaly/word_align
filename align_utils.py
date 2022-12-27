@@ -50,9 +50,9 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       # if src_phrase0==test_phrase: print(src_phrase0,trg_phrase0, ratio1,intersection1)
       if intersection1<min_intersection_count: continue
       adj_ratio=ratio1
-      matching_key=(src_key,trg_key)
-      matching_dict[matching_key]=adj_ratio
-      intersection1=10*int(intersection1*0.1)
+      # matching_key=(src_key,trg_key)
+      # matching_dict[matching_key]=adj_ratio
+      # intersection1=10*int(intersection1*0.1)
 
       #print("src_phrase0",src_phrase0,"trg_phrase0",trg_phrase0,round(ratio1,4),intersection1)
       # len_diff=abs(len(src_phrase0.split())-len(trg_phrase0.split()))
@@ -60,6 +60,8 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       
       #if intersection1<100: adj_ratio=adj_ratio*(0.01*intersection1)
       matching_list.append((src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,adj_ratio))
+  return matching_list
+  #final_matching_list=
   
   # combined_first_matched_list=[]
   # for a,b in matching_dict.items():
@@ -93,50 +95,54 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
   # new_matching_dict_items.sort(key=lambda x:-x[-1])
   # for a in new_matching_dict_items[:20]:
   #   print(">>>",a,child_dict.get(a[0]))
-  matching_list.sort(key=lambda x:(-round(x[-1],1),-x[-2],-len(x[0])-len(x[1])))
-  used_src_phrases=[]
-  used_trg_phrases=[]
-  final_matching_list=[]
-  src_used_counter_dict,trg_used_counter_dict={},{}
-  #print("matching_list",len(matching_list))
-  for i,a in enumerate(matching_list):
-    src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
-    if i<50: print(">>>>",a)
-    # min_n_locs=min(len(src_locs0),len(trg_locs0))
-    # # src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
-    # # trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
-    # src_check=src_used_counter_dict.get(src_phrase0)
-    # trg_check=trg_used_counter_dict.get(trg_phrase0)
-    # # if src_check==None or trg_check==None: #either phrase is the top phrase/not used before
-    # #     if not a in final_matching_list: final_matching_list.append(a)
-    # if src_check==None: src_check=len(src_locs0)
-    # if trg_check==None: trg_check=len(trg_locs0)
 
 
-    # # valid=False
-    # # if src_check==len(src_locs0) or trg_check==len(trg_locs0): valid=True
-    # # elif src_check>0 and trg_check>0: valid=True #final_matching_list.append(a)
-    # # if not valid: continue
-    # # print(src_check,trg_check,a)
-    # src_used_counter_dict[src_phrase0]=src_check-min_n_locs
-    # trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
-    # # final_matching_list.append(a)
-    # # #if src_phrase0=='document': print(a)
-    if src_phrase0 in used_src_phrases: continue
-    if trg_phrase0 in used_trg_phrases: continue
-    used_src_phrases.append(src_phrase0)
-    used_trg_phrases.append(trg_phrase0)
-    #final_matching_list.append(a)
-    if not a in final_matching_list: final_matching_list.append(a)
-  for a in matching_list:
-    src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
-    valid=False
-    if not src_phrase0 in used_src_phrases: valid=True
-    if not trg_phrase0 in used_trg_phrases: valid=True
-    if valid:
-        used_src_phrases.append(src_phrase0)
-        used_trg_phrases.append(trg_phrase0)
-        if not a in final_matching_list: final_matching_list.append(a)
+
+  #Let's try to avoid doing this
+  # matching_list.sort(key=lambda x:(-round(x[-1],1),-x[-2],-len(x[0])-len(x[1])))
+  # used_src_phrases=[]
+  # used_trg_phrases=[]
+  # final_matching_list=[]
+  # src_used_counter_dict,trg_used_counter_dict={},{}
+  # #print("matching_list",len(matching_list))
+  # for i,a in enumerate(matching_list):
+  #   src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
+  #   if i<50: print(">>>>",a)
+  #   # min_n_locs=min(len(src_locs0),len(trg_locs0))
+  #   # # src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
+  #   # # trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
+  #   # src_check=src_used_counter_dict.get(src_phrase0)
+  #   # trg_check=trg_used_counter_dict.get(trg_phrase0)
+  #   # # if src_check==None or trg_check==None: #either phrase is the top phrase/not used before
+  #   # #     if not a in final_matching_list: final_matching_list.append(a)
+  #   # if src_check==None: src_check=len(src_locs0)
+  #   # if trg_check==None: trg_check=len(trg_locs0)
+
+
+  #   # # valid=False
+  #   # # if src_check==len(src_locs0) or trg_check==len(trg_locs0): valid=True
+  #   # # elif src_check>0 and trg_check>0: valid=True #final_matching_list.append(a)
+  #   # # if not valid: continue
+  #   # # print(src_check,trg_check,a)
+  #   # src_used_counter_dict[src_phrase0]=src_check-min_n_locs
+  #   # trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
+  #   # # final_matching_list.append(a)
+  #   # # #if src_phrase0=='document': print(a)
+  #   if src_phrase0 in used_src_phrases: continue
+  #   if trg_phrase0 in used_trg_phrases: continue
+  #   used_src_phrases.append(src_phrase0)
+  #   used_trg_phrases.append(trg_phrase0)
+  #   #final_matching_list.append(a)
+  #   if not a in final_matching_list: final_matching_list.append(a)
+  # for a in matching_list:
+  #   src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
+  #   valid=False
+  #   if not src_phrase0 in used_src_phrases: valid=True
+  #   if not trg_phrase0 in used_trg_phrases: valid=True
+  #   if valid:
+  #       used_src_phrases.append(src_phrase0)
+  #       used_trg_phrases.append(trg_phrase0)
+  #       if not a in final_matching_list: final_matching_list.append(a)
 
   # matching_list.sort(key=lambda x:x[0]) #group for source phrase
   # matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[0])]
@@ -159,7 +165,7 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
     # for s1 in src_locs0:
     #   for t1 in trg_locs0:
     #     final_matching_list.append((s1,t1,ratio1,intersection1))
-  return final_matching_list
+  # return final_matching_list
 
 
 def retr_sent_phrase_indexes(sent_toks,inv_index,max_phrase_length=4,min_index_size=5): #get the indexes of the phrases of the tokenized sentence, together with their location info
