@@ -232,7 +232,7 @@ def get_src_trg_intersection(src_list0,trg_list0):
 
 
 #29 Dec 2022
-def get_aligned_path(matching_list,max_dist=3,n_epochs=3,dist_penalty=0.1):
+def get_aligned_path(matching_list,max_dist=3,n_epochs=3,dist_penalty=0.1,top_n=2):
   matching_list.sort(key=lambda x:-x[-1])
   print("all_matching",len(matching_list))
   src_start_dict,src_end_dict={},{}
@@ -263,7 +263,7 @@ def get_aligned_path(matching_list,max_dist=3,n_epochs=3,dist_penalty=0.1):
       #print("top src item", a)
       if a[-1]<0.01 or a in ml_new: continue
       corr.append(a)      
-      if len(corr)==1: break
+      if len(corr)==top_n: break
     ml_new.extend(corr)
     #print("----")
   matching_list.sort(key=lambda x:x[1]) #group for target phrase
@@ -275,7 +275,7 @@ def get_aligned_path(matching_list,max_dist=3,n_epochs=3,dist_penalty=0.1):
       #print("top trg item", a)
       if a[-1]<0.01 or a in ml_new: continue
       corr.append(a)      
-      if len(corr)==1: break
+      if len(corr)==top_n: break
     ml_new.extend(corr)
     #print("-----")
   for a in ml_new:
