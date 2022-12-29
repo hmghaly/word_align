@@ -232,7 +232,7 @@ def get_src_trg_intersection(src_list0,trg_list0):
 
 
 #29 Dec 2022
-def get_aligned_path(matching_list,max_dist=3,n_epochs=3):
+def get_aligned_path(matching_list,max_dist=3,n_epochs=3,dist_penalty=0.1):
   matching_list.sort(key=lambda x:-x[-1])
   print("all_matching",len(matching_list))
   src_start_dict,src_end_dict={},{}
@@ -294,7 +294,7 @@ def get_aligned_path(matching_list,max_dist=3,n_epochs=3):
   cur_item_list1=list(cur_items)
   for epoch0 in range(n_epochs):
     #print("cur_item_list0",len(cur_item_list0),"cur_item_list1",len(cur_item_list1))
-    new_items=match_el_lists(cur_item_list0,cur_item_list1,el_dict)
+    new_items=match_el_lists(cur_item_list0,cur_item_list1,el_dict,penalty=dist_penalty)
     cur_item_list0=[]
     for a in new_items:
       #print(">>>",a)
@@ -339,7 +339,7 @@ def get_aligned_path(matching_list,max_dist=3,n_epochs=3):
   return final_els0
 
 #29 Dec 2022
-def match_el_lists(el_list0,el_list1,el_dict0,max_dist=3,max_src_span=4,allow_ortho=False): #match 2 lists of elements and their weights to expand to larger elements
+def match_el_lists(el_list0,el_list1,el_dict0,max_dist=3,max_src_span=4,allow_ortho=False,penalty=0.1): #match 2 lists of elements and their weights to expand to larger elements
   new_els=[]
   used_pair_dict={}
   el_list0.sort()
@@ -385,8 +385,8 @@ def match_el_lists(el_list0,el_list1,el_dict0,max_dist=3,max_src_span=4,allow_or
       found_wt=el_dict0.get(combined_el01,0)
       if combined_wt>found_wt:
         #print(combined_el01, "combined_wt",combined_wt,"found_wt",found_wt)
-        penalty=0#0.1*(src_span_dist+trg_span_dist-2)
-        net_combined_wt=combined_wt-penalty
+        cur_penalty=penalty*(src_span_dist+trg_span_dist-2)
+        net_combined_wt=combined_wt-cur_penalty
         # el_dict[combined_el01]=net_combined_wt
         # el_child_dict[combined_el01]=(el0,el1)
         new_els.append((combined_el01,net_combined_wt,(el0,el1)))
