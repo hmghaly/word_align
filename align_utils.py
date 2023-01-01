@@ -370,11 +370,9 @@ def match_el_lists(el_list0,el_list1,el_dict0,max_dist=3,max_src_span=4,allow_or
         if trg_span1==trg_span0: 
           if src_span_dist<1 or src_span_dist>max_dist: continue
           if trg_span0[1]-trg_span0[0]>1: continue
-          continue
         elif src_span1==src_span0: 
           if trg_span_dist<1 or trg_span_dist>max_dist: continue
           if src_span0[1]-src_span0[0]>1: continue
-          continue
         else:
           if src_span_dist<1 or src_span_dist>max_dist: continue
           if trg_span_dist<1 or trg_span_dist>max_dist: continue
