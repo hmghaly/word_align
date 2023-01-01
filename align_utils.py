@@ -349,7 +349,7 @@ def match_el_lists(el_list0,el_list1,el_dict0,max_dist=3,max_src_span=4,allow_or
     # src_start0,src_end0=src_span0
     for el1,el_wt1 in el_list1:
       if el1==el0: continue
-      print("pair:", el0,el_wt0,el1,el_wt1)
+
       pair1,pair2=(el0,el1),(el1,el0)
       if used_pair_dict.get(pair1,False) or used_pair_dict.get(pair2,False): continue
       used_pair_dict[pair1]=True
@@ -381,6 +381,7 @@ def match_el_lists(el_list0,el_list1,el_dict0,max_dist=3,max_src_span=4,allow_or
       combined_el01=combine_els(el0,el1)
       combined_src_span0,combined_trg_span0=combined_el01
       if max_src_span!=None and combined_src_span0[1]-combined_src_span0[0]>max_src_span: continue #avoiding very large phrases
+      print("pair:", el0,el_wt0,el1,el_wt1,"span width:",combined_src_span0[1]-combined_src_span0[0])
       found_wt=el_dict0.get(combined_el01,0)
       if combined_wt>found_wt:
         #print(combined_el01, "combined_wt",combined_wt,"found_wt",found_wt)
