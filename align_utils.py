@@ -584,15 +584,20 @@ def combine_els(el1,el2): #combine two elements into a third element
   new_trg_span=(min_y,max_y)
   return (new_src_span,new_trg_span)
 
-def get_span_dist(span1,span2):
-  span1_x1,span1_x2=span1
-  span2_x1,span2_x2=span2
-  d1=abs(span1_x2-span1_x1)
-  d2=abs(span2_x2-span2_x1)
-  max_x=max(span1_x1,span1_x2,span2_x1,span2_x2)
-  min_x=min(span1_x1,span1_x2,span2_x1,span2_x2)
-  d_total=max_x-min_x
-  return d_total-d1-d2
+
+def get_span_dist(span0,span1):
+  if span0[0]>span1[0] or span0[1]>span1[1]: span0,span1=span1,span0
+  return span1[0]-span0[1]
+
+# def get_span_dist_OLD(span1,span2):
+#   span1_x1,span1_x2=span1
+#   span2_x1,span2_x2=span2
+#   d1=abs(span1_x2-span1_x1)
+#   d2=abs(span2_x2-span2_x1)
+#   max_x=max(span1_x1,span1_x2,span2_x1,span2_x2)
+#   min_x=min(span1_x1,span1_x2,span2_x1,span2_x2)
+#   d_total=max_x-min_x
+#   return d_total-d1-d2
 
 def get_rec_el_children(el0,el_child_dict0,el_list0=[],only_without_children=False): #recursively get children of an element
   cur_children0=el_child_dict0.get(el0,[])
