@@ -231,7 +231,7 @@ def get_src_trg_intersection(src_list0,trg_list0):
   return ratio0,len(intersection0)
 
 
-#1 Jan 2023
+#2 Jan 2023
 def get_aligned_path(matching_list,max_dist=4,n_epochs=3,max_src_span=6,dist_penalty=0.1,top_n=2):
   #matching_list.sort(key=lambda x:-x[-1])
   matching_list.sort(key=lambda x:(-round(x[-1],1),x[-2],-len(x[0])-len(x[1]),x[-1])) #sorting criteria - rounded weight, frequency,length, and then just weight
@@ -273,22 +273,13 @@ def get_aligned_path(matching_list,max_dist=4,n_epochs=3,max_src_span=6,dist_pen
         if ratio0>found_wt: el_dict[el0]=ratio0
           
   cur_items=list(el_dict.items()) #we do an intial iterative run to get a basic alignment
-  cur_item_list0=list(cur_items)
-  cur_item_list1=list(cur_items)
-  for epoch0 in range(n_epochs): 
-    #print("cur_item_list0",len(cur_item_list0),"cur_item_list1",len(cur_item_list1))
-    new_items=match_el_lists(cur_item_list0,cur_item_list1,el_dict,penalty=dist_penalty,max_src_span=max_src_span)
-    cur_item_list0=[]
-    for a in new_items:
-      #print(">>>",a)
-      new_el,new_el_wt,new_el_children=a
-      found_wt=el_dict.get(new_el,0)
-      if new_el_wt>found_wt:
-        el_dict[new_el]=new_el_wt
-        el_child_dict[new_el]=new_el_children
-        cur_item_list0.append((new_el,new_el_wt))
-    cur_item_list1=list(el_dict.items())
-  #print("cur_item_list0",len(cur_item_list0),"cur_item_list1",len(cur_item_list1))
+  new_combined_items=combine_items_rec(cur_items,el_dict)
+  for a in new_combined_items:
+    new_el,new_el_wt,new_el_children=a
+    found_wt=el_dict.get(new_el,0)
+    if new_el_wt>found_wt:
+      el_dict[new_el]=new_el_wt
+      el_child_dict[new_el]=new_el_children
 
   el_items=list(el_dict.items()) #now the el_dict is populated with also bigger elements by combining smaller ones
   el_items.sort(key=lambda x:-x[-1])
@@ -349,8 +340,8 @@ def get_aligned_path(matching_list,max_dist=4,n_epochs=3,max_src_span=6,dist_pen
     # print("valid_src_els",valid_src_els)
     # print("valid_trg_els",valid_trg_els)
     new_src_els,new_trg_els=[],[] #we start to combine ortho elements together to make bigger elements
-    if len(valid_src_els)>1: new_src_els=match_el_lists(valid_src_els,valid_src_els,el_dict,allow_ortho=True)
-    if len(valid_trg_els)>1: new_trg_els=match_el_lists(valid_trg_els,valid_trg_els,el_dict,allow_ortho=True)
+    if len(valid_src_els)>1: new_src_els=combine_items_rec(valid_src_els,el_dict,n_epochs0=1, allow_ortho=True) #match_el_lists(valid_src_els,valid_src_els,el_dict,allow_ortho=True)
+    if len(valid_trg_els)>1: new_trg_els=combine_items_rec(valid_trg_els,el_dict,n_epochs0=1,allow_ortho=True) #match_el_lists(valid_trg_els,valid_trg_els,el_dict,allow_ortho=True)
     #TODO: multiple iterations to account for longer ortho elements such as acronyms
     for vs in new_src_els: #and now we populate the new element dictionary with the new ortho elements
       vs_el0,vs_el_wt0,vs_children=vs
@@ -374,19 +365,13 @@ def get_aligned_path(matching_list,max_dist=4,n_epochs=3,max_src_span=6,dist_pen
 
   #Now obtaining the final solution, after we identify the new ortho/unused elements in addition to the current solution
   all_items=list(new_el_dict.items())
-  list0=list(all_items)
-  list1=list(all_items)
-  for epoch0 in range(5): #we run it iteratively to create new bigger elements
-    new_els=match_el_lists(list0,list1,el_dict,max_src_span=6)
-    list0=[]
-    for ns in new_els: 
-      ns_el0,ns_el_wt0,ns_children=ns
-      found_wt=new_el_dict.get(ns_el0,0)
-      if ns_el_wt0>found_wt: 
-        new_el_dict[ns_el0]=ns_el_wt0
-        new_el_child_dict[ns_el0]=ns_children  
-        list0.append((ns_el0,ns_el_wt0))  
-    list1=list(new_el_dict.items())
+  new_combined_items=combine_items_rec(cur_items,el_dict,allow_ortho=False)
+  for a in new_combined_items:
+    new_el,new_el_wt,new_el_children=a
+    found_wt=new_el_dict.get(new_el,0)
+    if new_el_wt>found_wt:
+      new_el_dict[new_el]=new_el_wt
+      new_el_child_dict[new_el]=new_el_children
 
   #And here is the final solution
   el_items=list(new_el_dict.items())
@@ -407,6 +392,183 @@ def get_aligned_path(matching_list,max_dist=4,n_epochs=3,max_src_span=6,dist_pen
       sub_children=new_el_child_dict.get(ch0,[])
       final_els0.append((ch0,new_el_dict.get(ch0,0),sub_children))
   return final_els0
+
+#1 Jan 2023
+# def get_aligned_path(matching_list,max_dist=4,n_epochs=3,max_src_span=6,dist_penalty=0.1,top_n=2):
+#   #matching_list.sort(key=lambda x:-x[-1])
+#   matching_list.sort(key=lambda x:(-round(x[-1],1),x[-2],-len(x[0])-len(x[1]),x[-1])) #sorting criteria - rounded weight, frequency,length, and then just weight
+#   #print("all_matching",len(matching_list))
+#   #src_start_dict,src_end_dict={},{}
+#   el_dict={}
+#   el_child_dict={}
+#   src_span_el_dict,trg_span_el_dict={},{}
+  
+#   ml_new=[]
+#   original_ml=[]
+#   used_src_phrases,used_trg_phrases=[],[]
+#   for a in matching_list: #we process the matching list in order to obtain the top matches with their spans
+#     #TODO: use the counter of used instances spans of src/trg phrases based on the number of spans of a valid pair
+#     src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection0,ratio0=a
+#     valid=True
+#     for src_span0 in src_locs0:
+#       for trg_span0 in trg_locs0: 
+#         el0=(src_span0,trg_span0)
+#         original_ml.append((el0,ratio0)) 
+#         src_span_el_dict[src_span0]=src_span_el_dict.get(src_span0,[])+[(el0,ratio0)] 
+#         trg_span_el_dict[trg_span0]=trg_span_el_dict.get(trg_span0,[])+[(el0,ratio0)] 
+#     if src_phrase0 in used_src_phrases or trg_phrase0 in used_trg_phrases: valid=False
+#     if ratio0<0.01: valid=False
+
+#     if not valid: continue
+#     used_src_phrases.append(src_phrase0)
+#     used_trg_phrases.append(trg_phrase0)   
+#     ml_new.append(a) #this is where we store the valid matching phrases with their weights and spans
+#     #print(">>>>>>>>",a)
+
+#   for a in ml_new: #now we create the elements of span pairs
+#     src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection0,ratio0=a
+#     for src_span0 in src_locs0:
+#       src_start0,src_end0=src_span0
+#       for trg_span0 in trg_locs0:
+#         el0=(src_span0,trg_span0)
+#         found_wt=el_dict.get(el0,0)
+#         if ratio0>found_wt: el_dict[el0]=ratio0
+          
+#   cur_items=list(el_dict.items()) #we do an intial iterative run to get a basic alignment
+#   cur_item_list0=list(cur_items)
+#   cur_item_list1=list(cur_items)
+#   for epoch0 in range(n_epochs): 
+#     #print("cur_item_list0",len(cur_item_list0),"cur_item_list1",len(cur_item_list1))
+#     new_items=match_el_lists(cur_item_list0,cur_item_list1,el_dict,penalty=dist_penalty,max_src_span=max_src_span)
+#     cur_item_list0=[]
+#     for a in new_items:
+#       #print(">>>",a)
+#       new_el,new_el_wt,new_el_children=a
+#       found_wt=el_dict.get(new_el,0)
+#       if new_el_wt>found_wt:
+#         el_dict[new_el]=new_el_wt
+#         el_child_dict[new_el]=new_el_children
+#         cur_item_list0.append((new_el,new_el_wt))
+#     cur_item_list1=list(el_dict.items())
+#   #print("cur_item_list0",len(cur_item_list0),"cur_item_list1",len(cur_item_list1))
+
+#   el_items=list(el_dict.items()) #now the el_dict is populated with also bigger elements by combining smaller ones
+#   el_items.sort(key=lambda x:-x[-1])
+#   used_src,used_trg=[],[]
+#   filled_used_src,filled_used_trg=[],[] #used src/trg for filling purposes - corresponding to src/trg locs already filled by elements without children
+#   final_els0=[]
+#   without_children=[]
+#   src_span_dict,trg_span_dict={},{}
+#   for el0,el_wt0 in el_items: #we refine the el_dict items to get the most highly weighted elements and their children as our solution
+#     src_span0,trg_span0=el0
+#     src_range0=list(range(src_span0[0],src_span0[1]+1))
+#     trg_range0=list(range(trg_span0[0],trg_span0[1]+1))
+#     if any([v in used_src for v in src_range0]): continue
+#     if any([v in used_trg for v in trg_range0]): continue
+#     used_src.extend(src_range0)
+#     used_trg.extend(trg_range0)
+#     children=get_rec_el_children(el0,el_child_dict,[])
+#     for ch0 in children:
+#       sub_children=el_child_dict.get(ch0,[])
+#       final_els0.append((ch0,el_dict.get(ch0,0),sub_children))
+#       if sub_children==[]: 
+#         without_children.append((ch0,el_dict.get(ch0,0)))
+#         ch_src_span0,ch_trg_span0=ch0
+#         ch_src_range0=list(range(ch_src_span0[0],ch_src_span0[1]+1))
+#         ch_trg_range0=list(range(ch_trg_span0[0],ch_trg_span0[1]+1)) 
+#         filled_used_src.extend(ch_src_range0) #we obtain the src/trg range used for each child element      
+#         filled_used_trg.extend(ch_trg_range0) 
+#         src_span_dict[ch_src_span0]=ch0
+#         trg_span_dict[ch_trg_span0]=ch0 
+  
+#   #Now we start to work on elements not covered in the solution, mainly ortho elements: elements with vertical and horizontal spans
+#   new_el_dict=dict(el_dict)
+#   new_el_child_dict=dict(el_child_dict)
+#   for el0,el_wt0 in without_children:
+#     new_el_dict[el0]=el_wt0
+#     src_span0,trg_span0=el0
+#     cur_src_range0,cur_trg_range0=get_el_ranges(el0)
+#     net_src_range=list(set(filled_used_src).difference(set(cur_src_range0))) 
+#     net_trg_range=list(set(filled_used_trg).difference(set(cur_trg_range0)))
+#     corr_src_span_els=src_span_el_dict.get(src_span0,[]) #we get elements matching same src/trg
+#     corr_trg_span_els=trg_span_el_dict.get(trg_span0,[]) 
+#     valid_src_els=[(el0,el_wt0)]
+#     valid_trg_els=[(el0,el_wt0)]
+#     for corr_el0,corr_el_wt0 in corr_src_span_els: #but are valid as they don't violate the used src/trg locs from the solution
+#       if corr_el0==el0: continue
+#       corr_src_span0,corr_trg_span0=combine_els(el0,corr_el0) 
+#       check_corr_src0=check_span_in_list(corr_src_span0,net_src_range)
+#       check_corr_trg0=check_span_in_list(corr_trg_span0,net_trg_range)
+#       if check_corr_src0 or check_corr_trg0: continue
+#       valid_src_els.append((corr_el0,corr_el_wt0)) #in this case, we add the new element 
+#     for corr_el0,corr_el_wt0 in corr_trg_span_els:
+#       if corr_el0==el0: continue
+#       corr_src_span0,corr_trg_span0=combine_els(el0,corr_el0) 
+#       check_corr_src0=check_span_in_list(corr_src_span0,net_src_range)
+#       check_corr_trg0=check_span_in_list(corr_trg_span0,net_trg_range)
+#       if check_corr_src0 or check_corr_trg0: continue
+#       valid_trg_els.append((corr_el0,corr_el_wt0))
+#     # print("valid_src_els",valid_src_els)
+#     # print("valid_trg_els",valid_trg_els)
+#     new_src_els,new_trg_els=[],[] #we start to combine ortho elements together to make bigger elements
+#     if len(valid_src_els)>1: new_src_els=match_el_lists(valid_src_els,valid_src_els,el_dict,allow_ortho=True)
+#     if len(valid_trg_els)>1: new_trg_els=match_el_lists(valid_trg_els,valid_trg_els,el_dict,allow_ortho=True)
+#     #TODO: multiple iterations to account for longer ortho elements such as acronyms
+#     for vs in new_src_els: #and now we populate the new element dictionary with the new ortho elements
+#       vs_el0,vs_el_wt0,vs_children=vs
+#       found_wt=new_el_dict.get(vs_el0,0)
+#       if vs_el_wt0>found_wt: 
+#         new_el_dict[vs_el0]=vs_el_wt0
+#         new_el_child_dict[vs_el0]=vs_children
+#     for vt in new_trg_els: 
+#       vt_el0,vt_el_wt0,vt_children=vt
+#       found_wt=new_el_dict.get(vt_el0,0)
+#       if vt_el_wt0>found_wt: 
+#         new_el_dict[vt_el0]=vt_el_wt0
+#         new_el_child_dict[vt_el0]=vt_children      
+#   for el0,el_wt0 in original_ml: #we also look into the original values, in case something was left out
+#     src_span0,trg_span0=el0
+#     check_corr_src0=check_span_in_list(src_span0,filled_used_src)
+#     check_corr_trg0=check_span_in_list(trg_span0,filled_used_trg)
+#     if check_corr_src0 or check_corr_trg0: continue    
+#     found_wt=new_el_dict.get(el0,0)
+#     if el_wt0>found_wt: new_el_dict[el0]=el_wt0
+
+#   #Now obtaining the final solution, after we identify the new ortho/unused elements in addition to the current solution
+#   all_items=list(new_el_dict.items())
+#   list0=list(all_items)
+#   list1=list(all_items)
+#   for epoch0 in range(5): #we run it iteratively to create new bigger elements
+#     new_els=match_el_lists(list0,list1,el_dict,max_src_span=6)
+#     list0=[]
+#     for ns in new_els: 
+#       ns_el0,ns_el_wt0,ns_children=ns
+#       found_wt=new_el_dict.get(ns_el0,0)
+#       if ns_el_wt0>found_wt: 
+#         new_el_dict[ns_el0]=ns_el_wt0
+#         new_el_child_dict[ns_el0]=ns_children  
+#         list0.append((ns_el0,ns_el_wt0))  
+#     list1=list(new_el_dict.items())
+
+#   #And here is the final solution
+#   el_items=list(new_el_dict.items())
+#   el_items.sort(key=lambda x:-x[-1])
+#   final_els0=[]
+#   used_src,used_trg=[],[]
+#   without_children=[]
+#   for el0,el_wt0 in el_items:
+#     src_span0,trg_span0=el0
+#     src_range0=list(range(src_span0[0],src_span0[1]+1))
+#     trg_range0=list(range(trg_span0[0],trg_span0[1]+1))
+#     if any([v in used_src for v in src_range0]): continue
+#     if any([v in used_trg for v in trg_range0]): continue
+#     used_src.extend(src_range0)
+#     used_trg.extend(trg_range0)
+#     children=get_rec_el_children(el0,new_el_child_dict,[])
+#     for ch0 in children:
+#       sub_children=new_el_child_dict.get(ch0,[])
+#       final_els0.append((ch0,new_el_dict.get(ch0,0),sub_children))
+#   return final_els0
 
 #2 Jan 2023
 def combine_items_rec(item_list,el_dict0={},penalty=0,max_src_span=6,n_epochs0=3,allow_ortho=False):#combine items recursively
