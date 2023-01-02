@@ -408,6 +408,25 @@ def get_aligned_path(matching_list,max_dist=4,n_epochs=3,max_src_span=6,dist_pen
       final_els0.append((ch0,new_el_dict.get(ch0,0),sub_children))
   return final_els0
 
+#2 Jan 2023
+def combine_items_rec(item_list,el_dict0={},penalty=0,max_src_span=6,n_epochs0=3,allow_ortho=False):#combine items recursively
+  cur_items=list(item_list) #we do an intial iterative run to get a basic alignment
+  cur_item_list0=list(cur_items)
+  cur_item_list1=list(cur_items)
+  final_list0=[]
+  for epoch0 in range(n_epochs0): 
+    new_items=match_el_lists(cur_item_list0,cur_item_list1,el_dict0,allow_ortho=allow_ortho, penalty=penalty,max_src_span=max_src_span)
+    cur_item_list0=[]
+    for a in new_items:
+      new_el,new_el_wt,new_el_children=a
+      found_wt=el_dict0.get(new_el,0)
+      if new_el_wt>found_wt:
+        cur_item_list0.append((new_el,new_el_wt))
+        cur_item_list1.append((new_el,new_el_wt))
+        final_list0.append(a)
+  return final_list0
+
+
 def get_el_ranges(el): #get src/trg ranges of an element
   src_span0,trg_span0=el
   src_range0=list(range(src_span0[0],src_span0[1]+1))
