@@ -232,7 +232,7 @@ def get_src_trg_intersection(src_list0,trg_list0):
 
 
 #2 Jan 2023
-def get_aligned_path(matching_list,max_dist=4,n_epochs=3,max_src_span=6,dist_penalty=0.1,top_n=2):
+def get_aligned_path(matching_list,n_epochs=3,max_dist=4,max_src_span=6,dist_penalty=0.1,top_n=2):
   #matching_list.sort(key=lambda x:-x[-1])
   matching_list.sort(key=lambda x:(-round(x[-1],1),x[-2],-len(x[0])-len(x[1]),x[-1])) #sorting criteria - rounded weight, frequency,length, and then just weight
   #print("all_matching",len(matching_list))
@@ -1584,6 +1584,7 @@ def walign(src_sent,trg_sent,params0={}):
   cur_n_epochs=params0.get("n_epochs",5)
   cur_max_sent_size=params0.get("max_sent_size",50)
   cur_max_src_span=params0.get("max_src_span",6)
+  cur_max_dist=params0.get("max_dist",3)
 
   src_index0=params0.get("src_index",{})
   trg_index0=params0.get("trg_index",{})
@@ -1608,7 +1609,8 @@ def walign(src_sent,trg_sent,params0={}):
   term_match0=match_keyed_dict(src_tokens_lower,trg_tokens_lower,term_dict0)
   acr_match0=match_keyed_dict(src_tokens,trg_tokens,acr_dict0)
   all_matching=phon_match0+exact_match0+index_match0+phrase_match0+term_match0+acr_match0
-  align_list=get_aligned_path(all_matching,n_epochs=cur_n_epochs,max_src_span=cur_max_src_span,dist_penalty=0)
+  #(matching_list,n_epochs=3,max_dist=4,max_src_span=6,dist_penalty=0.1,top_n=2)
+  align_list=get_aligned_path(all_matching,n_epochs=cur_n_epochs,max_dist=cur_max_dist,max_src_span=cur_max_src_span,dist_penalty=0)
   results={}
   results["src"]=src_tokens
   results["trg"]=trg_tokens
