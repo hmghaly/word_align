@@ -848,6 +848,26 @@ def get_unigram_locs(tok_list0):
   loc_dict0=dict(iter(grouped))
   return loc_dict0  
 
+#6 Jan 2023
+def get_ngram_key(phrase0,ngram=2): #a unigram/bigram or more ngram words as a key for a src phrase, for easy retrieval
+  phrase_split=phrase0.split()
+  if len(phrase_split)==1: return phrase0
+  return " ".join(phrase_split[:ngram])
+
+def create_bigram_keyed_dict(input_dict0,default_wt=0.5,default_freq=100): #or unigram- if src phrase is one word
+  bigram_keyed_dict0={}
+  for src_phrase0,corr_trg_list in input_dict0.items():
+    src_phrase_key0=get_ngram_key(src_phrase0)
+    tmp_dict=bigram_keyed_dict0.get(src_phrase_key0,{})
+    corr_with_vals=[]
+    for trg_phrase0 in corr_trg_list:
+      corr_with_vals.append((trg_phrase0,(default_freq,default_wt)))
+    tmp_dict[src_phrase0]=corr_with_vals
+    bigram_keyed_dict0[src_phrase_key0]=tmp_dict
+  return bigram_keyed_dict0
+
+
+
 #29 Dec 2022
 def get_phon_matching(src_toks,trg_toks,default_ratio=0.1):
   phon_matching_list=[]
