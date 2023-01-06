@@ -1103,11 +1103,11 @@ def present_aligned(src_tokens0,trg_tokens0,align_list0):
         final_list0.append((cur_src_phrase,cur_trg_phrase,el0,el_wt0))
     return final_list0
 
-def present_walign_results(aligned_results): #if the output is in the form of a dict results["src"]=..., results["trg"]=..., results["align"]=...
-    src_tokens0=aligned_results.get("src",[])
-    trg_tokens0=aligned_results.get("trg",[])
-    align_list0=aligned_results.get("align",[])
-    return present_aligned(src_tokens0,trg_tokens0,align_list0)
+# def present_walign_results(aligned_results): #if the output is in the form of a dict results["src"]=..., results["trg"]=..., results["align"]=...
+#     src_tokens0=aligned_results.get("src",[])
+#     trg_tokens0=aligned_results.get("trg",[])
+#     align_list0=aligned_results.get("align",[])
+#     return present_aligned(src_tokens0,trg_tokens0,align_list0)
 
 
 
@@ -1138,10 +1138,10 @@ def create_align_html_table(list_aligned_classed0):
   return table_str0
 
 
-def create_align_html_content(aligned_html_sent_pairs):
+def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     css_content=create_color_classes_css()
     res_html_table=create_align_html_table(aligned_html_sent_pairs)
-    phrase_analysis_table=""
+    
 
     cur_srcipt="""
     function handle(e){
