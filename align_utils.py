@@ -763,69 +763,6 @@ def match_el_lists(el_list0,el_list1,el_dict0,max_dist=3,max_src_span=4,allow_or
 
 
 
-#16 Dec 2022
-# def get_aligned_path_OLD(src_toks0,trg_toks0,match_list,n_epochs=10,allow_ortho=True,max_dist=5,max_sent_len=40, min_freq_without_penalty=10,penalty=0.25,reward_combined_phrases=True,only_without_children=False): #we apply penalty for less frequent pairs
-
-#   match_list=sorted(list(set(match_list)))
-#   if len(src_toks0)>max_sent_len or len(trg_toks0)>max_sent_len: n_epochs=1
-#   #Now we have the matching list - let's align
-#   el_dict={} #weight of each element
-#   el_child_dict={} #children of each element
-#   for a in match_list:
-#     src_span0,trg_span0,ratio0,freq0=a
-#     #if freq0<min_freq_without_penalty: ratio0=ratio0*penalty
-#     el0=(src_span0,trg_span0)
-#     found_ratio=el_dict.get(el0,0)
-#     if ratio0>found_ratio: el_dict[el0]=ratio0
-#   all_elements=list(el_dict.items()) #let's get horizontal and vertical spans
-  
-#   elements_list1,elements_list2=all_elements,all_elements
-#   #epoch
-#   for i in range(n_epochs):
-#     #print("epoch",i)
-#     new_elements=[]
-#     for cur_el0,cur_el_wt0 in elements_list1:
-#       src_span0,trg_span0=cur_el0
-#       for cur_el1,cur_el_wt1 in elements_list2:
-#         valid_el_pair=check_el_pair(cur_el0,cur_el1,allow_ortho=allow_ortho,max_dist=max_dist)
-#         if not valid_el_pair: continue
-#         #print("cur_el0",cur_el0,"cur_el1",cur_el1,"valid_el_pair",valid_el_pair )
-#         combined_el01=combine_els(cur_el0,cur_el1)
-#         combined_wt=cur_el_wt0+cur_el_wt1
-#         found_wt=el_dict.get(combined_el01,0)
-        
-#         if combined_wt>found_wt:
-#           el_dict[combined_el01]= combined_wt
-#           el_child_dict[combined_el01]=(cur_el0,cur_el1)
-#           new_elements.append((combined_el01,combined_wt))
-#           # print("cur_el0",cur_el0,"cur_el1",cur_el1)
-#           # print("combined_el01",combined_el01,"combined_wt",combined_wt,"found_wt",found_wt)
-          
-#           # print("----")
-#     if new_elements==[]: break
-#     elements_list1=new_elements
-#     elements_list2=list(el_dict.items())
-  
-#   all_elements=list(el_dict.items())
-#   all_elements.sort(key=lambda x:-x[-1])
-#   final_elements=[]
-#   used_xs,used_ys=[],[]
-#   for cur_el0,el_wt0 in all_elements:
-#     src_span0,trg_span0=cur_el0
-#     src_range0=list(range(src_span0[0],src_span0[1]+1))
-#     trg_range0=list(range(trg_span0[0],trg_span0[1]+1))
-#     if any([v in used_xs for v in src_range0]): continue
-#     if any([v in used_ys for v in trg_range0]): continue
-#     used_xs.extend(src_range0)
-#     used_ys.extend(trg_range0)
-#     cur_children=get_rec_el_children(cur_el0,el_child_dict,el_list0=[])
-#     for ch0 in cur_children:
-#       child_check=el_child_dict.get(ch0)
-#       ch0_wt=el_dict.get(ch0,0)
-#       has_children=False
-#       if child_check!=None: has_children=True
-#       final_elements.append((ch0,ch0_wt,has_children))
-#   return final_elements
 
 def get_unigrams_bigrams(token_list, exclude_numbers=True,exclude_single_chars=True): #for a list of tokens, identify all unigrams and bigrams
   list_unigrams_bigrams0=[]
@@ -866,6 +803,21 @@ def create_bigram_keyed_dict(input_dict0,default_wt=0.5,default_freq=100): #or u
     bigram_keyed_dict0[src_phrase_key0]=tmp_dict
   return bigram_keyed_dict0
 
+
+def match_keyed_dict(src_tokens,trg_tokens,keyed_dict): #match unigram/bigramed keyed dict (phrase table/terms/acronyms/custom)
+  all_matching_list=[]
+  src_unigrams_bigrams=get_unigrams_bigrams(src_tokens)
+  for ub in src_unigrams_bigrams:
+    corr_dict=keyed_dict.get(ub)
+    if corr_dict==None: continue
+    for src_phrase0,corr_trg_vals in corr_dict.items():
+      src_span0=general.is_in(src_phrase0.split(),src_tokens)
+      if not src_span0: continue
+      for trg_phrase0,trg_val0 in corr_trg_vals:
+        trg_span0=general.is_in(trg_phrase0.split(),trg_tokens)
+        if not trg_span0: continue
+        all_matching_list.append((src_phrase0,trg_phrase0,src_span0,trg_span0,trg_val0))
+  return all_matching_list
 
 
 #29 Dec 2022
