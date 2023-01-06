@@ -1170,66 +1170,100 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     """%(css_content,cur_srcipt,res_html_table,phrase_analysis_table)
     return html_main_content
 
-def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",min_chunk_size=None,max_aligned_phrase_len=6):
-  src_open_dict,src_close_dict={},{}
-  trg_open_dict,trg_close_dict={},{}
-  final_src_tokens,final_trg_tokens=[],[]
-  chunk_boundaries0=[]
-  if min_chunk_size!=None: chunk_boundaries0=get_aligned_chunks(aligned0,min_chunk_size)
-  chunk_xs=[v[0] for v in chunk_boundaries0]
-  chunk_ys=[v[1] for v in chunk_boundaries0]
-  aligned0.sort(key=lambda x:-x[1])
-  used_xs,used_ys=[],[]
+#6 Jan 2023
+def align_words_span_tags(src_tokens,trg_tokens,align_items,sent_class="sent0",only_without_children=True,max_phrase_length=6):
+  src_start_dict,src_end_dict={},{}
+  trg_start_dict,trg_end_dict={},{}
+  for i0,align_item in enumerate(align_items):
+    class_name="walign-%s"%(i0)
+    el0,wt0,children0=align_item
+    src_span0,trg_span0=el0
+    x0,x1=src_span0
+    y0,y1=trg_span0
+    src_phrase0=" ".join(src_tokens[x0:x1+1]) 
+    trg_phrase0=" ".join(trg_tokens[y0:y1+1])
+    if "<s>" in src_phrase0 or "<s>" in trg_phrase0: continue
+    if "</s>" in src_phrase0 or "</s>" in trg_phrase0: continue
+    if general.is_punct(src_phrase0) or general.is_punct(trg_phrase0): continue
+    valid=False
+    if x1-x0<3 or children0==[]: valid=True
+    if not valid: continue
+    open_class_str='<span class="aligned %s %s">'%(sent_class0, class_name)
+    src_start_dict[x0]=src_start_dict.get(x0,"")+open_class_str
+    trg_start_dict[y0]=trg_start_dict.get(y0,"")+open_class_str
+    src_end_dict[x1]=src_end_dict.get(x1,"")+"</span>"
+    trg_end_dict[y1]=trg_end_dict.get(y1,"")+"</span>"
+  src_tok_tags,trg_tok_tags=[],[]
+  for s_i,s_tok in enumerate(src_tokens):
+    open0,close0=src_start_dict.get(s_i,""),src_end_dict.get(s_i,"")
+    src_tok_tags.append((open0,close0))
+    # print("SRC:", open0,s_tok, close0)
+  for s_i,s_tok in enumerate(trg_tokens):
+    open0,close0=trg_start_dict.get(s_i,""),trg_end_dict.get(s_i,"")
+    trg_tok_tags.append((open0,close0))
+    # print("TRG:", open0,s_tok, close0)
+  return src_tok_tags,trg_tok_tags
+
+# def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",min_chunk_size=None,max_aligned_phrase_len=6):
+#   src_open_dict,src_close_dict={},{}
+#   trg_open_dict,trg_close_dict={},{}
+#   final_src_tokens,final_trg_tokens=[],[]
+#   chunk_boundaries0=[]
+#   if min_chunk_size!=None: chunk_boundaries0=get_aligned_chunks(aligned0,min_chunk_size)
+#   chunk_xs=[v[0] for v in chunk_boundaries0]
+#   chunk_ys=[v[1] for v in chunk_boundaries0]
+#   aligned0.sort(key=lambda x:-x[1])
+#   used_xs,used_ys=[],[]
 
 
-  for align_i,align_item in enumerate(aligned0):
-    span_name="walign-%s"%(align_i)
-    al0,al_wt=align_item[:2]
-    src_span0,trg_span0=al0
-    src_i0,src_i1=src_span0
-    trg_i0,trg_i1=trg_span0
-    src_phrase0=aligned_src0[src_i0:src_i1+1]
-    trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
-    if len(src_phrase0)>max_aligned_phrase_len: continue
+#   for align_i,align_item in enumerate(aligned0):
+#     span_name="walign-%s"%(align_i)
+#     al0,al_wt=align_item[:2]
+#     src_span0,trg_span0=al0
+#     src_i0,src_i1=src_span0
+#     trg_i0,trg_i1=trg_span0
+#     src_phrase0=aligned_src0[src_i0:src_i1+1]
+#     trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
+#     if len(src_phrase0)>max_aligned_phrase_len: continue
 
 
-    src_range0=list(range(src_i0,src_i1+1))
-    trg_range0=list(range(trg_i0,trg_i1+1))
-    if any([v in used_xs for v in src_range0]): continue
-    if any([v in used_ys for v in trg_range0]): continue
-    used_xs.extend(src_range0)
-    used_ys.extend(trg_range0)
+#     src_range0=list(range(src_i0,src_i1+1))
+#     trg_range0=list(range(trg_i0,trg_i1+1))
+#     if any([v in used_xs for v in src_range0]): continue
+#     if any([v in used_ys for v in trg_range0]): continue
+#     used_xs.extend(src_range0)
+#     used_ys.extend(trg_range0)
 
-    src_open_dict[src_i0]=[span_name]+src_open_dict.get(src_i0,[])
-    src_close_dict[src_i1]=[span_name]+src_close_dict.get(src_i1,[])
-    trg_open_dict[trg_i0]=[span_name]+trg_open_dict.get(trg_i0,[])
-    trg_close_dict[trg_i1]=[span_name]+trg_close_dict.get(trg_i1,[])
-    # src_open_dict[src_i0]=src_open_dict.get(src_i0,[])+[span_name]
-    # src_close_dict[src_i1]=src_close_dict.get(src_i1,[])+[span_name]
-    # trg_open_dict[trg_i0]=trg_open_dict.get(trg_i0,[])+[span_name]
-    # trg_close_dict[trg_i1]=trg_close_dict.get(trg_i1,[])+[span_name]
+#     src_open_dict[src_i0]=[span_name]+src_open_dict.get(src_i0,[])
+#     src_close_dict[src_i1]=[span_name]+src_close_dict.get(src_i1,[])
+#     trg_open_dict[trg_i0]=[span_name]+trg_open_dict.get(trg_i0,[])
+#     trg_close_dict[trg_i1]=[span_name]+trg_close_dict.get(trg_i1,[])
+#     # src_open_dict[src_i0]=src_open_dict.get(src_i0,[])+[span_name]
+#     # src_close_dict[src_i1]=src_close_dict.get(src_i1,[])+[span_name]
+#     # trg_open_dict[trg_i0]=trg_open_dict.get(trg_i0,[])+[span_name]
+#     # trg_close_dict[trg_i1]=trg_close_dict.get(trg_i1,[])+[span_name]
 
-  for tok_i,src_tok0 in enumerate(aligned_src0):
-    if src_tok0 in ["<s>","</s>"]: continue
-    open_classes=src_open_dict.get(tok_i,[])
-    close_classes=src_close_dict.get(tok_i,[])
-    cur_str=""
-    for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
-    cur_str+=src_tok0
-    for class0 in close_classes: cur_str+='</span>'
-    if tok_i in chunk_xs: cur_str+="<br>"
-    final_src_tokens.append((cur_str,src_tok0))
-  for tok_i,trg_tok0 in enumerate(aligned_trg0):
-    if trg_tok0 in ["<s>","</s>"]: continue
-    open_classes=trg_open_dict.get(tok_i,[])
-    close_classes=trg_close_dict.get(tok_i,[])
-    cur_str=""
-    for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
-    cur_str+=trg_tok0
-    for class0 in close_classes: cur_str+='</span>'
-    if tok_i in chunk_ys: cur_str+="<br>"
-    final_trg_tokens.append((cur_str,trg_tok0))
-  return final_src_tokens, final_trg_tokens
+#   for tok_i,src_tok0 in enumerate(aligned_src0):
+#     if src_tok0 in ["<s>","</s>"]: continue
+#     open_classes=src_open_dict.get(tok_i,[])
+#     close_classes=src_close_dict.get(tok_i,[])
+#     cur_str=""
+#     for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
+#     cur_str+=src_tok0
+#     for class0 in close_classes: cur_str+='</span>'
+#     if tok_i in chunk_xs: cur_str+="<br>"
+#     final_src_tokens.append((cur_str,src_tok0))
+#   for tok_i,trg_tok0 in enumerate(aligned_trg0):
+#     if trg_tok0 in ["<s>","</s>"]: continue
+#     open_classes=trg_open_dict.get(tok_i,[])
+#     close_classes=trg_close_dict.get(tok_i,[])
+#     cur_str=""
+#     for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
+#     cur_str+=trg_tok0
+#     for class0 in close_classes: cur_str+='</span>'
+#     if tok_i in chunk_ys: cur_str+="<br>"
+#     final_trg_tokens.append((cur_str,trg_tok0))
+#   return final_src_tokens, final_trg_tokens
 
 
 
