@@ -816,7 +816,8 @@ def match_keyed_dict(src_tokens,trg_tokens,keyed_dict): #match unigram/bigramed 
       for trg_phrase0,trg_val0 in corr_trg_vals:
         trg_span0=general.is_in(trg_phrase0.split(),trg_tokens)
         if not trg_span0: continue
-        all_matching_list.append((src_phrase0,trg_phrase0,src_span0,trg_span0,trg_val0))
+        freq0,wt0=trg_val0
+        all_matching_list.append((src_phrase0,trg_phrase0,src_span0,trg_span0,freq0,wt0))
   return all_matching_list
 
 
