@@ -1613,6 +1613,10 @@ def walign(src_sent,trg_sent,params0={}):
   results["src"]=src_tokens
   results["trg"]=trg_tokens
   results["align"]=align_list
+  results["terms"]=[v[:2] for v in term_match0]
+  results["acr"]=[v[:2] for v in acr_match0]
+  results["phon"]=[v[:2] for v in phon_match0]
+
   return results
 
 
