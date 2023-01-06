@@ -1076,6 +1076,20 @@ def get_aligned_chunks(aligned_elements,min_phrase_len=5): #to split a sentence 
     cur_x,cur_y=cb_x,cb_y
   return new_chunk_boundaries
 
+#QA related functions
+#6 Jan 2023
+def get_tsv_bitext(tsv_fpath): #extract bitext src/trg sentences even for messy tsvs pasted from eLuna
+  bitext0=[]
+  tsv_fopen=open(tsv_fpath)
+  for i0,line0 in enumerate(tsv_fopen):
+    line_split0=line0.strip().split("\t")
+    cells=[v for v in line_split0 if v]
+    if len(cells)<2: continue
+    src0,trg0=cells[:2]
+    bitext0.append((src0,trg0))
+  tsv_fopen.close()
+  return bitext0
+
 
 #Visual presentation of alignment
 def present_aligned(src_tokens0,trg_tokens0,align_list0):
