@@ -1188,7 +1188,7 @@ def align_words_span_tags(src_tokens,trg_tokens,align_items,sent_class="sent0",o
     valid=False
     if x1-x0<3 or children0==[]: valid=True
     if not valid: continue
-    open_class_str='<span class="aligned %s %s">'%(sent_class0, class_name)
+    open_class_str='<span class="aligned %s %s">'%(sent_class, class_name)
     src_start_dict[x0]=src_start_dict.get(x0,"")+open_class_str
     trg_start_dict[y0]=trg_start_dict.get(y0,"")+open_class_str
     src_end_dict[x1]=src_end_dict.get(x1,"")+"</span>"
