@@ -1120,6 +1120,22 @@ def create_color_classes_css(n_classes=100):
   css_str0='<style>\n'
   aligned_transparent_cls='.aligned-transparent {opacity: 0.25};\n'
   css_str0+=aligned_transparent_cls
+  green_underline="""
+  .green-ul {
+  text-decoration: underline;
+  -webkit-text-decoration-color: green; /* safari still uses vendor prefix */
+  text-decoration-color: green;
+	}
+  """
+  red_underline="""
+  .red-ul {
+  text-decoration: underline;
+  -webkit-text-decoration-color: red; /* safari still uses vendor prefix */
+  text-decoration-color: red;
+	}
+  """
+  css_str0+=green_underline+red_underline
+
   for class_i in range(n_classes):
     class_name="walign-%s"%(class_i)
     cur_color=random_color() #'#'+''.join(random.sample(chars,6))
