@@ -349,6 +349,7 @@ def html2sents(html_content,apply_tika=True):
   for a in dom_text_items:
     para0=general.unescape(a)
     para_items=para0.split("\t")
+    #all_sents.extend(para_items)
     for p0 in para_items:
       if apply_tika:
         tika_segs=split_tika_fn(p0)
@@ -358,8 +359,8 @@ def html2sents(html_content,apply_tika=True):
       else:
         cur_sents=general.ssplit(p0)
         all_sents.extend(cur_sents)
-        
-    return all_sents
+
+  return all_sents
 
 # page_obj=web_page(url)
 # #print(page_obj.title)
