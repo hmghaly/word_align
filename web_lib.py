@@ -330,12 +330,16 @@ class web_page_OLD:
       if self.tld in cur_link: self.internal_links.append(cur_link)
       else: self.external_links.append(cur_link)
 
-def html2sents(html_fpath):
-  all_sents=[]
+def html_file2sents():
   fopen=open(html_fpath)
   content0=fopen.read()
   fopen.close()
-  dom_obj0=DOM(content0)
+  return html2sents(content0)
+
+
+def html2sents(html_content):
+  all_sents=[]
+  dom_obj0=DOM(html_content)
   dom_text_items=dom_obj0.text_items
   for a in dom_text_items:
     para0=general.unescape(a)
