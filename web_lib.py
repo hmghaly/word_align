@@ -336,18 +336,30 @@ def html_file2sents(html_fpath):
   fopen.close()
   return html2sents(content0)
 
+def split_tika_fn(txt): #split tika footnotes for alignment
+  txt=re.sub('(\.\[footnoteRef.+?\])',r'\1\n',txt)
+  txt=re.sub('(\s+\[\d+\:)',r'\n\1',txt)
+  tmp_items=[v.strip("\xa0' ") for v in txt.split("\n") if v]
+  return tmp_items
 
-def html2sents(html_content):
+def html2sents(html_content,apply_tika=True):
   all_sents=[]
   dom_obj0=DOM(html_content)
   dom_text_items=dom_obj0.text_items
   for a in dom_text_items:
     para0=general.unescape(a)
     para_items=para0.split("\t")
-    for p0 in para_items: 
-      cur_sents=general.ssplit(p0)
-      all_sents.extend(cur_sents)
-  return all_sents
+    for p0 in para_items:
+      if apply_tika:
+        tika_segs=split_tika_fn(p0)
+        for ts in tika_segs:
+          cur_sents=general.ssplit(ts)
+          all_sents.extend(cur_sents)
+      else:
+        cur_sents=general.ssplit(p0)
+        all_sents.extend(cur_sents)
+        
+    return all_sents
 
 # page_obj=web_page(url)
 # #print(page_obj.title)
