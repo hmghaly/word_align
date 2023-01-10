@@ -339,8 +339,14 @@ def html_file2sents(html_fpath):
 def split_tika_fn(txt): #split tika footnotes for alignment
   txt=re.sub('(\.\[footnoteRef.+?\])',r'\1\n',txt)
   txt=re.sub('(\s+\[\d+\:)',r'\n\1',txt)
-  tmp_items=[v.strip("\xa0' ") for v in txt.split("\n") if v]
-  return tmp_items
+  final_items=[]
+  for v in txt.split("\n"):
+    if not v: continue
+    stripped_v=v.strip("\xa0' ")
+    if stripped_v=="]" and len(final_items)>0:final_items[-1]+stripped_v
+    else: final_items.append(stripped_v)
+  #tmp_items=[v.strip("\xa0' ") for v in txt.split("\n") if v]
+  return final_items
 
 def html2sents(html_content,apply_tika=True):
   all_sents=[]
