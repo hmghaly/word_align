@@ -330,7 +330,7 @@ class web_page_OLD:
       if self.tld in cur_link: self.internal_links.append(cur_link)
       else: self.external_links.append(cur_link)
 
-def html_file2sents():
+def html_file2sents(html_fpath):
   fopen=open(html_fpath)
   content0=fopen.read()
   fopen.close()
