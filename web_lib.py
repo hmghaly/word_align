@@ -343,7 +343,7 @@ def split_tika_fn(txt): #split tika footnotes for alignment
   for v in txt.split("\n"):
     if not v: continue
     stripped_v=v.strip("\xa0' ")
-    if stripped_v=="]" and len(final_items)>0:final_items[-1]+stripped_v
+    if stripped_v=="]" and len(final_items)>0: final_items[-1]=final_items[-1]+stripped_v
     else: final_items.append(stripped_v)
   #tmp_items=[v.strip("\xa0' ") for v in txt.split("\n") if v]
   return final_items
