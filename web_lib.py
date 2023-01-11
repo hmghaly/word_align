@@ -340,12 +340,12 @@ def split_tika_fn(txt): #split tika footnotes for alignment
   txt=re.sub('(\.\[footnoteRef.+?\])',r'\1\n',txt)
   txt=re.sub('(\s+\[\d+\:)',r'\n\1',txt)
   tmp_items=[v.strip("\xa0' ") for v in txt.split("\n") if v]
-  final_items=[]
-  for v in tmp_items:
-    if v=="]" and len(final_items)>0: final_items[-1]=final_items[-1]+stripped_v
-    else: final_items.append(v)
+  # final_items=[]
+  # for v in tmp_items:
+  #   if v=="]" and len(final_items)>0: final_items[-1]=final_items[-1]+stripped_v
+  #   else: final_items.append(v)
   #tmp_items=[v.strip("\xa0' ") for v in txt.split("\n") if v]
-  return final_items
+  return tmp_items
 
 def html2sents(html_content,apply_tika=True):
   all_sents=[]
@@ -364,8 +364,12 @@ def html2sents(html_content,apply_tika=True):
       else:
         cur_sents=general.ssplit(p0)
         all_sents.extend(cur_sents)
+  final_sents=[]
+  for a in cur_sents:
+  	if a.strip() in "}]" and len(final_sents)>0:  final_sents[-1]=final_sents[-1]+a
+  	else: final_sents.append(a)
 
-  return all_sents
+  return final_sents
 
 # page_obj=web_page(url)
 # #print(page_obj.title)
