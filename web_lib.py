@@ -365,7 +365,7 @@ def html2sents(html_content,apply_tika=True):
         cur_sents=general.ssplit(p0)
         all_sents.extend(cur_sents)
   final_sents=[]
-  for a in cur_sents:
+  for a in all_sents:
   	if a.strip() in "}]" and len(final_sents)>0:  final_sents[-1]=final_sents[-1]+a
   	else: final_sents.append(a)
 
