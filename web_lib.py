@@ -45,6 +45,7 @@ class DOM:
     self.actual_ids=[] #a list of IDs actually used, can help us spot duplicate IDs
     self.class_id_dict={} #map each class name to the assigned ids of elements with that class
     self.text_items=[]
+    self.simple_tag_text_items=[] #non-nested items with a text
     self.text_items_tags=[]
     self.tag_id_list=[] #list of assigned IDs
     self.all_links=[]
@@ -59,6 +60,14 @@ class DOM:
     last_open_tag_str=""
     for ti_, t in enumerate(tags):
       tag_str,tag_start,tag_end=t.group(0), t.start(), t.end()
+      tag_str_lower=tag_str.lower()
+      tag_name=re.findall(r'</?(.+?)[\s>]',tag_str_lower)[0]
+      tag_type=""
+      if tag_str.startswith('</'): tag_type="closing"
+      elif tag_str.startswith('<!'): tag_type="comment"
+      elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br"]: tag_type="s" #standalone
+      else: tag_type="opening"
+
       inter_text=self.content[start_i:tag_start] #intervening text since last tag
       last_open_tag=open_tags[-1]
       if len(inter_text)>0:
@@ -67,6 +76,8 @@ class DOM:
           if inter_text_stripped!="": 
           	self.text_items.append(inter_text)
           	self.text_items_tags.append((last_open_tag_str,inter_text))
+          	if tag_type=="closing" and len(open_tags)>0 and tag_name==open_tags[-1].split("_")[0]: self.simple_tag_text_items.append((last_open_tag_str,inter_text_stripped))
+
         text_node_count=tag_counter_dict.get("text_node",0)
         text_node_id="text_node_%s"%text_node_count
         tag_counter_dict["text_node"]=text_node_count+1
@@ -77,22 +88,19 @@ class DOM:
         self.tag_dict[text_node_id]=text_el
         if text_el.parent!=None: self.tag_dict[open_tags[-1]].children+=[text_node_id]
       start_i=tag_end
+
       last_open_tag_str=tag_str
-      tag_str_lower=tag_str.lower()
-      tag_name=re.findall(r'</?(.+?)[\s>]',tag_str_lower)[0]
+
       if tag_name.startswith("h") or tag_name in ["p","div","br","li"]: 
       	self.text_items.append("<br>")
       	self.text_items_tags.append((last_open_tag_str,"<br>"))
+
       tag_count=tag_counter_dict.get(tag_name,0)
       assigned_tag_id="%s_%s"%(tag_name,tag_count)
       tag_counter_dict[tag_name]=tag_count+1
       cur_el=element()
       cur_el.assigned_id=assigned_tag_id
-      tag_type=""
-      if tag_str.startswith('</'): tag_type="closing"
-      elif tag_str.startswith('<!'): tag_type="comment"
-      elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br"]: tag_type="s" #standalone
-      else: tag_type="opening"
+
       if tag_type=="closing" and len(open_tags)>0: #if it is a closing tag,
         if tag_name==open_tags[-1].split("_")[0]: #we check if the tag name matches the last open tag name
           el_to_close=self.tag_dict[open_tags[-1]] #and then identify the element corresponding to the last open tag
@@ -110,6 +118,9 @@ class DOM:
         	debug_line_items0=("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
         	self.mismatch_debug_items.append(debug_line_items0)
         	#print("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
+
+
+
       else:
         self.tag_id_list.append(assigned_tag_id)
         cur_el=element()
@@ -380,6 +391,40 @@ def html2sents(html_content,apply_tika=True):
   	if a.strip() in "}]" and len(final_sents)>0:  final_sents[-1]=final_sents[-1]+a
   	else: final_sents.append(a)
 
+  return final_sents
+
+
+def html_with_tags2sents(html_content,apply_tika=True):
+  dom_obj=DOM(html_content)
+  text_items_tags=dom_obj.text_items_tags
+  final_text=""
+  for tag0,txt0 in text_items_tags:
+    cur_tag_str,cur_txt_str=tag0,general.unescape(txt0)
+    if tag0.startswith("</"):cur_tag_str="" 
+    else: cur_tag_str= tag0+"\n"
+    if txt0=="<br>": cur_txt_str="\n"
+    final_text+=cur_tag_str+cur_txt_str
+  items=[v for v in final_text.split("\n") if v]
+  final_items=[]
+  for it_i,it0 in enumerate(items):
+    next_it=""
+    if it_i+1<len(items):next_it=items[it_i+1]
+    if it0.startswith("<") and it0.endswith(">"): 
+      if next_it.endswith(">") and next_it.startswith("<"): continue
+      else: final_items.append(it0)
+    else: 
+      if apply_tika:
+        tika_segs=split_tika_fn(it0)
+        for ts in tika_segs:
+          cur_sents=general.ssplit(ts)
+          final_items.extend(cur_sents)
+      else:
+        final_items.extend(general.ssplit(it0))
+    #print('----')
+  final_sents=[]
+  for a in final_items:
+    if a.strip() in "}]." and len(final_sents)>0:  final_sents[-1]=final_sents[-1]+a
+    else: final_sents.append(a)
   return final_sents
 
 # page_obj=web_page(url)
