@@ -53,7 +53,8 @@ class DOM:
     self.mismatch_debug_items=[]
     self.description=""
     self.title=""
-    tags=list(re.finditer('<([^<>]*?)>', self.content))
+    #tags=list(re.finditer('<([^<>]*?)>', self.content)) #'<[^<>]*?>|\<\!\-\-.+?\-\-\>'
+    tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
     open_tags=[""]
     tag_counter_dict={}
     start_i=0
@@ -89,7 +90,7 @@ class DOM:
         if text_el.parent!=None: self.tag_dict[open_tags[-1]].children+=[text_node_id]
       start_i=tag_end
 
-      last_open_tag_str=tag_str
+      if not tag_type in ["comment","s"]: last_open_tag_str=tag_str
 
       if tag_name.startswith("h") or tag_name in ["p","div","br","li"]: 
       	self.text_items.append("<br>")
