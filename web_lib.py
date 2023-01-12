@@ -45,15 +45,18 @@ class DOM:
     self.actual_ids=[] #a list of IDs actually used, can help us spot duplicate IDs
     self.class_id_dict={} #map each class name to the assigned ids of elements with that class
     self.text_items=[]
+    self.text_items_tags=[]
     self.tag_id_list=[] #list of assigned IDs
     self.all_links=[]
     self.all_images=[]
+    self.mismatch_debug_items=[]
     self.description=""
     self.title=""
     tags=list(re.finditer('<([^<>]*?)>', self.content))
     open_tags=[""]
     tag_counter_dict={}
     start_i=0
+    last_open_tag_str=""
     for ti_, t in enumerate(tags):
       tag_str,tag_start,tag_end=t.group(0), t.start(), t.end()
       inter_text=self.content[start_i:tag_start] #intervening text since last tag
@@ -61,7 +64,9 @@ class DOM:
       if len(inter_text)>0:
         if not last_open_tag.lower().split("_")[0] in ["script","style","noscript"]: 
           inter_text_stripped=inter_text.strip('\r\n\t ').replace("&times;","")
-          if inter_text_stripped!="": self.text_items.append(inter_text)
+          if inter_text_stripped!="": 
+          	self.text_items.append(inter_text)
+          	self.text_items_tags.append((last_open_tag_str,inter_text))
         text_node_count=tag_counter_dict.get("text_node",0)
         text_node_id="text_node_%s"%text_node_count
         tag_counter_dict["text_node"]=text_node_count+1
@@ -72,9 +77,12 @@ class DOM:
         self.tag_dict[text_node_id]=text_el
         if text_el.parent!=None: self.tag_dict[open_tags[-1]].children+=[text_node_id]
       start_i=tag_end
+      last_open_tag_str=tag_str
       tag_str_lower=tag_str.lower()
       tag_name=re.findall(r'</?(.+?)[\s>]',tag_str_lower)[0]
-      if tag_name.startswith("h") or tag_name in ["p","div","br","li"]: self.text_items.append("<br>")
+      if tag_name.startswith("h") or tag_name in ["p","div","br","li"]: 
+      	self.text_items.append("<br>")
+      	self.text_items_tags.append((last_open_tag_str,"<br>"))
       tag_count=tag_counter_dict.get(tag_name,0)
       assigned_tag_id="%s_%s"%(tag_name,tag_count)
       tag_counter_dict[tag_name]=tag_count+1
@@ -98,7 +106,10 @@ class DOM:
           
             
           open_tags=open_tags[:-1]
-        else: print("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
+        else: 
+        	debug_line_items0=("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
+        	self.mismatch_debug_items.append(debug_line_items0)
+        	#print("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
       else:
         self.tag_id_list.append(assigned_tag_id)
         cur_el=element()
