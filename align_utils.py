@@ -1140,7 +1140,7 @@ def create_color_classes_css(n_classes=100):
 
 .navbar {
   overflow: hidden;
-  background-color: #333;
+  background-color: lightyellow;
   position: fixed;
   top: 0;
   width: 100%;
@@ -1163,7 +1163,7 @@ def create_color_classes_css(n_classes=100):
 
 .main {
   padding: 16px;
-  margin-top: 30px;
+  margin-top: 80px;
   height: 1500px; /* Used in this example to enable scrolling */
 }
 
@@ -1222,13 +1222,25 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     html_main_content="""
     <html>
     <head>
-    %s
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+	  <title>QA Analysis</title>
+	  <meta charset="utf-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1">
+	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+	  <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    %s  
+    
     <script>%s</script>
     </head>
     <body onload="init()" onkeypress="handle(event)">
 	<div class="navbar" id="dashboard">
-	  <h1>QA Dashboard</h1>
+	  <div class="row">
+      <div class="column" style="float: left;width: 25%;">Alignment</div>
+      <div class="column" style="float: left;width: 25%;">Numbers</div>
+      <div class="column" style="float: left;width: 25%;">Terminology</div>
+      <div class="column" style="float: left;width: 25%;">Spelling</div>
+    </div>
 
 	</div>   
 	<div class="main"> 
