@@ -1121,35 +1121,55 @@ def create_color_classes_css(n_classes=100):
   aligned_transparent_cls='.aligned-transparent {opacity: 0.25};\n'
   
   css_str0+=aligned_transparent_cls
-  green_underline="""
-  .green-ul {
-  text-decoration: underline;
-  -webkit-text-decoration-color: green; /* safari still uses vendor prefix */
-  text-decoration-color: green;
-	}
-  """
-  red_underline="""
-  .red-ul {
-  text-decoration: underline;
-  -webkit-text-decoration-color: red; /* safari still uses vendor prefix */
-  text-decoration-color: red;
-	}
-  """
+ #  green_underline="""
+ #  .green-ul {
+ #  text-decoration: underline;
+ #  -webkit-text-decoration-color: green; /* safari still uses vendor prefix */
+ #  text-decoration-color: green;
+	# }
+ #  """
+ #  red_underline="""
+ #  .red-ul {
+ #  text-decoration: underline;
+ #  -webkit-text-decoration-color: red; /* safari still uses vendor prefix */
+ #  text-decoration-color: red;
+	# }
+ #  """
   fixed_header_css="""
-	.navbar {
-	  overflow: hidden;
-	  background-color: #333;
-	  position: fixed;
-	  top: 0;
-	  width: 100%;
-	}
-	.main {
-	  padding: 16px;
-	  margin-top: 30px;
-	  height: 1500px; /* Used in this example to enable scrolling */
-	}
+{margin:0;}
+
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.navbar a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.navbar a:hover {
+  background: #ddd;
+  color: black;
+}
+
+.main {
+  padding: 16px;
+  margin-top: 30px;
+  height: 1500px; /* Used in this example to enable scrolling */
+}
+
   """
-  css_str0+=green_underline+red_underline
+  #css_str0+=green_underline+red_underline+fixed_header_css
+  css_str0+=fixed_header_css
 
   for class_i in range(n_classes):
     class_name="walign-%s"%(class_i)
@@ -1218,7 +1238,7 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
 
     <h2>Phrase Matching Analysis</h2>
     %s
-    </main>
+    </div>
     </body>
     </html>
     """%(css_content,cur_srcipt,res_html_table,phrase_analysis_table)
