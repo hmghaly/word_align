@@ -1134,6 +1134,20 @@ def create_color_classes_css(n_classes=100):
   text-decoration-color: red;
 	}
   """
+  fixed_header_css="""
+	.navbar {
+	  overflow: hidden;
+	  background-color: #333;
+	  position: fixed;
+	  top: 0;
+	  width: 100%;
+	}
+	.main {
+	  padding: 16px;
+	  margin-top: 30px;
+	  height: 1500px; /* Used in this example to enable scrolling */
+	}
+  """
   css_str0+=green_underline+red_underline
 
   for class_i in range(n_classes):
@@ -1177,10 +1191,18 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     <script>%s</script>
     </head>
     <body onkeypress="handle(event)">
+	<div class="navbar" id="dashboard">
+	  <h1>QA Dashboard</h1>
+	  
+	</div>   
+	<div class="main"> 
+
+
     %s
 
     <h2>Phrase Matching Analysis</h2>
     %s
+    </main>
     </body>
     </html>
     """%(css_content,cur_srcipt,res_html_table,phrase_analysis_table)
