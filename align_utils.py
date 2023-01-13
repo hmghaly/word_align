@@ -1146,20 +1146,6 @@ def create_color_classes_css(n_classes=100):
   width: 100%;
 }
 
-.navbar a {
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-
-.navbar a:hover {
-  background: #ddd;
-  color: black;
-}
 
 .main {
   padding: 16px;
@@ -1197,15 +1183,28 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     
 
     cur_srcipt="""
+    function filter_items(){
+      
+    }
+    function init(){
+      strong_mismatch_items=get_class_el_items(".strong-mismatch")
+      weak_mismatch_items=get_class_el_items(".weak-mismatch")
+      $$("exact-strong-mismatch").innerHTML=""+len(strong_mismatch_items)
+      $$("exact-weak-mismatch").innerHTML=""+len(weak_mismatch_items)
+        // mismatches=$(".mismatch")
+        // $("#exact-strong-mismatch").text(""+mismatches.length)
+        // console.log(mismatches)
+    }
+
+
     function toggle_bg(){
         $(".aligned").toggleClass("no-bg");
     }
     function toggle_transparent_aligned(){
         $(".aligned").toggleClass("aligned-transparent");
     }
-    function init(){
-        mismatches=$(".mismatch")
-        console.log(mismatches)
+    function nav_classes(){
+
     }
 
     function handle(e){
@@ -1229,17 +1228,27 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
       <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://hmghaly.github.io/script.js"></script>
     %s  
     
     <script>%s</script>
     </head>
-    <body onload="init()" onkeypress="handle(event)">
+        <body onload="init()" onkeypress="handle(event)">
     <div class="navbar" id="dashboard">
-      <div class="row">
-          <div class="col">Alignment</div>
-          <div class="col">Numbers Mismatch</div>
+      <div class="row w-100 text-center">
+          <div class="col"> 
+            <h6>Alignment</h6>
+            <button onclick="toggle_bg()">Option1</button>
+            <button onclick="toggle_transparent_aligned()">Option2</button>
+          </div>
+          <div class="col">
+            <h6>Numbers Mismatch</h6>
+             <a href="JavaScript:void(0)" onclick="nav_classes()">Strong: <span id="exact-strong-mismatch">0</span></a>
+             <a href="JavaScript:void(0)" onclick="nav_classes()">Weak: <span id="exact-weak-mismatch">0</span></a>
+            </div>
+          <div class="col">Normative Mismatch</div>
           <div class="col">Terminology Mismatch</div>
-          <div class="col">Spelling Mismatch</div>
+          <div class="col">Spelling Mistakes</div>
     </div>
 
     </div>   
