@@ -1264,6 +1264,7 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     <script>%s</script>
     </head>
         <body onload="init()" onkeypress="handle(event)">
+    
     <div class="navbar" id="dashboard">
       <div class="row w-100 text-center">
           <div class="col"> 
@@ -1273,15 +1274,15 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
           </div>
           <div class="col">
             <h6>Numbers Mismatch</h6>
-             <a href="JavaScript:void(0)" onclick="nav_classes()">Strong: <span id="exact-strong-mismatch">0</span></a>
-             <a href="JavaScript:void(0)" onclick="nav_classes()">Weak: <span id="exact-weak-mismatch">0</span></a>
+             <a href="JavaScript:void(0)" onclick='go2el("strong-mismatch-exact")'>Strong: <span id="exact-strong-mismatch">0</span></a>
+             <a href="JavaScript:void(0)" onclick='go2el("weak-mismatch-exact")'>Weak: <span id="exact-weak-mismatch">0</span></a>
             </div>
           <div class="col">Normative Mismatch</div>
           <div class="col">Terminology Mismatch</div>
           <div class="col">Spelling Mistakes</div>
     </div>
+    </div>  
 
-    </div>   
     <div class="main"> 
 
 
