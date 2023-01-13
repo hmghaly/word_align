@@ -1119,8 +1119,8 @@ def create_color_classes_css(n_classes=100):
   chars = '0123456789ABCDEF'
   css_str0='<style>\n'
   aligned_transparent_cls='.aligned-transparent {opacity: 0.25};\n'
-  no_bg_cls='.no-bg { background-color:transparent; }\n'
-  css_str0+=aligned_transparent_cls+no_bg_cls
+  
+  css_str0+=aligned_transparent_cls
   green_underline="""
   .green-ul {
   text-decoration: underline;
@@ -1156,6 +1156,8 @@ def create_color_classes_css(n_classes=100):
     cur_color=random_color() #'#'+''.join(random.sample(chars,6))
     cur_css_line='.%s {background: %s;}\n'%(class_name,cur_color)
     css_str0+=cur_css_line
+  no_bg_cls='.no-bg { background-color:transparent; }\n'
+  css_str0+=no_bg_cls
   css_str0+='</style>\n'
   return css_str0
 
@@ -1175,14 +1177,26 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     
 
     cur_srcipt="""
+    function toggle_bg(){
+    	$(".aligned").toggleClass("no-bg");
+    }
+    function toggle_transparent_aligned(){
+    	$(".aligned").toggleClass("aligned-transparent");
+    }
+    function init(){
+    	mismatches=$(".mismatch")
+    	console.log(mismatches)
+    }
+
     function handle(e){
             if(e.keyCode === 13){
                 e.preventDefault(); // Ensure it is only this code that runs
                 //alert("Enter was pressed was presses");
                 //$(".aligned").toggleClass("aligned-transparent");
-                $(".aligned").toggleClass("no-bg");
+                //$(".aligned").toggleClass("no-bg");
             }
         }
+
     """
 
     html_main_content="""
@@ -1192,7 +1206,7 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     <script>%s</script>
     </head>
-    <body onkeypress="handle(event)">
+    <body onload="init()" onkeypress="handle(event)">
 	<div class="navbar" id="dashboard">
 	  <h1>QA Dashboard</h1>
 
