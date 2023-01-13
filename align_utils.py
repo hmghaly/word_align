@@ -1183,12 +1183,42 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
     
 
     cur_srcipt="""
-    function filter_items(){
-      
+    var qa_obj={}
+    function filter_items(all_items0,class0){
+      final_items=[]
+      for (item0 of all_items0){
+        if (item0.classList.contains(class0)) final_items.push(item0)
+      }
+      return final_items
     }
+
+    function go2el(qa_key){
+      console.log(qa_obj[qa_key])
+      cur_items=qa_obj[qa_key]["items"]
+      cur_i=qa_obj[qa_key]["i"]
+      if (cur_i==null || cur_i==undefined) cur_i=0
+      cur_item=cur_items[cur_i]
+      cur_item.scrollIntoView();
+      new_i=cur_i+1
+      console.log(new_i)
+      if (new_i>len(cur_items)-1) new_i=0
+      qa_obj[qa_key]["i"]=new_i
+      //console.log(qa_obj[qa_key])
+    }
+
     function init(){
       strong_mismatch_items=get_class_el_items(".strong-mismatch")
       weak_mismatch_items=get_class_el_items(".weak-mismatch")
+      qa_obj["strong-mismatch"]={"items":strong_mismatch_items}
+      qa_obj["weak-mismatch"]={"items":weak_mismatch_items}
+      qa_obj["strong-mismatch-exact"]={"items":filter_items(strong_mismatch_items,"exact")} //["items"]=filter_items(strong_mismatch_items,"exact")
+      qa_obj["weak-mismatch-exact"]={"items":filter_items(weak_mismatch_items,"exact")} 
+      qa_obj["strong-mismatch-normative"]={"items":filter_items(strong_mismatch_items,"normative")}
+      qa_obj["weak-mismatch-normative"]={"items":filter_items(weak_mismatch_items,"normative")}
+      console.log(qa_obj)
+
+      //filter_items(strong_mismatch_items,"exact")
+
       $$("exact-strong-mismatch").innerHTML=""+len(strong_mismatch_items)
       $$("exact-weak-mismatch").innerHTML=""+len(weak_mismatch_items)
         // mismatches=$(".mismatch")
