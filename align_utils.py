@@ -1164,6 +1164,8 @@ def create_color_classes_css(n_classes=100):
     css_str0+=cur_css_line
   no_bg_cls='.no-bg { background-color:transparent; }\n'
   css_str0+=no_bg_cls
+  css_str0+='.item-highlight {color: red;background-color:#00CED1;font-weight: bold;}'
+  css_str0+='.td-highlight {background-color:#F5F5DC;}'
   css_str0+='</style>\n'
   return css_str0
 
@@ -1184,43 +1186,50 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
 
     cur_srcipt="""
     var qa_obj={}
-    function filter_items(all_items0,class0){
-      final_items=[]
-      for (item0 of all_items0){
-        if (item0.classList.contains(class0)) final_items.push(item0)
-      }
-      return final_items
-    }
-
     function go2el(qa_key){
+      item_highlight_class="item-highlight"
+      td_highlight_class="td-highlight"
       console.log(qa_obj[qa_key])
       cur_items=qa_obj[qa_key]["items"]
       cur_i=qa_obj[qa_key]["i"]
-      if (cur_i==null || cur_i==undefined) cur_i=0
-      cur_item=cur_items[cur_i]
-      cur_item.scrollIntoView();
-      new_i=cur_i+1
-      console.log(new_i)
-      if (new_i>len(cur_items)-1) new_i=0
-      qa_obj[qa_key]["i"]=new_i
-      //console.log(qa_obj[qa_key])
+      if (cur_i==null || cur_i==undefined) cur_i=0 
+      else cur_i=cur_i+1
+      if (cur_i>=len(cur_items)) cur_i=0  
+      qa_obj[qa_key]["i"]=cur_i
+
+      cur_item0=cur_items[cur_i]
+      parent_td=get_parent_with_tag(cur_item0,"td")
+      scroll2el(cur_item0)
+      $(".item-highlight").removeClass("item-highlight");
+      $(".td-highlight").removeClass("td-highlight");
+
+      if (!cur_item0.classList.contains(item_highlight_class)) cur_item0.classList.add(item_highlight_class)
+      if (!parent_td.classList.contains(td_highlight_class)) parent_td.classList.add(td_highlight_class)
     }
 
     function init(){
       strong_mismatch_items=get_class_el_items(".strong-mismatch")
       weak_mismatch_items=get_class_el_items(".weak-mismatch")
+      strong_mismatch_exact_items=filter_items(strong_mismatch_items,"exact")
+      weak_mismatch_exact_items=filter_items(weak_mismatch_items,"exact")
+      strong_mismatch_normative_items=filter_items(strong_mismatch_items,"normative")
+      weak_mismatch_normative_items=filter_items(weak_mismatch_items,"normative")
+
       qa_obj["strong-mismatch"]={"items":strong_mismatch_items}
       qa_obj["weak-mismatch"]={"items":weak_mismatch_items}
-      qa_obj["strong-mismatch-exact"]={"items":filter_items(strong_mismatch_items,"exact")} //["items"]=filter_items(strong_mismatch_items,"exact")
-      qa_obj["weak-mismatch-exact"]={"items":filter_items(weak_mismatch_items,"exact")} 
-      qa_obj["strong-mismatch-normative"]={"items":filter_items(strong_mismatch_items,"normative")}
-      qa_obj["weak-mismatch-normative"]={"items":filter_items(weak_mismatch_items,"normative")}
+      qa_obj["strong-mismatch-exact"]={"items":strong_mismatch_exact_items} 
+      qa_obj["weak-mismatch-exact"]={"items":weak_mismatch_exact_items} 
+      qa_obj["strong-mismatch-normative"]={"items":strong_mismatch_normative_items}
+      qa_obj["weak-mismatch-normative"]={"items":weak_mismatch_normative_items}
       console.log(qa_obj)
 
       //filter_items(strong_mismatch_items,"exact")
 
-      $$("exact-strong-mismatch").innerHTML=""+len(strong_mismatch_items)
-      $$("exact-weak-mismatch").innerHTML=""+len(weak_mismatch_items)
+      $$("exact-strong-mismatch").innerHTML=""+len(strong_mismatch_exact_items)
+      $$("exact-weak-mismatch").innerHTML=""+len(weak_mismatch_exact_items)
+      $$("normative-strong-mismatch").innerHTML=""+len(strong_mismatch_normative_items)
+      $$("normative-weak-mismatch").innerHTML=""+len(weak_mismatch_normative_items)
+
         // mismatches=$(".mismatch")
         // $("#exact-strong-mismatch").text(""+mismatches.length)
         // console.log(mismatches)
@@ -1245,6 +1254,7 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
                 //$(".aligned").toggleClass("no-bg");
             }
         }
+
 
     """
 
@@ -1277,11 +1287,16 @@ def create_align_html_content(aligned_html_sent_pairs,phrase_analysis_table=""):
              <a href="JavaScript:void(0)" onclick='go2el("strong-mismatch-exact")'>Strong: <span id="exact-strong-mismatch">0</span></a>
              <a href="JavaScript:void(0)" onclick='go2el("weak-mismatch-exact")'>Weak: <span id="exact-weak-mismatch">0</span></a>
             </div>
-          <div class="col">Normative Mismatch</div>
+          <div class="col">
+            <h6>Normative Mismatch</h6> 
+             <a href="JavaScript:void(0)" onclick='go2el("strong-mismatch-normative")'>Strong: <span id="normative-strong-mismatch">0</span></a>
+             <a href="JavaScript:void(0)" onclick='go2el("weak-mismatch-normative")'>Weak: <span id="normative-weak-mismatch">0</span></a>
+
+          </div>
           <div class="col">Terminology Mismatch</div>
           <div class="col">Spelling Mistakes</div>
     </div>
-    </div>  
+    </div>   
 
     <div class="main"> 
 
