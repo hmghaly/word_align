@@ -124,6 +124,19 @@ def is_punct(token):
     return True
 
 
+arabic_letter_dict={}
+for i in range(10000):
+  char0=chr(i)
+  try: name = unicodedata.name(char0).lower()
+  except: name=""
+  if ('arabic' in name or 'persian' in name): arabic_letter_dict[char0]=True
+
+def is_arabic(word):
+  output=False
+  if len(word)==0: return False
+  if arabic_letter_dict.get(word[0],False) or arabic_letter_dict.get(word[-1],False): output=True
+  return output
+
 def get_chars(start_i,end_i,include_diacritics=False): #generate list of chars depending on the range - ar 1568,1646 
   char_list=[]
   for i in range(start_i,end_i):
