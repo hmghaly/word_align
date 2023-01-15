@@ -175,9 +175,11 @@ def tok(txt):
       if punc_exits_dict.get(char0,False): end_punc_chars=char0+end_punc_chars
       else: break
     bare_token=item0[len(begin_punc_chars):len(item0)-len(end_punc_chars)]
-    splitting_hyphen=True
-    if bare_token.lower().startswith("http") or bare_token.lower().startswith("www.") or "@" in bare_token: splitting_hyphen=False
-    if splitting_hyphen: bare_token=" _-_ ".join(bare_token.split("-")) 
+    splitting_hyphen_slash=True
+    if bare_token.lower().startswith("http") or bare_token.lower().startswith("www.") or "@" in bare_token: splitting_hyphen_slash=False
+    if bare_token[0].isupper() and bare_token[-1].isdigit() and bare_token.count("/")>0: splitting_hyphen_slash=False
+    if splitting_hyphen_slash: bare_token=bare_token.replace("-"," _-_ ") #" _-_ ".join(bare_token.split("-")) 
+    if splitting_hyphen_slash: bare_token=bare_token.replace("/"," _/_ ")
     if bare_token.endswith("'s"): bare_token=bare_token[:-2]+" _'s"
     #print([item0,begin_punc_chars,end_punc_chars, bare_token])
     for i0,char0 in enumerate(begin_punc_chars):
