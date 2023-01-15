@@ -162,33 +162,37 @@ def char_is_punct(char0):
 def tok(txt):
   new_str=""
   txt_split=txt.split()
-  punc_exits_dict={}
+  punc_exists_dict={}
   for char0 in set(txt):
-     if char_is_punct(char0):punc_exits_dict[char0]=True 
+     if char_is_punct(char0):punc_exists_dict[char0]=True 
   #cur_punct_items=[v for v in list(set(txt)) if char_is_punct(v)]
   for item0 in txt_split:
+    if punc_exists_dict.get(item0,False):
+       new_str+=" %s "%item0
+       continue
     begin_punc_chars,end_punc_chars="",""
     for char0 in item0: 
-      if punc_exits_dict.get(char0,False): begin_punc_chars+=char0
+      if punc_exists_dict.get(char0,False): begin_punc_chars+=char0
       else: break
     for char0 in reversed(item0): 
-      if punc_exits_dict.get(char0,False): end_punc_chars=char0+end_punc_chars
+      if punc_exists_dict.get(char0,False): end_punc_chars=char0+end_punc_chars
       else: break
     bare_token=item0[len(begin_punc_chars):len(item0)-len(end_punc_chars)]
     splitting_hyphen_slash=True
     if bare_token.lower().startswith("http") or bare_token.lower().startswith("www.") or "@" in bare_token: splitting_hyphen_slash=False
-    if bare_token[0].isupper() and bare_token[-1].isdigit() and bare_token.count("/")>0: splitting_hyphen_slash=False
+    if bare_token and bare_token[0].isupper() and bare_token[-1].isdigit() and "/" in bare_token: splitting_hyphen_slash=False
     if splitting_hyphen_slash: bare_token=bare_token.replace("-"," _-_ ") #" _-_ ".join(bare_token.split("-")) 
     if splitting_hyphen_slash: bare_token=bare_token.replace("/"," _/_ ")
     if bare_token.endswith("'s"): bare_token=bare_token[:-2]+" _'s"
-    #print([item0,begin_punc_chars,end_punc_chars, bare_token])
+    print([item0,begin_punc_chars,end_punc_chars, bare_token])
     for i0,char0 in enumerate(begin_punc_chars):
       if i0==0: new_str+=char0+"_ "
       else: new_str+=" _"+char0+"_ "
     new_str+=bare_token
-    for i0,char0 in enumerate(end_punc_chars):
-      if i0==len(end_punc_chars)-1: new_str+=" _"+char0
-      else: new_str+=" _"+char0+"_ "
+    if begin_punc_chars!=end_punc_chars:
+      for i0,char0 in enumerate(end_punc_chars):
+        if i0==len(end_punc_chars)-1: new_str+=" _"+char0
+        else: new_str+=" _"+char0+"_ "
     new_str+=" "    
   return [v for v in new_str.split(" ") if v]
 
