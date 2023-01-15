@@ -153,35 +153,99 @@ multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","o.k."," v."," vs."," v.s.", " et
 dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
 diac=u'\u064e\u064f\u0650\u0651\u0652\u064c\u064b\u064d\ufc62'
 
-def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False,keep_diacritics=True): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
-    replaced=[]
-    if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
-    if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
-    if keep_diacritics:
-        for d0 in diac: 
-            if d0 in txt: replaced.append(d0)
-    for mdw in multi_dot_words:
-        if mdw in txt: replaced.append(mdw)
+import unicodedata
+def char_is_punct(char0):
+  unicode_check=unicodedata.category(char0)
+  if len(unicode_check)>0: return unicode_check[0]=="P"
+  return False
 
-    #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
-    repl_dict={}
-    for i0,u0 in enumerate(replaced):
-        key="__item%s__"%i0
-        repl_dict[key]=u0
-        txt=txt.replace(u0,key)
+def tok(txt):
+  new_str=""
+  txt_split=txt.split()
+  punc_exits_dict={}
+  for char0 in set(txt):
+     if char_is_punct(char0):punc_exits_dict[char0]=True 
+  #cur_punct_items=[v for v in list(set(txt)) if char_is_punct(v)]
+  for item0 in txt_split:
+    begin_punc_chars,end_punc_chars="",""
+    for char0 in item0: 
+      if punc_exits_dict.get(char0,False): begin_punc_chars+=char0
+      else: break
+    for char0 in reversed(item0): 
+      if punc_exits_dict.get(char0,False): end_punc_chars=char0+end_punc_chars
+      else: break
+    bare_token=item0[len(begin_punc_chars):len(item0)-len(end_punc_chars)]
+    splitting_hyphen=True
+    if bare_token.lower().startswith("http") or bare_token.lower().startswith("www.") or "@" in bare_token: splitting_hyphen=False
+    if splitting_hyphen: bare_token=" _-_ ".join(bare_token.split("-")) 
+    if bare_token.endswith("'s"): bare_token=bare_token[:-2]+" _'s"
+    #print([item0,begin_punc_chars,end_punc_chars, bare_token])
+    for i0,char0 in enumerate(begin_punc_chars):
+      if i0==0: new_str+=char0+"_ "
+      else: new_str+=" _"+char0+"_ "
+    new_str+=bare_token
+    for i0,char0 in enumerate(end_punc_chars):
+      if i0==len(end_punc_chars)-1: new_str+=" _"+char0
+      else: new_str+=" _"+char0+"_ "
+    new_str+=" "    
+  return [v for v in new_str.split(" ") if v]
 
-    #txt=txt.replace(u'\x01'," ")
-    txt=txt.replace(u'\u2019',"'")
+def de_tok_space(tokens): #outputs list of tokens with the following, whether it is followed by space or not identify which tokens are followed by space and which are not, based on latest tok
+  tok_space_list=[]
+  for tok_i,tok0 in enumerate(tokens):
+    cur_tok=str(tok0)
+    prev_tok,next_tok="",""
+    if tok_i+1<len(tokens): next_tok=tokens[tok_i+1]
+    if tok_i>0: prev_tok=tokens[tok_i-1]
+    following=" "
+    if next_tok=="": following=""
+    if next_tok.startswith("_"): following=""
+    if cur_tok.endswith("_"): following=""
+    if next_tok.startswith("ـ"): following=""
+    if cur_tok.endswith("ـ"): following=""
+    if cur_tok.startswith("ال_"):
+      if prev_tok.strip("ـ")=="ل":
+        cur_tok=cur_tok.replace("ال_","ل")
+      else: cur_tok=cur_tok.replace("ال_","ال")
+    cur_item= (cur_tok.strip("_"),following)
+    tok_space_list.append(cur_item)
+  return tok_space_list
+
+def de_tok2str(tokens): #detokenize tokens into string
+  detok_str0=""
+  tokens_with_space_info0=de_tok_space(tokens)
+  for a0 in tokens_with_space_info0: detok_str0+=a0[0]+a0[1]
+  return detok_str0
+
+# def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False,keep_diacritics=True): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
+#     replaced=[]
+#     if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
+#     if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
+#     if keep_diacritics:
+#         for d0 in diac: 
+#             if d0 in txt: replaced.append(d0)
+#     for mdw in multi_dot_words:
+#         if mdw in txt: replaced.append(mdw)
+
+#     #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
+#     repl_dict={}
+#     for i0,u0 in enumerate(replaced):
+#         key="__item%s__"%i0
+#         repl_dict[key]=u0
+#         txt=txt.replace(u0,key)
+
+#     #txt=txt.replace(u'\x01'," ")
+#     txt=txt.replace(u'\u2019',"'")
     
-    txt=txt.replace("'s "," __a__s ") #keep apostrophe 's
-    txt=re.sub("(\w)'(\w)",r'\1__a__\2',txt) #keep any apostrophe inside a word
-    txt=re.sub("(?u)(\W)",r" \1 ", txt)
-    txt=txt.replace("__a__", "'")
-    for a,b in repl_dict.items():
-        txt=txt.replace(a,b)
+#     txt=txt.replace("'s "," __a__s ") #keep apostrophe 's
+#     txt=re.sub("(\w)'(\w)",r'\1__a__\2',txt) #keep any apostrophe inside a word
+#     txt=re.sub("(?u)(\W)",r" \1 ", txt)
+#     txt=txt.replace("__a__", "'")
+#     for a,b in repl_dict.items():
+#         txt=txt.replace(a,b)
     
-    out=re.split("\s+",txt)
-    return [v for v in out if v]
+#     out=re.split("\s+",txt)
+#     return [v for v in out if v]
 
 def tok_keep_punc(text0): #sep 2022
   non_space=text0.split() #simple split by space
