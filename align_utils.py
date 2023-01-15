@@ -1111,6 +1111,7 @@ def present_aligned(src_tokens0,trg_tokens0,align_list0):
 
 
 
+
 def random_color():
   rand = lambda: random.randint(100, 255)
   return '#%02X%02X%02X' % (rand(), rand(), rand())
@@ -1345,66 +1346,107 @@ def align_words_span_tags(src_tokens,trg_tokens,align_items,sent_class="sent0",o
     # print("TRG:", open0,s_tok, close0)
   return src_tok_tags,trg_tok_tags
 
-# def align_words_phrases_classes(aligned_src0,aligned_trg0,aligned0,sent_class0="sent0",min_chunk_size=None,max_aligned_phrase_len=6):
-#   src_open_dict,src_close_dict={},{}
-#   trg_open_dict,trg_close_dict={},{}
-#   final_src_tokens,final_trg_tokens=[],[]
-#   chunk_boundaries0=[]
-#   if min_chunk_size!=None: chunk_boundaries0=get_aligned_chunks(aligned0,min_chunk_size)
-#   chunk_xs=[v[0] for v in chunk_boundaries0]
-#   chunk_ys=[v[1] for v in chunk_boundaries0]
-#   aligned0.sort(key=lambda x:-x[1])
-#   used_xs,used_ys=[],[]
 
+#=================== QA functions ==============
+#15 Jan 23
+def gen_ul_style(color0="black"):
+  underline_style='text-decoration: underline;-webkit-text-decoration-color: %s;text-decoration-color: %s;'%(color0,color0)
+  return underline_style
 
-#   for align_i,align_item in enumerate(aligned0):
-#     span_name="walign-%s"%(align_i)
-#     al0,al_wt=align_item[:2]
-#     src_span0,trg_span0=al0
-#     src_i0,src_i1=src_span0
-#     trg_i0,trg_i1=trg_span0
-#     src_phrase0=aligned_src0[src_i0:src_i1+1]
-#     trg_phrase0=aligned_trg0[trg_i0:trg_i1+1]
-#     if len(src_phrase0)>max_aligned_phrase_len: continue
+def is_symbol(str0): #is a UN symbol, e.g. A/75/251
+  outcome=False
+  if str0[0].isupper() and str0[-1].isdigit() and str0.count("/")>0: outcome=True
+  return outcome
 
+def qa_match_exact(src_sent_toks,trg_sent_toks): #match numbers, UN-symbols and other items that have to be exact in src/trg
+  uq_src0=list(set(src_sent_toks))
+  uq_trg0=list(set(trg_sent_toks))
+  match_score=1.0
+  src_digits=[v for v in uq_src0 if v.isdigit()]
+  src_symbols=[v for v in uq_src0 if is_symbol(v)] #we can also add websites, twitter handles, hashtags ... etc
+  all_qa_matches=[]
+  for dig0 in src_digits:
+    match_type="exact-number"
+    if len(dig0)<2: criticality="low" #if a single digit number, which is often translated as a word
+    else: criticality="high"
+    cur_src_spans=general.is_in([dig0],src_sent_toks)
+    cur_trg_spans=general.is_in([dig0],trg_sent_toks)
+    all_qa_matches.append((dig0,dig0,cur_src_spans,cur_trg_spans,match_type,match_score,criticality))
+  for sym0 in src_symbols:
+    match_type="exact-UN-symbol"
+    criticality="high"
+    cur_src_spans=general.is_in([sym0],src_sent_toks)
+    cur_trg_spans=general.is_in([sym0],trg_sent_toks)
+    all_qa_matches.append((sym0,sym0,cur_src_spans,cur_trg_spans,match_type,match_score,criticality))
+  return all_qa_matches
 
-#     src_range0=list(range(src_i0,src_i1+1))
-#     trg_range0=list(range(trg_i0,trg_i1+1))
-#     if any([v in used_xs for v in src_range0]): continue
-#     if any([v in used_ys for v in trg_range0]): continue
-#     used_xs.extend(src_range0)
-#     used_ys.extend(trg_range0)
+def qa_match_normative(src_sent_toks,trg_sent_toks,normative_list):
+  match_score=1.0
+  all_norm_matches=[]
+  for norm_src0,norm_trg0,norm_type0 in normative_list: #tokenized norm src/trg items, and type
+    cur_type="normative-"+norm_type0
+    criticality="high"
+    src_spans=general.is_in(norm_src0,src_sent_toks)
+    trg_spans=general.is_in(norm_trg0,trg_sent_toks) #we'll need to think of cases where there can be multiple trg options
+    if src_spans==[] and trg_spans==[]: continue
+    all_norm_matches.append((" ".join(norm_src0)," ".join(norm_trg0),src_spans, trg_spans, cur_type,match_score, criticality)) 
+  return all_norm_matches
 
-#     src_open_dict[src_i0]=[span_name]+src_open_dict.get(src_i0,[])
-#     src_close_dict[src_i1]=[span_name]+src_close_dict.get(src_i1,[])
-#     trg_open_dict[trg_i0]=[span_name]+trg_open_dict.get(trg_i0,[])
-#     trg_close_dict[trg_i1]=[span_name]+trg_close_dict.get(trg_i1,[])
-#     # src_open_dict[src_i0]=src_open_dict.get(src_i0,[])+[span_name]
-#     # src_close_dict[src_i1]=src_close_dict.get(src_i1,[])+[span_name]
-#     # trg_open_dict[trg_i0]=trg_open_dict.get(trg_i0,[])+[span_name]
-#     # trg_close_dict[trg_i1]=trg_close_dict.get(trg_i1,[])+[span_name]
+def qa_match_all(src_sent_toks,trg_sent_toks,normative_list):
+  all_matches=[]
+  all_matches.extend(qa_match_exact(src_sent_toks,trg_sent_toks))
+  all_matches.extend(qa_match_normative(src_sent_toks,trg_sent_toks,normative_list))
+  all_matches.sort(key=lambda x:len(x[0].split()))
+  return all_matches
 
-#   for tok_i,src_tok0 in enumerate(aligned_src0):
-#     if src_tok0 in ["<s>","</s>"]: continue
-#     open_classes=src_open_dict.get(tok_i,[])
-#     close_classes=src_close_dict.get(tok_i,[])
-#     cur_str=""
-#     for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
-#     cur_str+=src_tok0
-#     for class0 in close_classes: cur_str+='</span>'
-#     if tok_i in chunk_xs: cur_str+="<br>"
-#     final_src_tokens.append((cur_str,src_tok0))
-#   for tok_i,trg_tok0 in enumerate(aligned_trg0):
-#     if trg_tok0 in ["<s>","</s>"]: continue
-#     open_classes=trg_open_dict.get(tok_i,[])
-#     close_classes=trg_close_dict.get(tok_i,[])
-#     cur_str=""
-#     for class0 in open_classes: cur_str+='<span class="aligned %s %s">'%(sent_class0, class0)
-#     cur_str+=trg_tok0
-#     for class0 in close_classes: cur_str+='</span>'
-#     if tok_i in chunk_ys: cur_str+="<br>"
-#     final_trg_tokens.append((cur_str,trg_tok0))
-#   return final_src_tokens, final_trg_tokens
+def qa_add_spans_classes(src_sent_toks,trg_sent_toks,qa_match_list):
+  src_start_dict,src_end_dict={},{}
+  trg_start_dict,trg_end_dict={},{}
+  for src0,trg0,src_spans0,trg_spans0,match_type0,match_score0,criticality0 in qa_match_list:
+    match_color="black"
+    match_message=""
+    class_name=""
+    match_type_classes0=match_type0
+    if match_type0.lower().split("-")[0] in ["normative","exact"]: match_type_classes0="%s %s"%(match_type0.lower().split("-")[0],match_type0)
+    # if match_type0.lower().startswith("normative"): match_type_classes0="%s %s"%("normative",match_type0)
+    # if match_type0.lower().startswith("exact"): match_type_classes0="%s %s"%("exact",match_type0)
+    if len(src_spans0)==0 and len(trg_spans0)==0: continue
+    if len(src_spans0)>0:
+      if len(trg_spans0)==len(src_spans0): 
+        match_color="lightgreen"
+        match_message+=" correct match"
+        class_name="match"
+      elif len(trg_spans0)==0: 
+        match_color="red"
+        match_message="target not found"
+        if criticality0=="low": class_name+=" weak-mismatch mismatch %s"%match_type_classes0
+        else: class_name+=" strong-mismatch mismatch %s"%match_type_classes0
+      elif len(trg_spans0)!=len(src_spans0): 
+        match_color="brown"
+        match_message="mismatch count of instances"
+        class_name+=" weak-mismatch mismatch %s"%match_type_classes0
+    else:
+      if len(trg_spans0)>0:
+        match_color="orange"
+        match_message="found in target but not in src"
+        class_name+=" weak-mismatch mismatch %s"%match_type_classes0
+
+    for x0,x1 in src_spans0:
+      src_start_dict[x0]=src_start_dict.get(x0,"")+'<span class="%s" style="%s">'%(class_name,gen_ul_style(match_color))
+      src_end_dict[x1]=src_end_dict.get(x1,"")+'</span>'
+    for y0,y1 in trg_spans0:
+      trg_start_dict[y0]=trg_start_dict.get(y0,"")+'<span class="%s" style="%s">'%(class_name,gen_ul_style(match_color))
+      trg_end_dict[y1]=src_end_dict.get(y1,"")+'</span>'
+  src_open_close_tags,trg_open_close_tags=[],[]
+  for i0,tok0 in enumerate(src_sent_toks):
+    open0=src_start_dict.get(i0,"")
+    close0=src_end_dict.get(i0,"")
+    src_open_close_tags.append((open0,close0))
+  for i0,tok0 in enumerate(trg_sent_toks):
+    open0=trg_start_dict.get(i0,"")
+    close0=trg_end_dict.get(i0,"")
+    trg_open_close_tags.append((open0,close0))
+  return src_open_close_tags,trg_open_close_tags
 
 
 
