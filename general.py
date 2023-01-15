@@ -184,7 +184,7 @@ def tok(txt):
     if splitting_hyphen_slash: bare_token=bare_token.replace("-"," _-_ ") #" _-_ ".join(bare_token.split("-")) 
     if splitting_hyphen_slash: bare_token=bare_token.replace("/"," _/_ ")
     if bare_token.endswith("'s"): bare_token=bare_token[:-2]+" _'s"
-    print([item0,begin_punc_chars,end_punc_chars, bare_token])
+    #print([item0,begin_punc_chars,end_punc_chars, bare_token])
     for i0,char0 in enumerate(begin_punc_chars):
       if i0==0: new_str+=char0+"_ "
       else: new_str+=" _"+char0+"_ "
