@@ -1,4 +1,4 @@
-import re, os, shelve, unicodedata, sys, json
+import re, os, shelve, unicodedata, sys, json, time
 #import pandas as pd
 import re
 
@@ -11,6 +11,9 @@ else:
     import cPickle
     import HTMLParser
     htmlp = HTMLParser.HTMLParser() #To decode html entities in the tika output
+
+def now():
+  return time.time()
 
 #from difflib import SequenceMatcher
 def unescape(text_with_html_entities):
