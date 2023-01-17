@@ -13,7 +13,7 @@ def xl_read_sheet(wb_obj,sheet_name):
   return sheet_data
 
 def xl_read_all_sheets(wb_obj,sheet_name_list=None):
-  if sheet_name_list==None: sheet_name_list=wb.sheetnames
+  if sheet_name_list==None: sheet_name_list=wb_obj.sheetnames
   else: sheet_name_list=[v for v in wb_obj.sheetnames if v in sheet_name_list]
   wb_dict={}
   for sheet0 in sheet_name_list: wb_dict[sheet0]=xl_read_sheet(wb_obj,sheet0)
