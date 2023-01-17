@@ -76,13 +76,13 @@ def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes whe
 def is_in(small,large,skip_punc=True): 
     return list_in_list(small,large,skip_punc=True)
 
-def group_2(list_2): #group a list with each element is of size 2, to group by first subelement and get only unique list of grouped subelement2 [("a",1),("a",2),("b",3)...] > a : [1,2], b : [3]
-  out_dict={}
-  list_2.sort(key=lambda x:x[0])
-  grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(list_2,lambda x:x[0])]
-  for key0,grp0 in grouped:
-    out_dict[key0]=list(set(grp0))
-  return out_dict
+# def group_2(list_2): #group a list with each element is of size 2, to group by first subelement and get only unique list of grouped subelement2 [("a",1),("a",2),("b",3)...] > a : [1,2], b : [3]
+#   out_dict={}
+#   list_2.sort(key=lambda x:x[0])
+#   grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(list_2,lambda x:x[0])]
+#   for key0,grp0 in grouped:
+#     out_dict[key0]=list(set(grp0))
+#   return out_dict
 
 ####################### STRINGS ###########################
 

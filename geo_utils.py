@@ -46,3 +46,50 @@ def get_el_midpoint(el0):
 
 def get_area_ratio(area0,area1):
   return min(area0,area1)/max(area0,area1)
+
+#===== Process the output data of Excel workbook to greate a geo dict
+def group_2(list_2): #group a list with each element is of size 2, to group by first subelement and get only unique list of grouped subelement2 [("a",1),("a",2),("b",3)...] > a : [1,2], b : [3]
+  out_dict={}
+  list_2.sort(key=lambda x:x[0])
+  grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(list_2,lambda x:x[0])]
+  for key0,grp0 in grouped:
+    out_dict[key0]=list(set(grp0))
+  return out_dict
+
+def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "cities"
+  countries_data=wb_dict["countries"]
+  admin_data=wb_dict["admin"]
+  cities_data=wb_dict["cities"]
+
+  geo_data_dict={}
+  geo_data_dict["country"]={}
+  geo_data_dict["admin"]={}
+  geo_data_dict["city"]={}
+  country_admin_list,admin_city_list=[],[]
+
+  for item0 in countries_data:
+    key0=item0["id"]
+    dict0=dict(item0)
+    dict0.pop("id", None)
+    geo_data_dict["country"][key0]=dict0
+  for item0 in admin_data:
+    #print(item0)
+    key0=item0["id"]
+    dict0=dict(item0)
+    dict0.pop("id", None)
+    geo_data_dict["admin"][key0]=dict0
+  for item0 in cities_data:
+    city_id=item0.get("id")
+    if city_id==None: city_id=item0.get("city-id") #for consistency, the column should be "id", but for now we have it as "city-id"
+    city_id=str(city_id)
+    dict0=dict(item0)
+    dict0.pop("id", None)
+    dict0.pop("city-id", None)
+    geo_data_dict["city"][city_id]=dict0
+    admin_id=str(dict0["admin-id"])
+    country_id=str(dict0["country-id"])
+    country_admin_list.append((country_id,admin_id))
+    admin_city_list.append((admin_id,city_id))
+  geo_data_dict["country-admin"]=group_2(country_admin_list)
+  geo_data_dict["admin-city"]=group_2(admin_city_list)
+  return geo_data_dict  
