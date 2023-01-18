@@ -97,3 +97,51 @@ def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "c
   geo_data_dict["country-admin"]=group_2(country_admin_list)
   geo_data_dict["admin-city"]=group_2(admin_city_list)
   return geo_data_dict  
+
+def get_geo_query_items(geo_dict,request_type="",country_id=None,admin_id=None,city_id=None,city_id_list=[],lang="en"): #generate lists of geo elements based on certain queries
+  out_items=[]
+  if request_type=="list_countries":
+    cur_dict=geo_dict['country']
+    for a,b in cur_dict.items(): 
+      name_lang_key="name-"+lang
+      name_en_key="name-en"
+      name_val=b.get(name_lang_key)
+      if name_val==None: name_val=b.get(name_en_key)
+      if name_val==None: name_val="-"
+      out_items.append((a,name_val))
+  if request_type=="list_admin":
+    cur_admin_ids=geo_dict['country-admin'].get(country_id,[])
+    admin_dict=geo_dict['admin']
+    for a in cur_admin_ids:
+      tmp_admin_info_dict=admin_dict.get(a,{})
+      name_lang_key="name-"+lang
+      name_en_key="name-en"
+      name_val=tmp_admin_info_dict.get(name_lang_key)
+      if name_val==None: name_val=tmp_admin_info_dict.get(name_en_key)
+      if name_val==None: name_val="-"
+      out_items.append((a,name_val))
+  if request_type=="list_cities":
+    cur_city_ids=geo_dict['admin-city'].get(admin_id,[])
+    city_dict=geo_dict['city']
+    for a in cur_city_ids:
+      tmp_city_info_dict=city_dict.get(a,{})
+      name_lang_key="name-"+lang
+      name_en_key="name-en"
+      name_val=tmp_city_info_dict.get(name_lang_key)
+      if name_val==None: name_val=tmp_city_info_dict.get(name_en_key)
+      if name_val==None: name_val="-"
+      out_items.append((a,name_val))
+  if request_type=="list_city_info": #get the info 
+    city_dict=geo_dict['city']
+    for a in city_id_list:
+      tmp_city_info_dict=city_dict.get(a,{})
+      name_lang_key="name-"+lang
+      name_en_key="name-en"
+      name_val=tmp_city_info_dict.get(name_lang_key)
+      if name_val==None: name_val=tmp_city_info_dict.get(name_en_key)
+      if name_val==None: name_val="-"
+      tmp_city_info_dict["name"]=name_val
+      out_items.append((a,name_val,tmp_city_info_dict))
+
+  out_items.sort(key=lambda x:x[1])
+  return out_items  
