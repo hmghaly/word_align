@@ -5,7 +5,7 @@ def xl_read_sheet(wb_obj,sheet_name):
   headers=[]
   sheet_data=[]
   for i0,row0 in enumerate(cur_sheet.iter_rows()):
-    row_vals=[v.value for v in row0]
+    row_vals=[str(v.value).strip() for v in row0]
     if i0==0: headers=row_vals
     else: 
       row_dict0=dict(iter(zip(headers,row_vals)))
