@@ -221,6 +221,9 @@ def tok(txt):
     if bare_token and bare_token[0].isupper() and bare_token[-1].isdigit() and "/" in bare_token: splitting_hyphen_slash=False
     if splitting_hyphen_slash: bare_token=bare_token.replace("-"," _-_ ") #" _-_ ".join(bare_token.split("-")) 
     if splitting_hyphen_slash: bare_token=bare_token.replace("/"," _/_ ")
+    bare_token=bare_token.replace("("," (_ ")
+    bare_token=bare_token.replace(")"," _) ")
+    bare_token=bare_token.replace('"',' " ')
     if bare_token.endswith("'s"): bare_token=bare_token[:-2]+" _'s"
     if bare_token.startswith("و") and bare_token[1:].isdigit(): bare_token=bare_token[0]+" "+bare_token[1:]
     #print([item0,begin_punc_chars,end_punc_chars, bare_token])
