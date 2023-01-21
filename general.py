@@ -133,6 +133,22 @@ def is_punct(token):
     return True
 
 
+def normalize(tokens):
+  new_tokens=["<s>"]
+  for tok0 in tokens:
+    tok0=tok0.lower().strip("_")
+    if tok0.replace(".","").isdigit(): tok0="5"*len(tok0)
+    elif tok0.startswith("http") or tok0.startswith("www."): tok0="_website_"
+    elif "@" in tok0 and "." in tok0: tok0="_email_"
+    elif "/" in tok0 and tok0[-1].isdigit() and tok0[0].isalpha(): tok0="_un_"
+    else: pass
+    new_tokens.append(tok0)
+  new_tokens.append("</s>")
+  return new_tokens
+
+
+
+
 arabic_letter_dict={}
 for i in range(10000):
   char0=chr(i)
@@ -245,6 +261,24 @@ def de_tok2str(tokens): #detokenize tokens into string
   tokens_with_space_info0=de_tok_space(tokens)
   for a0 in tokens_with_space_info0: detok_str0+=a0[0]+a0[1]
   return detok_str0
+
+
+#==== for applications such as spell checking or creating word vectors
+def get_neighbor_offsets(word_i,sent_words,max_offset=3):
+  #cur_word=sent_words[word_i]
+  neighbor_offsets=[]
+  for inc0 in range(1,max_offset+1):
+    prev_word,next_word="",""
+    if word_i-inc0>=0: prev_word=sent_words[word_i-inc0]
+    if word_i+inc0<len(sent_words): next_word=sent_words[word_i+inc0]
+    neighbor_offsets+=[(prev_word,-inc0),(next_word,inc0)]
+  neighbor_offsets.sort(key=lambda x:x[1])
+  return neighbor_offsets
+
+def create_one_hot_vec(hot_i,vec_size):
+  zeros=[0.]*vec_size
+  zeros[hot_i]=1.
+  return zeros
 
 # def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False,keep_diacritics=True): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
 #     replaced=[]
