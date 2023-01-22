@@ -2,6 +2,9 @@ import re, os, shelve, unicodedata, sys, json, time
 #import pandas as pd
 import re
 from itertools import groupby
+from difflib import SequenceMatcher
+
+
 
 
 if sys.version[0]=="3": 
@@ -24,6 +27,10 @@ def unescape(text_with_html_entities):
   else:
     import HTMLParser
     return HTMLParser.HTMLParser().unescape(text_with_html_entities)
+
+
+def similar(a, b):
+  return SequenceMatcher(None, a, b).ratio()
 
 ##################### LISTS ###########################
 #advanced list operations
