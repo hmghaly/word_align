@@ -217,16 +217,17 @@ class DOM:
       else: new_outer_html=new_open_tag+cur_el.inner_html+cur_el.close_tag      
       repl_list.append((cur_outer_html,new_outer_html))
     return repl_list
-  def get_repl_pairs(self,cur_repl_dict0):
+  def get_repl_pairs(self,cur_repl_dict0,except_id=""):
     repl_pairs=[]
     for key0,val0 in cur_repl_dict0.items():
       if val0==None: continue
       if type(val0) is str: new_content0,new_attrs0=val0,{}
       else: new_content0,new_attrs0=val0 #replacement dict has the values as tuples of new content and new attrs
+      if new_content0==None: continue
       if key0.startswith("#"): #we follow jquery selectors, # indicates selection by ID, while . indicates selection by class name
         repl_pairs.extend(self.apply_content_by_id(key0[1:],new_content0,new_attrs0))
       elif key0.startswith("."):
-        repl_pairs.extend(self.apply_content_by_class(key0[1:],new_content0,new_attrs0))
+        repl_pairs.extend(self.apply_content_by_class(key0[1:],new_content0,new_attrs0,except_id=except_id))
       elif key0=="title":
         found_title=re.findall('(?i)<title.+?/title>',self.content)
         new_title="<title>"+new_content0+"</title>" 
@@ -238,9 +239,9 @@ class DOM:
 
       #   old_title=re.findall('(?i)<title.+?/title>')
     return repl_pairs
-  def replace(self,repl_dict0):
+  def replace(self,repl_dict0,except_id=""):
     new_content=str(self.content)
-    cur_repl_pairs=self.get_repl_pairs(repl_dict0)
+    cur_repl_pairs=self.get_repl_pairs(repl_dict0,except_id=except_id)
     for a,b in cur_repl_pairs:
       new_content=new_content.replace(a,b)
     return new_content
