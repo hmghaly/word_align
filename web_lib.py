@@ -200,13 +200,15 @@ class DOM:
     # print("new_outer_html",new_outer_html)
     repl_list.append((cur_outer_html,new_outer_html))
     return repl_list
-  def apply_content_by_class(self,class0,el_content0,new_attrs_dict0={}):
+  def apply_content_by_class(self,class0,el_content0,new_attrs_dict0={},except_id=""):
     repl_list=[]
     cur_el_list=self.get_el_by_class(class0)
     for cur_el in cur_el_list:
       new_open_tag=cur_el.open_tag
+      cur_attrs=cur_el.attrs
+      if except_id!="" and cur_attrs.get("id")==except_id: continue
       if new_attrs_dict0!={}:
-        cur_attrs=cur_el.attrs
+        
         for a0,b0 in new_attrs_dict0.items():
           cur_attrs[a0]=b0
         new_open_tag=create_open_tag(cur_el.tag_name,cur_attrs)      
@@ -218,7 +220,9 @@ class DOM:
   def get_repl_pairs(self,cur_repl_dict0):
     repl_pairs=[]
     for key0,val0 in cur_repl_dict0.items():
-      new_content0,new_attrs0=val0 #replacement dict has the values as tuples of new content and new attrs
+      if val0=None: continue
+      if type(val0) is str: new_content0,new_attrs0=val0,{}
+      else: new_content0,new_attrs0=val0 #replacement dict has the values as tuples of new content and new attrs
       if key0.startswith("#"): #we follow jquery selectors, # indicates selection by ID, while . indicates selection by class name
         repl_pairs.extend(self.apply_content_by_id(key0[1:],new_content0,new_attrs0))
       elif key0.startswith("."):
@@ -240,6 +244,13 @@ class DOM:
     for a,b in cur_repl_pairs:
       new_content=new_content.replace(a,b)
     return new_content
+  def apply_class_except_id(self,class0,id0,el_content0):
+    new_content=str(self.content)
+    cur_repl_pairs=self.apply_content_by_class(class0,el_content0,{},except_id=id0)
+    for a,b in cur_repl_pairs:
+      new_content=new_content.replace(a,b)
+    return new_content
+
 
 
   
