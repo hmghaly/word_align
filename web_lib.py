@@ -220,7 +220,7 @@ class DOM:
   def get_repl_pairs(self,cur_repl_dict0):
     repl_pairs=[]
     for key0,val0 in cur_repl_dict0.items():
-      if val0=None: continue
+      if val0==None: continue
       if type(val0) is str: new_content0,new_attrs0=val0,{}
       else: new_content0,new_attrs0=val0 #replacement dict has the values as tuples of new content and new attrs
       if key0.startswith("#"): #we follow jquery selectors, # indicates selection by ID, while . indicates selection by class name
