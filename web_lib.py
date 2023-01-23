@@ -184,6 +184,7 @@ class DOM:
     for id0 in cur_ids: el_list.append(self.tag_dict[id0])
     return el_list
   def apply_content_by_id(self,id0,el_content0,new_attrs_dict0={}):
+    if el_content0!=None: el_content0=el_content0.strip()
     repl_list=[]
     cur_el=self.get_el_by_id(id0)
     if cur_el==None: return repl_list
@@ -195,12 +196,14 @@ class DOM:
       new_open_tag=create_open_tag(cur_el.tag_name,cur_attrs)
     cur_outer_html=cur_el.outer_html
     if el_content0: new_outer_html=new_open_tag+el_content0+cur_el.close_tag
-    else: new_outer_html=new_open_tag+cur_el.inner_html+cur_el.close_tag
+    elif el_content0==None: new_outer_html=new_open_tag+cur_el.inner_html+cur_el.close_tag
+    else: new_outer_html=""
     # print("cur_outer_html",cur_outer_html)
     # print("new_outer_html",new_outer_html)
     repl_list.append((cur_outer_html,new_outer_html))
     return repl_list
   def apply_content_by_class(self,class0,el_content0,new_attrs_dict0={},except_id=""):
+    if el_content0!=None: el_content0=el_content0.strip()
     repl_list=[]
     cur_el_list=self.get_el_by_class(class0)
     for cur_el in cur_el_list:
@@ -214,7 +217,8 @@ class DOM:
         new_open_tag=create_open_tag(cur_el.tag_name,cur_attrs)      
       cur_outer_html=cur_el.outer_html
       if el_content0: new_outer_html=new_open_tag+el_content0+cur_el.close_tag
-      else: new_outer_html=new_open_tag+cur_el.inner_html+cur_el.close_tag      
+      elif el_content0==None: new_outer_html=new_open_tag+cur_el.inner_html+cur_el.close_tag
+      else: new_outer_html=""
       repl_list.append((cur_outer_html,new_outer_html))
     return repl_list
   def get_repl_pairs(self,cur_repl_dict0,except_id=""):
