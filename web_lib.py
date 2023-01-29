@@ -209,7 +209,7 @@ class DOM:
     for cur_el in cur_el_list:
       new_open_tag=cur_el.open_tag
       cur_attrs=cur_el.attrs
-      if except_id!="" and cur_attrs.get("id","") in except_ids: continue
+      if cur_attrs.get("id","") in except_ids: continue
       if new_attrs_dict0!={}:
         
         for a0,b0 in new_attrs_dict0.items():
