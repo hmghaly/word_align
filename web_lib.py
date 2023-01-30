@@ -248,6 +248,8 @@ class DOM:
     new_content=str(self.content)
     cur_repl_pairs=self.get_repl_pairs(repl_dict0,except_ids=except_ids)
     for a,b in cur_repl_pairs:
+      print(a,b)
+      print("---")
       new_content=new_content.replace(a,b)
     return new_content
   # def apply_class_except_id(self,class0,id0,el_content0):
