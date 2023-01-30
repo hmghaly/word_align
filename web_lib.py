@@ -66,7 +66,7 @@ class DOM:
       tag_type=""
       if tag_str.startswith('</'): tag_type="closing"
       elif tag_str.startswith('<!'): tag_type="comment"
-      elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br"]: tag_type="s" #standalone
+      elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br","hr"]: tag_type="s" #standalone
       else: tag_type="opening"
 
       inter_text=self.content[start_i:tag_start] #intervening text since last tag
@@ -248,8 +248,8 @@ class DOM:
     new_content=str(self.content)
     cur_repl_pairs=self.get_repl_pairs(repl_dict0,except_ids=except_ids)
     for a,b in cur_repl_pairs:
-      print(a,b)
-      print("---")
+      # print(a,b)
+      # print("---")
       new_content=new_content.replace(a,b)
     return new_content
   # def apply_class_except_id(self,class0,id0,el_content0):
