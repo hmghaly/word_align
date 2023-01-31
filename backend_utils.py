@@ -7,6 +7,7 @@ from email.utils import make_msgid
 from smtplib import SMTP_SSL as SMTP
 import hashlib
 import datetime
+from datetime import date
 import uuid
 
 
@@ -47,6 +48,8 @@ def send_email(email_to0,email_subject0,email_html0,email_from0="contact@kmatter
     server.quit()  
     return str(msg)
 
+def today():
+    return date.today().isoformat()
 
 def gen_hex(N=10):
     chars = '0123456789abcdef'
