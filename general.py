@@ -477,10 +477,14 @@ def get_bitext(html_content): #get tr/td and extract bitext
   all_pairs0=[]
   for tr0 in all_trs:
     td_list=get_html_els(tr0,"td")
+    href_pair=[]
     pair0=[]
     for td0 in td_list:
+      href0=re.findall('href="(.+?)"',td0)+re.findall("href='(.+?)'",td0)
+      if href0!=[]: href_pair.append("|".join(href0))
       pair0.append(remove_html(td0))
     if len(pair0)!=2: continue
+    if href_pair: all_pairs0.append(href_pair)
     all_pairs0.append(pair0)
   return all_pairs0
 
