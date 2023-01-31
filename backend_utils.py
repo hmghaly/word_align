@@ -7,6 +7,7 @@ from email.utils import make_msgid
 from smtplib import SMTP_SSL as SMTP
 import hashlib
 import datetime
+import uuid
 
 
 
