@@ -299,7 +299,7 @@ def get_wsgi_cookie(environ):
   return cookie_dict
 
 def generate_uuid():
-    return uuid.uuid4().hex
+    return str(uuid.uuid4().hex)
 
 def read_file(fpath0):
     fopen0=open(fpath0)
