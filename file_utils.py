@@ -68,6 +68,7 @@ def insert_sorted(str0,fpath0,line_size=100): #insert string in a file to mainta
   return output
 
 def inc_count_items(items,fpath): #add items to a text file, indicate their count, and increment each time an item is add it, and move it up the list
+  output={}	
   item_count_dict={}
   used_counter=0
   for it0 in items: item_count_dict[it0]=1
@@ -95,6 +96,7 @@ def inc_count_items(items,fpath): #add items to a text file, indicate their coun
     items_count_list=sorted(list(item_count_dict.items()),key=lambda x:-x[1])
     out_fopen=open(tmp_fpath,"w")
     in_fopen=open(in_fpath)
+    final_n=0
     for i0,line0 in enumerate(in_fopen):
       applied_items_list=[]
       split0=line0.strip().split("\t")
@@ -106,12 +108,19 @@ def inc_count_items(items,fpath): #add items to a text file, indicate their coun
           new_line0="%s\t%s\n"%(item1,count1)
           out_fopen.write(new_line0)
           applied_items_list.append(item1)
+          final_n+=1
       items_count_list=items_count_list[len(applied_items_list):]
-      if not key0 in items: out_fopen.write(line0)
+      if not key0 in items: 
+      	out_fopen.write(line0)
+      	final_n+=1
     for item_count1 in items_count_list:
       item1,count1=item_count1
       new_line0="%s\t%s\n"%(item1,count1)
       out_fopen.write(new_line0)
+      final_n+=1
     in_fopen.close()
     out_fopen.close()
   if os.path.exists(tmp_fpath):shutil.move(tmp_fpath,in_fpath)  
+  output["success"]=True
+  output["final_n"]=final_n
+  return output
