@@ -70,6 +70,7 @@ def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "c
   geo_data_dict["admin"]={}
   geo_data_dict["city"]={}
   country_admin_list,admin_city_list=[],[]
+  city_loc_dict={}
 
   for item0 in countries_data:
     key0=item0["id"]
@@ -89,6 +90,9 @@ def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "c
     dict0=dict(item0)
     dict0.pop("id", None)
     dict0.pop("city-id", None)
+    x0=dict0.get("x")
+    y0=dict0.get("y")
+    if x0!=None and y0!=None: city_loc_dict[city_id]=(x0,y0)
     geo_data_dict["city"][city_id]=dict0
     admin_id=str(dict0["admin-id"])
     country_id=str(dict0["country-id"])
@@ -96,6 +100,7 @@ def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "c
     admin_city_list.append((admin_id,city_id))
   geo_data_dict["country-admin"]=group_2(country_admin_list)
   geo_data_dict["admin-city"]=group_2(admin_city_list)
+  geo_data_dict["city-loc"]=city_loc_dict
   return geo_data_dict  
 
 def get_geo_query_items(geo_dict,request_type="",country_id=None,admin_id=None,city_id=None,city_id_list=[],lang="en"): #generate lists of geo elements based on certain queries
