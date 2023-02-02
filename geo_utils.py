@@ -92,7 +92,7 @@ def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "c
     dict0.pop("city-id", None)
     x0=dict0.get("x")
     y0=dict0.get("y")
-    if x0!=None and y0!=None: city_loc_dict[city_id]=(x0,y0)
+    if x0!=None and y0!=None: city_loc_dict[city_id]=(float(x0),float(y0))
     geo_data_dict["city"][city_id]=dict0
     admin_id=str(dict0["admin-id"])
     country_id=str(dict0["country-id"])
