@@ -60,7 +60,7 @@ def group_2(list_2): #group a list with each element is of size 2, to group by f
     out_dict[key0]=list(set(grp0))
   return out_dict
 
-def get_geo_dict2(wb_dict): #the wb has three sheets, "countries","Admin", and "cities"
+def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "cities"
   countries_data=wb_dict["countries"]
   admin_data=wb_dict["admin"]
   cities_data=wb_dict["cities"]
@@ -116,10 +116,11 @@ def get_geo_list(item0,main_info_dict0,child_dict0,lang="en"):
     if name_val==None: name_val=tmp_admin_info_dict.get(name_en_key)
     if name_val==None: name_val=ch0   
     final_list.append((ch0,name_val))
+  final_list.sort(key=lambda x:x[1])
   return final_list
 
 
-def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "cities"
+def get_geo_dict_OLD(wb_dict): #the wb has three sheets, "countries","Admin", and "cities"
   countries_data=wb_dict["countries"]
   admin_data=wb_dict["admin"]
   cities_data=wb_dict["cities"]
