@@ -145,3 +145,16 @@ def get_geo_query_items(geo_dict,request_type="",country_id=None,admin_id=None,c
 
   out_items.sort(key=lambda x:x[1])
   return out_items  
+
+def get_hs_list(hs_code0,hs_dict0,lang="en"):
+  child_dict0=hs_dict0.get("child_dict",{})
+  name_dict0=hs_dict0.get("name_dict",{})
+  cur_children0=child_dict0.get(hs_code0,[])
+  final_list=[]
+  for ch0 in cur_children0: 
+    ch_local_name_dict0=name_dict0.get(ch0,{})
+    ch_name0=ch_local_name_dict0.get(lang)
+    if ch_name0==None: ch_name0=ch_local_name_dict0.get("en")
+    if ch_name0==None: ch_name0=str(ch0)
+    final_list.append((ch0,ch_name0))
+  return final_list  
