@@ -105,7 +105,7 @@ def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "c
   # geo_data_dict["city-loc"]=city_loc_dict
   return geo_info_dict, geo_child_dict, city_loc_dict
 
-def get_geo_list(item0,main_info_dict0,child_dict0,lang="en"):
+def get_geo_children_name_list(item0,main_info_dict0,child_dict0,lang="en"):
   cur_children0=child_dict0.get(item0,[])
   final_list=[]
   for ch0 in cur_children0:
