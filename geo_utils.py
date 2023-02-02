@@ -60,6 +60,65 @@ def group_2(list_2): #group a list with each element is of size 2, to group by f
     out_dict[key0]=list(set(grp0))
   return out_dict
 
+def get_geo_dict2(wb_dict): #the wb has three sheets, "countries","Admin", and "cities"
+  countries_data=wb_dict["countries"]
+  admin_data=wb_dict["admin"]
+  cities_data=wb_dict["cities"]
+  geo_info_dict={}
+  geo_child_dict={}
+  city_loc_dict={}
+  parent_child_list=[]
+  for item0 in countries_data:
+    key0=item0["id"]
+    dict0=dict(item0)
+    dict0.pop("id", None)
+    geo_info_dict[key0]=dict0
+    parent_child_list.append(("",key0))
+    #geo_data_dict["country"][key0]=dict0
+  for item0 in admin_data:
+    #print(item0)
+    key0=item0["id"]
+    country_id=item0['country-id']
+    dict0=dict(item0)
+    dict0.pop("id", None)
+    geo_info_dict[key0]=dict0
+    parent_child_list.append((country_id,key0))
+    #geo_data_dict["admin"][key0]=dict0
+  for item0 in cities_data:
+    city_id=item0.get("id")
+    if city_id==None: city_id=item0.get("city-id") #for consistency, the column should be "id", but for now we have it as "city-id"
+    city_id=str(city_id)
+    dict0=dict(item0)
+    dict0.pop("id", None)
+    dict0.pop("city-id", None)
+    x0=dict0.get("x")
+    y0=dict0.get("y")
+    if x0!=None and y0!=None: city_loc_dict[city_id]=(float(x0),float(y0))
+    admin_id=str(dict0["admin-id"])
+    parent_child_list.append((admin_id,city_id))
+    geo_info_dict[city_id]=dict0
+
+  
+  geo_child_dict=group_2(parent_child_list)
+  # geo_data_dict["country-admin"]=group_2(country_admin_list)
+  # geo_data_dict["admin-city"]=group_2(admin_city_list)
+  # geo_data_dict["city-loc"]=city_loc_dict
+  return geo_info_dict, geo_child_dict, city_loc_dict
+
+def get_geo_list(item0,main_info_dict0,child_dict0,lang="en"):
+  cur_children0=child_dict0.get(item0,[])
+  final_list=[]
+  for ch0 in cur_children0:
+    ch_tmp_info_dict=main_info_dict0.get(ch0,{})
+    name_lang_key="name-"+lang
+    name_en_key="name-en"
+    name_val=ch_tmp_info_dict.get(name_lang_key)
+    if name_val==None: name_val=tmp_admin_info_dict.get(name_en_key)
+    if name_val==None: name_val=ch0   
+    final_list.append((ch0,name_val))
+  return final_list
+
+
 def get_geo_dict(wb_dict): #the wb has three sheets, "countries","Admin", and "cities"
   countries_data=wb_dict["countries"]
   admin_data=wb_dict["admin"]
