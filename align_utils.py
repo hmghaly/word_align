@@ -998,7 +998,7 @@ def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12, 
   all_single_pts=[]
   results0=[]
   for el_item0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
-  	el0,el_wt0=el_item0[:2]
+    el0,el_wt0=el_item0[:2]
     src_span0,trg_span0=el0
     src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
     used_xs.extend(src_range0)
