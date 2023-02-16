@@ -1011,7 +1011,8 @@ def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12, 
       if src_i1-src_i0>max_phrase_size: continue
       elements_inside=[]
       trg_max_i,trg_min_i=0,len(trg_tokens)+1
-      for el0,el_wt0 in aligned_elements:
+      for el_item0 in aligned_elements:
+        el0,el_wt0=el_item0[:2]
         src_span0,trg_span0=el0
         src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
         if src_span0[0]>=src_i0 and src_span0[1]<=src_i1:
