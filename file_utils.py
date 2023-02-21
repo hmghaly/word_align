@@ -124,3 +124,40 @@ def inc_count_items(items,fpath): #add items to a text file, indicate their coun
   output["success"]=True
   output["final_n"]=final_n
   return output
+
+
+def get_file_page_info(fpath,page_i=1,n_items_per_page=10,start_from_end=True,first_page_1=True):
+  file_info_dict={}
+  file_info_dict["page_i"]=page_i #page index
+  file_info_dict["n_items_per_page"]=n_items_per_page #number of items per page in the pagination system
+  file_info_dict["start_from_end"]=start_from_end #do we start from the beginning or end of file
+  file_info_dict["first_page_1"]=first_page_1 #users see page numbers 1,2,3 ... so we subtract one to start from 0
+
+  if first_page_1: page_i=page_i-1 #subtract one to follow the user numbering
+  file_size=os.path.getsize(fpath)
+  fopen=open(fpath)
+  line0=fopen.readline()
+  line_size=len(line0)
+  n_lines=int(file_size/line_size)
+  n_pages=int(n_lines/n_items_per_page)+1
+  if start_from_end: start_line_i=n_lines-(1+page_i)*n_items_per_page
+  else: start_line_i=page_i*n_items_per_page
+  cur_n_items_per_page=n_items_per_page
+  if start_line_i<0 and abs(start_line_i)<n_items_per_page: 
+    cur_n_items_per_page=n_items_per_page+start_line_i
+    file_loc=0
+  elif start_line_i<0 and abs(start_line_i)>=n_items_per_page:
+    cur_n_items_per_page=0
+    file_loc=0
+  else:
+    file_loc=start_line_i*line_size
+  fopen.seek(file_loc)
+  raw_result=fopen.read(line_size*cur_n_items_per_page)
+  fopen.close()
+  if raw_result=="": final_result=[]
+  else: final_result=[v for v in raw_result.split("\n") if v]
+  file_info_dict["n_lines"]=n_lines
+  file_info_dict["n_pages"]=n_pages
+  file_info_dict["line_size"]=line_size #start_from_end
+  file_info_dict["result"]=final_result
+  return file_info_dict
