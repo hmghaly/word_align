@@ -70,6 +70,7 @@ def insert_sorted(str0,fpath0,line_size=100): #insert string in a file to mainta
 def inc_count_items(items,fpath): #add items to a text file, indicate their count, and increment each time an item is add it, and move it up the list
   output={}	
   item_count_dict={}
+  final_n=0
   used_counter=0
   for it0 in items: item_count_dict[it0]=1
   in_fpath=fpath
