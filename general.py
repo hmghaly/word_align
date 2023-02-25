@@ -605,6 +605,12 @@ def clean_html_OLD(html_str):
 
 
 ##################### FILES ##################
+def append2file(item,fpath): #add line to file
+  file_open=open(fpath,"a")
+  if item[-1]!="\n": item+="\n"
+  file_open.write(item)
+  file_open.close()  
+
 def read(fpath):
 	file_open=open(fpath)
 	content=file_open.read()
