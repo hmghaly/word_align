@@ -91,6 +91,16 @@ def is_in(small,large,skip_punc=True):
 #     out_dict[key0]=list(set(grp0))
 #   return out_dict
 
+
+####################### Dictionaries ######################
+def check_dict_multi_keys(dict0,possible_key_list): #if we're not fully sure which key works
+  key0,val0=None,None
+  for key0 in possible_key_list:
+    val0=dict0.get(key0)
+    if val0!=None: return key0,val0
+  return key0,val0
+
+
 ####################### STRINGS ###########################
 
 def str2key(str0):
