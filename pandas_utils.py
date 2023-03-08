@@ -63,7 +63,7 @@ def get_wb_data(wb_fpath,dtype0=str):
     sheet_data_list=[]
     cur_sheet0=wb_obj0[sh0]
     for index0,row_dict0 in cur_sheet0.iterrows():
-      sheet_data_list.append(row_dict0)
+      sheet_data_list.append(dict(row_dict0))
     wb_data_list0.append(sheet_data_list)
   return wb_data_list0
 
