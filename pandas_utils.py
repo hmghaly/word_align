@@ -54,5 +54,21 @@ def get_sheets_cols(wb_obj0,sheet_names0,col_names0,apply_str=True,exclude_nan=T
       all_col_data.append(cur_list)
   return all_col_data
 
+
+def get_wb_data(wb_fpath,dtype0=str):
+  wb_data_list0=[]
+  wb_obj0=pd.read_excel(path0, None,keep_default_na=False,dtype=dtype0)
+  sheet_names0=list(wb_obj.keys())
+  for sh0 in sheet_names0:
+    sheet_data_list=[]
+    cur_sheet0=wb_obj0[sh0]
+    for index0,row_dict0 in cur_sheet0.iterrows():
+      sheet_data_list.append(row_dict0)
+    wb_data_list0.append(sheet_data_list)
+  return wb_data_list0
+
+
+
+
 if __name__=="__main__":
   print("Hello")
