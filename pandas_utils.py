@@ -68,6 +68,19 @@ def get_wb_data(wb_fpath,dtype0=str):
   return wb_data_list0
 
 
+def get_wb_data_dict(wb_fpath,dtype0=str): #same as above, but data output is in dict format, keys are sheet names
+  wb_data_dict0={}
+  wb_obj0=pd.read_excel(wb_fpath, None,keep_default_na=False,dtype=dtype0)
+  sheet_names0=list(wb_obj0.keys())
+  for sh0 in sheet_names0:
+    sheet_data_list=[]
+    cur_sheet0=wb_obj0[sh0]
+    for index0,row_dict0 in cur_sheet0.iterrows():
+      sheet_data_list.append(dict(row_dict0))
+    #wb_data_list0.append(sheet_data_list)
+    wb_data_dict0[sh0]=sheet_data_list
+  return wb_data_dict0
+
 
 
 if __name__=="__main__":
