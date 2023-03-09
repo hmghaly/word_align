@@ -38,3 +38,11 @@ def update_sqld_multiple(sqld_fpath,key_val_list,overwrite=True):
     list_output.append(output)
   mydict.close()
   return list_output
+
+def dict2sqld(input_dict,sqld_fpath):
+    sql_dict0 = SqliteDict(sqld_fpath, autocommit=False)
+    for key0,val0 in input_dict.items():
+        sql_dict0[key0]=val0
+    sql_dict0.commit()
+    sql_dict0.close()
+    return True   
