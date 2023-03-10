@@ -1,16 +1,16 @@
 from sqlitedict import SqliteDict #Make sure to install it 
-import os
+import os, json
 
 def get_sqld_val(sqld_fpath,key):
   if not os.path.exists(sqld_fpath): return None
-  mydict = SqliteDict(sqld_fpath, autocommit=True)
+  mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=True)
   val=mydict.get(key)
   mydict.close()
   return val
 
 def update_sqld_val(sqld_fpath,key,val,overwrite=True):
   output={}
-  mydict = SqliteDict(sqld_fpath, autocommit=True)
+  mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=True)
   output["key"]=key
   old_val=mydict.get(key)
   output["old"]=old_val
@@ -24,7 +24,7 @@ def update_sqld_val(sqld_fpath,key,val,overwrite=True):
 
 def update_sqld_multiple(sqld_fpath,key_val_list,overwrite=True):
   list_output=[]
-  mydict = SqliteDict(sqld_fpath, autocommit=True)
+  mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=False)
   for key,val in key_val_list:
     output={}
     output["key"]=key
@@ -36,11 +36,12 @@ def update_sqld_multiple(sqld_fpath,key_val_list,overwrite=True):
       mydict[key]=val
       output["success"]=True
     list_output.append(output)
+  mydict.commit()    
   mydict.close()
   return list_output
 
 def dict2sqld(input_dict,sqld_fpath):
-    sql_dict0 = SqliteDict(sqld_fpath, autocommit=False)
+    sql_dict0 = SqliteDict(sqld_fpath,encode=json.dumps, decode=json.loads, autocommit=False)
     for key0,val0 in input_dict.items():
         sql_dict0[key0]=val0
     sql_dict0.commit()
