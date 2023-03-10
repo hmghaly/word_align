@@ -791,14 +791,16 @@ def get_ngram_key(phrase0,ngram=2): #a unigram/bigram or more ngram words as a k
   if len(phrase_split)==1: return phrase0
   return " ".join(phrase_split[:ngram])
 
-def create_bigram_keyed_dict(input_dict0,default_wt=0.5,default_freq=100): #or unigram- if src phrase is one word
+def create_bigram_keyed_dict(input_dict0,default_wt=1,default_freq=100,adj_wt_by_len=True): #or unigram- if src phrase is one word
   bigram_keyed_dict0={}
   for src_phrase0,corr_trg_list in input_dict0.items():
     src_phrase_key0=get_ngram_key(src_phrase0)
     tmp_dict=bigram_keyed_dict0.get(src_phrase_key0,{})
     corr_with_vals=[]
     for trg_phrase0 in corr_trg_list:
-      corr_with_vals.append((trg_phrase0,(default_freq,default_wt)))
+      if adj_wt_by_len: tmp_wt=default_wt*(len(src_phrase0.split())+len(trg_phrase0.split()))*0.5 #adjust the default weight by the average length of src/trg phrases
+      else: tmp_wt=default_wt
+      corr_with_vals.append((trg_phrase0,(default_freq,tmp_wt)))
     tmp_dict[src_phrase0]=corr_with_vals
     bigram_keyed_dict0[src_phrase_key0]=tmp_dict
   return bigram_keyed_dict0
@@ -1825,6 +1827,7 @@ def walign(src_sent,trg_sent,params0={}):
   term_dict0=params0.get("term_dict",{})
   acr_dict0=params0.get("acr_dict",{})
   custom_dict0=params0.get("custom_dict",{})
+  cur_default_keyed_wt0=params0.get("default_keyed_wt",1) #default weight for keyed items (e.g. terms, acronyms, phrases)
   
   src_tokens=tok_fn(src_sent)
   if lang2_tok_fn!=None: trg_tokens=lang2_tok_fn(trg_sent)
