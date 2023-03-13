@@ -218,6 +218,7 @@ def offset_indexes(index_list0,offset0,max_sent_size0=1000):
 
 #Use this
 def get_offset_intersection(index_list0,index_list1,max_sent_size0=1000):
+  if index_list0==None or index_list1==None: return []
   # list0_1000=[int(round(v*max_sent_size0)) for v in index_list0]
   # list1_1000=[int(round(v*max_sent_size0)) for v in index_list1]
   list0_1000=[round(v,3) for v in index_list0]
