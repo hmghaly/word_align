@@ -13,6 +13,7 @@ def filter_toks(tok_list0,params={}):
   cur_excluded_words=params.get("excluded_words",[])
   if params.get("lower",True): tok_list0=[v.lower() for v in tok_list0] #make all words lower case or not
   if cur_excluded_words!=[]: tok_list0=[v if not v in cur_excluded_words else "" for v in tok_list0] #ignore stop words
+  if params.get("exclude_numbers",False): tok_list0=[v if not v.isdigit() else "" for v in tok_list0] #ignore single character tokens
   if params.get("exclude_single_chars",True): tok_list0=[v if len(v)>1 else "" for v in tok_list0] #ignore single character tokens
   if params.get("exclude_punc",True): tok_list0=[v if not general.is_punct(v) else "" for v in tok_list0] #ignore punctuation
   
