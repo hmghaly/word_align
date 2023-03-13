@@ -1581,7 +1581,7 @@ def retr(phrase_tokens,inv_index): #retrieve a phrase
         #if token_i>max_phrase_len: continue
         cur_phrase=tuple(phrase_tokens[:token_i+1])
         cur_token_indexes=inv_index.get(cur_token,[]) #get_tok_indexes(cur_token,inv_index)
-        cur_token_indexes_offset=offset_results(cur_token_indexes,token_i)
+        cur_token_indexes_offset=offset_indexes(cur_token_indexes,token_i)
         #final_indexes=get_index_intersection(final_indexes,cur_token_indexes_offset)
         #final_indexes=list(set(final_indexes).intersection(set(cur_token_indexes_offset)))
         final_indexes=get_offset_intersection(final_indexes,cur_token_indexes_offset)
@@ -1627,7 +1627,8 @@ def list_results(result_dict0):
   for a,b in result_dict0.items():res_list0.extend(b)#count0+=len(b)
   return res_list0
 
-def offset_results(result_dict0,offset0,max_sent_size0=1000):
+#OLD
+def offset_results_OLD(result_dict0,offset0,max_sent_size0=1000):
   new_dict0={}
   for a,b in result_dict0.items():
     new_b=[v-(offset0/max_sent_size0) for v in b]
@@ -1643,7 +1644,8 @@ def get_tok_indexes(cur_tok,cur_index_dict): #retrieving inverted index for a to
         output[index_id]=inv_index_dict.get(cur_tok,[])
     return output
 
-def get_index_intersection(index_dict1,offset_index_dict2): #when we are getting phrase indexes of multiple tokens
+#OLD
+def get_index_intersection_OLD(index_dict1,offset_index_dict2): #when we are getting phrase indexes of multiple tokens
   combined_dict0={}
   for index_id,cur_indexes in index_dict1.items():
     offset_indexes=offset_index_dict2.get(index_id,[])
