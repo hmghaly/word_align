@@ -8,6 +8,17 @@ def get_sqld_val(sqld_fpath,key):
   mydict.close()
   return val
 
+def get_sqld_val_multiple(sqld_fpath,key_list):
+  if not os.path.exists(sqld_fpath): return None
+  output_dict={}
+  mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=True)
+  for key in key_list:
+    val=mydict.get(key)
+    output_dict[key]=val
+  mydict.close()
+  return output_dict
+
+
 def update_sqld_val(sqld_fpath,key,val,overwrite=True):
   output={}
   mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=True)
