@@ -973,6 +973,10 @@ def tok_bitext(list0,params0={}):
     tokenized_bitext_list0.append((cur_loc,src_toks0,trg_toks0))
   return tokenized_bitext_list0
 
+def index_sent_toks(sent_toks,sent_number,max_sent_size=1000):
+  indexed_sent0=[(v,sent_number+vi/max_sent_size) for vi,v in enumerate(sent_toks) if vi<max_sent_size and v!=""]
+  return indexed_sent0
+
 def index_bitext_list(list0,params0={}): #each list item = (loc/sent_id,src_tokens,trg_tokens)
   max_sent_n_tokens=params0.get("max_sent_n_tokens",1000)
   t_bitext0=tok_bitext(list0,params0)
