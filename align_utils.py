@@ -977,6 +977,13 @@ def index_sent_toks(sent_toks,sent_number,max_sent_size=1000):
   indexed_sent0=[(v,sent_number+vi/max_sent_size) for vi,v in enumerate(sent_toks) if vi<max_sent_size and v!=""]
   return indexed_sent0
 
+def get_inv_index(fwd_index):
+  fwd_index.sort()
+  grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(fwd_index,lambda x:x[0])]
+  inverted_index=dict(iter(grouped))  
+  return inverted_index
+
+
 def index_bitext_list(list0,params0={}): #each list item = (loc/sent_id,src_tokens,trg_tokens)
   max_sent_n_tokens=params0.get("max_sent_n_tokens",1000)
   t_bitext0=tok_bitext(list0,params0)
