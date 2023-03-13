@@ -14,6 +14,7 @@ def get_sqld_val_multiple(sqld_fpath,key_list):
   mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=True)
   for key in key_list:
     val=mydict.get(key)
+    if val==None: continue
     output_dict[key]=val
   mydict.close()
   return output_dict
