@@ -216,6 +216,7 @@ def retr_sent_phrase_indexes(sent_toks,inv_index,max_phrase_length=4,min_index_s
 def offset_indexes(index_list0,offset0,max_sent_size0=1000):
   return [v-(offset0/max_sent_size0) for v in index_list0] 
 
+#Use this
 def get_offset_intersection(index_list0,index_list1,max_sent_size0=1000):
   # list0_1000=[int(round(v*max_sent_size0)) for v in index_list0]
   # list1_1000=[int(round(v*max_sent_size0)) for v in index_list1]
@@ -1570,6 +1571,28 @@ def apply_trie(src_toks0,trg_toks0,trie0):
 
 
 def retr(phrase_tokens,inv_index): #retrieve a phrase
+    out_dict={}
+    final_indexes=inv_index.get(phrase_tokens[0],[]) #get_tok_indexes(phrase_tokens[0],inv_index)
+    #cur_phrase=tuple([phrase_tokens[0]])
+    #out_dict[cur_phrase]=final_indexes
+    for token_i,cur_token in enumerate(phrase_tokens):
+        if token_i==0: continue
+        if cur_token=="": continue
+        #if token_i>max_phrase_len: continue
+        cur_phrase=tuple(phrase_tokens[:token_i+1])
+        cur_token_indexes=inv_index.get(cur_token,[]) #get_tok_indexes(cur_token,inv_index)
+        cur_token_indexes_offset=offset_results(cur_token_indexes,token_i)
+        #final_indexes=get_index_intersection(final_indexes,cur_token_indexes_offset)
+        #final_indexes=list(set(final_indexes).intersection(set(cur_token_indexes_offset)))
+        final_indexes=get_offset_intersection(final_indexes,cur_token_indexes_offset)
+        if final_indexes==[]: continue
+        #out_dict[cur_phrase]=final_indexes
+        #if final_indexes==None: final_indexes=inv_index0.get(cur_token)
+    return final_indexes
+
+
+
+def retr_OLD(phrase_tokens,inv_index): #retrieve a phrase
     out_dict={}
     final_indexes=get_tok_indexes(phrase_tokens[0],inv_index)
     cur_phrase=tuple([phrase_tokens[0]])
