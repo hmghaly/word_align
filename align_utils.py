@@ -1574,6 +1574,7 @@ def apply_trie(src_toks0,trg_toks0,trie0):
 def retr(phrase_tokens,inv_index): #retrieve a phrase
     out_dict={}
     final_indexes=inv_index.get(phrase_tokens[0],[]) #get_tok_indexes(phrase_tokens[0],inv_index)
+    if final_indexes==None: final_indexes=[]
     #cur_phrase=tuple([phrase_tokens[0]])
     #out_dict[cur_phrase]=final_indexes
     for token_i,cur_token in enumerate(phrase_tokens):
@@ -1589,6 +1590,7 @@ def retr(phrase_tokens,inv_index): #retrieve a phrase
         if final_indexes==[]: continue
         #out_dict[cur_phrase]=final_indexes
         #if final_indexes==None: final_indexes=inv_index0.get(cur_token)
+    if final_indexes==None: final_indexes=[]
     return final_indexes
 
 
