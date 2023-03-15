@@ -26,6 +26,16 @@ def filter_toks(tok_list0,params={}):
   #remove_al=params0.get("remove_al", False) #remocve alif laam in Arabic 
   return tok_list0
 
+#get lines of a file by going to each item in the index list (file locations)
+def get_lines_simple(file_obj,index_list):
+  line_list=[]
+  for a in index_list:
+    line_loc=int(a)
+    file_obj.seek(line_loc)
+    line0=file_obj.readline()
+    line_list.append(line0.strip())
+  return line_list
+
 #Most important functions
 def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_length=3,min_intersection_count=10): #match src/trg phrase based on index matching intersection/ratio
   src_phrase_index_loc_dict=retr_sent_phrase_indexes(src_tokens0,src_index0,max_phrase_length=max_phrase_length)
