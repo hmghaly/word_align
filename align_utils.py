@@ -243,9 +243,111 @@ def get_src_trg_intersection(src_list0,trg_list0):
   ratio0=len(intersection0)/(len(src_list0)+len(trg_list0)-len(intersection0))
   return ratio0,len(intersection0)
 
+#17 March 2023
+def get_aligned_path(matching_list,n_epochs=5,max_dist=4):
+  matching_list.sort(key=lambda x:(-round(x[-1],1),x[-2],-len(x[0])-len(x[1]),x[-1])) #sorting criteria - rounded weight, frequency,length, and then just weight
+  el_dict={}
+  el_child_dict={}
+  src_span_el_dict,trg_span_el_dict={},{}
+  
+  ml_new=[]
+  #original_ml=[]
+  used_src_phrases,used_trg_phrases=[],[]
+  for a in matching_list: #we process the matching list in order to obtain the top matches with their spans
+    #TODO: use the counter of used instances spans of src/trg phrases based on the number of spans of a valid pair
+    src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection0,ratio0=a
+    valid=True
+    for src_span0 in src_locs0:
+      for trg_span0 in trg_locs0: 
+        el0=(src_span0,trg_span0)
+        #original_ml.append((el0,ratio0)) 
+        src_span_el_dict[src_span0]=src_span_el_dict.get(src_span0,[])+[(el0,ratio0)] 
+        trg_span_el_dict[trg_span0]=trg_span_el_dict.get(trg_span0,[])+[(el0,ratio0)] 
+    if src_phrase0 in used_src_phrases or trg_phrase0 in used_trg_phrases: valid=False
+    if ratio0<0.01: valid=False
+
+    if not valid: continue
+    used_src_phrases.append(src_phrase0)
+    used_trg_phrases.append(trg_phrase0)   
+    ml_new.append(a) #this is where we store the valid matching phrases with their weights and spans
+    #print(">>>>>>>>",a)
+
+  for a in ml_new: #now we create the elements of span pairs
+    src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection0,ratio0=a
+    for src_span0 in src_locs0:
+      src_start0,src_end0=src_span0
+      for trg_span0 in trg_locs0:
+        el0=(src_span0,trg_span0)
+        found_wt=el_dict.get(el0,0)
+        if ratio0>found_wt: 
+          el_dict[el0]=ratio0
+          #print("added el to dict:", el0,ratio0)
+  
+  child_dict={}
+  used_pair_wt_dict={}
+  cur_max_wt0=0
+  for epoch0 in range(n_epochs):
+    el_items=list(el_dict.items())
+    #print("epoch0",epoch0,"items:",len(el_items))
+    for i0,item0 in enumerate(el_items):
+      el0,wt0=item0
+      src_span0,trg_span0=el0
+      for item1 in el_items[i0+1:]:
+        el1,wt1=item1
+        cur_pair_key=(el0,el1)
+        combined_wt_check=used_pair_wt_dict.get(cur_pair_key)
+        #if pair was used before, and its combined wt is equal to what it was before, skip
+        if combined_wt_check==None or combined_wt_check<wt0+wt1: used_pair_wt_dict[cur_pair_key]=wt0+wt1
+        else: continue
+        src_span1,trg_span1=el1
+        cur_src_dist=get_span_dist(src_span0,src_span1)
+        cur_trg_dist=get_span_dist(trg_span0,trg_span1) 
+        if cur_src_dist>max_dist or cur_trg_dist>max_dist: continue
+        if cur_src_dist<0 or cur_trg_dist<0: continue
+        if cur_src_dist<1 and src_span0!=src_span1: continue
+        if cur_trg_dist<1 and trg_span0!=trg_span1: continue
+        if src_span0==src_span1 and cur_trg_dist>2: continue
+        if trg_span0==trg_span1 and cur_src_dist>2: continue
+        combined_wt01=wt0+wt1
+        combined_el01=combine_els(el0,el1) 
+        found_wt=el_dict.get(combined_el01,0)
+        if combined_wt01>found_wt:
+          el_dict[combined_el01]=combined_wt01
+          child_dict[combined_el01]=(el0,el1)
+
+    el_items=list(el_dict.items())
+    el_items.sort(key=lambda x:-x[-1])
+    used_src,used_trg=[],[]
+    filled_used_src,filled_used_trg=[],[] #used src/trg for filling purposes - corresponding to src/trg locs already filled by elements without children
+    epoch_final_els0=[]
+    src_span_dict,trg_span_dict={},{}
+    for el0,el_wt0 in el_items: #we refine the el_dict items to get the most highly weighted elements and their children as our solution
+      src_span0,trg_span0=el0
+      src_range0=list(range(src_span0[0],src_span0[1]+1))
+      trg_range0=list(range(trg_span0[0],trg_span0[1]+1))
+      if any([v in used_src for v in src_range0]): continue
+      if any([v in used_trg for v in trg_range0]): continue
+      used_src.extend(src_range0)
+      used_trg.extend(trg_range0)
+      epoch_final_els0.append((el0,el_wt0))
+    final_total_wt=sum([v[1] for v in epoch_final_els0])
+    #print("final_total_wt",final_total_wt)
+    #for a in epoch_final_els0:
+    #   print("final el0:",a)
+    # print("==================================")
+    if cur_max_wt0>0 and cur_max_wt0==final_total_wt: break
+    cur_max_wt0=final_total_wt
+  final_els=[]
+  for el0,wt0 in epoch_final_els0:  
+    children=get_rec_el_children(el0,child_dict,[])
+    #final_els.append((el0,wt0,children))
+    for ch0 in children:
+      sub_children=child_dict.get(ch0,[])
+      final_els.append((ch0,el_dict.get(ch0,0),sub_children))
+  return final_els
 
 #2 Jan 2023
-def get_aligned_path(matching_list,n_epochs=3,max_dist=4,max_src_span=6,dist_penalty=0.1,top_n=2):
+def get_aligned_path_OLD(matching_list,n_epochs=3,max_dist=4,max_src_span=6,dist_penalty=0.1,top_n=2):
   #matching_list.sort(key=lambda x:-x[-1])
   matching_list.sort(key=lambda x:(-round(x[-1],1),x[-2],-len(x[0])-len(x[1]),x[-1])) #sorting criteria - rounded weight, frequency,length, and then just weight
   #print("all_matching",len(matching_list))
