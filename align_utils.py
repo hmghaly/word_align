@@ -2006,7 +2006,8 @@ def walign(src_sent,trg_sent,params0={}):
   all_matching=phon_match0+exact_match0+index_match0+phrase_match0+term_match0+acr_match0
 
   #(matching_list,n_epochs=3,max_dist=4,max_src_span=6,dist_penalty=0.1,top_n=2)
-  align_list=get_aligned_path(all_matching,n_epochs=cur_n_epochs,max_dist=cur_max_dist,max_src_span=cur_max_src_span,dist_penalty=0)
+  #align_list=get_aligned_path(all_matching,n_epochs=cur_n_epochs,max_dist=cur_max_dist,max_src_span=cur_max_src_span,dist_penalty=0)
+  align_list=get_aligned_path(all_matching,n_epochs=cur_n_epochs,max_dist=cur_max_dist)
   results={}
   results["src"]=src_tokens
   results["trg"]=trg_tokens
