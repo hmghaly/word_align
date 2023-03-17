@@ -1878,6 +1878,8 @@ def walign(src_sent,trg_sent,params0={}):
   acr_dict0=params0.get("acr_dict",{})
   custom_dict0=params0.get("custom_dict",{})
   cur_default_keyed_wt0=params0.get("default_keyed_wt",1) #default weight for keyed items (e.g. terms, acronyms, phrases)
+  cur_debug=params0.get("debug",False)
+  #cur_debug=False
   
   src_tokens=tok_fn(src_sent)
   if lang2_tok_fn!=None: trg_tokens=lang2_tok_fn(trg_sent)
@@ -1900,6 +1902,7 @@ def walign(src_sent,trg_sent,params0={}):
   term_match0=match_keyed_dict(src_tokens_lower,trg_tokens_lower,term_dict0)
   acr_match0=match_keyed_dict(src_tokens,trg_tokens,acr_dict0)
   all_matching=phon_match0+exact_match0+index_match0+phrase_match0+term_match0+acr_match0
+
   #(matching_list,n_epochs=3,max_dist=4,max_src_span=6,dist_penalty=0.1,top_n=2)
   align_list=get_aligned_path(all_matching,n_epochs=cur_n_epochs,max_dist=cur_max_dist,max_src_span=cur_max_src_span,dist_penalty=0)
   results={}
@@ -1909,6 +1912,7 @@ def walign(src_sent,trg_sent,params0={}):
   results["terms"]=[v[:2] for v in term_match0]
   results["acr"]=[v[:2] for v in acr_match0]
   results["phon"]=[v[:2] for v in phon_match0]
+  if cur_debug: results["debug"]=all_matching
 
   return results
 
