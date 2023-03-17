@@ -215,7 +215,7 @@ def char_is_punct(char0):
   return False
 
 def tok(txt):
-  txt=txt.replace('’s ',"'s ")
+  #txt=txt.replace('’s ',"'s ")
   new_str=""
   txt_split=txt.split()
   punc_exists_dict={}
@@ -243,6 +243,7 @@ def tok(txt):
     bare_token=bare_token.replace(")"," _) ")
     bare_token=bare_token.replace('"',' " ')
     if bare_token.endswith("'s"): bare_token=bare_token[:-2]+" _'s"
+    if bare_token.endswith("’s"): bare_token=bare_token[:-2]+" _'s"
     if bare_token.startswith("و") and bare_token[1:].isdigit(): bare_token=bare_token[0]+" "+bare_token[1:]
     #print([item0,begin_punc_chars,end_punc_chars, bare_token])
     for i0,char0 in enumerate(begin_punc_chars):
