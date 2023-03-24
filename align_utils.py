@@ -937,6 +937,27 @@ def match_keyed_dict(src_tokens,trg_tokens,keyed_dict): #match unigram/bigramed 
         all_matching_list.append((src_phrase0,trg_phrase0,src_span0,trg_span0,freq0,wt0))
   return all_matching_list
 
+def qa_keyed_dict(src_tokens,trg_tokens,keyed_dict): #inspect if for a keyed dict, each phrase found in source have corresponding trg phrase
+  all_qa_list=[]
+  src_unigrams_bigrams=get_unigrams_bigrams(src_tokens)
+  for ub in src_unigrams_bigrams:
+    corr_dict=keyed_dict.get(ub)
+    if corr_dict==None: continue
+    for src_phrase0,corr_trg_vals in corr_dict.items():
+      src_span0=general.is_in(src_phrase0.split(),src_tokens)
+      if not src_span0: continue
+      #the src phrase exists
+      corr_trg_vals.append((src_phrase0,0)) #to account for situations where the corresponding term is also in English
+      trg_corr=[]
+      for trg_phrase0,trg_val0 in corr_trg_vals:
+        trg_span0=general.is_in(trg_phrase0.split(),trg_tokens)
+        trg_corr.append((trg_phrase0,trg_span0))
+      all_qa_list.append((src_phrase0,src_span0,trg_corr))
+        # if not trg_span0: continue
+        # freq0,wt0=trg_val0
+        # all_matching_list.append((src_phrase0,trg_phrase0,src_span0,trg_span0,freq0,wt0))
+  return all_qa_list
+
 
 #29 Dec 2022
 def get_phon_matching(src_toks,trg_toks,default_ratio=0.1):
