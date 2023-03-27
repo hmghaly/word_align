@@ -941,8 +941,8 @@ def match_keyed_dict(src_tokens,trg_tokens,keyed_dict): #match unigram/bigramed 
 def qa_keyed_dict(src_tokens,trg_tokens,keyed_dict,dict_type="",filter_params={}): #inspect if for a keyed dict, each phrase found in source have corresponding trg phrase
   all_qa_list=[]
   #print("testing")
-  src_tokens=filter_toks(src_tokens,filter_params)
-  trg_tokens=filter_toks(trg_tokens,filter_params)
+  #src_tokens=filter_toks(src_tokens,filter_params)
+  #trg_tokens=filter_toks(trg_tokens,filter_params)
   src_unigrams_bigrams=get_unigrams_bigrams(src_tokens)
   for ub in src_unigrams_bigrams:
     #print(ub)
@@ -952,7 +952,7 @@ def qa_keyed_dict(src_tokens,trg_tokens,keyed_dict,dict_type="",filter_params={}
     for src_phrase0,corr_trg_vals in corr_dict.items(): #phrase is a token-ready string
       #print(src_phrase0)
       src_phrase_tokens0=src_phrase0.split()
-      src_phrase_tokens0=filter_toks(src_phrase_tokens0,filter_params)
+      #src_phrase_tokens0=filter_toks(src_phrase_tokens0,filter_params)
       src_span0=general.is_in(src_phrase_tokens0,src_tokens)
       new_src_span=[]
       for ss in src_span0:
@@ -960,11 +960,13 @@ def qa_keyed_dict(src_tokens,trg_tokens,keyed_dict,dict_type="",filter_params={}
         if end0-start0==len(src_phrase_tokens0)-1: new_src_span.append(ss)
       if not new_src_span: continue
       #the src phrase exists
+      #print(src_phrase0)
       corr_trg_vals.append((src_phrase0,0)) #to account for situations where the corresponding term is also in English
       trg_corr=[]
       for trg_phrase0,trg_val0 in corr_trg_vals:
         trg_phrase_tokens0=trg_phrase0.split()
-        trg_phrase_tokens0=filter_toks(trg_phrase_tokens0,filter_params)
+        print(trg_phrase_tokens0)
+        #trg_phrase_tokens0=filter_toks(trg_phrase_tokens0,filter_params)
         trg_span0=general.is_in(trg_phrase_tokens0,trg_tokens)
         trg_corr.append((trg_phrase0,trg_span0))
       all_qa_list.append((src_phrase0,src_span0,dict_type,trg_corr))
@@ -972,6 +974,41 @@ def qa_keyed_dict(src_tokens,trg_tokens,keyed_dict,dict_type="",filter_params={}
         # freq0,wt0=trg_val0
         # all_matching_list.append((src_phrase0,trg_phrase0,src_span0,trg_span0,freq0,wt0))
   return all_qa_list
+
+# def qa_keyed_dict(src_tokens,trg_tokens,keyed_dict,dict_type="",filter_params={}): #inspect if for a keyed dict, each phrase found in source have corresponding trg phrase
+#   all_qa_list=[]
+#   #print("testing")
+#   src_tokens=filter_toks(src_tokens,filter_params)
+#   trg_tokens=filter_toks(trg_tokens,filter_params)
+#   src_unigrams_bigrams=get_unigrams_bigrams(src_tokens)
+#   for ub in src_unigrams_bigrams:
+#     #print(ub)
+#     corr_dict=keyed_dict.get(ub)
+#     #print(corr_dict)
+#     if corr_dict==None: continue
+#     for src_phrase0,corr_trg_vals in corr_dict.items(): #phrase is a token-ready string
+#       #print(src_phrase0)
+#       src_phrase_tokens0=src_phrase0.split()
+#       src_phrase_tokens0=filter_toks(src_phrase_tokens0,filter_params)
+#       src_span0=general.is_in(src_phrase_tokens0,src_tokens)
+#       new_src_span=[]
+#       for ss in src_span0:
+#         start0,end0=ss
+#         if end0-start0==len(src_phrase_tokens0)-1: new_src_span.append(ss)
+#       if not new_src_span: continue
+#       #the src phrase exists
+#       corr_trg_vals.append((src_phrase0,0)) #to account for situations where the corresponding term is also in English
+#       trg_corr=[]
+#       for trg_phrase0,trg_val0 in corr_trg_vals:
+#         trg_phrase_tokens0=trg_phrase0.split()
+#         trg_phrase_tokens0=filter_toks(trg_phrase_tokens0,filter_params)
+#         trg_span0=general.is_in(trg_phrase_tokens0,trg_tokens)
+#         trg_corr.append((trg_phrase0,trg_span0))
+#       all_qa_list.append((src_phrase0,src_span0,dict_type,trg_corr))
+#         # if not trg_span0: continue
+#         # freq0,wt0=trg_val0
+#         # all_matching_list.append((src_phrase0,trg_phrase0,src_span0,trg_span0,freq0,wt0))
+#   return all_qa_list
 
 # def qa_keyed_dict(src_tokens,trg_tokens,keyed_dict,filter_params={}): #inspect if for a keyed dict, each phrase found in source have corresponding trg phrase
 #   all_qa_list=[]
