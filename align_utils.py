@@ -11,13 +11,29 @@ import arabic_lib
 
 def filter_toks(tok_list0,params={}):
   cur_excluded_words=params.get("excluded_words",[])
+  keep_all_tokens=params.get("keep_all_tokens",False)
+  exclude_numbers=params.get("exclude_numbers",False)
+  exclude_single_chars=params.get("exclude_single_chars",True)
+  exclude_punc=params.get("exclude_punc",True)
+  ignore_ar_pre_suf=params.get("ignore_ar_pre_suf",True)
+
+  if keep_all_tokens:
+    cur_excluded_words=[]
+    exclude_numbers=False
+    exclude_single_chars=False
+    exclude_punc=False
+    ignore_ar_pre_suf=False
+
+
+
   if params.get("lower",True): tok_list0=[v.lower() for v in tok_list0] #make all words lower case or not
-  if cur_excluded_words!=[]: tok_list0=[v if not v in cur_excluded_words else "" for v in tok_list0] #ignore stop words
-  if params.get("exclude_numbers",False): tok_list0=[v if not v.isdigit() else "" for v in tok_list0] #ignore single character tokens
-  if params.get("exclude_single_chars",True): tok_list0=[v if len(v)>1 else "" for v in tok_list0] #ignore single character tokens
-  if params.get("exclude_punc",True): tok_list0=[v if not general.is_punct(v) else "" for v in tok_list0] #ignore punctuation
   
-  if params.get("ignore_ar_pre_suf",True): tok_list0=["" if v.startswith("ـ") or v.endswith("ـ") else v for v in tok_list0] #ignore arabic prefixes and suffixes
+  if cur_excluded_words!=[]: tok_list0=[v if not v in cur_excluded_words else "" for v in tok_list0] #ignore stop words
+  if exclude_numbers: tok_list0=[v if not v.isdigit() else "" for v in tok_list0] #ignore single character tokens
+  if exclude_single_chars: tok_list0=[v if len(v)>1 else "" for v in tok_list0] #ignore single character tokens
+  if exclude_punc: tok_list0=[v if not general.is_punct(v) else "" for v in tok_list0] #ignore punctuation
+  if ignore_ar_pre_suf: tok_list0=["" if v.startswith("ـ") or v.endswith("ـ") else v for v in tok_list0] #ignore arabic prefixes and suffixes
+
   if params.get("remove_ar_diacritics",True): tok_list0=[general.remove_diactitics(v) for v in tok_list0] #remove Arabic diacritics
   if params.get("remove_al",True): tok_list0=[v.replace("ال_","") for v in tok_list0] #remove alif laam for the beginning of Arabic words
   if params.get("normalize_taa2_marbootah",False): tok_list0=[v[:-1]+"ت"  if v.endswith("ة") else v for v in tok_list0] #normalize taa2 marbootah
