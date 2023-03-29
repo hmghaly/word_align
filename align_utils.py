@@ -895,7 +895,7 @@ def match_el_lists(el_list0,el_list1,el_dict0,max_dist=3,max_src_span=4,allow_or
 
 
 
-def get_unigrams_bigrams(token_list, exclude_numbers=True,exclude_single_chars=True): #for a list of tokens, identify all unigrams and bigrams
+def get_unigrams_bigrams(token_list, exclude_numbers=False,exclude_single_chars=False): #for a list of tokens, identify all unigrams and bigrams
   list_unigrams_bigrams0=[]
   for uni0 in list(set(token_list)):
     if exclude_numbers and uni0.isdigit():continue
