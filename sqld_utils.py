@@ -1,6 +1,12 @@
 from sqlitedict import SqliteDict #Make sure to install it 
 import os, json
 
+def open_sqld(sqld_fpath):
+  if not os.path.exists(sqld_fpath): return None
+  mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=True)
+  return mydict
+
+
 def get_sqld_val(sqld_fpath,key):
   if not os.path.exists(sqld_fpath): return None
   mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=True)
