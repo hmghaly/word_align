@@ -965,7 +965,7 @@ def qa_keyed_dict(src_tokens,trg_tokens,keyed_dict,dict_type="",filter_params={}
       trg_corr=[]
       for trg_phrase0,trg_val0 in corr_trg_vals:
         trg_phrase_tokens0=trg_phrase0.split()
-        print(trg_phrase_tokens0)
+        #print(trg_phrase_tokens0)
         #trg_phrase_tokens0=filter_toks(trg_phrase_tokens0,filter_params)
         trg_span0=general.is_in(trg_phrase_tokens0,trg_tokens)
         trg_corr.append((trg_phrase0,trg_span0))
