@@ -518,6 +518,21 @@ def read_tsv(tsv_fpath):
   tsv_fopen.close()
   return out_list
 
+def process_tsv_content(tsv_content):
+  output0=[]
+  tsv_content=tsv_content.replace("\r\n","\n")
+  lines=tsv_content.split("\n")
+  for i0,row0 in enumerate(lines):
+    row_split=row0.split("\t")
+    row_split=[v.strip() for v in row_split]
+    if i0==0:
+      headers=row_split
+    else:
+      row_dict=dict(iter(zip(headers,row_split)))
+      output0.append(row_dict)
+  return output0
+
+
 
 def html_bitext2list(bitext_path):
   fopen=open(bitext_path)

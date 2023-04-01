@@ -9,6 +9,12 @@ import general
 #This library is for accessing web pages, reading and processing their content
 #and also for templating web pages by DOM manipulation
 
+def download_file(file_url):
+  with requests.Session() as sess0:
+    download = sess0.get(file_url)
+    decoded_content0 = download.content.decode('utf-8')
+  return decoded_content0
+
 def get_attrs(tag0):
   found_attrs=re.findall('(\S+)="(.+?)"',tag0)
   return dict(iter(found_attrs))
