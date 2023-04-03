@@ -89,111 +89,6 @@ def get_index_matching(src_tokens0,trg_tokens0,src_index0,trg_index0,max_phrase_
       matching_list.append((src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,adj_ratio))
   return matching_list
   #final_matching_list=
-  
-  # combined_first_matched_list=[]
-  # for a,b in matching_dict.items():
-  #   first_src=a[0][0]
-  #   combined_first_matched_list.append((first_src,a,b))
-  # combined_first_matched_list.sort(key=lambda x:x[0])
-  # grouped=[(key,[v[1:] for v in list(group)]) for key,group in groupby(combined_first_matched_list,lambda x:x[0])]
-  # first_dict=dict(iter(grouped))
-  # child_dict={}
-  # new_matching_dict={} #dict(matching_dict)
-  # all_matching_items=list(matching_dict.items())
-  # all_matching_items.sort(key=lambda x:len(x[0][0]+x[0][1]))
-  # for pair,wt in all_matching_items:
-    
-  #   final_wt=wt
-  #   new_matching_dict[pair]=final_wt
-  #   src_tuple0,trg_tuple0=pair
-  #   #if len(src_tuple0)==1 and len(trg_tuple0)==1: continue
-  #   #print(">>>>",pair,wt)
-  #   for tok0 in src_tuple0:
-  #       if tok0=="": continue
-  #       candidate_child_pairs=first_dict.get(tok0,[])
-  #       for cd_pair,cd_wt in candidate_child_pairs:
-  #           if cd_pair==pair: continue
-  #           cd_src,cd_trg=cd_pair
-  #           if general.is_in(cd_src,src_tuple0) and general.is_in(cd_trg,trg_tuple0):
-  #               final_wt+=cd_wt
-  #               new_matching_dict[pair]=final_wt
-  #               child_dict[pair]=child_dict.get(pair,[])+[cd_pair]
-  # new_matching_dict_items=list(new_matching_dict.items())
-  # new_matching_dict_items.sort(key=lambda x:-x[-1])
-  # for a in new_matching_dict_items[:20]:
-  #   print(">>>",a,child_dict.get(a[0]))
-
-
-
-  #Let's try to avoid doing this
-  # matching_list.sort(key=lambda x:(-round(x[-1],1),-x[-2],-len(x[0])-len(x[1])))
-  # used_src_phrases=[]
-  # used_trg_phrases=[]
-  # final_matching_list=[]
-  # src_used_counter_dict,trg_used_counter_dict={},{}
-  # #print("matching_list",len(matching_list))
-  # for i,a in enumerate(matching_list):
-  #   src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
-  #   if i<50: print(">>>>",a)
-  #   # min_n_locs=min(len(src_locs0),len(trg_locs0))
-  #   # # src_check=src_used_counter_dict.get(src_phrase0,len(src_locs0))
-  #   # # trg_check=trg_used_counter_dict.get(trg_phrase0,len(trg_locs0))
-  #   # src_check=src_used_counter_dict.get(src_phrase0)
-  #   # trg_check=trg_used_counter_dict.get(trg_phrase0)
-  #   # # if src_check==None or trg_check==None: #either phrase is the top phrase/not used before
-  #   # #     if not a in final_matching_list: final_matching_list.append(a)
-  #   # if src_check==None: src_check=len(src_locs0)
-  #   # if trg_check==None: trg_check=len(trg_locs0)
-
-
-  #   # # valid=False
-  #   # # if src_check==len(src_locs0) or trg_check==len(trg_locs0): valid=True
-  #   # # elif src_check>0 and trg_check>0: valid=True #final_matching_list.append(a)
-  #   # # if not valid: continue
-  #   # # print(src_check,trg_check,a)
-  #   # src_used_counter_dict[src_phrase0]=src_check-min_n_locs
-  #   # trg_used_counter_dict[trg_phrase0]=trg_check-min_n_locs
-  #   # # final_matching_list.append(a)
-  #   # # #if src_phrase0=='document': print(a)
-  #   if src_phrase0 in used_src_phrases: continue
-  #   if trg_phrase0 in used_trg_phrases: continue
-  #   used_src_phrases.append(src_phrase0)
-  #   used_trg_phrases.append(trg_phrase0)
-  #   #final_matching_list.append(a)
-  #   if not a in final_matching_list: final_matching_list.append(a)
-  # for a in matching_list:
-  #   src_phrase0,trg_phrase0,src_locs0,trg_locs0,intersection1,ratio1=a
-  #   valid=False
-  #   if not src_phrase0 in used_src_phrases: valid=True
-  #   if not trg_phrase0 in used_trg_phrases: valid=True
-  #   if valid:
-  #       used_src_phrases.append(src_phrase0)
-  #       used_trg_phrases.append(trg_phrase0)
-  #       if not a in final_matching_list: final_matching_list.append(a)
-
-  # matching_list.sort(key=lambda x:x[0]) #group for source phrase
-  # matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[0])]
-  # for grp0 in matching_list_grouped:
-  #   grp0.sort(key=lambda x:-x[-1])
-  #   if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
-  #   for a in grp0:
-  #       if a in final_matching_list: continue
-  #       final_matching_list.append(a)
-  #       break
-  # matching_list.sort(key=lambda x:x[1]) #group for target phrase
-  # matching_list_grouped=[list(group) for key,group in groupby(matching_list,lambda x:x[1])]
-  # for grp0 in matching_list_grouped:
-  #   grp0.sort(key=lambda x:-x[-1])
-  #   if not grp0[0] in final_matching_list: final_matching_list.append(grp0[0])  
-  #   for a in grp0:
-  #       if a in final_matching_list: continue
-  #       final_matching_list.append(a)
-  #       break
-    # for s1 in src_locs0:
-    #   for t1 in trg_locs0:
-    #     final_matching_list.append((s1,t1,ratio1,intersection1))
-  # return final_matching_list
-
 
 def retr_sent_phrase_indexes(sent_toks,inv_index,max_phrase_length=4,min_index_size=5): #get the indexes of the phrases of the tokenized sentence, together with their location info
   phrase_index_dict={}
@@ -1303,13 +1198,15 @@ def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12, 
 
 def get_aligned_chunks(aligned_elements,min_phrase_len=5): #to split a sentence into contiguous aligned chunks, based on alignment information
   all_single_pts=[]
-  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+  for el_item in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+  	el0,el_wt0=el_item[:2]
     src_span0,trg_span0=el0
     src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
     for a in src_range0:
       for b in trg_range0: all_single_pts.append((a,b)) #identifying single points (not elements)
   chunk_boundaries=[]
-  for el0,el_wt0 in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+  for el_item in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
+  	el0,el_wt0=el_item[:2]
     src_span0,trg_span0=el0
     last_x,last_y=src_span0[-1],trg_span0[-1]
     valid=True
