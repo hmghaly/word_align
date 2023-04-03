@@ -1199,14 +1199,14 @@ def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12, 
 def get_aligned_chunks(aligned_elements,min_phrase_len=5): #to split a sentence into contiguous aligned chunks, based on alignment information
   all_single_pts=[]
   for el_item in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
-  	el0,el_wt0=el_item[:2]
+    el0,el_wt0=el_item[:2]
     src_span0,trg_span0=el0
     src_range0,trg_range0=range(src_span0[0],src_span0[1]+1),range(trg_span0[0],trg_span0[1]+1)
     for a in src_range0:
       for b in trg_range0: all_single_pts.append((a,b)) #identifying single points (not elements)
   chunk_boundaries=[]
   for el_item in aligned_elements: #identifying aligned/unaligned locs in scr/trg tokens
-  	el0,el_wt0=el_item[:2]
+    el0,el_wt0=el_item[:2]
     src_span0,trg_span0=el0
     last_x,last_y=src_span0[-1],trg_span0[-1]
     valid=True
