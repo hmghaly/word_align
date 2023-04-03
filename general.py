@@ -601,10 +601,12 @@ def norm_lam_alef(ar_txt_uc):
 
 # Clean Arabic Text from diacritics and tatweel
 def clean_ar(ar_txt): #unicode text
+
     output=remove_diactitics(ar_txt)
     output=from_hindi(output)
     output=output.replace('/ ','/')
     output=norm_lam_alef(output)
+    output=output.replace('\u200f',"").replace('\u200e',"")
 
     #output=re.sub("(\d) (\d)",r"\1\2",output) #to normalize the string of the numbers to their bare value
     #output=output.strip()
