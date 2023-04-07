@@ -458,3 +458,26 @@ def html_with_tags2sents(html_content,apply_tika=True):
 # #print(page_obj.meta_content)
 # links=page_obj.all_links
 # text=page_obj.clean_text
+
+def get_bare_url(full_url): #the the top level domain of the url, stripping http, https, www, slash and colons
+  bare_url=full_url.replace("http://","").replace("https://","")
+  if bare_url.startswith("www."): bare_url=bare_url.replace("www.","")
+  if bare_url.startswith("www1."): bare_url=bare_url.replace("www1.","")
+  if bare_url.startswith("www2."): bare_url=bare_url.replace("www2.","")  
+  bare_url=bare_url.strip("/")
+  bare_url=bare_url.split("/")[0]
+  bare_url=bare_url.split(":")[0]
+  return bare_url
+
+def reverse_url(full_url): #make site.abc.gov.au > au.gov.abc.site to sort by the last part of the url
+  bare_url=full_url.replace("http://","").replace("https://","")
+  if bare_url.startswith("www."): bare_url=bare_url.replace("www.","")
+  if bare_url.startswith("www1."): bare_url=bare_url.replace("www1.","")
+  if bare_url.startswith("www2."): bare_url=bare_url.replace("www2.","")  
+  url_split=bare_url.split("/")
+  first_part=url_split[0]
+  second_part="/".join(url_split[1:])
+  first_part=".".join(reversed(first_part.split(".")))
+  if second_part: r_url=first_part+"/"+second_part #return first_part+"/"+second_part
+  else: r_url=first_part #return first_part
+  return r_url.strip("/")
