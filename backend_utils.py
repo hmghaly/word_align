@@ -16,6 +16,12 @@ def hash_password(pwd0):
     pwd0=pwd0.encode('utf-8')
     return hashlib.sha256(pwd0).hexdigest()
 
+def hash_dict(dict0): #to avoid duplicate entries
+  items=list(dict0.items())
+  items.sort()
+  return hash(str(items))
+
+
 def send_email(email_to0,email_subject0,email_html0,email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
     server = SMTP(server_name0)
     server.set_debuglevel(False)
