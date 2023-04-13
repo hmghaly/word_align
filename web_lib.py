@@ -233,7 +233,7 @@ class DOM:
       if val0==None: continue
       if type(val0) is str: new_content0,new_attrs0=val0,{}
       else: new_content0,new_attrs0=val0 #replacement dict has the values as tuples of new content and new attrs
-      if new_content0==None: continue
+      if new_content0==None and new_attrs0=={}: continue
       if key0.startswith("#"): #we follow jquery selectors, # indicates selection by ID, while . indicates selection by class name
         if key0[1:] in except_ids: continue
         repl_pairs.extend(self.apply_content_by_id(key0[1:],new_content0,new_attrs0))
