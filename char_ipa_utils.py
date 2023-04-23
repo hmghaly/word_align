@@ -69,8 +69,10 @@ def arpabet2ipa(arpabet_symbol0):
 
 
 #==================== 
-import cmudict
-cur_cmu=cmudict.dict()
+try:
+  import cmudict
+  cur_cmu=cmudict.dict()
+except: pass
 
 def word2ipa(word0):
   word0=word0.replace("’","'")
