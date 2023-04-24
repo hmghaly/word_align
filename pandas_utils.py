@@ -63,7 +63,10 @@ def get_wb_data(wb_fpath,dtype0=str):
     sheet_data_list=[]
     cur_sheet0=wb_obj0[sh0]
     for index0,row_dict0 in cur_sheet0.iterrows():
-      sheet_data_list.append(dict(row_dict0))
+      tmp_row_dict={}
+      for a,b in dict(row_dict0).items(): tmp_row_dict[a.strip()]=b.strip()
+      sheet_data_list.append(tmp_row_dict)
+
     wb_data_list0.append(sheet_data_list)
   return wb_data_list0
 
@@ -76,9 +79,11 @@ def get_wb_data_dict(wb_fpath,dtype0=str): #same as above, but data output is in
     sheet_data_list=[]
     cur_sheet0=wb_obj0[sh0]
     for index0,row_dict0 in cur_sheet0.iterrows():
-      sheet_data_list.append(dict(row_dict0))
+      tmp_row_dict={}
+      for a,b in dict(row_dict0).items(): tmp_row_dict[a.strip()]=b.strip()
+      sheet_data_list.append(tmp_row_dict)
     #wb_data_list0.append(sheet_data_list)
-    wb_data_dict0[sh0]=sheet_data_list
+    wb_data_dict0[sh0.strip()]=sheet_data_list
   return wb_data_dict0
 
 
