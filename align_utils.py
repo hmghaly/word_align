@@ -155,7 +155,7 @@ def get_src_trg_intersection(src_list0,trg_list0):
   return ratio0,len(intersection0)
 
 #17 March 2023
-def get_aligned_path(matching_list,n_epochs=5,max_dist=4):
+def get_aligned_path(matching_list,n_epochs=5,max_dist=4,max_span=None,min_wt=0.001):
   matching_list.sort(key=lambda x:(-round(x[-1],1),x[-2],-len(x[0])-len(x[1]),x[-1])) #sorting criteria - rounded weight, frequency,length, and then just weight
   el_dict={}
   el_child_dict={}
@@ -175,7 +175,7 @@ def get_aligned_path(matching_list,n_epochs=5,max_dist=4):
         src_span_el_dict[src_span0]=src_span_el_dict.get(src_span0,[])+[(el0,ratio0)] 
         trg_span_el_dict[trg_span0]=trg_span_el_dict.get(trg_span0,[])+[(el0,ratio0)] 
     if src_phrase0 in used_src_phrases or trg_phrase0 in used_trg_phrases: valid=False
-    if ratio0<0.01: valid=False
+    if ratio0<min_wt: valid=False
 
     if not valid: continue
     used_src_phrases.append(src_phrase0)
@@ -221,6 +221,10 @@ def get_aligned_path(matching_list,n_epochs=5,max_dist=4):
         if trg_span0==trg_span1 and cur_src_dist>2: continue
         combined_wt01=wt0+wt1
         combined_el01=combine_els(el0,el1) 
+        combined_src_span,combined_trg_span=combined_el01
+        if max_span!=None and combined_src_span[1]-combined_src_span[0]>max_span: continue #if larger than max span
+        if max_span!=None and combined_trg_span[1]-combined_trg_span[0]>max_span: continue
+
         found_wt=el_dict.get(combined_el01,0)
         if combined_wt01>found_wt:
           el_dict[combined_el01]=combined_wt01
