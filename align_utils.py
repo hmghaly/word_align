@@ -2043,6 +2043,70 @@ def walign(src_sent,trg_sent,params0={}):
   return results
 
 
+def bert_walign(src_tokens,trg_tokens,align_layer=8,n_epochs=8,max_dist=2,max_span=6):
+  bert_out0=get_bert_align_list(src_toks0,trg_toks0,align_layer=align_layer)
+  aligned_path0=get_aligned_path(bert_out0,n_epochs=n_epochs,max_dist=max_dist,max_span=max_span)
+  return aligned_path0
+
+def get_bert_align_list(src_tokens,trg_tokens,align_layer=8):
+  #token_src, token_tgt = [tokenizer.tokenize(word) for word in sent_src], [tokenizer.tokenize(word) for word in sent_tgt]
+  token_src, token_tgt = [tokenizer.tokenize(word) for word in src_tokens], [tokenizer.tokenize(word) for word in trg_tokens]
+  wid_src, wid_tgt = [tokenizer.convert_tokens_to_ids(x) for x in token_src], [tokenizer.convert_tokens_to_ids(x) for x in token_tgt]
+  ids_src, ids_tgt = tokenizer.prepare_for_model(list(itertools.chain(*wid_src)), return_tensors='pt', model_max_length=tokenizer.model_max_length, truncation=True)['input_ids'], tokenizer.prepare_for_model(list(itertools.chain(*wid_tgt)), return_tensors='pt', truncation=True, model_max_length=tokenizer.model_max_length)['input_ids']
+  sub2word_map_src = []
+  for i, word_list in enumerate(token_src):
+    sub2word_map_src += [i for x in word_list]
+  sub2word_map_tgt = []
+  for i, word_list in enumerate(token_tgt):
+    sub2word_map_tgt += [i for x in word_list]
+
+  out_src = model(ids_src.unsqueeze(0), output_hidden_states=True)[2][align_layer][0, 1:-1]
+  out_tgt = model(ids_tgt.unsqueeze(0), output_hidden_states=True)[2][align_layer][0, 1:-1]
+
+  dot_prod = torch.matmul(out_src, out_tgt.transpose(-1, -2))
+
+  softmax_srctgt = torch.nn.Softmax(dim=-1)(dot_prod)
+  softmax_tgtsrc = torch.nn.Softmax(dim=-2)(dot_prod)
+
+  align_dict={}
+  temp_list=[]
+  for i in range(len(softmax_srctgt)):
+    word_i=sub2word_map_src[i]
+    #src_word=sent_src[word_i] #src_tokens
+    src_word=src_tokens[word_i] #src_tokens
+    cur_row=softmax_srctgt[i]
+    combined_row=[]
+    for j in range(len(cur_row)):
+      #combined_row.append((j,softmax_srctgt[i][j].item(),softmax_tgtsrc[i][j].item()))
+      word_j=sub2word_map_tgt[j]
+      #trg_word=sent_tgt[word_j] #trg_tokens
+      trg_word=trg_tokens[word_j] #trg_tokens
+      ij_val=round(softmax_srctgt[i][j].item(),4)
+      ji_val=round(softmax_tgtsrc[i][j].item(),4)
+      avg_val=combined_val=(ij_val+ji_val)/2
+      max_val=max(ij_val,ji_val)
+      new_val=0.5*(avg_val+max_val)
+      #combined_val=ji_val
+      if combined_val==0: continue
+      if src_word=="the": continue #check - make it general
+      if len(src_word.strip("_"))<2: continue
+      if len(trg_word.strip("_"))<2: continue
+      combined_row.append((word_j,trg_word,combined_val))
+      temp_list.append(((word_i,word_j,src_word,trg_word), combined_val))
+  temp_list.sort()
+  grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(temp_list,lambda x:x[0])]
+  raw_align_list=[]
+  common_count=100
+  for key0,grp0 in grouped:
+    avg_val=sum(grp0)/len(grp0)
+    avg_max=0.5*(max(grp0)+avg_val)
+    x0,y0,src_word0,trg_word0=key0
+    src_span=(x0,x0)
+    trg_span=(y0,y0)
+    wt0=round(avg_max,4)
+    raw_align_list.append((src_word0,trg_word0,[src_span],[trg_span],common_count,wt0))
+  return raw_align_list
+
 
 #================= Sentence alignment
 def norm_sent_size(sent_size0,step=10,max_size=400):
