@@ -189,6 +189,12 @@ def get_chars(start_i,end_i,include_diacritics=False): #generate list of chars d
   return char_list
 
 
+def has_arabic(str0):
+  for char0 in str0:
+    char_ord=ord(char0)
+    if char_ord>=1560 and char_ord<=1646: return True
+  return False
+
 ar_chars=get_chars(start_i=1560,end_i=1646,include_diacritics=False)
 ascii_chars=get_chars(start_i=0,end_i=500,include_diacritics=False)
 
