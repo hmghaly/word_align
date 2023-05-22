@@ -181,6 +181,111 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       self.romanized+=rom
 
 
+def rstrip_if(word,to_strip):
+  if word.endswith(to_strip): word=word[:-len(to_strip)]
+  return word
+def lstrip_if(word,to_strip):
+  if word.startswith(to_strip): word=word[len(to_strip):]
+  return word
+
+
+def conjugate_verb_msa(verb_obj_input):
+  verb_obj=dict(verb_obj_input)
+  past_i=verb_obj.get("conj-past-i","")
+  past_we=verb_obj.get("conj-past-we","")
+  past_he=verb_obj.get("conj-past-he","")
+  past_she=verb_obj.get("conj-past-she","")
+  past_they_2m=verb_obj.get("conj-past-they_2m","")
+  past_they_2f=verb_obj.get("conj-past-they_2f","")
+  past_they_3m=verb_obj.get("conj-past-they_3m","")
+  past_they_3f=verb_obj.get("conj-past-they_3f","")
+  past_you_m=verb_obj.get("conj-past-you_m","")
+  past_you_f=verb_obj.get("conj-past-you_f","")
+  past_you_2=verb_obj.get("conj-past-you_2","")
+  past_you_3m=verb_obj.get("conj-past-you_3m","")
+  past_you_3f=verb_obj.get("conj-past-you_3f","")
+  #print("past_we",past_we)
+
+
+  present_he=verb_obj.get("conj-present-he","")
+  imperative_m=verb_obj.get("conj-imperative-m","")
+  imperative_f=verb_obj.get("conj-imperative-f","")
+  imperative_2=verb_obj.get("conj-imperative-2","")
+  imperative_3m=verb_obj.get("conj-imperative-3m","")
+  imperative_3f=verb_obj.get("conj-imperative-3f","")
+
+  present_we=verb_obj.get("conj-present-we","")
+  present_she=verb_obj.get("conj-present-she","")
+  present_they_2m=verb_obj.get("conj-present-they_2m","")
+  present_they_2f=verb_obj.get("conj-present-they_2f","")
+  present_they_3m=verb_obj.get("conj-present-they_3m","")
+  present_they_3f=verb_obj.get("conj-present-they_3f","")
+
+  present_you_m=verb_obj.get("conj-present-you_m","")
+  present_you_f=verb_obj.get("conj-present-you_f","")
+  present_you_2=verb_obj.get("conj-present-you_2","")
+  present_you_3m=verb_obj.get("conj-present-you_3m","")
+  present_you_3f=verb_obj.get("conj-present-you_3f","")
+
+  present_i=verb_obj.get("conj-present-i","")
+  masdar=verb_obj.get("conj-masdar","")
+  if past_i=="": past_i=verb_obj["conj-past-i"]=past_he.rstrip("َ")+"تُ"
+  if past_i[-1]!="ُ": past_i+="ُ"
+  if present_he=="": present_he=verb_obj["conj-present-he"]="يَ"+past_he.rstrip("َ")
+
+  if imperative_m!="-":
+    base_imperative=imperative_m
+    if present_he.endswith("ى"):base_imperative=base_imperative.rstrip("َِ")+"ي"
+    if present_he.endswith("و"):base_imperative=base_imperative.rstrip("ُ")+"و"
+
+    if imperative_m=="": imperative_m=verb_obj["conj-imperative-m"]=past_he.rstrip("َ")
+    if imperative_f=="": imperative_f=verb_obj["conj-imperative-f"]=imperative_m+"ي"
+    if imperative_2=="": imperative_2=verb_obj["conj-imperative-2"]=base_imperative+"ا"
+    if imperative_3m=="": imperative_3m=verb_obj["conj-imperative-3m"]=imperative_m+"وا"
+    if imperative_3f=="": imperative_3f=verb_obj["conj-imperative-3f"]=base_imperative+"نَ"
+  
+  past_base_he_form=rstrip_if(past_he,"ى")
+  past_base_he_form_y=past_base_he_form
+  if past_he.endswith("ى"): past_base_he_form_y=rstrip_if(past_he,"ى")+"ي"
+  if past_we=="": past_we=verb_obj["conj-past-we"]=rstrip_if(past_i,"تُ")+"نا" #past_i.rstrip("َ")+"تُ"
+  if past_she=="": past_she=verb_obj["conj-past-she"]=past_base_he_form+"ت" #rstrip_if(past_he,"تُ")+"نا"
+  if past_they_2m=="": past_they_2m=verb_obj["conj-past-they_2m"]=past_base_he_form_y+"ا" #rstrip_if(past_he,"تُ")+"نا"
+  if past_they_2f=="": past_they_2f=verb_obj["conj-past-they_2f"]=past_base_he_form+"تا" #rstrip_if(past_he,"تُ")+"نا"
+  if past_they_3m=="": past_they_3m=verb_obj["conj-past-they_3m"]=past_base_he_form.rstrip("َ")+"وا" #rstrip_if(past_he,"تُ")+"نا"
+  if past_they_2f=="": past_they_2f=verb_obj["conj-past-they_2f"]=past_base_he_form.rstrip("َ")+"نَ" #rstrip_if(past_he,"تُ")+"نا"
+
+  past_base_i_form=rstrip_if(past_i,"تُ")
+  if past_you_m=="": past_you_m=verb_obj["conj-past-you_m"]=past_base_i_form+"تَ" #rstrip_if(past_he,"تُ")+"نا"
+  if past_you_f=="": past_you_f=verb_obj["conj-past-you_f"]=past_base_i_form+"تِ" #rstrip_if(past_he,"تُ")+"نا"
+  if past_you_2=="": past_you_2=verb_obj["conj-past-you_2"]=past_base_i_form+"تُما" #rstrip_if(past_he,"تُ")+"نا"
+  if past_you_3m=="": past_you_3m=verb_obj["conj-past-you_3m"]=past_base_i_form+"تُم" #rstrip_if(past_he,"تُ")+"نا"
+  if past_you_3f=="": past_you_3f=verb_obj["conj-past-you_3f"]=past_base_i_form+"تُنَّ" #rstrip_if(past_he,"تُ")+"نا"
+
+  present_base_i_form=lstrip_if(present_he,"يَ")
+
+  present_base_he_form=rstrip_if(present_he,"ى")
+  present_base_she_form="ت"+present_base_he_form[1:]
+  present_base_he_form_y=present_base_he_form
+  if present_he.endswith("ى"): present_base_he_form_y=rstrip_if(present_he,"ى")+"ي"
+  present_base_she_form_y="ت"+present_base_he_form_y[1:]
+
+
+  if present_i=="": present_i=verb_obj["conj-present-i"]="أَ"+present_base_i_form #rstrip_if(past_i,"تُ")+"نا"
+  if present_she=="": present_she=verb_obj["conj-present-she"]="تَ"+present_base_i_form #rstrip_if(past_i,"تُ")+"نا"
+  if present_we=="": present_we=verb_obj["conj-present-we"]="نَ"+present_base_i_form #rstrip_if(past_i,"تُ")+"نا"
+  if present_they_2m=="": present_they_2m=verb_obj["conj-present-they_2m"]=present_base_he_form_y+"ان"
+  if present_they_2f=="": present_they_2f=verb_obj["conj-present-they_2f"]=present_base_she_form_y+"ان"
+  if present_they_3m=="": present_they_3m=verb_obj["conj-present-they_3m"]=present_base_he_form+"ون"
+  if present_they_3f=="": present_they_3f=verb_obj["conj-present-they_3f"]=present_base_he_form_y+"نَ"
+
+  if present_you_m=="": present_you_m=verb_obj["conj-present-you_m"]=present_she
+  if present_you_f=="": present_you_f=verb_obj["conj-present-you_f"]=present_base_she_form+"ين" #rstrip_if(past_he,"تُ")+"نا"
+  if present_you_2=="": present_you_2=verb_obj["conj-present-you_2"]=present_base_she_form_y+"ان" #rstrip_if(past_he,"تُ")+"نا"
+  if present_you_3m=="": present_you_3m=verb_obj["conj-present-you_3m"]=present_base_she_form+"ون" #rstrip_if(past_he,"تُ")+"نا"
+  if present_you_3f=="": present_you_3f=verb_obj["conj-present-you_3f"]=present_base_she_form_y+"نَ" #rstrip_if(past_he,"تُ")+"نا"
+
+  return verb_obj
+
 # import pandas
 # def get_sheet_dict(sheet_obj,key_col0,val_col0): #pandas get conversion dicts
 #   tmp_sheet_dict={}
