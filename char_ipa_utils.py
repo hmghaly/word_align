@@ -89,15 +89,17 @@ ar_shape_dict={'أ': ['أ', 'ـأ'], 'ب': ['ب', 'بـ', 'ـبـ', 'ـب'], 'ت
 romanization_dict={'أ': ('2', 'a'), 'ا': ('aa', 'a'), 'إ': ('2i', 'i'), 'آ': ('2aa', 'aa'), 'ى': ('aa', ''), 'ب': ('b', ''), 'ت': ('t', ''), 'ث': ('th', ''), 'ج': ('j', ''), 'ح': ('7', ''), 'خ': ('kh', ''), 'د': ('d', ''), 'ذ': ('dh', ''), 'ر': ('r', ''), 'ز': ('z', ''), 'س': ('s', ''), 'ش': ('sh', ''), 'ص': ('S', ''), 'ض': ('D', ''), 'ط': ('T', ''), 'ظ': ('DH', ''), 'ع': ('3', ''), 'غ': ('gh', ''), 'ف': ('f', ''), 'ق': ('q', ''), 'ك': ('k', ''), 'ل': ('l', ''), 'م': ('m', ''), 'ن': ('n', ''), 'ه': ('h', ''), 'و': ('oo', 'w'), 'ي': ('ee', 'y'), 'ة': ('h', ''), 'ئ': ('2', ''), 'ؤ': ('2', ''), 'ء': ('2', ''), 'َ': ('a', ''), 'ِ': ('i', ''), 'ُ': ('u', ''), 'ٌ': ('un', ''), 'ً': ('an', ''), 'ٍ': ('in', ''), 'ّ': ('x', '')}
 
 class analyze_ar_word: #analyze a word with diacritics in different ways
-  def __init__(self,word0,shape_dict0=ar_shape_dict,romanize_dict0=romanization_dict):
+  def __init__(self,word0,shape_dict0=ar_shape_dict,romanize_dict0=romanization_dict,exclude_waaw_jamaa3ah=True):
     self.word=word0
+    self.word1=word0
+    if exclude_waaw_jamaa3ah and self.word1.endswith("وا"):self.word1=self.word1[:-1]
     self.shape_dict=shape_dict0
     self.romanize_dict=romanize_dict0
     #first split the word into chunks, based on diacritics
     self.chunks=[]
     new_chunk=""
     self.plain=""
-    for w0 in self.word:
+    for w0 in self.word1:
       if w0.isalpha() or w0==" ":
         self.plain+=w0
         if  new_chunk!="": self.chunks.append(new_chunk)
