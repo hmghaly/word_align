@@ -24,7 +24,7 @@ def hash_dict(dict0): #to avoid duplicate entries
 def dict2base64(obj0):
   s = json.dumps(obj0)
   out0=base64.b64encode(s.encode('utf-8'))
-  return out0
+  return out0.decode("utf-8")
 
 def send_email(email_to0,email_subject0,email_html0,email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
     server = SMTP(server_name0)
