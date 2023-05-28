@@ -26,6 +26,11 @@ def dict2base64(obj0):
   out0=base64.b64encode(s.encode('utf-8'))
   return out0.decode("utf-8")
 
+def convert2binary(file_bs64_data):
+  split0=file_bs64_data.split(",")
+  decoded=base64.b64decode(split0[1])
+  return decoded
+
 def send_email(email_to0,email_subject0,email_html0,email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
     server = SMTP(server_name0)
     server.set_debuglevel(False)
