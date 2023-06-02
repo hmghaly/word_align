@@ -81,9 +81,9 @@ class DOM:
         if not last_open_tag.lower().split("_")[0] in ["script","style","noscript"]: 
           inter_text_stripped=inter_text.strip('\r\n\t ').replace("&times;","")
           if inter_text_stripped!="": 
-          	self.text_items.append(inter_text)
-          	self.text_items_tags.append((last_open_tag_str,inter_text))
-          	if tag_type=="closing" and len(open_tags)>0 and tag_name==open_tags[-1].split("_")[0]: self.simple_tag_text_items.append((last_open_tag_str,inter_text_stripped))
+            self.text_items.append(inter_text)
+            self.text_items_tags.append((last_open_tag_str,inter_text))
+            if tag_type=="closing" and len(open_tags)>0 and tag_name==open_tags[-1].split("_")[0]: self.simple_tag_text_items.append((last_open_tag_str,inter_text_stripped))
 
         text_node_count=tag_counter_dict.get("text_node",0)
         text_node_id="text_node_%s"%text_node_count
@@ -99,8 +99,8 @@ class DOM:
       if not tag_type in ["comment","s"]: last_open_tag_str=tag_str
 
       if tag_name.startswith("h") or tag_name in ["p","div","br","li"]: 
-      	self.text_items.append("<br>")
-      	self.text_items_tags.append((last_open_tag_str,"<br>"))
+        self.text_items.append("<br>")
+        self.text_items_tags.append((last_open_tag_str,"<br>"))
 
       tag_count=tag_counter_dict.get(tag_name,0)
       assigned_tag_id="%s_%s"%(tag_name,tag_count)
@@ -122,9 +122,9 @@ class DOM:
             
           open_tags=open_tags[:-1]
         else: 
-        	debug_line_items0=("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
-        	self.mismatch_debug_items.append(debug_line_items0)
-        	#print("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
+          debug_line_items0=("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
+          self.mismatch_debug_items.append(debug_line_items0)
+          #print("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
 
 
 
@@ -180,6 +180,12 @@ class DOM:
       #html_content0+=ch_obj.
     html_content0+=cur_el.close_tag
     return html_content0
+  def get_el_by_tag_name(self,tag_name):
+    items0=list(self.tag_dict.items())
+    items0.sort()
+    cur_items=[b.inner_html for a,b in items0 if a.startswith(tag_name+"_")]
+    return cur_items
+
   def get_el_by_id(self,actual_id):
     cur_assigned_id=self.id_dict.get(actual_id)
     if cur_assigned_id==None: return None
@@ -414,8 +420,8 @@ def html2sents(html_content,apply_tika=True):
         all_sents.extend(cur_sents)
   final_sents=[]
   for a in all_sents:
-  	if a.strip() in "}]" and len(final_sents)>0:  final_sents[-1]=final_sents[-1]+a
-  	else: final_sents.append(a)
+    if a.strip() in "}]" and len(final_sents)>0:  final_sents[-1]=final_sents[-1]+a
+    else: final_sents.append(a)
 
   return final_sents
 
