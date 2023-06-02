@@ -99,7 +99,7 @@ class docx:
       cur_xml_path=os.path.join(extracted_dir,xml_fname)
       with open(cur_xml_path) as fopen:
         xml_content=fopen.read()
-      xml_dom_obj=DOM(xml_content)
+      xml_dom_obj=web_lib.DOM(xml_content)
       cur_tag_name="w:p" #xml tag for docx files
       if self.TEMP_DOCX.lower().endswith(".pptx"): cur_tag_name="a:p"
       
