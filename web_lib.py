@@ -84,7 +84,7 @@ class DOM:
       inter_text=self.content[start_i:tag_start] #intervening text since last tag
       last_open_tag=open_tags[-1]
       if len(inter_text)>0:
-        if not last_open_tag.lower().split("_")[0] in ["script","style","noscript"]: 
+        if not last_open_tag.lower().split("_")[0] in ["script","style","noscript","xml"]: 
           inter_text_stripped=inter_text.strip('\r\n\t ').replace("&times;","")
           if inter_text_stripped!="": 
             self.text_items.append(inter_text)
