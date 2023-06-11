@@ -1,5 +1,5 @@
 #a librry for all the utilities we need for scraping data from the web
-import requests, re, sys
+import requests, re, sys, time
 from urllib.parse import urljoin, urlsplit
 sys.path.append("code_utils")
 import general
