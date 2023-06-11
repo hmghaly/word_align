@@ -482,6 +482,17 @@ def get_bare_url(full_url): #the the top level domain of the url, stripping http
   bare_url=bare_url.split(":")[0]
   return bare_url
 
+tlds_list=["co","ac","edu","com","org","gov","govt","net","info"]
+exclude_prefix=["mail"]
+def get_domain_suf(full_url):
+  bare_url=get_bare_url(full_url)
+  bare_url_split=bare_url.split(".")
+  if bare_url_split[0] in exclude_prefix: bare_url_split=bare_url_split[1:]
+  if len(bare_url_split[-1])==2 and bare_url_split[-2] in tlds_list: output=".".join(bare_url_split[-3:])
+  elif len(bare_url_split[-1])==2 and len(bare_url_split[-2])<=3: output=".".join(bare_url_split[-3:])
+  else: output=".".join(bare_url_split[-2:])	
+  return output
+
 def reverse_url(full_url): #make site.abc.gov.au > au.gov.abc.site to sort by the last part of the url
   # bare_url=full_url.replace("http://","").replace("https://","")
   # if bare_url.startswith("www."): bare_url=bare_url.replace("www.","")
