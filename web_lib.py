@@ -476,10 +476,11 @@ def get_bare_url(full_url): #the the top level domain of the url, stripping http
   return bare_url
 
 def reverse_url(full_url): #make site.abc.gov.au > au.gov.abc.site to sort by the last part of the url
-  bare_url=full_url.replace("http://","").replace("https://","")
-  if bare_url.startswith("www."): bare_url=bare_url.replace("www.","")
-  if bare_url.startswith("www1."): bare_url=bare_url.replace("www1.","")
-  if bare_url.startswith("www2."): bare_url=bare_url.replace("www2.","")  
+  # bare_url=full_url.replace("http://","").replace("https://","")
+  # if bare_url.startswith("www."): bare_url=bare_url.replace("www.","")
+  # if bare_url.startswith("www1."): bare_url=bare_url.replace("www1.","")
+  # if bare_url.startswith("www2."): bare_url=bare_url.replace("www2.","")  
+  bare_url=get_bare_url(full_url)
   url_split=bare_url.split("/")
   first_part=url_split[0]
   second_part="/".join(url_split[1:])
