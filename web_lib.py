@@ -59,6 +59,7 @@ class DOM:
     self.mismatch_debug_items=[]
     self.description=""
     self.title=""
+    self.keywords=""
     #tags=list(re.finditer('<([^<>]*?)>', self.content)) #'<[^<>]*?>|\<\!\-\-.+?\-\-\>'
     tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
     open_tags=[""]
@@ -149,6 +150,7 @@ class DOM:
         cur_class_list=[v for v in cur_class_str.split(" ") if v]
 
         if tag_name=="meta" and cur_el.attrs.get("name","")=="description":self.description=cur_el.attrs.get("content","")
+        if tag_name=="meta" and cur_el.attrs.get("name","")=="keywords":self.keywords=cur_el.attrs.get("content","")
         if cur_el.attrs.get("href")!=None: cur_el.href=cur_el.attrs.get("href") #self.all_links.append(cur_el.attrs.get("href"))
         if cur_el.attrs.get("src")!=None: cur_el.src=cur_el.attrs.get("src")
         if tag_name=="img": self.all_images.append(cur_el)
