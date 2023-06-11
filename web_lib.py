@@ -495,3 +495,89 @@ def reverse_url(full_url): #make site.abc.gov.au > au.gov.abc.site to sort by th
   if second_part: r_url=first_part+"/"+second_part #return first_part+"/"+second_part
   else: r_url=first_part #return first_part
   return r_url.strip("/")
+
+def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
+  full0=root0.strip("/")+"/"+rel0.strip("/")
+  return full0
+
+
+def get_page_info(url):
+  page_content=get_page_content(url)
+  page_content=page_content.replace("\r","\n").replace("\t","\n")
+  #page_content=page_content.replace("\r\n","|")#.replace("\r","|")
+  t0=time.time()
+  page_dom_obj=DOM(page_content)
+  t1=time.time()
+  dom_elapsed=round(t1-t0)
+  print("dom_elapsed",dom_elapsed)
+
+  t0=time.time()
+  title0=page_dom_obj.title.strip()
+  description0=page_dom_obj.description.strip()
+  keywords0=page_dom_obj.keywords.strip()
+  phone_numbers=[]
+  logos=[]
+  text_items=[]
+  links=[]
+  emails=[]
+  addresses=[]
+
+  #processing links
+  raw_links=page_dom_obj.all_links
+  for link0 in raw_links:
+    anchor0=remove_tags(link0.inner_html)
+    href0=link0.href.strip("/")
+    if href0.startswith("#"): continue
+    if href0.lower().startswith("javascript"): continue
+    if href0=="": continue
+    if href0.startswith("tel:"):
+      phone_numbers.append(href0)
+      continue
+    if href0.split(".")[-1].lower() in ["pdf","png","jpg"]: continue
+    if not href0.lower().startswith("http"): href0=join_url(url,href0) #url0.strip("/")+"/"+href0.strip("/")
+    anchor0=re.sub("\s+"," ",anchor0).strip()
+    #print(href0,anchor0)
+    links.append((href0,anchor0))
+  links=list(set(links)) 
+
+  #processing images/get logos
+  raw_images=page_dom_obj.all_images
+  for img0 in raw_images:
+    if "logo" in img0.attrs.get("alt","").lower() or "logo" in img0.src.lower(): 
+      src0=img0.src
+      if src0.startswith("//"):src0="http://"+src0
+      elif not src0.startswith("http"): src0=join_url(url,src0)
+      logos.append(src0)
+      #print(src0)
+
+  #processing text items
+  raw_items0=page_dom_obj.text_items
+  #final_items=[]
+  for it0 in raw_items0:
+    it0=remove_tags(it0)
+    text_items.extend(it0.split("\n"))
+  text_items=[v.strip() for v in text_items if v.strip()]
+
+  #processing addresses
+  for key0,val0 in page_dom_obj.tag_dict.items():
+    if key0.startswith("address_"): addresses.append(remove_tags(val0.inner_html))
+
+  #processing emails
+  emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
+  emails=list(set([v.lower() for v in emails]))
+  t1=time.time()
+  elapsed=round(t1-t0,2)
+  print("elapsed",elapsed)
+  page_info_dict={}
+  page_info_dict["url"]=url
+  page_info_dict["title"]=title0
+  page_info_dict["description"]=description0
+  page_info_dict["keywords"]=keywords0
+  page_info_dict["phone_numbers"]=phone_numbers
+  page_info_dict["links"]=links
+  page_info_dict["emails"]=emails
+  page_info_dict["addresses"]=addresses
+  page_info_dict["logos"]=logos
+  page_info_dict["text_items"]=text_items
+  
+  return page_info_dict  
