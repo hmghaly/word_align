@@ -70,10 +70,15 @@ class DOM:
       tag_str_lower=tag_str.lower()
       tag_name=re.findall(r'</?(.+?)[\s>]',tag_str_lower)[0]
       tag_type=""
+
+
       if tag_str.startswith('</'): tag_type="closing"
       elif tag_str.startswith('<!'): tag_type="comment"
       elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br","hr"]: tag_type="s" #standalone
       else: tag_type="opening"
+
+      if len(open_tags)>0 and open_tags[-1].split("_")[0]=="script": #avoid identifying < > chars in javascript as tags
+      	if not (tag_name=="script" and tag_type== "closing"): continue
 
       inter_text=self.content[start_i:tag_start] #intervening text since last tag
       last_open_tag=open_tags[-1]
