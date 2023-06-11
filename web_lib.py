@@ -525,7 +525,7 @@ def get_page_info(url):
   #processing links
   raw_links=page_dom_obj.all_links
   for link0 in raw_links:
-    anchor0=remove_tags(link0.inner_html)
+    anchor0=general.remove_tags(link0.inner_html)
     href0=link0.href.strip("/")
     if href0.startswith("#"): continue
     if href0.lower().startswith("javascript"): continue
@@ -554,13 +554,13 @@ def get_page_info(url):
   raw_items0=page_dom_obj.text_items
   #final_items=[]
   for it0 in raw_items0:
-    it0=remove_tags(it0)
+    it0=general.remove_tags(it0)
     text_items.extend(it0.split("\n"))
   text_items=[v.strip() for v in text_items if v.strip()]
 
   #processing addresses
   for key0,val0 in page_dom_obj.tag_dict.items():
-    if key0.startswith("address_"): addresses.append(remove_tags(val0.inner_html))
+    if key0.startswith("address_"): addresses.append(general.remove_tags(val0.inner_html))
 
   #processing emails
   emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
