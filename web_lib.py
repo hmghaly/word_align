@@ -482,7 +482,7 @@ def get_bare_url(full_url): #the the top level domain of the url, stripping http
   bare_url=bare_url.split(":")[0]
   return bare_url
 
-tlds_list=["co","ac","edu","com","org","gov","govt","net","info"]
+tlds_list=["co","ac","edu","com","org","gov","govt","net","info","sci"]
 exclude_prefix=["mail"]
 def get_url_id(full_url): #domain with suffix/tld
   bare_url=get_bare_url(full_url)
@@ -520,7 +520,7 @@ def get_page_info(url):
   page_dom_obj=DOM(page_content)
   t1=time.time()
   dom_elapsed=round(t1-t0)
-  print("dom_elapsed",dom_elapsed)
+  #print("dom_elapsed",dom_elapsed)
 
   t0=time.time()
   title0=page_dom_obj.title.strip()
@@ -578,7 +578,7 @@ def get_page_info(url):
   emails=list(set([v.lower() for v in emails]))
   t1=time.time()
   elapsed=round(t1-t0,2)
-  print("elapsed",elapsed)
+  #print("elapsed",elapsed)
   page_info_dict={}
   page_info_dict["url"]=url
   page_info_dict["title"]=title0
