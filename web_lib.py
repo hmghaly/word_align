@@ -484,7 +484,7 @@ def get_bare_url(full_url): #the the top level domain of the url, stripping http
 
 tlds_list=["co","ac","edu","com","org","gov","govt","net","info"]
 exclude_prefix=["mail"]
-def get_domain_suf(full_url):
+def get_url_id(full_url): #domain with suffix/tld
   bare_url=get_bare_url(full_url)
   bare_url_split=bare_url.split(".")
   if bare_url_split[0] in exclude_prefix: bare_url_split=bare_url_split[1:]
