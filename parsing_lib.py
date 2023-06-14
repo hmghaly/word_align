@@ -31,6 +31,14 @@ def get_conll(sent_input): #Use spaCy to get CoNLL format outpus of an input sen
     return conll_2d
 
 
+def get_pos_tags(sent_input):
+    new_sent_input=tok_sent_join(sent_input) #
+    doc = nlp(new_sent_input)
+    tmp_pos_tags=[]
+    for token in doc: tmp_pos_tags.append(token.tag_)
+    return tmp_pos_tags
+
+
 #https://github.com/hmghaly/word_align/edit/master/parsing_lib.py
 
 def nested_dict(n, type):
