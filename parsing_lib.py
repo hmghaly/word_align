@@ -1,7 +1,9 @@
 import re, json
 from collections import defaultdict
 #spaCy part
-import os, re, spacy, shelve, sys
+import os, re, shelve, sys
+import spacy
+from spacy.tokenizer import Tokenizer
 from itertools import groupby
 sys.path.append("code_utils")
 import general
