@@ -12,11 +12,11 @@ nlp = spacy.load("en_core_web_sm")
 #https://github.com/explosion/spaCy/issues/533 #spacy to output conll format
 nlp.tokenizer = Tokenizer(nlp.vocab, token_match=re.compile(r'\S+').match)
 def tok_sent_join(sent_text): #tokenize with our function, and then join with whitespace for spacy tokenization
-	tokenized_sent=general.tok(sent_text)
-	return " ".join(tokenized_sent)
+    tokenized_sent=general.tok(sent_text)
+    return " ".join(tokenized_sent)
 
 def get_conll(sent_input): #Use spaCy to get CoNLL format outpus of an input sentence
-	new_sent_input=tok_sent_join(sent_input) #
+    new_sent_input=tok_sent_join(sent_input) #
     doc = nlp(new_sent_input)
     conll_2d=[]
     for token in doc:   
