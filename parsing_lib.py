@@ -15,6 +15,7 @@ nlp = spacy.load("en_core_web_sm")
 nlp.tokenizer = Tokenizer(nlp.vocab, token_match=re.compile(r'\S+').match)
 def tok_sent_join(sent_text): #tokenize with our function, and then join with whitespace for spacy tokenization
     tokenized_sent=general.tok(sent_text)
+    tokenized_sent=[v.strip("_") for v in tokenized_sent]
     return " ".join(tokenized_sent)
 
 def get_conll(sent_input): #Use spaCy to get CoNLL format outpus of an input sentence
