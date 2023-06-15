@@ -23,6 +23,114 @@ random.seed(0)
 #   tmp_pos_tags=[]
 #   for token in doc: tmp_pos_tags.append(token.tag_)
 #   return tmp_pos_tags
+def get_rec_children(el0,el_child_dict0,el_list0=[],only_without_children=True):
+  #print("el0",el0)
+  cur_children0=el_child_dict0.get(el0,[])
+  if cur_children0==[]: return []
+  for ch0 in cur_children0:
+    sub_children=el_child_dict0.get(ch0,[])
+    if only_without_children and sub_children==[]: el_list0.append(ch0)
+    else: el_list0=get_rec_children(ch0,el_child_dict0,el_list0,only_without_children)
+    
+  return el_list0
+
+def dep2phrases(conll2d_input):
+  head_dep_list=[]
+  pos_dict={}
+  max_proj_dict={}
+  #proj_span_dict={}
+  #phrase_span_dict={}
+  loc_dict={}
+  phrase_count_dict={}
+  phrase_child_dict={}
+  phrase_head_dict={}
+  phrase_head_lemma_dict={}
+  all_words=[]
+  all_lemmas=[]
+  for c2 in conll2d_input:
+      cur_ind,cur_word,cur_pos,cur_head=int(c2[0]),c2[1],c2[3],int(c2[6])
+      cur_lemma=c2[2]
+      all_lemmas.append(cur_lemma)
+      head_dep_list.append((cur_head,cur_ind))
+      if cur_pos[0] in "VN": phrase_label=cur_pos[0].upper()+"P"
+      elif cur_pos=="JJ": phrase_label="AP"
+      elif cur_pos=="IN": phrase_label="PP"
+      elif cur_pos=="MD": phrase_label="VP"
+      else: phrase_label="XP"
+      phrase_count=phrase_count_dict.get(phrase_label,0)
+      phrase_count_dict[phrase_label]=phrase_count+1
+      phrase_id="%s_%s"%(phrase_label,phrase_count)
+      max_proj_id="max_%s"%cur_ind
+      max_proj_dict[max_proj_id]=phrase_id
+      all_words.append(cur_word)
+      phrase_child_dict[phrase_id]=[]
+      loc_dict[phrase_id]=cur_ind-1
+      phrase_head_dict[phrase_id]=(cur_word,cur_ind-1)
+      phrase_head_lemma_dict[phrase_id]=cur_lemma
+      pos_dict[phrase_id]=cur_pos
+  head_dep_list.sort()
+  grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(head_dep_list,lambda x:x[0])]
+  grouped_dict=dict(iter(grouped)) #to show how many dependents does each token have
+  for key0,grp0 in grouped:
+    head_i=key0-1
+    dependents=[(v,abs(v-key0),len(grouped_dict.get(v,[]))) for v in grp0]
+    dependents.sort(key=lambda x:x[1:])
+    dependents=[v[0] for v in dependents]
+    max_proj_id="max_%s"%key0
+    cur_max_proj0=max_proj_dict.get(max_proj_id,"S_0")
+    cur_phrase_label=cur_max_proj0.split("_")[0]
+    for d0 in dependents:
+      dep_proj_id="max_%s"%d0
+      phrase_count=phrase_count_dict.get(cur_phrase_label,0)
+      phrase_count_dict[cur_phrase_label]=phrase_count+1
+      next_proj_phrase_id="%s_%s"%(cur_phrase_label,phrase_count)
+      cur_max_proj0=max_proj_dict.get(max_proj_id,"S_0")
+      phrase_child_dict[next_proj_phrase_id]=(cur_max_proj0,dep_proj_id)
+      max_proj_dict[max_proj_id]=next_proj_phrase_id
+      if head_i<0: continue
+      phrase_head_dict[next_proj_phrase_id]=(all_words[head_i],head_i)
+      phrase_head_lemma_dict[next_proj_phrase_id]=(all_lemmas[head_i])
+
+  children_items=phrase_child_dict.items()
+  for phrase_id0,phrase_children in children_items:
+    #print(phrase_id0,phrase_children)
+    new_children=[]
+    for child0 in phrase_children:
+      if child0==phrase_id0: continue
+      if child0.startswith("max_"): new_children.append(max_proj_dict.get(child0))
+      else: new_children.append(child0)
+    phrase_child_dict[phrase_id0]=new_children
+
+  phrase_info_dict={}
+  ch_items=phrase_child_dict.items()
+  for phrase_id0,direct_children in ch_items:
+    rec_children0=[]
+    if direct_children!=[]:
+      rec_children0=get_rec_children(phrase_id0,phrase_child_dict,[])
+      children_locs=[loc_dict.get(v) for v in rec_children0]
+      cur_span=(min(children_locs),max(children_locs))
+    else:
+      cur_span=(loc_dict.get(phrase_id0),loc_dict.get(phrase_id0))
+    cur_phrase_words=all_words[cur_span[0]:cur_span[1]+1]
+    cur_phrase_text=" ".join(cur_phrase_words)
+    cur_head=phrase_head_dict.get(phrase_id0)
+    cur_pos=pos_dict.get(phrase_id0)
+    cur_head_lemma=phrase_head_lemma_dict.get(phrase_id0)
+    tmp_dict={}
+    tmp_dict["direct_children"]=direct_children
+    tmp_dict["rec_children"]=rec_children0
+    tmp_dict["text"]=cur_phrase_text
+    tmp_dict["head"]=cur_head
+    tmp_dict["head_lemma"]=cur_head_lemma
+    tmp_dict["pos"]=cur_pos
+    tmp_dict["span"]=cur_span
+    tmp_dict["type"]=phrase_id0.split("_")[0]
+    tmp_dict["size"]=cur_span[1]-cur_span[0]+1
+
+    phrase_info_dict[phrase_id0]=tmp_dict
+  return phrase_info_dict
+
+
 
 
 def consctv(list1): #to split a group of items into subgroups of contiguous/consecutive items
@@ -90,6 +198,15 @@ def get_recursive_all_heads(cur_dep_dict,level=0): #get recursively all the head
         #print(ind,head,ancestors)
     return cur_list
 
+
+
+# def get_rec_children(el0,child_dict0,el_list0=[],only_without_children=True): #recursively get children of an element
+#   cur_children0=el_child_dict0.get(el0,[])
+#   if only_without_children and len(cur_children0)==0: el_list0.append(el0)
+#   else: el_list0.append(el0)
+#   for ch0 in cur_children0:
+#     el_list0=get_rec_el_children(ch0,el_child_dict0,el_list0,only_without_children)
+#   return el_list0
 
 
 
