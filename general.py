@@ -910,6 +910,43 @@ def match_seq(list1,list2):
             output.append((cur_a,cur_b))
     return output
 
+
+def get_seq_edits(tokens1,tokens2):
+  match_obj=SequenceMatcher(None,tokens1,tokens2)
+  final_list=[]
+  for a in match_obj.get_opcodes():
+    match_type,x0,x1,y0,y1=a
+    if match_type=="delete":
+      #print("deleted",tokens1[x0:x1])
+      final_list.append(("deleted",tokens1[x0:x1]))
+    if match_type=="equal":
+      #print("equal",tokens1[x0:x1])
+      final_list.append(("equal",tokens1[x0:x1]))
+    if match_type=="replace":
+      final_list.append(("delete",tokens1[x0:x1]))
+      final_list.append(("insert",tokens2[y0:y1]))
+    if match_type=="insert":
+      final_list.append(("insert",tokens2[y0:y1]))
+  return final_list
+
+def make_html_safe(text):
+  text=text.replace(">","&gt;").replace("<","&lt;")
+  return text
+
+def get_edit_html(tokens1,tokens2):
+  edit_list=get_seq_edits(tokens1,tokens2)
+  final_str_items=[]
+  for edit_type0,chunk0 in edit_list:
+    cur_chunk_str=de_tok2str(chunk0)
+    cur_chunk_str=make_html_safe(cur_chunk_str)
+    if edit_type0=="delete": final_str_items.append('<del>%s</del>'%cur_chunk_str) 
+    elif edit_type0=="insert": final_str_items.append('<ins>%s</ins>'%cur_chunk_str) 
+    else: final_str_items.append(cur_chunk_str) 
+  final_str=" ".join(final_str_items)
+  return final_str
+
+
+
 def segmenting(html_content):
     segs=[v.strip() for v in re.findall('>([^<>]*?)<', html_content)]
     segs=[v for v in segs if v]
