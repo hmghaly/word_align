@@ -83,13 +83,12 @@ def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes whe
 def is_in(small,large,skip_punc=True): 
     return list_in_list(small,large,skip_punc=True)
 
-# def group_2(list_2): #group a list with each element is of size 2, to group by first subelement and get only unique list of grouped subelement2 [("a",1),("a",2),("b",3)...] > a : [1,2], b : [3]
-#   out_dict={}
-#   list_2.sort(key=lambda x:x[0])
-#   grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(list_2,lambda x:x[0])]
-#   for key0,grp0 in grouped:
-#     out_dict[key0]=list(set(grp0))
-#   return out_dict
+def group_list(list_2): #group a list with each element is of size 2 - by the first sub-element
+  out_dict={}
+  list_2.sort(key=lambda x:x[0])
+  grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(list_2,lambda x:x[0])]
+  out_dict=dict(iter(grouped))
+  return out_dict
 
 
 ####################### Dictionaries ######################
@@ -103,7 +102,7 @@ def check_dict_multi_keys(dict0,possible_key_list): #if we're not fully sure whi
 
 ####################### STRINGS ###########################
 
-def str2key(str0):
+def str2key(str0): #create_id, create_key, create_text_id
   str0=unescape(str0)
   str0=str0.lower().strip()
   str0=re.sub("\W+","_",str0).strip("_")
