@@ -35,6 +35,7 @@ def get_rec_children(el0,el_child_dict0,el_list0=[],only_without_children=True):
   return el_list0
 
 def dep2phrases(conll2d_input):
+  output_dict={}
   head_dep_list=[]
   pos_dict={}
   max_proj_dict={}
@@ -47,10 +48,12 @@ def dep2phrases(conll2d_input):
   phrase_head_lemma_dict={}
   all_words=[]
   all_lemmas=[]
+  all_pos=[]
   for c2 in conll2d_input:
       cur_ind,cur_word,cur_pos,cur_head=int(c2[0]),c2[1],c2[3],int(c2[6])
       cur_lemma=c2[2]
       all_lemmas.append(cur_lemma)
+      all_pos.append(cur_pos)
       head_dep_list.append((cur_head,cur_ind))
       if cur_pos[0] in "VN": phrase_label=cur_pos[0].upper()+"P"
       elif cur_pos=="JJ": phrase_label="AP"
@@ -128,7 +131,12 @@ def dep2phrases(conll2d_input):
     tmp_dict["size"]=cur_span[1]-cur_span[0]+1
 
     phrase_info_dict[phrase_id0]=tmp_dict
-  return phrase_info_dict
+  output_dict["phrase_info"]=phrase_info_dict
+  output_dict["words"]=all_words
+  output_dict["lemmas"]=all_lemmas
+  output_dict["pos"]=all_pos
+  
+  return output_dict
 
 
 
