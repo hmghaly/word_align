@@ -140,10 +140,7 @@ def dep2phrases(conll2d_input):
   return output_dict
 
 
-def text2parsed(text):
-  conll_2d0=get_conll(text)
-  parse_out_dict0=dep2phrases(conll_2d0)
-  return parse_out_dict0
+
 
 
 
