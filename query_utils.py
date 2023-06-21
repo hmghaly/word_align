@@ -1,10 +1,12 @@
-import re,json
+import time, json, shelve, os, re, sys
 from scipy import spatial
 from itertools import groupby
 # from code_utils.general import *
 # from code_utils.parsing_lib import *
 # from code_utils.dep_lib import *
 # from code_utils.sqld_utils import *
+sys.path.append("code_utils")
+
 import gensim
 import gensim.downloader as api
 import code_utils.sqld_utils as sqld
@@ -180,7 +182,7 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
   data=[]
   if country==None: 
     narrative_elements.append("Sorry, country was mentioned.")
-    return " ".join(narrative_elements),data
+    return " ".join(narrative_elements),data,structured_query_dict1,tagged_query1
   cur_query_dict={}
   if subject!=None: 
     narrative_elements.append("Analyzing information for subject: %s."%subject.title())
@@ -217,4 +219,4 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
     adoption_date=cur_info["adoption_date"]
     data_with_info.append((symbol,title,adoption_date))
 
-  return " ".join(narrative_elements),data_with_info  
+  return " ".join(narrative_elements),data_with_info,structured_query_dict1,tagged_query1  
