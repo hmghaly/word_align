@@ -97,12 +97,14 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   if vote_against_span!=[]: el_span_list.append(("voting","vote_against",vote_against_span[0],1.1))
   if vote_abstain_span!=[]: el_span_list.append(("voting","vote_abstaining",vote_abstain_span[0],1.1))
 
-  np_list=[]
+  np_list_with_sim=[]
+  all_nps=[]
 
   for a,b in phrase_info.items():
     if not a.startswith("N"): continue
     cur_text=b["text"]
     cur_span=b["span"]
+    all_nps.append((cur_text,cur_span))
     corr_country=country_dict.get(cur_text.upper())
     if corr_country!=None:
       el_span_list.append(("country",corr_country,cur_span,1.1))
@@ -126,7 +128,7 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
 
     for subj1,sim1 in sim_list[:5]:
       el_span_list.append(("subject",subj1,cur_span,sim1))
-    np_list.append((cur_text,cur_span,el_span_list[:5]))
+    np_list_with_sim.append((cur_text,cur_span,el_span_list[:5]))
     #print("-------")
   used_spans=[]
   used_text=[]
@@ -175,7 +177,9 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   query_parse_dict["tagged_query_html"]=final_tagged_query_html
   query_parse_dict["syntax_dict"]=syntax_dict
   query_parse_dict["lemmas"]=lemma_list
-  query_parse_dict["np_list"]=np_list
+  query_parse_dict["np_list_with_sim"]=np_list
+  query_parse_dict["all_nps"]=all_nps
+  
   query_parse_dict["conll"]=dep.conll2str(syntax_dict["conll"])
 
   #syntax_dict
