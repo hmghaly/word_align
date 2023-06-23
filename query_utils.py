@@ -177,7 +177,7 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   query_parse_dict["tagged_query_html"]=final_tagged_query_html
   query_parse_dict["syntax_dict"]=syntax_dict
   query_parse_dict["lemmas"]=lemma_list
-  query_parse_dict["np_list_with_sim"]=np_list
+  query_parse_dict["np_list_with_sim"]=np_list_with_sim
   query_parse_dict["all_nps"]=all_nps
   
   query_parse_dict["conll"]=dep.conll2str(syntax_dict["conll"])
