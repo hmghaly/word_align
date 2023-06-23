@@ -86,6 +86,7 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   word_list=general.tok(query)
   lemma_list=[v.lower() for v in syntax_dict["lemmas"]]
   lemma_list=["favour" if v=="favor" else v for v in lemma_list]
+  pos_tags=syntax_dict["pos"]
   el_span_list=[]
   vote_span=general.is_in(["vote"],lemma_list)
   vote_for_span=general.is_in(["vote","for"],lemma_list)
@@ -96,6 +97,13 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   if vote_for_span!=[]: el_span_list.append(("voting","vote_for",vote_for_span[0],1.1))
   if vote_against_span!=[]: el_span_list.append(("voting","vote_against",vote_against_span[0],1.1))
   if vote_abstain_span!=[]: el_span_list.append(("voting","vote_abstaining",vote_abstain_span[0],1.1))
+
+  #question_span=[(vi,vi) for vi,v in enumerate(pos_tags) if ]
+  for word_i,word0 in enumerate(word_list):
+    tag0=pos_tags[word_i]
+    if tag0.startswith("W"):
+      el_span_list.append(("question",word0.lower(),(word_i,word_i),1.1))
+
 
   np_list_with_sim=[]
   all_nps=[]
