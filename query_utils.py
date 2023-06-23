@@ -251,7 +251,7 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
     narrative_elements.append("For the subject: (%s), %s resolutions were adopted."%(subject,len(id_list)))
   elif country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]:
     if subject!=None:
-      narrative_elements.append("Analyzing information for subject: <b>(%s)</b>.<br>"%subject.title())
+      narrative_elements.append("Analyzing information for subject: (%s). "%subject.title())
     if voting=="vote_for": 
       if len(data)==0: narrative_elements.append("%s didn't vote in favour of any resolution."%(country))
       elif len(data)==1: narrative_elements.append("%s voted in favour of one resolution."%(country))
