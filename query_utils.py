@@ -81,10 +81,10 @@ def check_used_span(span0,list_used_spans):
 
 
 def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
-  out_dict=text2parsed(query)
-  phrase_info=out_dict["phrase_info"]
+  syntax_dict=text2parsed(query)
+  phrase_info=syntax_dict["phrase_info"]
   word_list=general.tok(query)
-  lemma_list=[v.lower() for v in out_dict["lemmas"]]
+  lemma_list=[v.lower() for v in syntax_dict["lemmas"]]
   lemma_list=["favour" if v=="favor" else v for v in lemma_list]
   el_span_list=[]
   vote_span=general.is_in(["vote"],lemma_list)
@@ -96,6 +96,8 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   if vote_for_span!=[]: el_span_list.append(("voting","vote_for",vote_for_span[0],1.1))
   if vote_against_span!=[]: el_span_list.append(("voting","vote_against",vote_against_span[0],1.1))
   if vote_abstain_span!=[]: el_span_list.append(("voting","vote_abstaining",vote_abstain_span[0],1.1))
+
+  np_list=[]
 
   for a,b in phrase_info.items():
     if not a.startswith("N"): continue
@@ -119,11 +121,12 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
       if len(cur_text.split())==1 and len(subj0.split())>1: continue
       sim0=cos_sim(subj_vec0,cur_text_vec)
       if sim0<0.5: continue
-      sim_list.append((subj0,sim0))
+      sim_list.append((subj0,round(sim0,4)))
     sim_list.sort(key=lambda x:-x[-1])
 
     for subj1,sim1 in sim_list[:5]:
       el_span_list.append(("subject",subj1,cur_span,sim1))
+    np_list.append((cur_text,cur_span,el_span_list[:5]))
     #print("-------")
   used_spans=[]
   used_text=[]
@@ -142,7 +145,7 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
     structured_query_elements.append(el0)
   structured_query_elements.sort()
   grouped=[(key,[v[1:] for v in list(group)]) for key,group in groupby(structured_query_elements,lambda x:x[0])]
-  structured_query_dict={}
+  raw_structured_query_dict={}
   open_tag_dict,close_tag_dict={},{}
   for key0,grp0 in grouped:
     grp0.sort(key=lambda x:-len(x[0]))
@@ -153,7 +156,7 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
     open_tag_dict[x0]=cur_open_tag
     close_tag_dict[x1]=cur_close_tag
     #print(key0,grp0[0])
-    structured_query_dict[key0]=grp0[0][0]
+    raw_structured_query_dict[key0]=grp0[0][0]
   
   # for a,b in structured_query_dict.items():
   #   print(a,b)
@@ -167,37 +170,65 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
     final_tagged_query_html_items.append(word_tag_space_str)
   final_tagged_query_html="".join(final_tagged_query_html_items)
   #print(final_tagged_query_html)
-  return structured_query_dict,final_tagged_query_html
+  query_parse_dict={}
+  query_parse_dict["raw_structured_query_dict"]=raw_structured_query_dict
+  query_parse_dict["tagged_query_html"]=final_tagged_query_html
+  query_parse_dict["syntax_dict"]=syntax_dict
+  query_parse_dict["lemmas"]=lemma_list
+  query_parse_dict["np_list"]=np_list
+  query_parse_dict["conll"]=dep.conll2str(syntax_dict["conll"])
+
+  #syntax_dict
+  
+  
+  
+
+  return query_parse_dict #structured_query_dict,final_tagged_query_html
   
 
 def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,country_dict,wv_model):
-  structured_query_dict1,tagged_query1=parse_query(query_text,subject_vec_list,subject_dict,country_dict,wv_model)
-  country=structured_query_dict1.get("country")
-  voting=structured_query_dict1.get("voting")
-  subject=structured_query_dict1.get("subject")
+  #structured_query_dict1,tagged_query1
+  query_parse_dict0=parse_query(query_text,subject_vec_list,subject_dict,country_dict,wv_model)
+  raw_structured_query_dict1=query_parse_dict0["raw_structured_query_dict"]
+  tagged_query1=query_parse_dict0["tagged_query_html"]
+
+  country=raw_structured_query_dict1.get("country")
+  voting=raw_structured_query_dict1.get("voting")
+  subject=raw_structured_query_dict1.get("subject")
   print("country",country,"voting",voting,"subject",subject)
   narrative="Sorry, no information found"
   narrative_elements=[]
-  
   data=[]
+  data_with_info=[]
+  structured_query_dict={}
+
+  final_out_dict={}
+  final_out_dict["narrative"]=" ".join(narrative_elements)
+  final_out_dict["data_with_info"]=data_with_info
+  final_out_dict["query_parse_dict"]=query_parse_dict0
+  final_out_dict["structured_query_dict"]=structured_query_dict
+
+  
+  
   if country==None: 
     narrative_elements.append("Sorry, country was mentioned.")
-    return " ".join(narrative_elements),data,structured_query_dict1,tagged_query1
-  cur_query_dict={}
+    final_out_dict["narrative"]=" ".join(narrative_elements)
+    return final_out_dict #" ".join(narrative_elements),data,raw_structured_query_dict1,tagged_query1
+  structured_query_dict={}
   if subject!=None: 
     narrative_elements.append("Analyzing information for subject: %s."%subject.title())
-    cur_query_dict["subjects"]=subject
+    structured_query_dict["subjects"]=subject
   
   # for voting in ["vote_for","vote_against", "vote_abstaining"]:
   # all_voting_keys=["vote_for","vote_against", "vote_abstaining"]
   # for vote_status0 in all_voting_keys:
   #   if voting in 
   if voting in ["vote_for","vote_against", "vote_abstaining"]:
-    cur_query_dict[voting]=country
+    structured_query_dict[voting]=country
     #if voting=="vote_for": 
   
-  print("cur_query_dict",cur_query_dict)
-  out0=retrieve_query(cur_query_dict,index_dict,prev_results=None)
+  #print("structured_query_dict",structured_query_dict)
+  out0=retrieve_query(structured_query_dict,index_dict,prev_results=None)
   data=out0["results"]
   if voting=="vote_for": 
     if len(data)==0: narrative_elements.append("%s didn't vote in favour of any resolution."%(country))
@@ -218,5 +249,12 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
     title=cur_info["title"]
     adoption_date=cur_info["adoption_date"]
     data_with_info.append((symbol,title,adoption_date))
+  final_out_dict={}
+  final_out_dict["narrative"]=" ".join(narrative_elements)
+  final_out_dict["data_with_info"]=data_with_info
+  final_out_dict["query_parse_dict"]=query_parse_dict0
+  final_out_dict["structured_query"]=structured_query_dict
+  
+  #final_out_dict["narrative"]=" ".join(narrative_elements)
 
-  return " ".join(narrative_elements),data_with_info,structured_query_dict1,tagged_query1  
+  return final_out_dict #" ".join(narrative_elements),data_with_info,raw_structured_query_dict1,tagged_query1  
