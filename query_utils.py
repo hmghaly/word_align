@@ -271,7 +271,7 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
   #print("structured_query_dict",structured_query_dict)
   final_out_dict={}
   final_out_dict["narrative"]=" ".join(narrative_elements)
-  final_out_dict["data_with_info"]=data_with_info
+  final_out_dict["data"]=data_with_info
   final_out_dict["query_parse_dict"]=query_parse_dict0
   final_out_dict["structured_query"]=structured_query_dict
   
