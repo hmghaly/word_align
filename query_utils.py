@@ -98,11 +98,15 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   if vote_against_span!=[]: el_span_list.append(("voting","vote_against",vote_against_span[0],1.1))
   if vote_abstain_span!=[]: el_span_list.append(("voting","vote_abstaining",vote_abstain_span[0],1.1))
 
-  #question_span=[(vi,vi) for vi,v in enumerate(pos_tags) if ]
+  #identify words by string match and by POS info
   for word_i,word0 in enumerate(word_list):
     tag0=pos_tags[word_i]
     if tag0.startswith("W"):
       el_span_list.append(("question",word0.lower(),(word_i,word_i),1.1))
+    if word0.lower().startswith("a/res") or word0.lower().startswith("s/res"):
+      el_span_list.append(("resolution",word0,(word_i,word_i),1.1))
+
+
 
 
   np_list_with_sim=[]
