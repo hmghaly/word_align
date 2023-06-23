@@ -235,13 +235,13 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
 
   out0=retrieve_query(structured_query_dict,index_dict,prev_results=None)
   id_list=out0["results"]
-  data_with_info=[]
+  data=[]
   for d0 in id_list:
     cur_info=info_dict[d0]
     symbol=cur_info["symbol"]
     title=cur_info["title"]
     adoption_date=cur_info["adoption_date"]
-    data_with_info.append((symbol,title,adoption_date))
+    data.append((symbol,title,adoption_date))
 
   if symbol!=None and question=="when" and len(id_list)>0:
     cur_info_dict=info_dict[id_list[0]]
@@ -271,7 +271,7 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
   #print("structured_query_dict",structured_query_dict)
   final_out_dict={}
   final_out_dict["narrative"]=" ".join(narrative_elements)
-  final_out_dict["data"]=data_with_info
+  final_out_dict["data"]=data
   final_out_dict["query_parse_dict"]=query_parse_dict0
   final_out_dict["structured_query"]=structured_query_dict
   
