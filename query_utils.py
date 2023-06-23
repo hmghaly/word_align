@@ -104,7 +104,7 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
     if tag0.startswith("W"):
       el_span_list.append(("question",word0.lower(),(word_i,word_i),1.1))
     if word0.lower().startswith("a/res") or word0.lower().startswith("s/res"):
-      el_span_list.append(("resolution",word0,(word_i,word_i),1.1))
+      el_span_list.append(("symbol",word0,(word_i,word_i),1.1))
 
 
 
@@ -211,7 +211,10 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
   country=raw_structured_query_dict1.get("country")
   voting=raw_structured_query_dict1.get("voting")
   subject=raw_structured_query_dict1.get("subject")
-  print("country",country,"voting",voting,"subject",subject)
+  question=raw_structured_query_dict1.get("question")
+  symbol=raw_structured_query_dict1.get("symbol")
+
+  #print("country",country,"voting",voting,"subject",subject)
   narrative="Sorry, no information found"
   narrative_elements=[]
   data=[]
@@ -223,48 +226,49 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
   final_out_dict["data_with_info"]=data_with_info
   final_out_dict["query_parse_dict"]=query_parse_dict0
   final_out_dict["structured_query_dict"]=structured_query_dict
-
   
-  
-  if country==None: 
-    narrative_elements.append("Sorry, country was mentioned.")
-    final_out_dict["narrative"]=" ".join(narrative_elements)
-    return final_out_dict #" ".join(narrative_elements),data,raw_structured_query_dict1,tagged_query1
+  query_intent=""
   structured_query_dict={}
-  if subject!=None: 
-    narrative_elements.append("Analyzing information for subject: %s."%subject.title())
-    structured_query_dict["subjects"]=subject
-  
-  # for voting in ["vote_for","vote_against", "vote_abstaining"]:
-  # all_voting_keys=["vote_for","vote_against", "vote_abstaining"]
-  # for vote_status0 in all_voting_keys:
-  #   if voting in 
-  if voting in ["vote_for","vote_against", "vote_abstaining"]:
-    structured_query_dict[voting]=country
-    #if voting=="vote_for": 
-  
-  #print("structured_query_dict",structured_query_dict)
+  if subject!=None: structured_query_dict["subjects"]=subject
+  if country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]: structured_query_dict[voting]=country
+  if symbol!=None: structured_query_dict["symbol"]=symbol
+
   out0=retrieve_query(structured_query_dict,index_dict,prev_results=None)
-  data=out0["results"]
-  if voting=="vote_for": 
-    if len(data)==0: narrative_elements.append("%s didn't vote in favour of any resolution."%(country))
-    elif len(data)==1: narrative_elements.append("%s voted in favour of one resolution."%(country))
-    else: narrative_elements.append("%s voted in favour of %s resolutions."%(country,len(data)))
-  if voting=="vote_against": 
-    if len(data)==0: narrative_elements.append("%s didn't vote against any resolution."%(country))
-    elif len(data)==1: narrative_elements.append("%s voted against one resolution."%(country))
-    else: narrative_elements.append("%s voted against %s resolutions."%(country,len(data)))
-  if voting=="vote_abstaining": 
-    if len(data)==0: narrative_elements.append("%s didn't abstain from voting on any resolution."%(country))
-    elif len(data)==1: narrative_elements.append("%s abstained from voting on one resolution."%(country))
-    else: narrative_elements.append("%s abstained from voting on %s resolutions."%(country,len(data)))
+  id_list=out0["results"]
   data_with_info=[]
-  for d0 in data:
+  for d0 in id_list:
     cur_info=info_dict[d0]
     symbol=cur_info["symbol"]
     title=cur_info["title"]
     adoption_date=cur_info["adoption_date"]
     data_with_info.append((symbol,title,adoption_date))
+
+  if symbol!=None and question=="when" and len(id_list)>0:
+    cur_info_dict=info_dict[id_list[0]]
+    adoption_date=cur_info_dict["adoption_date"]
+    narrative_elements.append("Resolution %s was adopted on %s"%(symbol,adoption_date))
+  elif subject!=None and country==None:
+    narrative_elements.append("For the subject: (%s), %s resolutions were adopted."%(subject,len(id_list)))
+  elif country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]:
+    if subject!=None:
+      narrative_elements.append("Analyzing information for subject: <b>(%s)</b>.<br>"%subject.title())
+    if voting=="vote_for": 
+      if len(data)==0: narrative_elements.append("%s didn't vote in favour of any resolution."%(country))
+      elif len(data)==1: narrative_elements.append("%s voted in favour of one resolution."%(country))
+      else: narrative_elements.append("%s voted in favour of %s resolutions."%(country,len(data)))
+    if voting=="vote_against": 
+      if len(data)==0: narrative_elements.append("%s didn't vote against any resolution."%(country))
+      elif len(data)==1: narrative_elements.append("%s voted against one resolution."%(country))
+      else: narrative_elements.append("%s voted against %s resolutions."%(country,len(data)))
+    if voting=="vote_abstaining": 
+      if len(data)==0: narrative_elements.append("%s didn't abstain from voting on any resolution."%(country))
+      elif len(data)==1: narrative_elements.append("%s abstained from voting on one resolution."%(country))
+      else: narrative_elements.append("%s abstained from voting on %s resolutions."%(country,len(data)))
+  else:
+    narrative_elements.append("Sorry, no information was found.")
+
+
+  #print("structured_query_dict",structured_query_dict)
   final_out_dict={}
   final_out_dict["narrative"]=" ".join(narrative_elements)
   final_out_dict["data_with_info"]=data_with_info
