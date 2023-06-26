@@ -284,6 +284,7 @@ def query2output(query_text,params):
   subject=raw_structured_query_dict1.get("subject")
   question=raw_structured_query_dict1.get("question")
   symbol=raw_structured_query_dict1.get("symbol")
+  title=raw_structured_query_dict1.get("title")
   with_title=raw_structured_query_dict1.get("with_title")
 
   #print("country",country,"voting",voting,"subject",subject)
@@ -304,6 +305,7 @@ def query2output(query_text,params):
   if subject!=None: structured_query_dict["subjects"]=subject
   if country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]: structured_query_dict[voting]=country
   if symbol!=None: structured_query_dict["symbol"]=symbol
+  if title!None and with_title!=None: structured_query_dict["title"]=title
 
   out0=retrieve_query(structured_query_dict,index_dict,prev_results=None)
   id_list=out0["results"]
@@ -321,9 +323,15 @@ def query2output(query_text,params):
     narrative_elements.append("Resolution %s was adopted on %s"%(symbol,adoption_date))
   elif subject!=None and country==None:
     narrative_elements.append("For the subject: (%s), %s resolutions were adopted."%(subject,len(id_list)))
+  elif with_title!=None and title!=None and country==None:
+    narrative_elements.append("For the title: (%s), %s resolutions were adopted."%(title,len(id_list)))
+
   elif country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]:
     if subject!=None:
       narrative_elements.append("Analyzing information for subject: (%s). "%subject.title())
+    if with_title!=None and title!=None:
+      narrative_elements.append("Analyzing information for resolutions with title: (%s). "%title.title())
+
     if voting=="vote_for": 
       if len(data)==0: narrative_elements.append("%s didn't vote in favour of any resolution."%(country))
       elif len(data)==1: narrative_elements.append("%s voted in favour of one resolution."%(country))
