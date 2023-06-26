@@ -18,6 +18,28 @@ import code_utils.general as general
 
 cur_excluded=["the","of","for", "in","on","at","to","from","and"]
 
+
+def list2vec_list(str_list,wv_model):
+  vec_list0=[]
+  for item0 in str_list:
+    item_words=text_split(item0,excluded_words=cur_excluded)
+    item_vector0=wv_model.wv.get_mean_vector(item_words)
+    if sum(item_vector0)==0: continue
+    vec_list0.append((item0,item_vector0))
+  return vec_list0
+
+def get_top_sim(phrase,wv_model,vec_list,n_top=10):
+  phrase_words=text_split(phrase,excluded_words=cur_excluded)
+  phrase_vec=wv_model.wv.get_mean_vector(phrase_words)
+  if sum(phrase_vec)==0: return []
+  sim_list0=[]
+  for item0,vec0 in vec_list:
+    sim0=cos_sim(phrase_vec,vec0)
+    sim_list0.append((item0,sim0))
+  sim_list0.sort(key=lambda x:-x[-1])
+  return sim_list0[:n_top]
+
+
 def text2parsed(text):
   conll_2d0=parse.get_conll(text)
   parse_out_dict0=dep.dep2phrases(conll_2d0)
@@ -105,6 +127,8 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
       el_span_list.append(("question",word0.lower(),(word_i,word_i),1.1))
     if word0.lower().startswith("a/res") or word0.lower().startswith("s/res"):
       el_span_list.append(("symbol",word0,(word_i,word_i),1.1))
+    if word0.lower()==("title"):
+      el_span_list.append(("title",word0,(word_i,word_i),1.1))
 
 
 
