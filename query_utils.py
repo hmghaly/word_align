@@ -195,6 +195,10 @@ def parse_query(query,params):
     #   else: el_span_list.append(("subject",subj1,cur_span,sim1))
     # np_list_with_sim.append((cur_text,cur_span,el_span_list[:5]))
     #print("-------")
+  
+  #raw_structured_query_dict["title"]=title_span_list
+
+
   used_spans=[]
   used_text=[]
   structured_query_elements=[]
@@ -210,6 +214,10 @@ def parse_query(query,params):
     used_text.append(el_text)
     #print(el0)
     structured_query_elements.append(el0)
+
+  title_span_list.sort(key=lambda x:-x[-1])
+  if len(title_span_list)>0: structured_query_elements.append(title_span_list[0])
+    
   structured_query_elements.sort()
   grouped=[(key,[v[1:] for v in list(group)]) for key,group in groupby(structured_query_elements,lambda x:x[0])]
   raw_structured_query_dict={}
@@ -225,8 +233,6 @@ def parse_query(query,params):
     #print(key0,grp0[0])
     raw_structured_query_dict[key0]=grp0[0][0]
   
-  title_span_list.sort(key=lambda x:-x[-1])
-  raw_structured_query_dict["test_title"]=title_span_list
   # for a,b in structured_query_dict.items():
   #   print(a,b)
   final_tagged_query_html_items=[]
