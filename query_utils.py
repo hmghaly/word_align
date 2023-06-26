@@ -305,7 +305,7 @@ def query2output(query_text,params):
   if subject!=None: structured_query_dict["subjects"]=subject
   if country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]: structured_query_dict[voting]=country
   if symbol!=None: structured_query_dict["symbol"]=symbol
-  if title!None and with_title!=None: structured_query_dict["title"]=title
+  if title!=None and with_title!=None: structured_query_dict["title"]=title
 
   out0=retrieve_query(structured_query_dict,index_dict,prev_results=None)
   id_list=out0["results"]
