@@ -173,11 +173,11 @@ def parse_query(query,params):
       for title0,title_vec0 in title_vec_list:
         if len(cur_text.split())==1 and len(title0.split())>1: continue
         sim0=cos_sim(title_vec0,cur_text_vec)
-        if sim0<0.5: continue
+        if sim0<0.4: continue
         title_sim_list.append((title0,round(sim0,4)))
       title_sim_list.sort(key=lambda x:-x[-1])
-      for subj1,sim1 in subj_sim_list[:5]:
-        title_span_list.append(("title",subj1,cur_span,sim1))
+      for title1,sim1 in title_sim_list[:5]:
+        title_span_list.append(("title",title1,cur_span,sim1))
 
     else:
       for subj0,subj_vec0 in cur_vec_list:
