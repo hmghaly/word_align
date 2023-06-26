@@ -118,6 +118,7 @@ def parse_query(query,params):
   lemma_list=["favour" if v=="favor" else v for v in lemma_list]
   pos_tags=syntax_dict["pos"]
   el_span_list=[]
+  title_span_list=[]
   vote_span=general.is_in(["vote"],lemma_list)
   vote_for_span=general.is_in(["vote","for"],lemma_list)
   if vote_for_span==[]: vote_for_span=general.is_in(["vote","in","favour"],lemma_list)
@@ -167,17 +168,32 @@ def parse_query(query,params):
     cur_vec_list=subject_vec_list
     if query_with_title: cur_vec_list=title_vec_list
     subj_sim_list=[]
-    for subj0,subj_vec0 in cur_vec_list:
-      if len(cur_text.split())==1 and len(subj0.split())>1: continue
-      sim0=cos_sim(subj_vec0,cur_text_vec)
-      if sim0<0.5: continue
-      subj_sim_list.append((subj0,round(sim0,4)))
-    subj_sim_list.sort(key=lambda x:-x[-1])
+    title_sim_list=[]
+    if query_with_title:
+      for title0,title_vec0 in title_vec_list:
+        if len(cur_text.split())==1 and len(title0.split())>1: continue
+        sim0=cos_sim(title_vec0,cur_text_vec)
+        if sim0<0.5: continue
+        title_sim_list.append((title0,round(sim0,4)))
+      title_sim_list.sort(key=lambda x:-x[-1])
+      for subj1,sim1 in subj_sim_list[:5]:
+        title_span_list.append(("title",subj1,cur_span,sim1))
 
-    for subj1,sim1 in subj_sim_list[:5]:
-      if query_with_title: el_span_list.append(("title",subj1,cur_span,sim1))		
-      else: el_span_list.append(("subject",subj1,cur_span,sim1))
-    np_list_with_sim.append((cur_text,cur_span,el_span_list[:5]))
+    else:
+      for subj0,subj_vec0 in cur_vec_list:
+        if len(cur_text.split())==1 and len(subj0.split())>1: continue
+        sim0=cos_sim(subj_vec0,cur_text_vec)
+        if sim0<0.5: continue
+        subj_sim_list.append((subj0,round(sim0,4)))
+      subj_sim_list.sort(key=lambda x:-x[-1])
+      for subj1,sim1 in subj_sim_list[:5]:
+        el_span_list.append(("subject",subj1,cur_span,sim1))
+      np_list_with_sim.append((cur_text,cur_span,el_span_list[:5]))
+
+    # for subj1,sim1 in subj_sim_list[:5]:
+    #   if query_with_title: el_span_list.append(("title",subj1,cur_span,sim1))		
+    #   else: el_span_list.append(("subject",subj1,cur_span,sim1))
+    # np_list_with_sim.append((cur_text,cur_span,el_span_list[:5]))
     #print("-------")
   used_spans=[]
   used_text=[]
@@ -209,6 +225,8 @@ def parse_query(query,params):
     #print(key0,grp0[0])
     raw_structured_query_dict[key0]=grp0[0][0]
   
+  title_span_list.sort(key=lambda x:-x[-1])
+  raw_structured_query_dict["test_title"]=title_span_list
   # for a,b in structured_query_dict.items():
   #   print(a,b)
   final_tagged_query_html_items=[]
