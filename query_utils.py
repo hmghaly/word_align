@@ -226,7 +226,15 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   return query_parse_dict #structured_query_dict,final_tagged_query_html
   
 
-def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,country_dict,wv_model):
+def query2output(query_text,params):
+  index_dict=params.get("index_dict",{})
+  info_dict=params.get("info_dict",{})
+  subject_vec_list=params.get("subject_vec_list",[])
+  subject_dict=params.get("subject_dict",{})
+  country_dict=params.get("country_dict",{})
+  wv_model=params.get("wv_model",{})
+
+
   #structured_query_dict1,tagged_query1
   query_parse_dict0=parse_query(query_text,subject_vec_list,subject_dict,country_dict,wv_model)
   raw_structured_query_dict1=query_parse_dict0["raw_structured_query_dict"]
@@ -237,6 +245,7 @@ def query2output(query_text,index_dict,info_dict,subject_vec_list,subject_dict,c
   subject=raw_structured_query_dict1.get("subject")
   question=raw_structured_query_dict1.get("question")
   symbol=raw_structured_query_dict1.get("symbol")
+  title=raw_structured_query_dict1.get("title")
 
   #print("country",country,"voting",voting,"subject",subject)
   narrative="Sorry, no information found"
