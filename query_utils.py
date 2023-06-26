@@ -102,7 +102,15 @@ def check_used_span(span0,list_used_spans):
   return False
 
 
-def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
+def parse_query(query,params):
+  index_dict=params.get("index_dict",{})
+  info_dict=params.get("info_dict",{})
+  subject_vec_list=params.get("subject_vec_list",[])
+  title_vec_list=params.get("title_vec_list",[])
+  subject_dict=params.get("subject_dict",{})
+  country_dict=params.get("country_dict",{})
+  wv_model=params.get("wv_model",{})
+
   syntax_dict=text2parsed(query)
   phrase_info=syntax_dict["phrase_info"]
   word_list=general.tok(query)
@@ -121,6 +129,7 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
   if vote_abstain_span!=[]: el_span_list.append(("voting","vote_abstaining",vote_abstain_span[0],1.1))
 
   #identify words by string match and by POS info
+  query_with_title=False
   for word_i,word0 in enumerate(word_list):
     tag0=pos_tags[word_i]
     if tag0.startswith("W"):
@@ -128,7 +137,8 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
     if word0.lower().startswith("a/res") or word0.lower().startswith("s/res"):
       el_span_list.append(("symbol",word0,(word_i,word_i),1.1))
     if word0.lower()==("title"):
-      el_span_list.append(("title",word0,(word_i,word_i),1.1))
+      el_span_list.append(("with_title",word0,(word_i,word_i),1.1))
+      query_with_title=True
 
 
 
@@ -154,16 +164,19 @@ def parse_query(query,subject_vec_list,subject_dict,country_dict,wv_model):
     cur_text_words=text_split(cur_text)
     cur_text_vec=wv_model.wv.get_mean_vector(cur_text_words)
     #print(a,b["text"],b["span"])
-    sim_list=[]
-    for subj0,subj_vec0 in subject_vec_list:
+    cur_vec_list=subject_vec_list
+    if query_with_title: cur_vec_list=title_vec_list
+    subj_sim_list=[]
+    for subj0,subj_vec0 in cur_vec_list:
       if len(cur_text.split())==1 and len(subj0.split())>1: continue
       sim0=cos_sim(subj_vec0,cur_text_vec)
       if sim0<0.5: continue
-      sim_list.append((subj0,round(sim0,4)))
-    sim_list.sort(key=lambda x:-x[-1])
+      subj_sim_list.append((subj0,round(sim0,4)))
+    subj_sim_list.sort(key=lambda x:-x[-1])
 
-    for subj1,sim1 in sim_list[:5]:
-      el_span_list.append(("subject",subj1,cur_span,sim1))
+    for subj1,sim1 in subj_sim_list[:5]:
+      if query_with_title: el_span_list.append(("title",subj1,cur_span,sim1))		
+      else: el_span_list.append(("subject",subj1,cur_span,sim1))
     np_list_with_sim.append((cur_text,cur_span,el_span_list[:5]))
     #print("-------")
   used_spans=[]
@@ -230,13 +243,15 @@ def query2output(query_text,params):
   index_dict=params.get("index_dict",{})
   info_dict=params.get("info_dict",{})
   subject_vec_list=params.get("subject_vec_list",[])
+  title_vec_list=params.get("title_vec_list",[])
   subject_dict=params.get("subject_dict",{})
   country_dict=params.get("country_dict",{})
   wv_model=params.get("wv_model",{})
 
 
   #structured_query_dict1,tagged_query1
-  query_parse_dict0=parse_query(query_text,subject_vec_list,subject_dict,country_dict,wv_model)
+  #query_parse_dict0=parse_query(query_text,subject_vec_list,subject_dict,country_dict,wv_model)
+  query_parse_dict0=parse_query(query_text,params)
   raw_structured_query_dict1=query_parse_dict0["raw_structured_query_dict"]
   tagged_query1=query_parse_dict0["tagged_query_html"]
 
@@ -245,7 +260,7 @@ def query2output(query_text,params):
   subject=raw_structured_query_dict1.get("subject")
   question=raw_structured_query_dict1.get("question")
   symbol=raw_structured_query_dict1.get("symbol")
-  title=raw_structured_query_dict1.get("title")
+  with_title=raw_structured_query_dict1.get("with_title")
 
   #print("country",country,"voting",voting,"subject",subject)
   narrative="Sorry, no information found"
