@@ -177,6 +177,7 @@ def parse_query(query,params):
   for title_item0 in found_titles:
     title0,span_list0=title_item0
     for span0 in span_list0:
+      title_wt=1.1+0.01*len(title0.split())
       el_span_list.append(("title",title0,span0,1.1))
 
 
@@ -241,7 +242,7 @@ def parse_query(query,params):
   used_text=[]
   structured_query_elements=[]
   el_span_list.sort(key=lambda x:(-x[-1],-len(x[1])))
-  for el0 in el_span_list:
+  for el0 in el_span_list: #now we filter all the elements found with their spans, to exclude smaller elements that are within other elements
     #print(">>>>", el0,len(el0))
     el_type,el_text,el_span,el_wt=el0
     if el_text in used_text: continue
