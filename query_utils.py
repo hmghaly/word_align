@@ -174,6 +174,12 @@ def parse_query(query,params):
 
 
   found_titles=locate_substrings(query,title_first_dict)
+  for title_item0 in found_titles:
+    title0,span_list0=title_item0
+    for span0 in span_list0:
+      el_span_list.append(("title",title0,span0,1.1))
+
+
 
   np_list_with_sim=[]
   all_nps=[]
@@ -287,6 +293,8 @@ def parse_query(query,params):
   
   query_parse_dict["conll"]=dep.conll2str(syntax_dict["conll"])
   query_parse_dict["found_titles"]=found_titles
+  query_parse_dict["el_span_list"]=el_span_list
+  
 
   #syntax_dict
   
