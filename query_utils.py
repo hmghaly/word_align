@@ -178,7 +178,7 @@ def parse_query(query,params):
     title0,span_list0=title_item0
     for span0 in span_list0:
       title_wt=1.1+0.01*len(title0.split())
-      el_span_list.append(("title",title0,span0,1.1))
+      el_span_list.append(("title",title0,span0,title_wt))
 
 
 
