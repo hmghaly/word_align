@@ -137,7 +137,7 @@ def parse_query(query,params):
       el_span_list.append(("question",word0.lower(),(word_i,word_i),1.1))
     if word0.lower().startswith("a/res") or word0.lower().startswith("s/res"):
       el_span_list.append(("symbol",word0,(word_i,word_i),1.1))
-    if word0.lower()==("title"):
+    if word0.lower() in ["title","entitled"]:
       el_span_list.append(("with_title",word0,(word_i,word_i),1.1))
       query_with_title=True
 
