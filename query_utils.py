@@ -19,6 +19,29 @@ import code_utils.general as general
 cur_excluded=["the","of","for", "in","on","at","to","from","and"]
 
 
+def create_first_tok_dict(str_list): #create a dictionary to retrieve a list of strings, using the key being the first token, and the values being all string items starting with this token
+  first_tok_list0=[]
+  for str0 in str_list:
+    tokenized0=general.tok(str0.lower())
+    first_tok_list0.append((tokenized0[0],str0)) #not sure whether to include tokenized to save time for tokenization or keep original string for straightforward retrieval
+  first_dict0=general.group_list(first_tok_list0)
+  return first_dict0
+
+def locate_substrings(cur_str,cur_first_dict): #then using the first token dict, we can input a text and try to identify which of the substrings whertr included in it
+  cur_str_tokens=general.tok(cur_str.lower())
+  cur_str_tokens_list=list(set(cur_str_tokens))
+  found_items=[]
+  for token0 in cur_str_tokens_list:
+    corr_str_items=cur_first_dict.get(token0,[])
+    for str_item0 in corr_str_items:
+      str_item_tokens0=str_item0
+      if type(str_item0) is str: str_item_tokens0=general.tok(str_item0.lower())
+      check_is_in0=general.is_in(str_item_tokens0,cur_str_tokens)
+      if check_is_in0: found_items.append((str_item0,check_is_in0))
+  return found_items
+
+
+
 def list2vec_list(str_list,wv_model):
   vec_list0=[]
   for item0 in str_list:
