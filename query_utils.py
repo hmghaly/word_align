@@ -28,8 +28,10 @@ def create_first_tok_dict(str_list): #create a dictionary to retrieve a list of 
   return first_dict0
 
 def locate_substrings(cur_input,cur_first_dict): #then using the first token dict, we can input a text and try to identify which of the substrings whertr included in it
-  if type(cur_input) is str: cur_str_tokens=general.tok(cur_input.lower())
-  else: cur_str_tokens=cur_input
+  # if type(cur_input) is str: cur_str_tokens=general.tok(cur_input.lower())
+  # else: cur_str_tokens=cur_input
+
+  cur_str_tokens=general.tok(cur_input.lower())
   
   cur_str_tokens_list=list(set(cur_str_tokens))
   found_items=[]
@@ -171,7 +173,7 @@ def parse_query(query,params):
 
 
 
-  found_titles=locate_substrings(word_list,title_first_dict)
+  found_titles=locate_substrings(query,title_first_dict)
 
   np_list_with_sim=[]
   all_nps=[]
