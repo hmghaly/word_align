@@ -362,7 +362,9 @@ def query2output(query_text,params):
   if symbol!=None and question=="when" and len(id_list)>0:
     cur_info_dict=info_dict[id_list[0]]
     adoption_date=cur_info_dict["adoption_date"]
-    narrative_elements.append("Resolution %s was adopted on %s"%(symbol,adoption_date))
+    symbol_href='https://undocs.org/%s'%symbol
+    symbol_link='<a href="%s" target="new">%s</a>'%(symbol_href,symbol)
+    narrative_elements.append("Resolution %s was adopted on %s"%(symbol_link,adoption_date))
   elif subject!=None and country==None:
     narrative_elements.append("For the subject: (%s), %s resolutions were adopted."%(subject,len(id_list)))
   elif with_title!=None and title!=None and country==None:
