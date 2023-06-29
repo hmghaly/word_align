@@ -27,8 +27,10 @@ def create_first_tok_dict(str_list): #create a dictionary to retrieve a list of 
   first_dict0=general.group_list(first_tok_list0)
   return first_dict0
 
-def locate_substrings(cur_str,cur_first_dict): #then using the first token dict, we can input a text and try to identify which of the substrings whertr included in it
-  cur_str_tokens=general.tok(cur_str.lower())
+def locate_substrings(cur_input,cur_first_dict): #then using the first token dict, we can input a text and try to identify which of the substrings whertr included in it
+  if type(cur_input) is str: cur_str_tokens=general.tok(cur_input.lower())
+  else: cur_str_tokens=cur_input
+  
   cur_str_tokens_list=list(set(cur_str_tokens))
   found_items=[]
   for token0 in cur_str_tokens_list:
@@ -130,6 +132,7 @@ def parse_query(query,params):
   info_dict=params.get("info_dict",{})
   subject_vec_list=params.get("subject_vec_list",[])
   title_vec_list=params.get("title_vec_list",[])
+  title_first_dict=params.get("title_first_dict",{})
   subject_dict=params.get("subject_dict",{})
   country_dict=params.get("country_dict",{})
   wv_model=params.get("wv_model",{})
@@ -167,6 +170,9 @@ def parse_query(query,params):
 
 
 
+
+  found_titles=locate_substrings(word_list,title_first_dict)
+
   np_list_with_sim=[]
   all_nps=[]
 
@@ -189,18 +195,19 @@ def parse_query(query,params):
     cur_text_vec=wv_model.wv.get_mean_vector(cur_text_words)
     #print(a,b["text"],b["span"])
     cur_vec_list=subject_vec_list
-    if query_with_title: cur_vec_list=title_vec_list
+    #if query_with_title: cur_vec_list=title_vec_list
     subj_sim_list=[]
     title_sim_list=[]
     if query_with_title:
-      for title0,title_vec0 in title_vec_list:
-        if len(cur_text.split())==1 and len(title0.split())>1: continue
-        sim0=cos_sim(title_vec0,cur_text_vec)
-        if sim0<0.4: continue
-        title_sim_list.append((title0,round(sim0,4)))
-      title_sim_list.sort(key=lambda x:-x[-1])
-      for title1,sim1 in title_sim_list[:5]:
-        title_span_list.append(("title",title1,cur_span,sim1))
+      pass
+      # for title0,title_vec0 in title_vec_list:
+      #   if len(cur_text.split())==1 and len(title0.split())>1: continue
+      #   sim0=cos_sim(title_vec0,cur_text_vec)
+      #   if sim0<0.4: continue
+      #   title_sim_list.append((title0,round(sim0,4)))
+      # title_sim_list.sort(key=lambda x:-x[-1])
+      # for title1,sim1 in title_sim_list[:5]:
+      #   title_span_list.append(("title",title1,cur_span,sim1))
 
     else:
       for subj0,subj_vec0 in cur_vec_list:
@@ -277,6 +284,7 @@ def parse_query(query,params):
   query_parse_dict["all_nps"]=all_nps
   
   query_parse_dict["conll"]=dep.conll2str(syntax_dict["conll"])
+  query_parse_dict["found_titles"]=found_titles
 
   #syntax_dict
   
