@@ -354,6 +354,8 @@ def query2output(query_text,params):
   if country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]: structured_query_dict[voting]=country
   if symbol!=None: structured_query_dict["symbol"]=symbol
   if title!=None and with_title!=None: structured_query_dict["title"]=title
+  if country!=None and with_sponsor!=None: structured_query_dict["sponsors_all"]=country
+
 
   out0=retrieve_query(structured_query_dict,index_dict,prev_results=None)
   id_list=out0["results"]
@@ -377,8 +379,8 @@ def query2output(query_text,params):
   elif with_title!=None and title!=None and country==None:
     narrative_elements.append("For the title: (%s), %s resolutions were adopted."%(title,len(id_list)))
   elif country!=None and with_sponsor:
-    if len(data)==0: narrative_elements.append("%s didn't sponsor of any resolution."%(country))
-    elif len(data)==1: narrative_elements.append("%s sponsored of one resolution."%(country))
+    if len(data)==0: narrative_elements.append("%s didn't sponsor any resolution."%(country))
+    elif len(data)==1: narrative_elements.append("%s sponsored one resolution."%(country))
     else: narrative_elements.append("%s sponsored %s resolutions."%(country,len(data)))
 
   elif country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]:
