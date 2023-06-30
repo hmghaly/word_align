@@ -162,6 +162,9 @@ def parse_query(query,params):
   for word_i,word0 in enumerate(word_list):
     tag0=pos_tags[word_i]
     lemma0=lemma_list[word_i]
+    prev_word_1,prev_word_2="",""
+    if word_i>0: prev_word_1=word_list[word_i-1]
+    if word_i>1: prev_word_2=word_list[word_i-2]
     if tag0.startswith("W"):
       el_span_list.append(("question",word0.lower(),(word_i,word_i),1.1))
     if word0.lower().startswith("a/res") or word0.lower().startswith("s/res"):
@@ -171,7 +174,10 @@ def parse_query(query,params):
       query_with_title=True
     if lemma0.lower() in ["sponsor"]:
       el_span_list.append(("with_sponsor",word0,(word_i,word_i),1.1))
-      #query_with_title=True
+    if word0[0].isdigit():
+      if prev_word_1.lower()=="sdg": el_span_list.append(("sdgs",word0,(word_i-1,word_i),1.1))
+      elif prev_word_1.lower()=="sdg": el_span_list.append(("sdgs",word0,(word_i-2,word_i),1.1))
+      #el_span_list.append(("with_title",word0,(word_i,word_i),1.1))
 
 
 
@@ -334,6 +340,7 @@ def query2output(query_text,params):
   title=raw_structured_query_dict1.get("title")
   with_title=raw_structured_query_dict1.get("with_title")
   with_sponsor=raw_structured_query_dict1.get("with_sponsor")
+  sdgs=raw_structured_query_dict1.get("sdgs")
 
   #print("country",country,"voting",voting,"subject",subject)
   #narrative="Sorry, no information found"
@@ -355,6 +362,7 @@ def query2output(query_text,params):
   if symbol!=None: structured_query_dict["symbol"]=symbol
   if title!=None and with_title!=None: structured_query_dict["title"]=title
   if country!=None and with_sponsor!=None: structured_query_dict["sponsors_all"]=country
+  if sdgs!=None: structured_query_dict["sdgs"]=sdgs
 
 
   out0=retrieve_query(structured_query_dict,index_dict,prev_results=None)
@@ -376,6 +384,10 @@ def query2output(query_text,params):
     narrative_elements.append("Resolution %s was adopted on %s"%(symbol_link,adoption_date))
   elif subject!=None and country==None:
     narrative_elements.append("For the subject: (%s), %s resolutions were adopted."%(subject,len(id_list)))
+  elif sdgs!=None and country==None:
+    narrative_elements.append("For the SDG: (%s), %s resolutions were adopted."%(sdgs,len(id_list)))
+
+
   elif with_title!=None and title!=None and country==None:
     narrative_elements.append("For the title: (%s), %s resolutions were adopted."%(title,len(id_list)))
   elif country!=None and with_sponsor:
