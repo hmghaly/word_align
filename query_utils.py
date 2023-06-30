@@ -161,6 +161,7 @@ def parse_query(query,params):
   query_with_title=False
   for word_i,word0 in enumerate(word_list):
     tag0=pos_tags[word_i]
+    lemma0=lemma_list[word_i]
     if tag0.startswith("W"):
       el_span_list.append(("question",word0.lower(),(word_i,word_i),1.1))
     if word0.lower().startswith("a/res") or word0.lower().startswith("s/res"):
@@ -168,6 +169,10 @@ def parse_query(query,params):
     if word0.lower() in ["title","entitled"]:
       el_span_list.append(("with_title",word0,(word_i,word_i),1.1))
       query_with_title=True
+    if lemma0.lower() in ["sponsor"]:
+      el_span_list.append(("with_sponsor",word0,(word_i,word_i),1.1))
+      #query_with_title=True
+
 
 
 
@@ -328,9 +333,10 @@ def query2output(query_text,params):
   symbol=raw_structured_query_dict1.get("symbol")
   title=raw_structured_query_dict1.get("title")
   with_title=raw_structured_query_dict1.get("with_title")
+  with_sponsor=raw_structured_query_dict1.get("with_sponsor")
 
   #print("country",country,"voting",voting,"subject",subject)
-  narrative="Sorry, no information found"
+  #narrative="Sorry, no information found"
   narrative_elements=[]
   data=[]
   data_with_info=[]
@@ -370,6 +376,10 @@ def query2output(query_text,params):
     narrative_elements.append("For the subject: (%s), %s resolutions were adopted."%(subject,len(id_list)))
   elif with_title!=None and title!=None and country==None:
     narrative_elements.append("For the title: (%s), %s resolutions were adopted."%(title,len(id_list)))
+  elif country!=None and with_sponsor:
+    if len(data)==0: narrative_elements.append("%s didn't sponsor of any resolution."%(country))
+    elif len(data)==1: narrative_elements.append("%s sponsored of one resolution."%(country))
+    else: narrative_elements.append("%s sponsored %s resolutions."%(country,len(data)))
 
   elif country!=None and voting in ["vote_for","vote_against", "vote_abstaining"]:
     if subject!=None:
