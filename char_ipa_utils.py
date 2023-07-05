@@ -150,7 +150,8 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       try:
         if ch_i==0 and found[1]!="": first=found[1]
       except:
-        print("error","found",found,ch_i,ch)
+        print("error","found",found,ch_i,ch,word0)
+        continue
 
       if first=="q" and lang=="ega" and not "q" in self.word_params: first="2"
       #first=self.romanize_dict[ch[0]][0]
