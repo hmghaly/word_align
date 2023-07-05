@@ -147,7 +147,10 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
     for ch_i,ch in enumerate(self.chunks):
       found=self.romanize_dict.get(ch[0],ch[0])
       first=found[0]
-      if ch_i==0 and found[1]!="": first=found[1]
+      try:
+        if ch_i==0 and found[1]!="": first=found[1]
+      except:
+        print("error","found",found,ch_i,ch)
 
       if first=="q" and lang=="ega" and not "q" in self.word_params: first="2"
       #first=self.romanize_dict[ch[0]][0]
