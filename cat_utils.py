@@ -168,6 +168,9 @@ class docx:
 
 #2 June 2023
 def get_edit_info(para_content):
+  para_content=para_content.replace("<w:br/>","\n")
+  para_content=para_content.replace("<w:tab/>","\t")
+	
   tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', para_content))
   open_tags=[""]
   tag_counter_dict={}
