@@ -175,6 +175,8 @@ def get_edit_info(para_content):
   para_content=para_content.replace("<w:br/>","\n")
   para_content=para_content.replace("<w:tab/>","\t")
   para_content=para_content.replace("<w:noBreakHyphen/>","-")
+  #<w:footnoteReference w:customMarkFollows="1" w:id="2"/>
+  #<w:footnoteReference w:id="3"/>
   
 
   tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', para_content))
@@ -239,6 +241,29 @@ def safe_xml(txt):
   txt=txt.replace(">","&gt;")
   return txt  
 
+
+def get_seq_replace(tokens1,tokens2):
+  match_obj=SequenceMatcher(None,tokens1,tokens2)
+  final_list=[]
+  for a in match_obj.get_opcodes():
+    match_type,x0,x1,y0,y1=a
+    deleted_tokens,inserted_tokens=[],[]
+    if match_type=="delete":
+      deleted_tokens=tokens1[x0:x1]
+      #final_list.append(("deleted",tokens1[x0:x1]))
+    if match_type=="equal":
+      #final_list.append(("equal",tokens1[x0:x1]))
+      pass
+    if match_type=="replace":
+      deleted_tokens=tokens1[x0:x1]
+      inserted_tokens=tokens2[y0:y1]
+      #final_list.append(("delete",tokens1[x0:x1]))
+      #final_list.append(("insert",tokens2[y0:y1]))
+    if match_type=="insert":
+      #final_list.append(("insert",tokens2[y0:y1]))
+      inserted_tokens=tokens2[y0:y1]
+    final_list.append((match_type,deleted_tokens,inserted_tokens,(x0,x1),(y0,y1)))
+  return final_list
 
 
 def get_seq_edits(tokens1,tokens2):
