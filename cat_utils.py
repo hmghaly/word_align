@@ -207,7 +207,7 @@ def get_edit_info(para_content):
     if tag_name=="w:del" and tag_type=="closing": is_deleted=False
 
     inter_text=para_content[start_i:tag_start] #intervening text since last tag
-    if inter_text!="": print("inter_text",[inter_text],"last_open_tag_str",last_open_tag_str)
+    #if inter_text!="": print("inter_text",[inter_text],"last_open_tag_str",last_open_tag_str)
     #print(tag_name, inter_text,"is_inserted",is_inserted,"is_deleted",is_deleted)
     if last_open_tag_str.startswith("w:"):
       if not is_inserted: original_text0+=inter_text
@@ -226,7 +226,7 @@ def get_edit_info(para_content):
     elif a=="edited_deleted": edited_text_html0+='<del>'+b+'</del>'
     else: edited_text_html0+=b
   return original_text0,final_text0, edited_text_html0 
-  
+
 # def get_edit_info(para_content):
 #   para_content=para_content.replace("<w:br/>","\n")
 #   para_content=para_content.replace("<w:tab/>","\t")
