@@ -207,14 +207,17 @@ def get_edit_info(para_content):
     if tag_name=="w:del" and tag_type=="closing": is_deleted=False
 
     inter_text=para_content[start_i:tag_start] #intervening text since last tag
+    if inter_text!="": print("inter_text",[inter_text],"last_open_tag_str",last_open_tag_str)
     #print(tag_name, inter_text,"is_inserted",is_inserted,"is_deleted",is_deleted)
-    if not is_inserted: original_text0+=inter_text
-    if not is_deleted: final_text0+=inter_text
-    seg_class="edited_same"
-    if is_inserted: seg_class="edited_inserted"
-    if is_deleted: seg_class="edited_deleted"
-    if inter_text!="":edit_segments0.append((inter_text,seg_class))
+    if last_open_tag_str.startswith("w:"):
+      if not is_inserted: original_text0+=inter_text
+      if not is_deleted: final_text0+=inter_text
+      seg_class="edited_same"
+      if is_inserted: seg_class="edited_inserted"
+      if is_deleted: seg_class="edited_deleted"
+      if inter_text!="":edit_segments0.append((inter_text,seg_class))
     start_i=tag_end
+    if tag_type=="opening": last_open_tag_str=tag_name
   #edit_segments_grouped=edit_segments0[(key,"".join([v[0] for v in list(group)])) for key,group in groupby(edit_segments0,lambda x,x[0])]
   edit_segments_grouped0=[(key,"".join([v[0] for v in list(group)])) for key,group in groupby(edit_segments0,lambda x:x[1])]
   edited_text_html0=""
@@ -222,7 +225,60 @@ def get_edit_info(para_content):
     if a=="edited_inserted": edited_text_html0+='<ins>'+b+'</ins>'
     elif a=="edited_deleted": edited_text_html0+='<del>'+b+'</del>'
     else: edited_text_html0+=b
-  return original_text0,final_text0, edited_text_html0    
+  return original_text0,final_text0, edited_text_html0 
+  
+# def get_edit_info(para_content):
+#   para_content=para_content.replace("<w:br/>","\n")
+#   para_content=para_content.replace("<w:tab/>","\t")
+#   para_content=para_content.replace("<w:noBreakHyphen/>","-")
+#   #<w:footnoteReference w:customMarkFollows="1" w:id="2"/>
+#   #<w:footnoteReference w:id="3"/>
+  
+
+#   tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', para_content))
+#   open_tags=[""]
+#   tag_counter_dict={}
+#   start_i=0
+#   last_open_tag_str=""
+#   is_inserted=False
+#   is_deleted=False
+#   original_text0,final_text0="",""
+#   edit_segments0=[]
+#   for ti_, t in enumerate(tags):
+#     tag_str,tag_start,tag_end=t.group(0), t.start(), t.end()
+#     tag_str_lower=tag_str.lower()
+#     tag_name=re.findall(r'</?(.+?)[\s>]',tag_str_lower)[0]
+#     tag_type=""
+#     if tag_str.startswith('</'): tag_type="closing"
+#     elif tag_str.startswith('<!'): tag_type="comment"
+#     elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br","hr"]: tag_type="s" #standalone
+#     #elif tag_name in ["wp:posOffset"]: tag_type="exclude"
+#     else: tag_type="opening"
+
+#     #if tag_type=="exclude": continue
+
+#     if tag_name=="w:ins" and tag_type=="opening": is_inserted=True
+#     if tag_name=="w:ins" and tag_type=="closing": is_inserted=False
+#     if tag_name=="w:del" and tag_type=="opening": is_deleted=True
+#     if tag_name=="w:del" and tag_type=="closing": is_deleted=False
+
+#     inter_text=para_content[start_i:tag_start] #intervening text since last tag
+#     #print(tag_name, inter_text,"is_inserted",is_inserted,"is_deleted",is_deleted)
+#     if not is_inserted: original_text0+=inter_text
+#     if not is_deleted: final_text0+=inter_text
+#     seg_class="edited_same"
+#     if is_inserted: seg_class="edited_inserted"
+#     if is_deleted: seg_class="edited_deleted"
+#     if inter_text!="":edit_segments0.append((inter_text,seg_class))
+#     start_i=tag_end
+#   #edit_segments_grouped=edit_segments0[(key,"".join([v[0] for v in list(group)])) for key,group in groupby(edit_segments0,lambda x,x[0])]
+#   edit_segments_grouped0=[(key,"".join([v[0] for v in list(group)])) for key,group in groupby(edit_segments0,lambda x:x[1])]
+#   edited_text_html0=""
+#   for a,b in edit_segments_grouped0:
+#     if a=="edited_inserted": edited_text_html0+='<ins>'+b+'</ins>'
+#     elif a=="edited_deleted": edited_text_html0+='<del>'+b+'</del>'
+#     else: edited_text_html0+=b
+#   return original_text0,final_text0, edited_text_html0    
 
 
 #7 july
