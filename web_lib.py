@@ -188,9 +188,16 @@ class DOM:
     html_content0+=cur_el.close_tag
     return html_content0
   def get_el_by_tag_name(self,tag_name):
-    items0=list(self.tag_dict.items())
-    items0.sort()
-    cur_items=[b.outer_html for a,b in items0 if a.startswith(tag_name+"_")]
+    temp_items=[]
+    for a,b in self.tag_dict.items():
+      if a.startswith(tag_name+"_"):
+        tag_num=a.split("_")[-1]
+        tag_num_int=int(tag_num)
+        temp_items.append((tag_num_int,b.outer_html))
+    #items0=list(self.tag_dict.items())
+    temp_items.sort()
+    cur_items=[v[1] for v in temp_items]
+    #cur_items=[b.outer_html for a,b in items0 if a.startswith(tag_name+"_")]
     return cur_items
 
   def get_el_by_id(self,actual_id):
