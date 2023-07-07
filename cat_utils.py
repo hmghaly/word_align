@@ -174,6 +174,8 @@ class docx:
 def get_edit_info(para_content):
   para_content=para_content.replace("<w:br/>","\n")
   para_content=para_content.replace("<w:tab/>","\t")
+  para_content=para_content.replace("<w:noBreakHyphen/>","-")
+  
 
   tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', para_content))
   open_tags=[""]
@@ -476,109 +478,109 @@ def update_wr_text(wr_xml,new_text):
 
 
 
-class docx_OLD:
-  def __init__(self,docx_fpath,keep_copy=True): #openning the docx file, by unzipping it
-    self.TEMP_DOCX = docx_fpath
-    self.closed=False
-    self.COPY_DOCX = docx_fpath+"2"
-    shutil.copy(self.TEMP_DOCX, self.COPY_DOCX) #keep a temp copy of out file, just in case
-    self.file_extension="."+docx_fpath.split(".")[-1]
-    self.TEMP_ZIP = docx_fpath.replace(self.file_extension,".zip")
-    self.TEMP_FOLDER = docx_fpath.replace(self.file_extension,"")
-    if os.path.exists(self.TEMP_ZIP):
-      os.remove(self.TEMP_ZIP)
-    if os.path.exists(self.TEMP_FOLDER):
-      shutil.rmtree(self.TEMP_FOLDER)
-    os.rename(self.TEMP_DOCX, self.TEMP_ZIP) #rename the original docx to zip extension
-    # unzip file zip to specific folder
-    z_open=zipfile.ZipFile(self.TEMP_ZIP, 'r')
-    z_open.extractall(self.TEMP_FOLDER)
-    z_open.close()
-    os.rename(self.COPY_DOCX, self.TEMP_DOCX) #keep the original file
-  def save_as(self,out_fpath):
-    if os.path.exists(out_fpath): #remove any of these if already exists
-      os.remove(out_fpath)
-    #self.OUT_ZIP = out_fpath.replace(".docx",".zip")
-    #shutil.make_archive(self.OUT_ZIP, 'zip', self.TEMP_FOLDER)
-    shutil.make_archive(self.TEMP_ZIP.replace(".zip", ""), 'zip', self.TEMP_FOLDER)
-    os.rename(self.TEMP_ZIP, out_fpath)
-  def extract_paras(self,cat_file_path=""): 
-    self.paras=[]
-    if self.TEMP_DOCX.lower().endswith(".docx"): main_dir="word"
-    if self.TEMP_DOCX.lower().endswith(".pptx"): main_dir="ppt/slides"
-    if self.TEMP_DOCX.lower().endswith(".xlsx"): main_dir="xl"
+# class docx_OLD:
+#   def __init__(self,docx_fpath,keep_copy=True): #openning the docx file, by unzipping it
+#     self.TEMP_DOCX = docx_fpath
+#     self.closed=False
+#     self.COPY_DOCX = docx_fpath+"2"
+#     shutil.copy(self.TEMP_DOCX, self.COPY_DOCX) #keep a temp copy of out file, just in case
+#     self.file_extension="."+docx_fpath.split(".")[-1]
+#     self.TEMP_ZIP = docx_fpath.replace(self.file_extension,".zip")
+#     self.TEMP_FOLDER = docx_fpath.replace(self.file_extension,"")
+#     if os.path.exists(self.TEMP_ZIP):
+#       os.remove(self.TEMP_ZIP)
+#     if os.path.exists(self.TEMP_FOLDER):
+#       shutil.rmtree(self.TEMP_FOLDER)
+#     os.rename(self.TEMP_DOCX, self.TEMP_ZIP) #rename the original docx to zip extension
+#     # unzip file zip to specific folder
+#     z_open=zipfile.ZipFile(self.TEMP_ZIP, 'r')
+#     z_open.extractall(self.TEMP_FOLDER)
+#     z_open.close()
+#     os.rename(self.COPY_DOCX, self.TEMP_DOCX) #keep the original file
+#   def save_as(self,out_fpath):
+#     if os.path.exists(out_fpath): #remove any of these if already exists
+#       os.remove(out_fpath)
+#     #self.OUT_ZIP = out_fpath.replace(".docx",".zip")
+#     #shutil.make_archive(self.OUT_ZIP, 'zip', self.TEMP_FOLDER)
+#     shutil.make_archive(self.TEMP_ZIP.replace(".zip", ""), 'zip', self.TEMP_FOLDER)
+#     os.rename(self.TEMP_ZIP, out_fpath)
+#   def extract_paras(self,cat_file_path=""): 
+#     self.paras=[]
+#     if self.TEMP_DOCX.lower().endswith(".docx"): main_dir="word"
+#     if self.TEMP_DOCX.lower().endswith(".pptx"): main_dir="ppt/slides"
+#     if self.TEMP_DOCX.lower().endswith(".xlsx"): main_dir="xl"
 
-    extracted_dir=os.path.join(self.TEMP_FOLDER, main_dir)
-    for xml_fname in os.listdir(extracted_dir):
-      #print(xml_fname)
-      skip_file=True
-      if xml_fname in ["document.xml", "footnotes.xml","endnotes.xml","sharedStrings.xml"]: skip_file=False
-      if xml_fname.startswith("slide"): skip_file=False
-      if xml_fname.startswith("sheet"): skip_file=False
-      if xml_fname.startswith("header"): skip_file=False
-      if xml_fname.startswith("footer"): skip_file=False
-      if skip_file: continue
-      # if xml_fname in ["document.xml", "footnotes.xml","endnotes.xml"] or xml_fname.startswith("header") or xml_fname.startswith("footer"): pass
-      # else: continue
-      #if not xml_fname=="document.xml" and not xml_fname.startswith("header") and not xml_fname.startswith("footer"): continue
-      cur_xml_path=os.path.join(extracted_dir,xml_fname)
-      with open(cur_xml_path) as fopen:
-        xml_content=fopen.read()
-      cur_tag_name="w:p" #xml tag for docx files
-      if self.TEMP_DOCX.lower().endswith(".pptx"): cur_tag_name="a:p"
-      cur_wps=get_xml_elements(xml_content,el_name=cur_tag_name)
-      for i0,wp_xml in enumerate(cur_wps):
-        #wp_text=get_wr_text(wp_xml)
-        wp_text=get_el_text(wp_xml)        
-        para_obj=para()
-        para_obj.path=cur_xml_path
-        para_obj.xml=wp_xml
-        para_obj.text=wp_text
-        para_obj.i=i0
-        para_obj.tag_name=cur_tag_name        
-        found_ids=re.findall('paraId="(.+?)"',wp_xml) 
-        if found_ids: para_obj.id=  found_ids[0]
-        self.paras.append(para_obj)
-      if cat_file_path!="": #save paragraphs with their info to cat file
-        cat_fopen=open(cat_file_path,"w")
-        for p_obj in self.paras:
-          cur_text=p_obj.text.replace("\t"," <tab> ").replace("\n"," <br> ")
-          json_obj={}
-          json_obj["path"]=p_obj.path
-          json_obj["i"]=p_obj.i
-          json_obj["id"]=p_obj.id
-          json_obj["tag_name"]=p_obj.tag_name          
-          json_obj["text"]=cur_text
-          json_obj_str=json.dumps(json_obj) 
-          line=json_obj_str+"\n"
-          #line="%s\t%s\t%s\t%s\n"%(p_obj.path,p_obj.i,p_obj.id,cur_text)
-          cat_fopen.write(line)
-        cat_fopen.close()
+#     extracted_dir=os.path.join(self.TEMP_FOLDER, main_dir)
+#     for xml_fname in os.listdir(extracted_dir):
+#       #print(xml_fname)
+#       skip_file=True
+#       if xml_fname in ["document.xml", "footnotes.xml","endnotes.xml","sharedStrings.xml"]: skip_file=False
+#       if xml_fname.startswith("slide"): skip_file=False
+#       if xml_fname.startswith("sheet"): skip_file=False
+#       if xml_fname.startswith("header"): skip_file=False
+#       if xml_fname.startswith("footer"): skip_file=False
+#       if skip_file: continue
+#       # if xml_fname in ["document.xml", "footnotes.xml","endnotes.xml"] or xml_fname.startswith("header") or xml_fname.startswith("footer"): pass
+#       # else: continue
+#       #if not xml_fname=="document.xml" and not xml_fname.startswith("header") and not xml_fname.startswith("footer"): continue
+#       cur_xml_path=os.path.join(extracted_dir,xml_fname)
+#       with open(cur_xml_path) as fopen:
+#         xml_content=fopen.read()
+#       cur_tag_name="w:p" #xml tag for docx files
+#       if self.TEMP_DOCX.lower().endswith(".pptx"): cur_tag_name="a:p"
+#       cur_wps=get_xml_elements(xml_content,el_name=cur_tag_name)
+#       for i0,wp_xml in enumerate(cur_wps):
+#         #wp_text=get_wr_text(wp_xml)
+#         wp_text=get_el_text(wp_xml)        
+#         para_obj=para()
+#         para_obj.path=cur_xml_path
+#         para_obj.xml=wp_xml
+#         para_obj.text=wp_text
+#         para_obj.i=i0
+#         para_obj.tag_name=cur_tag_name        
+#         found_ids=re.findall('paraId="(.+?)"',wp_xml) 
+#         if found_ids: para_obj.id=  found_ids[0]
+#         self.paras.append(para_obj)
+#       if cat_file_path!="": #save paragraphs with their info to cat file
+#         cat_fopen=open(cat_file_path,"w")
+#         for p_obj in self.paras:
+#           cur_text=p_obj.text.replace("\t"," <tab> ").replace("\n"," <br> ")
+#           json_obj={}
+#           json_obj["path"]=p_obj.path
+#           json_obj["i"]=p_obj.i
+#           json_obj["id"]=p_obj.id
+#           json_obj["tag_name"]=p_obj.tag_name          
+#           json_obj["text"]=cur_text
+#           json_obj_str=json.dumps(json_obj) 
+#           line=json_obj_str+"\n"
+#           #line="%s\t%s\t%s\t%s\n"%(p_obj.path,p_obj.i,p_obj.id,cur_text)
+#           cat_fopen.write(line)
+#         cat_fopen.close()
 
-    return self.paras
+#     return self.paras
   
 
-  def update_tbl_rtl(self):
-    extracted_dir=os.path.join(self.TEMP_FOLDER, "word")
-    cur_xml_path=os.path.join(extracted_dir,"document.xml")
-    fopen_read=open(cur_xml_path)
-    xml_content=fopen_read.read()
-    fopen_read.close()
-    xml_content=xml_content.replace("<w:tblPr>","<w:tblPr><w:bidiVisual/>")
-    xml_content=xml_content.replace("<w:lang ","<w:rtl/><w:lang ")
+#   def update_tbl_rtl(self):
+#     extracted_dir=os.path.join(self.TEMP_FOLDER, "word")
+#     cur_xml_path=os.path.join(extracted_dir,"document.xml")
+#     fopen_read=open(cur_xml_path)
+#     xml_content=fopen_read.read()
+#     fopen_read.close()
+#     xml_content=xml_content.replace("<w:tblPr>","<w:tblPr><w:bidiVisual/>")
+#     xml_content=xml_content.replace("<w:lang ","<w:rtl/><w:lang ")
 
     
-    fopen_write=open(cur_xml_path, "wb")
-    fopen_write.write(xml_content)
-    fopen_write.close()
+#     fopen_write=open(cur_xml_path, "wb")
+#     fopen_write.write(xml_content)
+#     fopen_write.close()
 
 
-  def close(self):
-    self.closed=True
-    os.remove(self.TEMP_ZIP)
-    shutil.make_archive(self.TEMP_ZIP.replace(".zip", ""), 'zip', self.TEMP_FOLDER)
-    os.rename(self.TEMP_ZIP, self.TEMP_DOCX)
-    shutil.rmtree(self.TEMP_FOLDER)
+#   def close(self):
+#     self.closed=True
+#     os.remove(self.TEMP_ZIP)
+#     shutil.make_archive(self.TEMP_ZIP.replace(".zip", ""), 'zip', self.TEMP_FOLDER)
+#     os.rename(self.TEMP_ZIP, self.TEMP_DOCX)
+#     shutil.rmtree(self.TEMP_FOLDER)
   
 
 class para:
