@@ -6,8 +6,11 @@ import zipfile
 import random, string
 import hashlib
 from itertools import groupby
+from difflib import SequenceMatcher
+
 sys.path.append("code_utils")
 import web_lib
+import general
 
 ver=sys.version_info
 if ver[0]==3: 
@@ -166,11 +169,12 @@ class docx:
     os.rename(self.TEMP_ZIP, self.TEMP_DOCX)
     shutil.rmtree(self.TEMP_FOLDER)
 
+#Editing project
 #2 June 2023
 def get_edit_info(para_content):
   para_content=para_content.replace("<w:br/>","\n")
   para_content=para_content.replace("<w:tab/>","\t")
-	
+
   tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', para_content))
   open_tags=[""]
   tag_counter_dict={}
@@ -213,6 +217,72 @@ def get_edit_info(para_content):
   return original_text0,final_text0, edited_text_html0    
 
 
+#7 july
+def get_edit_html(tokens1,tokens2):
+  edit_list=get_seq_edits(tokens1,tokens2)
+  final_str_items=[]
+  for edit_type0,chunk0 in edit_list:
+    cur_chunk_str=general.de_tok2str(chunk0)
+    cur_chunk_str=safe_xml(cur_chunk_str)
+    if edit_type0=="delete": final_str_items.append('<del>%s</del>'%cur_chunk_str)
+    elif edit_type0=="insert": final_str_items.append('<ins>%s</ins>'%cur_chunk_str)
+    else: final_str_items.append(cur_chunk_str)
+  final_str=" ".join(final_str_items)
+  return final_str
+
+
+def safe_xml(txt):
+  txt=txt.replace("&","&amp;")
+  txt=txt.replace("<","&lt;")
+  txt=txt.replace(">","&gt;")
+  return txt  
+
+
+
+def get_seq_edits(tokens1,tokens2):
+  match_obj=SequenceMatcher(None,tokens1,tokens2)
+  final_list=[]
+  for a in match_obj.get_opcodes():
+    match_type,x0,x1,y0,y1=a
+    if match_type=="delete":
+      final_list.append(("deleted",tokens1[x0:x1]))
+    if match_type=="equal":
+      final_list.append(("equal",tokens1[x0:x1]))
+    if match_type=="replace":
+      final_list.append(("delete",tokens1[x0:x1]))
+      final_list.append(("insert",tokens2[y0:y1]))
+    if match_type=="insert":
+      final_list.append(("insert",tokens2[y0:y1]))
+  return final_list
+
+
+def get_docx_paras_edits(docx_fpath): #main function to extract edit info, while keeping track of para path/id
+  docx_obj=docx(docx_fpath)
+  data_list1=[]
+  all_paras,paras_dict=docx_obj.extract_paras()
+  docx_obj.close()
+  for para_path0,para_content0 in all_paras:
+    orig0,final0,edit0=get_edit_info(para_content0)
+    if orig0==final0=="": continue
+    data_list1.append((para_path0,orig0,final0,edit0))
+  return data_list1
+
+# def get_docx_paras_edits_src_trg_editing(docx_fpath):
+#   docx_obj=docx(docx_fpath)
+#   data_list1=[]
+#   all_paras,paras_dict=docx_obj.extract_paras()
+#   docx_obj.close()
+#   for para_path0,para_content0 in all_paras:
+#     orig0,final0,edit0=get_edit_info(para_content0)
+#     if orig0==final0=="": continue
+#     data_list1.append((orig0,final0,edit0))
+#   return data_list1
+
+def para2sents(text):
+  text=text.replace(". ",".\n")
+  text=text.replace("\t","\n")
+  sents0=[v.strip() for v in text.split("\n") if v.strip()]
+  return sents0
 
 
 
@@ -223,21 +293,12 @@ def get_edit_info(para_content):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+##################### OLD #########################
 def gen_para_id():
   return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
+
+#OLD
 w_p_exp=r"<w:p\b.*?>.*?</w:p>"
 w_t_exp=r"<w:t\b.*?>.*?</w:t>"
 w_t_inside_exp=r"<w:t\b.*?>(.*?)</w:t>"
@@ -280,6 +341,11 @@ def save_tmp2docx(tmp_dir_path,new_docx_fpath): #convert the temp directory with
   if os.path.exists(new_docx_fpath): os.remove(new_docx_fpath) #remove any of these if already exists
   shutil.make_archive(tmp_dir_path, 'zip', tmp_dir_path)
   os.rename(tmp_dir_path+".zip", new_docx_fpath)
+
+
+
+
+
 
 # def update_para_OLD(para_id0,xml_path0,new_text0,rtl=True,style={}): #get an xml element by ID, update it with new text and style, save the new XML with this updated element
 #   fopen=open(xml_fpath0)
@@ -342,11 +408,6 @@ def get_xml_wrs(xml_content):
   cur_chunks=find_iter_split(w_p_exp,xml_content)
   return cur_chunks
 
-def safe_xml(txt):
-  txt=txt.replace("&","&amp;")
-  txt=txt.replace("<","&lt;")
-  txt=txt.replace(">","&gt;")
-  return txt  
 
 def find_iter_split(expression,text): #generic function to split a text (haystack) around a certain regex
   split_text=[]
