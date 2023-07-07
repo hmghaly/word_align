@@ -196,11 +196,11 @@ def get_edit_info(para_content):
     if tag_str.startswith('</'): tag_type="closing"
     elif tag_str.startswith('<!'): tag_type="comment"
     elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br","hr"]: tag_type="s" #standalone
-    elif tag_name in ["wp:posOffset"]: tag_type="exclude"
+    #elif tag_name in ["wp:posOffset"]: tag_type="exclude"
     else: tag_type="opening"
 
-    if tag_type=="exclude": continue
-    
+    #if tag_type=="exclude": continue
+
     if tag_name=="w:ins" and tag_type=="opening": is_inserted=True
     if tag_name=="w:ins" and tag_type=="closing": is_inserted=False
     if tag_name=="w:del" and tag_type=="opening": is_deleted=True
