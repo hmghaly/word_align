@@ -225,6 +225,8 @@ def get_edit_info(para_content):
     if a=="edited_inserted": edited_text_html0+='<ins>'+b+'</ins>'
     elif a=="edited_deleted": edited_text_html0+='<del>'+b+'</del>'
     else: edited_text_html0+=b
+  original_text0=general.unescape(original_text0)
+  final_text0=general.unescape(final_text0)
   return original_text0,final_text0, edited_text_html0 
 
 # def get_edit_info(para_content):
