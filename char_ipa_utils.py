@@ -248,7 +248,9 @@ class analyze_ar_text: #analyze a word with diacritics in different ways
     self.romanized_chunks=[]
     self.romanized=""
     self.plain=""
+
     all_words=text0.split(" ")
+    self.text=" ".join([v.split("_")[0] for v in all_words])
     for w_i,cur_word in enumerate(all_words)
       obj0=analyze_ar_word(cur_word,shape_dict,romanize_dict,lang,exclude_waaw_jamaa3ah)
       self.chunks.extend(obj0.chunks)
