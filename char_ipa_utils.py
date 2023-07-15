@@ -325,8 +325,13 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
     self.romanized_chunks=[]
     prev_romanized=""
     for ch_i,ch in enumerate(self.chunks):
+      ch=ch.strip("ـ")
+      #if ch[0]=="ى" and ch_i<len(self.chunks)-1: ch=="ي"+ch[1:]
       found=self.romanize_dict.get(ch[0],ch[0])
+
       first=found[0]
+      if ch[0]=="ى" and ch_i<len(self.chunks)-1: first="ai"
+
       try:
         if ch_i==0 and found[1]!="": first=found[1]
       except:
@@ -360,6 +365,7 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       prev_romanized=cur_romanized_chunk
     #fine tuning the chunk sequence to avoid double vowels and make sure taa2 marbooTah is preceded vy fat7ah
     temp_romanized_chunks=[]
+    temp_ar_chunks=[]
     for s_i, rom in enumerate(self.romanized_chunks):
       cur_ar_chunk=self.chunks[s_i]
       next_rom_chunk=""
@@ -382,7 +388,14 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
         rom=rom.rstrip("ou")
       if next_ar_chunk=="ة": rom=rom.rstrip("a")+"a"
       temp_romanized_chunks.append(rom)
+      if s_i<len(self.romanized_chunks)-1:
+        if cur_ar_chunk[0]=="ى" : cur_ar_chunk="ي"+cur_ar_chunk[1:]
+      elif s_i==len(self.romanized_chunks)-1:
+        if cur_ar_chunk=="و" and self.word[-1]=="ا": cur_ar_chunk="وا" #waaw al-jamaa3ah
+      temp_ar_chunks.append(cur_ar_chunk)
 
+
+    self.chunks=temp_ar_chunks
     self.romanized_chunks=temp_romanized_chunks
     self.romanized=""
     for s_i, rom in enumerate(self.romanized_chunks):
