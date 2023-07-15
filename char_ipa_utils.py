@@ -330,7 +330,7 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       found=self.romanize_dict.get(ch[0],ch[0])
 
       first=found[0]
-      if ch[0]=="ى" and ch_i<len(self.chunks)-1: first="ai"
+      #if ch[0]=="ى" and ch_i<len(self.chunks)-1: first="ai"
 
       try:
         if ch_i==0 and found[1]!="": first=found[1]
@@ -356,12 +356,12 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       if has_shaddah: cur_romanized_chunk=first+cur_romanized_chunk #shaddah
 
       if ch_i==0 and cur_romanized_chunk=="aa" and ch[0]!="آ":  cur_romanized_chunk="a" #cheap hacks to fix certain fringe cases
-      #if cur_romanized_chunk=="ai":  cur_romanized_chunk="i"
+      if cur_romanized_chunk=="ai":  cur_romanized_chunk="i"
       if cur_romanized_chunk=="ii":  cur_romanized_chunk="i"
       if cur_romanized_chunk=="au":  cur_romanized_chunk="u"
       if cur_romanized_chunk=="aan":  cur_romanized_chunk="an"
 
-      #if ch[0]=="ى" and ch_i<len(self.chunks)-1: cur_romanized_chunk="ai"
+      if ch[0]=="ى" and ch_i<len(self.chunks)-1: cur_romanized_chunk="ai"
 
       self.romanized_chunks.append(cur_romanized_chunk)
       prev_romanized=cur_romanized_chunk
