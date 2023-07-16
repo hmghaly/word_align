@@ -249,10 +249,11 @@ class analyze_ar_text: #analyze a word with diacritics in different ways
     self.romanized=""
     self.plain=""
 
-    all_words=text0.split(" ")
+    all_words=[] #text0.split(" ")
     self.text=" ".join([v.split("_")[0] for v in all_words])
     for w_i,cur_word in enumerate(all_words):
       obj0=analyze_ar_word(cur_word,shape_dict,romanize_dict,lang,exclude_waaw_jamaa3ah)
+      all_words.append(obj0.word)
       self.chunks.extend(obj0.chunks)
       self.word_letter_shapes_plain.extend(obj0.word_letter_shapes_plain)
       self.romanized_chunks.extend(obj0.romanized_chunks)
@@ -265,6 +266,7 @@ class analyze_ar_text: #analyze a word with diacritics in different ways
         self.romanized_chunks.append(" ")
         self.romanized+=" "
         self.plain+=" "
+    self.text=" ".join(all_words)
 
 
 
@@ -407,6 +409,13 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       # if rom.endswith("u") and next_chunk=="oo": rom=rom[:-1]
       # if rom.endswith("a") and next_chunk=="aa": rom=rom[:-1]
       self.romanized+=rom
+    new_word=""
+    for ch_i,char0 in self.word:
+      if ch_i<len(self.word)-1 and char0=="ى": char0="ي"
+      new_word+=char0
+    self.word=new_word
+
+
 
 def rstrip_if(word,to_strip):
   if word.endswith(to_strip): word=word[:-len(to_strip)]
