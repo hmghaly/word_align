@@ -411,7 +411,7 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       # if rom.endswith("a") and next_chunk=="aa": rom=rom[:-1]
       self.romanized+=rom
     new_word=""
-    for ch_i,char0 in self.word:
+    for ch_i,char0 in enumerate(self.word):
       if ch_i<len(self.word)-1 and char0=="ى": char0="ي"
       new_word+=char0
     self.word=new_word
