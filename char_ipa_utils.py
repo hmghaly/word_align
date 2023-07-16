@@ -248,12 +248,13 @@ class analyze_ar_text: #analyze a word with diacritics in different ways
     self.romanized_chunks=[]
     self.romanized=""
     self.plain=""
+    all_words=text0.split(" ")
 
-    all_words=[] #text0.split(" ")
-    self.text=" ".join([v.split("_")[0] for v in all_words])
+    all_word_str=[] #text0.split(" ")
+    #self.text=" ".join([v.split("_")[0] for v in all_words])
     for w_i,cur_word in enumerate(all_words):
       obj0=analyze_ar_word(cur_word,shape_dict,romanize_dict,lang,exclude_waaw_jamaa3ah)
-      all_words.append(obj0.word)
+      all_word_str.append(obj0.word)
       self.chunks.extend(obj0.chunks)
       self.word_letter_shapes_plain.extend(obj0.word_letter_shapes_plain)
       self.romanized_chunks.extend(obj0.romanized_chunks)
@@ -266,7 +267,7 @@ class analyze_ar_text: #analyze a word with diacritics in different ways
         self.romanized_chunks.append(" ")
         self.romanized+=" "
         self.plain+=" "
-    self.text=" ".join(all_words)
+    self.text=" ".join(all_word_str)
 
 
 
