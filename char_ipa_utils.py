@@ -278,6 +278,9 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
     self.word_params=""
     if len(word_split)>1: self.word_params=word_split[1]
     self.word1=word_split[0]
+    if self.word1.startswith("أا"): self.word1="آ" + self.word1[2:]
+    if self.word1.startswith('اأ'): self.word1="آ" + self.word1[2:]
+
     if exclude_waaw_jamaa3ah and self.word1.endswith("وا"):self.word1=self.word1[:-1]
     self.shape_dict=shape_dict
     self.romanize_dict=romanize_dict
