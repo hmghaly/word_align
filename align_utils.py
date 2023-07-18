@@ -821,6 +821,27 @@ def get_ngram_key(phrase0,ngram=2): #a unigram/bigram or more ngram words as a k
   if len(phrase_split)==1: return phrase0
   return " ".join(phrase_split[:ngram])
 
+
+def get_tokens_ngrams(tokens0,max_ngram_size=5):
+  all_phrases=[]
+  for size0 in range(1,max_ngram_size+1):
+    for token_i in range(0,len(tokens0)-size0+1):
+      cur_phrase_tokens=tokens0[token_i:token_i+size0]
+      cur_phrase=" ".join(cur_phrase_tokens) #tokens0[token_i:token_i+size0]      
+      span=(token_i,token_i+size0)
+      all_phrases.append((cur_phrase, span))
+  return all_phrases
+
+# def get_tokens_ngrams(tokens0,ngram=2): #a unigram/bigram or more ngram words as a key for a src phrase, for easy retrieval
+#   ngram_list=[]
+#   for ng0 in range(1,ngram+1):
+#   	for i0 in range(len(tokens0)-ng0):
+#   		cur_phrase=" ".join()
+#   #phrase_split=phrase0.split()
+#   #if len(token0)==1: return 
+#   return " ".join(phrase_split[:ngram])
+
+
 def create_bigram_keyed_dict(input_dict0,default_wt=1,default_freq=100,adj_wt_by_len=True): #or unigram- if src phrase is one word
   bigram_keyed_dict0={}
   for src_phrase0,corr_trg_list in input_dict0.items():
