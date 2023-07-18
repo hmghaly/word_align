@@ -527,6 +527,78 @@ def conjugate_verb_msa(verb_obj_input):
 
   return verb_obj
 
+
+
+def check_params(word0):
+  params0=""
+  word_split=word0.split("_")
+  word_main=word_split[0]
+  if len(word_split)>1: params0="_"+word_split[1]
+  return word_main,params0
+
+def conjugate_verb_ega(input_dict):
+  past_he=input_dict.get("conj-past-he","")
+  present_he=input_dict.get("conj-present-he","")
+  past_i=input_dict.get("conj-past-i","")
+  imperative_m=input_dict.get("conj-imperative-m","")
+  active_m=input_dict.get("conj-active-m","")
+  active_f=input_dict.get("conj-active-f","")
+
+  past_he,past_he_params=check_params(past_he)
+  present_he,present_he_params=check_params(present_he)
+  past_i,past_i_params=check_params(past_i)
+  imperative_m,imperative_m_params=check_params(imperative_m)
+  active_m,active_m_params=check_params(active_m)
+  active_f,active_f_params=check_params(active_f)
+
+  
+
+  present_base=present_he.strip("ي")
+  if present_he.startswith("يِ"): present_base=present_he[2:]
+  elif present_he.startswith("ي"): present_base=present_he[1:]
+
+  present_he_initial,present_she_initial,present_we_initial="يِ","تِ","نِ"
+  if present_base[0] in "اي":
+    present_he_initial,present_she_initial,present_we_initial="ي","ت","ن"
+
+  conj_dict={}
+  present_base_no_ending=present_base.lstrip("اوي")
+  present_he=conj_dict["conj-present-he"]=present_he_initial+present_base+present_he_params
+  conj_dict["conj-present-i"]="أ"+present_base+present_he_params
+  present_she=conj_dict["conj-present-she"]=present_she_initial+present_base+present_he_params
+  conj_dict["conj-present-they"]=present_he.rstrip("اوي")+"وا"+present_he_params
+  conj_dict["conj-present-we"]=present_we_initial+present_base+present_he_params
+  present_you_m=conj_dict["conj-present-you_m"]=present_she+present_he_params
+  conj_dict["conj-present-you_f"]=present_you_m.rstrip("اوي")+"ي"+present_he_params
+  conj_dict["conj-present-you_pl"]=present_you_m.rstrip("اوي")+"وا"+present_he_params
+
+  # past_i_split=past_i.split("_")
+  # word_params=""
+  # if len(past_i_split)==2:
+  #   past_i,word_params=past_i_split
+  if "i" in past_i_params: past_i=past_i.replace("يت","ىت")
+
+  conj_dict["conj-past-i"]=past_i+past_i_params#.rstrip("ت")+"نا"
+  conj_dict["conj-past-he"]=past_he+past_he_params #.rstrip("ت")+"نا"
+  conj_dict["conj-past-she"]=past_he+"ِت"+past_he_params
+  conj_dict["conj-past-we"]=past_i.rstrip("ت")+"نا"+past_i_params
+  conj_dict["conj-past-they"]=past_he+"وا"+past_he_params
+  conj_dict["conj-past-you_m"]=past_i+past_i_params #.rstrip("ت")+"نا"
+  conj_dict["conj-past-you_f"]=past_i+"ي"+past_i_params  #.rstrip("ت")+"نا"
+  conj_dict["conj-past-you_pl"]=past_i+"وا"+past_i_params #.rstrip("ت")+"نا"
+
+  conj_dict["conj-imperative-m"]=imperative_m+imperative_m_params
+  conj_dict["conj-imperative-f"]=imperative_m.rstrip("اوي")+"ي"+imperative_m_params
+  conj_dict["conj-imperative-pl"]=imperative_m.rstrip("اوي")+"وا"+imperative_m_params
+
+  conj_dict["conj-active-m"]=active_m+active_m_params
+  if active_f!=None: conj_dict["conj-active-f"]=active_f+active_m_params
+  else: active_f=conj_dict["conj-active-f"]=active_m+"ة"+active_m_params
+
+  conj_dict["conj-active-pl"]=active_f.strip("َة")+"ين"+active_m_params
+  return conj_dict
+  
+
 # import pandas
 # def get_sheet_dict(sheet_obj,key_col0,val_col0): #pandas get conversion dicts
 #   tmp_sheet_dict={}
