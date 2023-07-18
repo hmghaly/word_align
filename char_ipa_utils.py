@@ -596,7 +596,10 @@ def conjugate_verb_ega(input_dict):
   else: active_f=conj_dict["conj-active-f"]=active_m+"ة"+active_m_params
 
   conj_dict["conj-active-pl"]=active_f.strip("َة")+"ين"+active_m_params
-  return conj_dict
+  out_dict=dict(input_dict)
+  for a,b in conj_dict.items():
+    out_dict[a]=b
+  return out_dict
   
 
 # import pandas
