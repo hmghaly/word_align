@@ -82,163 +82,149 @@ def word2ipa(word0):
   return ipa_out0 
 
 
+#============== Latin 2 Arabic script ===================
+def split_word(word1): return re.findall("[^eao]*?[eao]+|[^eao]+",word1)
+def remove_end_vowel(word1): return re.sub(r"aa\b|ee\b|oo\b","",word1) #remove long vowel from the end of verbs
+def remove_penult_chunk_vowel(word1): #mainly dor the active form
+  chunks=split_word(word1)
+  if len(chunks)<3: return word1 
+  penult_chunk=chunks[-2] #ye.nze.l ye.Tla.3 
+  if penult_chunk.endswith(("aa","ee","oo")): return word1
+  if penult_chunk.endswith("e"): penult_chunk=penult_chunk[:-1]
+  chunks[-2]=penult_chunk
+  return "".join(chunks)
+def remove_1st_chunk_vowel(word1):
+  chunks=split_word(word1)
+  first_chunk=chunks[0]
+  if first_chunk.endswith(("aa","ee","oo")): return word1
+  if first_chunk.endswith("e"): 
+    first_chunk=first_chunk[:-1]
+    chunks[0]=first_chunk
+    return "".join(chunks)
+  return word1
+
+#conversion class from an Arabic word in latin/romanization/franco into Arabic script
+class latin2ar:
+  def __init__(self,latin2ar_dict,ar_variety="msa"):
+    self.latin2ar_dict=latin2ar_dict
+    self.ar_variety=ar_variety
+    self.latin2ar_dict_keys=sorted(list(latin2ar_dict.keys()),key=lambda x:-len(x))
+  def convert(self,word_latin,ref_ar="",waaw_pl=False,with_suffix=False,alif_layyenah=True,taa2_marbootah=False):
+    #word_latin : the arabic word in latin characters e.g. kitaab
+    #the reference Arabic كتاب
+    #waaw_pl: waaw al-jamaa3ah, to add alif after waaw in MSA
+    #with_suffix: if there is a suffix (conjugation) at the end of the word, to avoid alif layyenah then
+    word_copy=str(word_latin)
+    for am in ['DH', 'dh', 'gh', 'kh', 'sh', 'th']: #multi-character item
+      word_copy=word_copy.replace(am,self.latin2ar_dict[am][0])
+    #handle hamzas
+
+    word_copy=re.sub(r"\b2aa","آ", word_copy) #2aalah 2aakul
+    word_copy=re.sub(r"\b2a2","آ", word_copy)
+    word_copy=re.sub(r"\b2u","أُ", word_copy)
+    word_copy=re.sub(r"ee2\b","يء", word_copy)
+
+    if self.ar_variety=="msa":
+      word_copy=re.sub("[uo]2","ؤ", word_copy)
+      word_copy=re.sub("[ie]2","ئ", word_copy) 
+      word_copy=re.sub("2[ie]","ئ", word_copy) 
+      word_copy=re.sub("aa2","اء", word_copy) 
+      word_copy=re.sub("a2","أ", word_copy) 
+      word_copy=re.sub("2a","أ", word_copy) 
+      
+
+    if "ق" in ref_ar and self.ar_variety!="msa":
+      word_copy=word_copy.replace("2","ق")
+    if "أ" in ref_ar:
+      word_copy=word_copy.replace("2","أ")
+
+    if word_copy.endswith("ah") and not ref_ar.endswith("ه"):
+      word_copy=re.sub(r"ah\b","ة",word_copy) #word_copy.replace("2","ق")
+
+    if word_copy.endswith("h"):
+      if ref_ar.endswith("ة"):
+        word_copy=re.sub(r"h\b","ة",word_copy)
+      else:
+        word_copy=re.sub(r"h\b","ه",word_copy)
+    word_copy=word_copy.replace("h","ه")
+    word_copy=word_copy.replace("ai","ي")
+
+    word_copy=re.sub(r"\b2a","أ",word_copy)
+    word_copy=re.sub(r"\b[ei]","اِ",word_copy)
+    word_copy=re.sub(r"\b[ou]","أُ",word_copy)
+
+    if word_copy.startswith("e"):
+      word_copy=re.sub(r"\be","ا",word_copy) #word_copy.replace("2","ق")
+    if word_copy.startswith("a"):
+      word_copy=re.sub(r"\ba","ا",word_copy) #word_copy.replace("2","ق")
+    if word_copy.startswith("o"):
+      word_copy=re.sub(r"\bo","اُ",word_copy) #word_copy.replace("2","ق")
+
+
+    if word_copy.endswith("ee"):
+      word_copy=re.sub(r"ee\b","ي",word_copy) #word_copy.replace("2","ق")
+    #we'll need to find a sensible way to handle alif/alif layyenah at the end of words
+    #this rule was to avoid putting alif layyenah for words with suffixes/conjugation e.g. ro7naa
+    # if word_copy.endswith("naa") and not ref_ar.endswith("ى"):
+    #   word_copy=re.sub(r"naa\b","نا",word_copy) #word_copy.replace("2","ق")
+
+    if waaw_pl: word_copy=re.sub(r"oo\b","وا",word_copy)
+    if with_suffix: word_copy=re.sub(r"naa\b","نا",word_copy)
+    if alif_layyenah: word_copy=re.sub(r"aa\b","ى",word_copy)
+    else: word_copy=re.sub(r"aa\b","ا",word_copy)
+
+    if word_copy.endswith("aa"):
+      word_copy=re.sub(r"aa\b","ى",word_copy) #word_copy.replace("2","ق")
+    if word_copy.endswith("oo"):
+      word_copy=re.sub(r"oo\b","و",word_copy) #word_copy.replace("2","ق")
+
+    if "aa" in word_copy:
+      word_copy=word_copy.replace("aa","ا") #word_copy.replace("2","ق")
+    if "ee" in word_copy:
+      word_copy=word_copy.replace("ee","ي") #word_copy.replace("2","ق")
+    if "oo" in word_copy:
+      word_copy=word_copy.replace("oo","و") #word_copy.replace("2","ق")
+    grouped_chars=["".join(list(grp)) for key,grp in groupby(word_copy)]
+    for gc in grouped_chars:
+      repl=gc[0]+"x"
+      if len(gc)>1: word_copy=word_copy.replace(gc,repl)
+
+    for k in self.latin2ar_dict_keys:
+      if k in word_copy: 
+        #print(k)
+        corr=self.latin2ar_dict[k]
+        if len(corr)==1:
+          word_copy=word_copy.replace(k,corr[0])
+    #hamza_locs=[i0 for i0,v0 in enumerate(word_copy)]
+    word_copy=word_copy.replace("-","")
+    return word_copy
+
+def load_conversion_dict(sheet_obj,en_ar=True): #a sheet with a column en, ar, and we convert en > ar
+  latin2ar_conversion_list=[]
+  for row in sheet_obj.iterrows():
+    row_dict=row[1].to_dict()
+    if en_ar: latin2ar_conversion_list.append([str(row_dict["en"]),str(row_dict["ar"])])
+    else: latin2ar_conversion_list.append([str(row_dict["ar"]),str(row_dict["en"])])
+  latin2ar_conversion_list.sort()
+  latin2ar_conversion_dict=dict(iter([(key,[v[1] for v in list(grp)]) for key,grp in groupby(latin2ar_conversion_list,lambda x:x[0])])) #
+  return latin2ar_conversion_dict
+
+
+test_latin2ar_dict={'2': ['ء', 'أ', 'ؤ', 'ئ', 'ق'], '2aa': ['آ'], '2i': ['إ'], '3': ['ع'], '7': ['ح'], 'D': ['ض'], 'DH': ['ظ'], 'S': ['ص'], 'T': ['ط'], 'a': ['َ'], 'aa': ['ا', 'ى'], 'an': ['ً'], 'b': ['ب'], 'd': ['د'], 'dh': ['ذ'], 'e': ['ِ'], 'ee': ['ي'], 'f': ['ف'], 'g': ['ج'], 'gh': ['غ'], 'h': ['ة', 'ه'], 'i': ['اِ'], 'in': ['ٍ'], 'k': ['ك'], 'kh': ['خ'], 'l': ['ل'], 'm': ['م'], 'n': ['ن'], 'o': ['ُ'], 'oo': ['و'], 'q': ['ق'], 'r': ['ر'], 's': ['س'], 'sh': ['ش'], 't': ['ت'], 'th': ['ث'], 'u': ['ُ'], 'un': ['ٌ'], 'w': ['و'], 'x': ['ّ'], 'y': ['ي'], 'z': ['ز']}
+msa_dict={'2': ['ء', 'أ', 'ؤ', 'ئ'], '2aa': ['آ'], '2i': ['إ'], '3': ['ع'], '7': ['ح'], 'D': ['ض'], 'DH': ['ظ'], 'S': ['ص'], 'T': ['ط'], 'a': ['َ'], 'aa': ['ا', 'ى'], 'b': ['ب'], 'd': ['د'], 'dh': ['ذ'], 'e': ['ِ'], 'ee': ['ي'], 'f': ['ف'], 'g': ['ج'], 'gh': ['غ'], 'h': ['ة', 'ه'], 'i': ['ِ'], 'j': ['ج'], 'k': ['ك'], 'kh': ['خ'], 'l': ['ل'], 'm': ['م'], 'n': ['ن'], 'o': ['ُ'], 'oo': ['و'], 'q': ['ق'], 'r': ['ر'], 's': ['س'], 'sh': ['ش'], 't': ['ت'], 'th': ['ث'], 'u': ['ُ'], 'w': ['و'], 'x': ['ّ'], 'y': ['ي'], 'z': ['ز']}
+
+# latin2ar_obj=latin2ar(msa_dict,"msa")
+# #latin2ar_obj.convert("2akala",waaw_pl=True)
+# latin2ar_obj.convert("2akalaa",waaw_pl=True,alif_layyenah=True)
+# latin2ar_obj.convert("2ajee2",waaw_pl=True,alif_layyenah=True)
+
 #===========================================
 #Converting an Arabic word to franco, split it and analyze it
 
 ar_shape_dict={'أ': ['أ', 'ـأ'], 'ب': ['ب', 'بـ', 'ـبـ', 'ـب'], 'ت': ['ت', 'تـ', 'ـتـ', 'ـت'], 'ث': ['ث', 'ثـ', 'ـثـ', 'ـث'], 'ج': ['ج', 'جـ', 'ـجـ', 'ـج'], 'ح': ['ح', 'حـ', 'ـحـ', 'ـح'], 'خ': ['خ', 'خـ', 'ـخـ', 'ـخ'], 'د': ['د', 'ـد'], 'ذ': ['ذ', 'ـذ'], 'ر': ['ر', 'ـر'], 'ز': ['ز', 'ـز'], 'س': ['س', 'سـ', 'ـسـ', 'ـس'], 'ش': ['ش', 'شـ', 'ـشـ', 'ـش'], 'ص': ['ص', 'صـ', 'ـصـ', 'ـص'], 'ض': ['ض', 'ضـ', 'ـضـ', 'ـض'], 'ط': ['ط', 'طـ', 'ـطـ', 'ـط'], 'ظ': ['ظ', 'ظـ', 'ـظـ', 'ـظ'], 'ع': ['ع', 'عـ', 'ـعـ', 'ـع'], 'غ': ['غ', 'غـ', 'ـغـ', 'ـغ'], 'ف': ['ف', 'فـ', 'ـفـ', 'ـف'], 'ق': ['ق', 'قـ', 'ـقـ', 'ـق'], 'ك': ['ك', 'كـ', 'ـكـ', 'ـك'], 'ل': ['ل', 'لـ', 'ـلـ', 'ـل'], 'م': ['م', 'مـ', 'ـمـ', 'ـم'], 'ن': ['ن', 'نـ', 'ـنـ', 'ـن'], 'هـ': ['ه', 'هـ', 'ـهـ', 'ـه'], 'و': ['و', 'ـو'], 'ي': ['ي', 'يـ', 'ـيـ', 'ـي'], 'ء': ['ء'], 'لا': ['لا', 'ـلا'], 'ئ': ['ئ', 'ئـ', 'ـئـ', 'ـئ'], 'ؤ': ['ؤ', 'ـؤ'], 'ة': ['ة', 'ـة'], 'ى': ['ى', 'ـى'], 'إ': ['إ', 'ـإ'], 'آ': ['آ', 'ـآ'], 'لأ': ['لأ', 'ـلأ'], 'لإ': ['لإ', 'ـلإ'], 'لآ': ['لآ', 'ـلآ']}    
 romanization_dict={'أ': ('2', 'a'), 'ا': ('aa', 'a'), 'إ': ('2i', 'i'), 'آ': ('2aa', 'aa'), 'ى': ('aa', ''), 'ب': ('b', ''), 'ت': ('t', ''), 'ث': ('th', ''), 'ج': ('j', ''), 'ح': ('7', ''), 'خ': ('kh', ''), 'د': ('d', ''), 'ذ': ('dh', ''), 'ر': ('r', ''), 'ز': ('z', ''), 'س': ('s', ''), 'ش': ('sh', ''), 'ص': ('S', ''), 'ض': ('D', ''), 'ط': ('T', ''), 'ظ': ('DH', ''), 'ع': ('3', ''), 'غ': ('gh', ''), 'ف': ('f', ''), 'ق': ('q', ''), 'ك': ('k', ''), 'ل': ('l', ''), 'م': ('m', ''), 'ن': ('n', ''), 'ه': ('h', ''), 'و': ('oo', 'w'), 'ي': ('ee', 'y'), 'ة': ('h', ''), 'ئ': ('2', ''), 'ؤ': ('2', ''), 'ء': ('2', ''), 'َ': ('a', ''), 'ِ': ('i', ''), 'ُ': ('u', ''), 'ٌ': ('un', ''), 'ً': ('an', ''), 'ٍ': ('in', ''), 'ّ': ('x', '')}
 
-# class analyze_ar_text(object):
-#   """docstring for analyze_ar_text"""
-#   def __init__(self, arg):
-# #     super(analyze_ar_text, self).__init__()
-#     self.arg = arg
-    
 
-# class analyze_ar_word: #analyze a word with diacritics in different ways
-#   def __init__(self,text0,shape_dict=ar_shape_dict,romanize_dict=romanization_dict,lang="msa",exclude_waaw_jamaa3ah=True):
-#     all_words=text0.split(" ")
-#     self.text=" ".join([v.split("_")[0] for v in all_words]) 
-#     self.chunks=[]
-#     self.word_letter_shapes_plain=[]
-#     self.word_letter_shapes=[]
-#     self.romanized_chunks=[]
-#     self.romanized=""
-#     self.plain=""
-
-#     for w_i,word0 in enumerate(all_words):
-#       word_split=word0.split("_")
-#       self.word=word_split[0]
-#       self.word_params=""
-#       if len(word_split)>1: self.word_params=word_split[1]
-#       self.word1=word_split[0]
-#       if exclude_waaw_jamaa3ah and self.word1.endswith("وا"):self.word1=self.word1[:-1]
-#       self.shape_dict=shape_dict
-#       self.romanize_dict=romanize_dict
-#       if lang=="ega": self.romanize_dict["ج"]=("g","")
-#       #first split the word into chunks, based on diacritics
-      
-#       new_chunk=""
-      
-#       for w0 in self.word1:
-#         if w0.isalpha() or w0==" ":
-#           self.plain+=w0
-#           if  new_chunk!="": self.chunks.append(new_chunk)
-#           new_chunk=w0 
-#         else: new_chunk+=w0
-#       if  new_chunk!="": self.chunks.append(new_chunk)
-#       #get the shape
-#       prev_shapes=[]
-      
-#       #get the shapes
-#       for i0,ch in enumerate(self.chunks):
-#         att_before,att_after=False,False #attach before and attach after
-#         w0=ch[0]
-#         cur_shape=w0
-#         possible_shapes=shape_dict.get(w0,[])
-
-#         if i0==0 and len(possible_shapes)>2: att_after=True #cur_shape=w0+"ـ"
-#         elif i0==len(self.chunks)-1:
-#           if len(prev_shapes)>2: att_before=True #cur_shape="ـ"+w0
-#         else:
-#           if len(prev_shapes)>2: att_before=True # cur_shape="ـ"+w0
-#           if len(possible_shapes)>2:  att_after=True
-#             #cur_shape=cur_shape+"ـ"
-#         prev_shapes=possible_shapes
-#         cur_shape=w0
-#         if att_before: cur_shape="ـ"+cur_shape
-#         if att_after: cur_shape=cur_shape+"ـ"
-#         self.word_letter_shapes_plain.append(cur_shape)
-#         #print(cur_shape)
-        
-#         cur_shape=ch
-#         if att_before: cur_shape="ـ"+cur_shape
-#         if att_after: cur_shape=cur_shape+"ـ"
-#         self.word_letter_shapes.append(cur_shape)
-    
-#       #get the sound
-
-#       prev_romanized=""
-#       cur_word_romanized_chunks=[]
-#       for ch_i,ch in enumerate(self.chunks):
-#         ch=ch.strip("ـ")
-#         found=self.romanize_dict.get(ch[0],ch[0])
-#         first=found[0]
-#         try:
-#           if ch_i==0 and found[1]!="": first=found[1]
-#         except:
-#           print("error","found",found,ch_i,ch,word0)
-#           continue
-
-#         if first=="q" and lang=="ega" and not "q" in self.word_params: first="2"
-#         #first=self.romanize_dict[ch[0]][0]
-        
-#         #cur_romanized_chunk=first
-#         dia0="".join([self.romanize_dict.get(v,["",""])[0] for v in ch[1:]]) #convert the diacritics part of the chunk
-#         has_shaddah=False
-#         if "x" in dia0: has_shaddah=True #in the conversion sheet, shadda is converted to x
-#         dia0=dia0.replace("x","")
-#         if dia0 and found[1]!="": first=found[1] 
-#         if ch_i>0 and "2" in found[0]: first="2" #imra2ah
-
-#         if prev_romanized.endswith("a") and ch[0] in "وي" and found[1]!="": first=found[1]
-#         if has_shaddah and found[1]!="": first=found[1]
-
-#         cur_romanized_chunk=first+dia0
-#         if has_shaddah: cur_romanized_chunk=first+cur_romanized_chunk #shaddah
-
-#         if ch_i==0 and cur_romanized_chunk=="aa" and ch[0]!="آ":  cur_romanized_chunk="a" #cheap hacks to fix certain fringe cases
-#         if cur_romanized_chunk=="ai":  cur_romanized_chunk="i"
-#         if cur_romanized_chunk=="ii":  cur_romanized_chunk="i"
-#         if cur_romanized_chunk=="au":  cur_romanized_chunk="u"
-#         if cur_romanized_chunk=="aan":  cur_romanized_chunk="an"
-
-#         self.romanized_chunks.append(cur_romanized_chunk)
-#         prev_romanized=cur_romanized_chunk
-#       #fine tuning the chunk sequence to avoid double vowels and make sure taa2 marbooTah is preceded vy fat7ah
-#       temp_romanized_chunks=[]
-#       for s_i, rom in enumerate(self.romanized_chunks):
-#         cur_ar_chunk=self.chunks[s_i]
-#         next_rom_chunk=""
-#         next_ar_chunk=""
-#         if s_i<len(self.romanized_chunks)-1:
-#           next_rom_chunk=self.romanized_chunks[s_i+1]
-#           next_ar_chunk=self.chunks[s_i+1]
-#         #if rom[0]=="q" and lang=="ega" and not "q" in self.word_params: rom="2"+rom 
-#         if rom in ["y","ee"] and lang=="ega" and "i" in self.word_params: rom="ai"
-#         if rom in ["w","oo"] and lang=="ega" and "o" in self.word_params: rom="oa"
-#         if next_rom_chunk=="aa": 
-#           if rom=="oo": rom="w"
-#           if rom=="ee": rom="y"
-#           rom=rom.rstrip("a")
-#         if next_rom_chunk=="ee": 
-#           if rom=="ee": rom="y"
-#           if rom=="oo": rom="w"
-#           rom=rom.rstrip("ei")
-#         if next_rom_chunk=="oo": 
-#           rom=rom.rstrip("ou")
-#         if next_ar_chunk=="ة": rom=rom.rstrip("a")+"a"
-#         temp_romanized_chunks.append(rom)
-
-
-
-#       self.romanized_chunks+=temp_romanized_chunks
-      
-#       for s_i, rom in enumerate(self.romanized_chunks):
-#         next_chunk=""
-#         if s_i<len(self.romanized_chunks)-1: next_chunk=self.romanized_chunks[s_i+1]
-#         # if rom.endswith("i") and next_chunk=="ee": rom=rom[:-1] #avoid iee for kasrah before yaa2
-#         # if rom.endswith("u") and next_chunk=="oo": rom=rom[:-1]
-#         # if rom.endswith("a") and next_chunk=="aa": rom=rom[:-1]
-#         self.romanized+=rom
-
-#       if w_i<len(all_words)-1:
-#         self.chunks.append(" ")
-#         self.word_letter_shapes_plain.append(" ")
-#         self.word_letter_shapes.append(" ")
-#         self.romanized_chunks.append(" ")
-#         self.romanized+=" "
-#         self.plain+=" "
 
 class analyze_ar_text: #analyze a word with diacritics in different ways
   def __init__(self,text0,shape_dict=ar_shape_dict,romanize_dict=romanization_dict,lang="msa",exclude_waaw_jamaa3ah=True):
@@ -591,11 +577,11 @@ def conjugate_verb_ega(input_dict):
   conj_dict["conj-imperative-f"]=imperative_m.rstrip("اوي")+"ي"+imperative_m_params
   conj_dict["conj-imperative-pl"]=imperative_m.rstrip("اوي")+"وا"+imperative_m_params
 
-  conj_dict["conj-active-m"]=active_m+active_m_params
-  if active_f!=None: conj_dict["conj-active-f"]=active_f+active_m_params
-  else: active_f=conj_dict["conj-active-f"]=active_m+"ة"+active_m_params
-
-  conj_dict["conj-active-pl"]=active_f.strip("َة")+"ين"+active_m_params
+  if active_m!="" and active_m!="-":
+      conj_dict["conj-active-m"]=active_m+active_m_params
+      if active_f!=None: conj_dict["conj-active-f"]=active_f+active_m_params
+      else: active_f=conj_dict["conj-active-f"]=active_m+"ة"+active_m_params
+      conj_dict["conj-active-pl"]=active_f.strip("َة")+"ين"+active_m_params
   out_dict=dict(input_dict)
   for a,b in conj_dict.items():
     out_dict[a]=b
