@@ -345,6 +345,50 @@ def get_seq_edits(tokens1,tokens2):
   return final_list
 
 
+def compare_repl(tokens1,tokens2,window_size=5): #make all changes as replacements - add sentence boundaries for whole segment edits
+  tokens1=add_padding(tokens1)
+  tokens2=add_padding(tokens2)
+  match_obj=SequenceMatcher(None,tokens1,tokens2)
+  final_list=[]
+  for a in match_obj.get_opcodes():
+    match_type,x0,x1,y0,y1=a
+    if match_type in ["insert","delete"]: #for insertaions/deletions, get preceding+following token to make it a replacement
+      x0=x0-1
+      x1=x1+1
+      y0=y0-1
+      y1=y1+1
+      match_type="replace"
+  
+    old0=tokens1[x0:x1]
+    new0=tokens2[y0:y1]
+    span_old0=(x0,x1)
+    span_new0=(y0,y1)
+    prev_context=tokens1[max(0,x0-window_size):x0]
+    next_context=tokens1[x1:]
+    final_list.append((match_type,old0,new0,span_old0,span_new0,prev_context,next_context))
+  return final_list
+
+def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding to a percentage of file size
+  file_size=os.stat(fpath).st_size
+  cur_loc0=int(file_size*ratio)
+  fopen0=open(output_edit_fpath)
+  fopen0.seek(cur_loc0)
+  fopen0.readline()
+  new_loc0=fopen0.tell()
+  fopen0.close()
+  return new_loc0
+
+def add_padding(token_list):
+  if len(token_list)==0: return ["<s>","</s>"]
+  if token_list[0]=="<s>" and token_list[-1]=="</s>": return token_list
+  return ["<s>"]+token_list+["</s>"]
+
+
+
+
+
+
+
 def get_docx_paras_edits(docx_fpath): #main function to extract edit info, while keeping track of para path/id
   docx_obj=docx(docx_fpath)
   data_list1=[]
