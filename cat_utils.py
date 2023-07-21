@@ -371,7 +371,7 @@ def compare_repl(tokens1,tokens2,window_size=5): #make all changes as replacemen
 def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding to a percentage of file size
   file_size=os.stat(fpath).st_size
   cur_loc0=int(file_size*ratio)
-  fopen0=open(output_edit_fpath)
+  fopen0=open(fpath)
   fopen0.seek(cur_loc0)
   fopen0.readline()
   new_loc0=fopen0.tell()
