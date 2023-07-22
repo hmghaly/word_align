@@ -385,6 +385,36 @@ def add_padding(token_list):
 
 
 
+#============ Replacement model ===================
+def apply_replace(sent_tokens,first_repl_dict): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
+  new_sent_tokens=list(sent_tokens)
+  valid_replacements=[]
+  for word0 in list(set(sent_tokens)):
+    all_corr=first_repl_dict.get(word0,[])
+    for corr0 in all_corr:
+      if not general.is_in(corr0[0],sent_tokens): continue
+      valid_replacements.append(corr0)
+  for repl0 in valid_replacements:
+    repl_src,repl_trg,repl_wt=repl0
+    new_sent_tokens=repl_phrase(new_sent_tokens,repl_src,repl_trg)
+  return new_sent_tokens
+
+
+
+def repl_phrase(sent_tokens,phrase_to_be_replaced,new_phrase): #replace a phrase within a sentence
+  last_i=0
+  new_tokens=[]
+  found_spans=general.is_in(phrase_to_be_replaced,sent_tokens)
+  for span0 in found_spans:
+    span_i0,span_j0=span0
+    new_tokens.extend(sent_tokens[last_i:span_i0])
+    new_tokens.extend(new_phrase)
+    last_i=span_j0+1
+  new_tokens.extend(sent_tokens[last_i:])
+  return new_tokens
+
+
+
 
 
 
