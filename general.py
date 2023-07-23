@@ -80,8 +80,8 @@ def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes whe
 
             #ranges.append((idx,idx+len(small)-1))
     return ranges
-def is_in(small,large,skip_punc=True): 
-    return list_in_list(small,large,skip_punc=True)
+def is_in(small,large,skip_punc=False): 
+    return list_in_list(small,large,skip_punc=skip_punc)
 
 def group_list(list_2): #group a list with each element is of size 2 - by the first sub-element
   out_dict={}
