@@ -220,7 +220,7 @@ def char_is_punct(char0):
   return False
 
 def tok(txt):
-  #txt=txt.replace('’s ',"'s ")
+  txt=txt.replace('\u200b','')
   new_str=""
   txt_split=txt.split()
   punc_exists_dict={}
