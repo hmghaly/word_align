@@ -364,10 +364,17 @@ def compare_repl(tokens1,tokens2,window_size=5): #make all changes as replacemen
     span_old0=(x0,x1-1) #adjust the end of the span to reflect the index of the last token
     span_new0=(y0,y1-1)
     final_list.append((match_type,old0,new0,span_old0,span_new0))
-    # prev_context=tokens1[max(0,x0-window_size):x0]
-    # next_context=tokens1[x1:]
-    # final_list.append((match_type,old0,new0,span_old0,span_new0,prev_context,next_context))
   return final_list
+
+def get_possible_replacements(sent_tokens,first_repl_dict): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
+  new_sent_tokens=list(sent_tokens)
+  valid_replacements=[]
+  for word0 in list(set(sent_tokens)):
+    all_corr=first_repl_dict.get(word0,[])
+    for corr0 in all_corr:
+      found_spans=general.is_in(corr0[0],sent_tokens)
+      for span0 in found_spans: valid_replacements.append((corr0,span0)) #just the phrase and the span
+  return valid_replacements
 
 
 # def compare_repl_OLD(tokens1,tokens2,window_size=5): #make all changes as replacements - add sentence boundaries for whole segment edits
