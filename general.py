@@ -700,8 +700,8 @@ def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding 
   cur_loc0=int(file_size*ratio)
   fopen0=open(fpath)
   fopen0.seek(cur_loc0)
-  fopen0.readline()
-  new_loc0=fopen0.tell()
+  cur_line=fopen0.readline()
+  new_loc0=fopen0.tell()-len(cur_line)
   fopen0.close()
   return new_loc0
 
