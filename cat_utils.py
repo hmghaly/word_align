@@ -346,8 +346,8 @@ def get_seq_edits(tokens1,tokens2):
 
 
 def compare_repl(tokens1,tokens2,window_size=5): #make all changes as replacements - add sentence boundaries for whole segment edits
-  tokens1=add_padding(tokens1)
-  tokens2=add_padding(tokens2)
+  tokens1=general.add_padding(tokens1)
+  tokens2=general.add_padding(tokens2)
   match_obj=SequenceMatcher(None,tokens1,tokens2)
   final_list=[]
   for a in match_obj.get_opcodes():
