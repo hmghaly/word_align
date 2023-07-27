@@ -707,12 +707,14 @@ def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding 
 
 #read the file from certain percentage to certain percentage - useful for navigating large files
 #and also for splitting files to training/dev/test portions
-def process_file_from_to(fpath,to_ratio=None,from_ratio=0): #process file line by line from start percentage/ratio (e.g. 0%) to an end ratio (e.g. 80%)
+def process_file_from_to(fpath,to_ratio=None,from_ratio=0,from_loc=None,to_loc=None): #process file line by line from start percentage/ratio (e.g. 0%) to an end ratio (e.g. 80%)
   file_size=os.stat(fpath).st_size
-  if from_ratio==0: from_loc=0
-  else: from_loc=get_file_loc_ratio(from_ratio,fpath)
-  if to_ratio==None: to_loc=file_size
-  else: to_loc=get_file_loc_ratio(to_ratio,fpath)
+  if from_loc==None:
+    if from_ratio==0: from_loc=0
+    else: from_loc=get_file_loc_ratio(from_ratio,fpath)
+  if to_loc==None:
+    if to_ratio==None: to_loc=file_size
+    else: to_loc=get_file_loc_ratio(to_ratio,fpath)
   fopen0=open(fpath)
   fopen0.seek(from_loc)
   line0="-"
