@@ -400,20 +400,7 @@ def get_possible_replacements(sent_tokens,first_repl_dict): #use the repl dict (
 #     final_list.append((match_type,old0,new0,span_old0,span_new0,prev_context,next_context))
 #   return final_list
 
-def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding to a percentage of file size
-  file_size=os.stat(fpath).st_size
-  cur_loc0=int(file_size*ratio)
-  fopen0=open(fpath)
-  fopen0.seek(cur_loc0)
-  fopen0.readline()
-  new_loc0=fopen0.tell()
-  fopen0.close()
-  return new_loc0
 
-def add_padding(token_list):
-  if len(token_list)==0: return ["<s>","</s>"]
-  if token_list[0]=="<s>" and token_list[-1]=="</s>": return token_list
-  return ["<s>"]+token_list+["</s>"]
 
 
 

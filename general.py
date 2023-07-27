@@ -290,6 +290,13 @@ def de_tok2str(tokens): #detokenize tokens into string
   return detok_str0
 
 
+def add_padding(token_list):
+  if len(token_list)==0: return ["<s>","</s>"]
+  if token_list[0]=="<s>" and token_list[-1]=="</s>": return token_list
+  return ["<s>"]+token_list+["</s>"]
+
+
+
 #==== for applications such as spell checking or creating word vectors
 def get_neighbor_offsets(word_i,sent_words,max_offset=3):
   #cur_word=sent_words[word_i]
@@ -306,6 +313,9 @@ def create_one_hot_vec(hot_i,vec_size):
   zeros=[0.]*vec_size
   zeros[hot_i]=1.
   return zeros
+
+
+
 
 # def tok(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False,keep_diacritics=True): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
 #     replaced=[]
@@ -684,6 +694,36 @@ def count_plus(counter_shelve_fpath,count_key="count"):
 
 
 ################## OS FUNCTIONS ##########################
+#file operations
+def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding to a percentage of file size
+  file_size=os.stat(fpath).st_size
+  cur_loc0=int(file_size*ratio)
+  fopen0=open(fpath)
+  fopen0.seek(cur_loc0)
+  fopen0.readline()
+  new_loc0=fopen0.tell()
+  fopen0.close()
+  return new_loc0
+
+#read the file from certain percentage to certain percentage - useful for navigating large files
+#and also for splitting files to training/dev/test portions
+def process_file_from_to(fpath,to_ratio=None,from_ratio=0): #process file line by line from start percentage/ratio (e.g. 0%) to an end ratio (e.g. 80%)
+  file_size=os.stat(fpath).st_size
+  if from_ratio==0: from_loc=0
+  else: from_loc=get_file_loc_ratio(from_ratio,fpath)
+  if to_ratio==None: to_loc=file_size
+  else: to_loc=get_file_loc_ratio(to_ratio,fpath)
+  fopen0=open(fpath)
+  fopen0.seek(from_loc)
+  line0="-"
+  loc0=fopen0.tell()
+  while line0 and loc0<=to_loc:
+    line0=fopen0.readline()
+    loc0=fopen0.tell()
+    if line0: yield line0
+  fopen0.close()
+
+
 
 #OS functions
 def create_dir(dir_path):
