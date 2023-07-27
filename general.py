@@ -704,7 +704,7 @@ def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding 
   # prev_chunk=fopen0.read(1000)
   # split_br=prev_chunk.split("\n")
 
-  #cur_line=fopen0.readline()
+  cur_line=fopen0.readline()
   new_loc0=fopen0.tell()#-len(cur_line) 
   fopen0.close()
   return new_loc0
