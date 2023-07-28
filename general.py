@@ -730,6 +730,16 @@ def read_file_from_to(fpath,to_ratio=None,from_ratio=0,from_loc=None,to_loc=None
   fopen0.close()
 
 
+def get_last_line(fpath,chunk_size=4000):
+  file_size=os.stat(fpath).st_size
+  fopen0=open(fpath)
+  fopen0.seek(file_size-chunk_size)
+  cur_chunk=fopen0.read(chunk_size)
+  chunk_split=[v for v in cur_chunk.split("\n") if v]
+  last_line=chunk_split[-1]
+  fopen0.close()
+  return last_line
+
 
 #OS functions
 def create_dir(dir_path):
