@@ -366,15 +366,58 @@ def compare_repl(tokens1,tokens2,window_size=5): #make all changes as replacemen
     final_list.append((match_type,old0,new0,span_old0,span_new0))
   return final_list
 
+
+def get_corr_freq_dict(file_gen): #iterting file lines, each line is json dict, with keys "src","trg"
+  corr_dict0={}
+  for line0 in file_gen:
+    line_dict0=json.loads(line0)
+    src0=line_dict0["src"]
+    trg0=line_dict0["trg"]
+    temp_dict=corr_dict0.get(src0,{})
+    temp_dict[trg0]=temp_dict.get(trg0,0)+1
+    corr_dict0[src0]=temp_dict
+  return corr_dict0
+  # items=list(corr_dict.items())
+  # items.sort(key=lambda x:-sum(x[1].values()))
+def filter_freq_dict(freq_dict,min_freq=2):
+  new_freq_dict={}
+  for key,val_dict in freq_dict.items():
+    temp_val_dict={}
+    for sub_key,freq in val_dict.items():
+      if freq<min_freq: continue
+      temp_val_dict[sub_key]=freq
+    if temp_val_dict!={}: new_freq_dict[key]=temp_val_dict
+  return new_freq_dict
+
+def get_first_freq_dict(freq_dict):
+  list_with_first=[]
+  for a,b in freq_dict.items():
+    first=a.split(" ")[0]
+    list_with_first.append((first,(a,b)))
+  list_with_first.sort()
+  grouped0=[(key,[v[1] for v in list(group)]) for key,group in groupby(list_with_first,lambda x:x[0])]
+  return dict(iter(grouped0))
+
+
 def get_possible_replacements(sent_tokens,first_repl_dict): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
   new_sent_tokens=list(sent_tokens)
   valid_replacements=[]
   for word0 in list(set(sent_tokens)):
-    all_corr=first_repl_dict.get(word0,[])
-    for corr0 in all_corr:
-      found_spans=general.is_in(corr0[0],sent_tokens)
-      for span0 in found_spans: valid_replacements.append((corr0,span0)) #just the phrase and the span
+    all_corr=first_repl_dict.get(word0,[]) #get the corresponding equivalents/freq to the current word
+    for corr_key0,corr_freq_val_dict0 in all_corr:
+      found_spans=general.is_in(corr_key0.split(),sent_tokens)
+      for span0 in found_spans: valid_replacements.append((corr_key0,corr_freq_val_dict0,span0)) #just the phrase and the span
   return valid_replacements
+  
+# def get_possible_replacements(sent_tokens,first_repl_dict): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
+#   new_sent_tokens=list(sent_tokens)
+#   valid_replacements=[]
+#   for word0 in list(set(sent_tokens)):
+#     all_corr=first_repl_dict.get(word0,[])
+#     for corr0 in all_corr:
+#       found_spans=general.is_in(corr0[0],sent_tokens)
+#       for span0 in found_spans: valid_replacements.append((corr0,span0)) #just the phrase and the span
+#   return valid_replacements
 
 
 # def compare_repl_OLD(tokens1,tokens2,window_size=5): #make all changes as replacements - add sentence boundaries for whole segment edits
