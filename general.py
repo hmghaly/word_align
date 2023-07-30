@@ -731,6 +731,7 @@ def read_file_from_to(fpath,to_ratio=None,from_ratio=0,from_loc=None,to_loc=None
 
 
 def get_last_line(fpath,chunk_size=4000):
+  if not os.path.exists(fpath): return None
   file_size=os.stat(fpath).st_size
   fopen0=open(fpath)
   fopen0.seek(file_size-chunk_size)
