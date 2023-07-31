@@ -20,6 +20,16 @@ if ver[0]==2:
   import HTMLParser
   #HTMLParser.HTMLParser().unescape('Suzy &amp; John')  
 
+excluded_punc_tokens=["<s>","</s>",".","(",")",",",";","[","]"]
+excluded_words=["the","a","an","and","of","in","on","at","to","by","is","are","has","have","had","it","its"]
+all_excluded=excluded_punc_tokens+excluded_words
+
+def is_un_symbol(str0):
+  out=False
+  if str0[0].isupper() and str0[-1].isdigit() and "/" in str0: out=True
+  return out
+    
+
 
 def unescape(text_with_html_entities):
   if sys.version_info[0]==3:
@@ -408,7 +418,7 @@ def get_possible_replacements(sent_tokens,first_repl_dict): #use the repl dict (
       found_spans=general.is_in(corr_key0.split(),sent_tokens)
       for span0 in found_spans: valid_replacements.append((corr_key0,corr_freq_val_dict0,span0)) #just the phrase and the span
   return valid_replacements
-  
+
 # def get_possible_replacements(sent_tokens,first_repl_dict): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
 #   new_sent_tokens=list(sent_tokens)
 #   valid_replacements=[]
