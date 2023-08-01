@@ -7,6 +7,7 @@ import random, string
 import hashlib
 from itertools import groupby
 from difflib import SequenceMatcher
+import copy
 
 sys.path.append("code_utils")
 import web_lib
