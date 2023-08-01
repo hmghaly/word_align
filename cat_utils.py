@@ -21,14 +21,115 @@ if ver[0]==2:
   #HTMLParser.HTMLParser().unescape('Suzy &amp; John')  
 
 excluded_punc_tokens=["<s>","</s>",".","(",")",",",";","[","]"]
-excluded_words=["the","a","an","and","of","in","on","at","to","by","is","are","has","have","had","it","its"]
+excluded_words=["the","a","an","and","of","in","on","at","to","by","is","are","has","have","had","it","its","with"]
 all_excluded=excluded_punc_tokens+excluded_words
+
+#functions for extracting features from raw features
+def dict2ft_lb(data_dict,wv_model,special_tokens_list=[],outcome_key="outcome"): #should be "outcome" in next run
+  # data_dict_items=list(data_dict.items())
+  # data_dict_items.sort()
+  label_list=[data_dict.get(outcome_key,-1)]
+  main_keys=["src","trg","context"]
+  feature_list=[]
+  for key0 in main_keys:
+    val0=data_dict[key0]
+    val_tokens=val0.split(" ")
+    val_tokens=[v for v in val_tokens if not v.lower().strip("_") in special_tokens_list]
+    try: val_vec_list=wv_model.wv.get_mean_vector(val_tokens).tolist()
+    except: val_vec_list=wv_model.wv.get_mean_vector([""]).tolist()
+    feature_list.extend(val_vec_list)
+  feature_list.append(data_dict["is_in_context"])
+  feature_list.append(float(data_dict["freq"]))
+  prev_oh=is_in_one_hot(data_dict["prev_token"].lower().strip("_"),special_tokens_list)
+  next_oh=is_in_one_hot(data_dict["next_token"].lower().strip("_"),special_tokens_list)
+  first_context_word=data_dict["context"].split(" ")[0]
+  first_context_word=first_context_word.strip("_").lower()
+  first_context_oh=is_in_one_hot(first_context_word,special_tokens_list)
+  feature_list.extend(prev_oh)
+  feature_list.extend(next_oh)
+  feature_list.extend(first_context_oh)
+  return feature_list,label_list
+
+def is_in_one_hot(item0,list0):
+  one_hot0=[0.]*len(list0)
+  if item0 in list0:
+    index_i=list0.index(item0)
+    one_hot0[index_i]=1.
+  return one_hot0
+
+
+def extract_repl_raw_features_labels(src_tokens,trg_tokens,first_repl_dict,window_size=5): #check each possible replacement for context and other features
+  #src_tokens0,trg_tokens0=src_tokens,trg_tokens
+  #possible_replacements=get_possible_replacements(src_tokens,first_repl_dict)
+  final_repl_list=[]
+  edit_list=compare_repl(src_tokens,trg_tokens)
+  possible_repl_list=get_possible_replacements(src_tokens,first_repl_dict)
+  actual_repl_dict={}
+  for el in edit_list:
+    match_type,repl_src_token0,repl_trg_token0,src_span0,trg_span0=el
+    if match_type=="equal": continue
+    repl_src0=" ".join(repl_src_token0)
+    repl_trg0=" ".join(repl_trg_token0)
+    a_key=(repl_src0,src_span0) #actual replacement key
+    actual_repl_dict[a_key]=repl_trg0
+
+  p_ft_dict_list=[]
+  for repl_src0,trg_repl_dict0,span0 in possible_repl_list:
+    #if repl_src0!="UK": continue
+    p_key=(repl_src0,span0)
+    actual_trg_repl0=actual_repl_dict.get(p_key)
+    temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
+    temp_ft_dict["src"]=repl_src0
+    context0=temp_ft_dict.get("context","")
+    context_words_lower0=[v.lower() for v in context0.split(" ") if v!="|"]
+
+    # print("repl_src0,trg_repl_dict0,span0",repl_src0,trg_repl_dict0,span0)
+    # print(temp_ft_dict)
+    # print("actual_trg_repl0",actual_trg_repl0)
+    for trg_repl0,freq0 in trg_repl_dict0.items():
+      temp_ft_dict1=copy.deepcopy(temp_ft_dict)
+      temp_ft_dict1["trg"]=trg_repl0
+      temp_ft_dict1["freq"]=freq0
+      outcome=0
+      is_in_context=0
+      if trg_repl0==actual_trg_repl0: outcome=1
+
+      repl_trg_tokens_lower=trg_repl0.lower().split()
+      if general.is_in(repl_trg_tokens_lower,context_words_lower0): is_in_context=1
+      temp_ft_dict1["outcome"]=outcome
+      temp_ft_dict1["is_in_context"]=is_in_context
+      #print(temp_ft_dict1)
+      final_repl_list.append(temp_ft_dict1)
+  return final_repl_list
+
+def extract_context_ft(src_tokens,src_repl_span,window_size=5,input_ft_dict={}):
+  #temp_ft_dict={}
+  #p_repl_src_tokens0,p_repl_trg_tokens0,freq0=triple0
+  # repl_src0=" ".join(repl_src_tokens)
+  # repl_trg0=" ".join(repl_trg_tokens)
+
+  prev_token,next_token="",""
+  x0,x1=src_repl_span
+  #full_window=src_tokens0[max(0,x0-window_size):x1+window_size+1]
+
+  full_window=src_tokens[max(0,x0-window_size):x0]+["|"]+ src_tokens[x1+1:x1+window_size+1]
+  if x0>0: prev_token=src_tokens[x0-1]
+  if x1<len(src_tokens)-1: next_token=src_tokens[x1+1]
+
+  input_ft_dict["context"]=" ".join(full_window)
+  input_ft_dict["prev_token"]=prev_token
+  input_ft_dict["next_token"]=next_token
+  return input_ft_dict
+
+#==================================
+
+
 
 def is_un_symbol(str0):
   out=False
   if str0[0].isupper() and str0[-1].isdigit() and "/" in str0: out=True
   return out
-    
+
 
 
 def unescape(text_with_html_entities):
@@ -238,59 +339,6 @@ def get_edit_info(para_content):
   original_text0=general.unescape(original_text0)
   final_text0=general.unescape(final_text0)
   return original_text0,final_text0, edited_text_html0 
-
-# def get_edit_info(para_content):
-#   para_content=para_content.replace("<w:br/>","\n")
-#   para_content=para_content.replace("<w:tab/>","\t")
-#   para_content=para_content.replace("<w:noBreakHyphen/>","-")
-#   #<w:footnoteReference w:customMarkFollows="1" w:id="2"/>
-#   #<w:footnoteReference w:id="3"/>
-  
-
-#   tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', para_content))
-#   open_tags=[""]
-#   tag_counter_dict={}
-#   start_i=0
-#   last_open_tag_str=""
-#   is_inserted=False
-#   is_deleted=False
-#   original_text0,final_text0="",""
-#   edit_segments0=[]
-#   for ti_, t in enumerate(tags):
-#     tag_str,tag_start,tag_end=t.group(0), t.start(), t.end()
-#     tag_str_lower=tag_str.lower()
-#     tag_name=re.findall(r'</?(.+?)[\s>]',tag_str_lower)[0]
-#     tag_type=""
-#     if tag_str.startswith('</'): tag_type="closing"
-#     elif tag_str.startswith('<!'): tag_type="comment"
-#     elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br","hr"]: tag_type="s" #standalone
-#     #elif tag_name in ["wp:posOffset"]: tag_type="exclude"
-#     else: tag_type="opening"
-
-#     #if tag_type=="exclude": continue
-
-#     if tag_name=="w:ins" and tag_type=="opening": is_inserted=True
-#     if tag_name=="w:ins" and tag_type=="closing": is_inserted=False
-#     if tag_name=="w:del" and tag_type=="opening": is_deleted=True
-#     if tag_name=="w:del" and tag_type=="closing": is_deleted=False
-
-#     inter_text=para_content[start_i:tag_start] #intervening text since last tag
-#     #print(tag_name, inter_text,"is_inserted",is_inserted,"is_deleted",is_deleted)
-#     if not is_inserted: original_text0+=inter_text
-#     if not is_deleted: final_text0+=inter_text
-#     seg_class="edited_same"
-#     if is_inserted: seg_class="edited_inserted"
-#     if is_deleted: seg_class="edited_deleted"
-#     if inter_text!="":edit_segments0.append((inter_text,seg_class))
-#     start_i=tag_end
-#   #edit_segments_grouped=edit_segments0[(key,"".join([v[0] for v in list(group)])) for key,group in groupby(edit_segments0,lambda x,x[0])]
-#   edit_segments_grouped0=[(key,"".join([v[0] for v in list(group)])) for key,group in groupby(edit_segments0,lambda x:x[1])]
-#   edited_text_html0=""
-#   for a,b in edit_segments_grouped0:
-#     if a=="edited_inserted": edited_text_html0+='<ins>'+b+'</ins>'
-#     elif a=="edited_deleted": edited_text_html0+='<del>'+b+'</del>'
-#     else: edited_text_html0+=b
-#   return original_text0,final_text0, edited_text_html0    
 
 
 #7 july
