@@ -25,6 +25,16 @@ excluded_punc_tokens=["<s>","</s>",".","(",")",",",";","[","]"]
 excluded_words=["the","a","an","and","of","in","on","at","to","by","is","are","has","have","had","it","its","with","for"]
 all_excluded=excluded_punc_tokens+excluded_words
 
+
+from scipy import spatial
+
+def cos_sim(vector1,vector2):
+  if len(vector1)==0 or len(vector2)==0: return 0
+  result = 1 - spatial.distance.cosine(vector1, vector2)
+  return result
+
+  
+
 #functions for extracting features from raw features
 def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should be "outcome" in next run
   special_tokens_list=ft_params.get("token_list",[])
@@ -89,7 +99,7 @@ def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should b
     feature_list.extend(first_trg_oh)
 
   return feature_list,label_list
-  
+
 def is_in_one_hot(item0,list0):
   one_hot0=[0.]*len(list0)
   if item0 in list0:
