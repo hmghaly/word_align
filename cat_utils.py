@@ -22,35 +22,74 @@ if ver[0]==2:
   #HTMLParser.HTMLParser().unescape('Suzy &amp; John')  
 
 excluded_punc_tokens=["<s>","</s>",".","(",")",",",";","[","]"]
-excluded_words=["the","a","an","and","of","in","on","at","to","by","is","are","has","have","had","it","its","with"]
+excluded_words=["the","a","an","and","of","in","on","at","to","by","is","are","has","have","had","it","its","with","for"]
 all_excluded=excluded_punc_tokens+excluded_words
 
 #functions for extracting features from raw features
-def dict2ft_lb(data_dict,wv_model,special_tokens_list=[],outcome_key="outcome"): #should be "outcome" in next run
-  # data_dict_items=list(data_dict.items())
-  # data_dict_items.sort()
-  label_list=[data_dict.get(outcome_key,-1)]
-  main_keys=["src","trg","context"]
+def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should be "outcome" in next run
+  special_tokens_list=ft_params.get("token_list",[])
+  include_src_wv=ft_params.get("include_src_wv",False)
+  include_trg_wv=ft_params.get("include_trg_wv",False)
+  include_context_wv=ft_params.get("include_context_wv",False)
+  include_context_trg_sim=ft_params.get("include_context_trg_sim",False)
+
+  include_include_freq=ft_params.get("include_include_freq",False)
+  include_is_in_context=ft_params.get("include_is_in_context",False)
+
+  include_prev_oh=ft_params.get("include_prev_oh",False)
+  include_next_oh=ft_params.get("include_next_oh",False)
+  include_trg_first_oh=ft_params.get("include_trg_first_oh",False)
+  include_trg_last_oh=ft_params.get("include_trg_last_oh",False)
+
+
+  label_list=[data_dict[outcome_key]]
   feature_list=[]
+
+  main_keys=["src","trg","context"]
+  temp_vec_dict={}
   for key0 in main_keys:
+    if key0=="src" and include_src_wv==False: continue
+    if key0=="trg" and include_trg_wv==False and include_context_trg_sim==False: continue
+    if key0=="context" and include_context_wv==False and include_context_trg_sim==False: continue
+
     val0=data_dict[key0]
     val_tokens=val0.split(" ")
     val_tokens=[v for v in val_tokens if not v.lower().strip("_") in special_tokens_list]
-    try: val_vec_list=wv_model.wv.get_mean_vector(val_tokens).tolist()
-    except: val_vec_list=wv_model.wv.get_mean_vector([""]).tolist()
-    feature_list.extend(val_vec_list)
-  feature_list.append(data_dict["is_in_context"])
-  feature_list.append(float(data_dict["freq"]))
-  prev_oh=is_in_one_hot(data_dict["prev_token"].lower().strip("_"),special_tokens_list)
-  next_oh=is_in_one_hot(data_dict["next_token"].lower().strip("_"),special_tokens_list)
-  first_context_word=data_dict["context"].split(" ")[0]
-  first_context_word=first_context_word.strip("_").lower()
-  first_context_oh=is_in_one_hot(first_context_word,special_tokens_list)
-  feature_list.extend(prev_oh)
-  feature_list.extend(next_oh)
-  feature_list.extend(first_context_oh)
-  return feature_list,label_list
+    try: val_vec=wv_model.wv.get_mean_vector(val_tokens)#.tolist()
+    except: val_vec=wv_model.wv.get_mean_vector([""])#.tolist()
+    temp_vec_dict[key0]=val_vec
 
+    if key0=="trg" and include_trg_wv==False: continue
+    if key0=="context" and include_context_wv==False: continue
+    feature_list.extend(val_vec.tolist())
+  if include_context_trg_sim:
+    context_trg_sim0=-1
+    if sum(temp_vec_dict["trg"])!=0 and sum(temp_vec_dict["context"])!=0: 
+      context_trg_sim0=cos_sim(temp_vec_dict["trg"],temp_vec_dict["context"])
+    feature_list.append(context_trg_sim0)
+  if include_include_freq: feature_list.append(float(data_dict["freq"]))
+  if include_is_in_context: feature_list.append(data_dict["is_in_context"])
+
+  if include_prev_oh:
+    prev_oh=is_in_one_hot(data_dict["prev_token"].lower().strip("_"),special_tokens_list)
+    feature_list.extend(prev_oh)
+
+  if include_next_oh:
+    next_oh=is_in_one_hot(data_dict["next_token"].lower().strip("_"),special_tokens_list)
+    feature_list.extend(next_oh)
+  trg_split=data_dict["trg"].split(" ")
+  if include_trg_first_oh:
+    first_trg_word=trg_split[0].strip("_").lower()
+    first_trg_oh=is_in_one_hot(first_trg_word,special_tokens_list)
+    feature_list.extend(first_trg_oh)
+
+  if include_trg_last_oh:
+    last_trg_word=trg_split[-1].strip("_").lower()
+    last_trg_oh=is_in_one_hot(last_trg_word,special_tokens_list)
+    feature_list.extend(first_trg_oh)
+
+  return feature_list,label_list
+  
 def is_in_one_hot(item0,list0):
   one_hot0=[0.]*len(list0)
   if item0 in list0:
