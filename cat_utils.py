@@ -21,8 +21,12 @@ if ver[0]==2:
   import HTMLParser
   #HTMLParser.HTMLParser().unescape('Suzy &amp; John')  
 
-excluded_punc_tokens=["<s>","</s>",".","(",")",",",";","[","]",":","?","/","#"]
-excluded_words=["the","a","an","and","of","in","on","at","to","by","is","are","has","have","had","it","its","with","for"]
+excluded_punc_tokens=["<s>","</s>",".","(",")",",",";","[","]",":","?","/","#","”","“","'s"]
+excluded_words=["the","a","an","and","or", "of","in","on","at","to","by","with","for","from","about","against",
+"is","are","was","were", "be","being", "has","have","had","it","its","they","as",
+"may","would","which","so",
+"he","she","his","her","them","that","their","those","this","such", "one","not","no",
+"including","notes"]
 all_excluded=excluded_punc_tokens+excluded_words
 
 
