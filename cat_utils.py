@@ -465,7 +465,7 @@ def compare_repl(tokens1,tokens2,window_size=5): #make all changes as replacemen
       x1=x1+1
       y0=y0-1
       y1=y1+1
-      match_type="replace"
+      #match_type="replace"
   
     old0=tokens1[x0:x1]
     new0=tokens2[y0:y1]
