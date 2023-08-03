@@ -24,7 +24,7 @@ if ver[0]==2:
 excluded_punc_tokens=["<s>","</s>",".","(",")",",",";","[","]",":","?","/","#","”","“","'s"]
 excluded_words=["the","a","an","and","or", "of","in","on","at","to","by","with","for","from","about","against",
 "is","are","was","were", "be","being", "has","have","had","it","its","they","as",
-"may","would","which","so",
+"may","would","which","so","through",
 "he","she","his","her","them","that","their","those","this","such", "one","not","no",
 "including","notes"]
 all_excluded=excluded_punc_tokens+excluded_words
@@ -45,16 +45,17 @@ def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should b
   include_src_wv=ft_params.get("include_src_wv",False)
   include_trg_wv=ft_params.get("include_trg_wv",False)
   include_context_wv=ft_params.get("include_context_wv",False)
+  
   include_context_trg_sim=ft_params.get("include_context_trg_sim",False)
 
-  include_include_freq=ft_params.get("include_include_freq",False)
+  include_freq=ft_params.get("include_freq",False)
   include_is_in_context=ft_params.get("include_is_in_context",False)
+  include_paren_check=ft_params.get("include_paren_check",False) #if surrounded by parentheses
 
   include_prev_oh=ft_params.get("include_prev_oh",False)
   include_next_oh=ft_params.get("include_next_oh",False)
   include_trg_first_oh=ft_params.get("include_trg_first_oh",False)
   include_trg_last_oh=ft_params.get("include_trg_last_oh",False)
-
 
   label_list=[data_dict[outcome_key]]
   feature_list=[]
@@ -81,8 +82,13 @@ def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should b
     if sum(temp_vec_dict["trg"])!=0 and sum(temp_vec_dict["context"])!=0: 
       context_trg_sim0=cos_sim(temp_vec_dict["trg"],temp_vec_dict["context"])
     feature_list.append(context_trg_sim0)
-  if include_include_freq: feature_list.append(float(data_dict["freq"]))
+  if include_freq: feature_list.append(float(data_dict["freq"]))
   if include_is_in_context: feature_list.append(data_dict["is_in_context"])
+
+  if include_paren_check:
+    paren_check0=0.
+    if data_dict["prev_token"].lower().strip("_")=="(" and data_dict["next_token"].lower().strip("_")==")":paren_check0=1.
+    feature_list.append(paren_check0)
 
   if include_prev_oh:
     prev_oh=is_in_one_hot(data_dict["prev_token"].lower().strip("_"),special_tokens_list)
