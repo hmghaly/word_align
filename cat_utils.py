@@ -341,6 +341,27 @@ class docx:
     shutil.rmtree(self.TEMP_FOLDER)
 
 #Editing project
+def identify_edit_type(src_str,trg_str):
+  key=src_str
+  sub_key=trg_str
+  no_dash_key_str="".join([v for v in key.split(" ") if v.strip("_")!="-"])
+  no_dash_subkey_str="".join([v for v in sub_key.split(" ") if v.strip("_")!="-"])
+
+  edit_type="other"
+  if key.isupper():
+    if key=="".join([v for v in sub_key if v.isupper()]) or key.lower()=="".join([v[0].lower() for v in sub_key.split(" ")]):
+      edit_type="acronym"
+  elif key[-1]=="s" and len(key)>2 and key[:-1].isupper(): #SDGs IEDs
+    if key[:-1]=="".join([v for v in sub_key if v.isupper()]) or key[:-1].lower()=="".join([v[0].lower() for v in sub_key.split(" ")]):
+      edit_type="acronym-s"
+  elif key.lower()==sub_key.lower():
+    edit_type="capitalization"
+  elif key.replace(" ","")==sub_key.replace(" ",""):
+    edit_type="compunding"
+  elif no_dash_key_str==no_dash_subkey_str:
+    edit_type="hyphenation"
+  return edit_type
+
 #2 June 2023
 def get_edit_info(para_content):
   para_content=para_content.replace("<w:br/>","\n")
