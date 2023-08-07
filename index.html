@@ -1,0 +1,3438 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>ALIF - Arabic Language Is Fun!</title>
+    <meta
+      name="description"
+      content="Alif Verbs - learn Arabic Verb Conjugation. Learn the different tenses and forms for verbs. Learn verbs in Modern Standard Arbic, Egyptian Arabic, and other Arabic varieties. Learn steadily, 5 minutes a day, five new verbs every day!"
+    />
+    <meta
+      name="keywords"
+      content="Arabic verbs forms conjugation alphabet letters reading writing listening games online web mobile androin ios fun app pronunciation diacritics tashkeel harakaat pronunciation"
+    />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/img/main-logo-2022.png" type="image/x-icon" />
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css" />
+    <!--Temporary css file index.css-->
+    <link rel="stylesheet" href="/assets/css/index.css" />
+
+    <!-- Roboto font -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap"
+      rel="stylesheet"
+    />
+    <!--Varela round font-->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind -->
+    <script src="assets/js/vendor/tailwind.3.3.0.js"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Roboto", "sans-serif"],
+              body: ["Roboto", "sans-serif"],
+              mono: ["ui-monospace", "monospace"],
+              varela: ["Varela Round", "sans-serif"],
+            },
+            colors: {
+              goldenrod: "#daa520",
+            },
+            gridTemplateColumns: {
+              custom: "1fr 5fr 1fr",
+              custom_2: "1fr 1fr",
+              custom_3: "2fr 1fr",
+            },
+          },
+        },
+        corePlugins: {
+          preflight: false,
+        },
+      };
+    </script>
+    <script src="assets/js/vendor/jquery.min.js"></script>
+    <script src="assets/js/vendor/gsap.min.js"></script>
+
+    <script src="https://hmghaly.github.io/script.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/theme.js" defer></script>
+    <script src="assets/js/tabs.js" defer></script>
+
+    <!-- Tailwind Elements CSS -->
+    <!--    <link rel="stylesheet" href="assets/css/tw-elements.min.css" />-->
+    <link rel="manifest" href="manifest.json" crossorigin="use-credentials" />
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-61484468-1"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-61484468-1");
+    </script>
+
+    <!--        Google Signin-->
+    <meta
+      name="google-signin-client_id"
+      content="761509954064-gb2hb7onq6igr2nrqvc6v7dnegd99vo5.apps.googleusercontent.com"
+    />
+    <meta name="google-signin-scope" content="profile email" />
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!--      Google Ads-->
+<!--     <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1461464026864680"
+      crossorigin="anonymous"
+    ></script>
+ -->
+    <script>
+      //Facebook login
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId: "443130417462988",
+          cookie: true,
+          xfbml: true,
+          version: "v12.0",
+        });
+
+        FB.AppEvents.logPageView();
+      };
+
+      (function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+          return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
+    </script>
+
+    <!-- Custom styles -->
+    <style></style>
+  </head>
+
+  <body
+    style="margin: 0px"
+    class="font-varela min-h-screen relative bg-gray-100 dark:bg-gray-900"
+  >
+    <div id="fb-root"></div>
+    <script
+      async
+      defer
+      crossorigin="anonymous"
+      src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v12.0&appId=443130417462988&autoLogAppEvents=1"
+      nonce="9YXf4wrt"
+    ></script>
+
+    <!-- Start your project here-->
+    <div class="grid md:grid-cols-custom gap-4 h-full relative">
+      <div id="right" class="sm:col-span-1"></div>
+      <div id="mid_section" class="col-span-3 w-full lg:col-span-1 grid">
+        <!--      Screen 0 -Intro #intro#-->
+        <div id="intro" class="screen text-center h-screen grid">
+          <div
+            class="bg-white text-center md:my-6 rounded border-solid border-[1px] border-[#9c9c9c] h-full md:h-2/3 dark:bg-gray-700"
+          >
+            <div
+              id="intro_app_logo_div"
+              class="flex items-center justify-center w-full h-[10vh]"
+            >
+              <img
+                class="rounded-full w-[8vh] h-[8vh] m-1"
+                src="assets/img/alif-logo.png"
+                alt="intro alif logo"
+              />
+            </div>
+            <div id="app_header">
+              <h1
+                id="app_tag_line1"
+                data-brackets-id="69"
+                class="display-2 text-white"
+              >
+                <span style="color: #1264a4">A</span
+                ><span style="color: #ecb22f">L</span
+                ><span style="color: #007a5b">I</span
+                ><span style="color: #e01e5b">F</span>
+              </h1>
+              <h4 data-brackets-id="70" id="app_tag_line2" class="text-white">
+                <span style="color: #1264a4">Arabic</span>
+                <span style="color: #ecb22f">Learning</span>
+                <span style="color: #007a5b">Is</span>
+                <span style="color: #e01e5b">Fun!</span>
+              </h4>
+            </div>
+            <div id="intro_by_line"></div>
+            <div id="champolu_logo">
+              <img
+                class="rounded-full w-24 h-24"
+                src="assets/img/main-logo-2022.png"
+                alt="intro alif logo"
+              />
+            </div>
+            <button
+              type="button"
+              onclick="after_intro()"
+              class="px-5 py-3 w-1/2 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+        <!--            End of intro-->
+
+        <!--      Screen 1 -Choose Language #language# -->
+        <div id="choose_language" class="screen text-center h-screen grid" hidden>
+          <div
+            class="bg-white text-center md:my-6 rounded border-solid border-[1px] border-[#9c9c9c] h-full md:h-2/3 dark:bg-gray-700"
+          >
+            <div
+              id="choose_lang_app_logo_div"
+              class="flex items-center justify-center w-full h-[10vh]"
+            >
+              <img
+                class="rounded-full w-[8vh] h-[8vh] m-1"
+                src="assets/img/main-logo-2022.png"
+                alt="intro alif logo"
+              />
+            </div>
+
+            <h4
+              id="which_arabic_heading"
+              class="mb-2 mt-0 text-2xl font-medium leading-tight text-primary dark:text-white"
+            >
+              Which Arabic to learn?
+            </h4>
+
+            <a
+              href="https://wp.champolu.com/arabic/which-arabic-to-learn/"
+              target="_blank"
+              class="font-medium text-blue-600 dark:text-blue-500 mb-5 hover:underline align-center"
+            >
+              <div class="flex items-center justify-center w-full">
+                How to choose?
+                <img src="assets/img/float.png" height="20px" class="ml-1" />
+              </div> </a
+            ><br />
+
+            <div class="text-center">
+              <button
+                type="button"
+                onclick="after_lang_selection(this)"
+                name="selection_btn-msa"
+                class="px-5 py-3 w-1/2 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                <div class="flex items-center justify-center w-full">
+                  Modern Standard Arabic
+                  <img src="assets/img/arabic.svg" height="30px" class="ml-1" />
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onclick="after_lang_selection(this)"
+                name="selection_btn-ega"
+                class="px-5 py-3 w-1/2 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                <div class="flex items-center justify-center w-full">
+                  Egyptian Arabic
+                  <img src="assets/img/egypt.svg" height="30px" class="ml-1" />
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--            End of language selection-->
+
+        <!--      Screen 2 -Login/Signup #login# #signup#-->
+        <div id="login_signup" class="screen text-center" hidden>
+          <!--Tabs navigation-->
+          <ul
+            class="mb-2 z-10 flex list-none flex-row flex-wrap border-b-0 pl-0 justify-center gap-[4rem] md:gap-[10rem]"
+            role="tablist"
+            data-te-nav-ref
+          >
+            <li role="presentation" class="">
+              <a
+                href="#tabs-home02"
+                class="focus:border-transparent hover:text-goldenrod dark:hover:text-blue-600 my-2 block border-x-0 border-b-2 border-t-0 border-transparent pb-1 md:pb-3 pt-3 font-medium uppercase leading-tight text-neutral-500 focus:isolate data-[te-nav-active]:border-primary data-[te-nav-active]:text-goldenrod dark:data-[te-nav-active]:text-blue-600"
+                data-te-toggle="pill"
+                data-te-target="#tabs-home02"
+                data-te-nav-active
+                role="tab"
+                aria-controls="tabs-home02"
+                aria-selected="true"
+                >Login</a
+              >
+            </li>
+            <li id="app_logo" class="m-1">
+              <img
+                class="rounded-full w-12 h-12"
+                src="assets/img/main-logo-2022.png"
+                alt="intro alif logo"
+              />
+            </li>
+            <li role="presentation" class="hover:text-goldenrod">
+              <a
+                href="#tabs-profile02"
+                class="focus:border-transparent hover:text-goldenrod dark:hover:text-blue-600 my-2 block border-x-0 border-b-2 border-t-0 border-transparent pb-3 pt-3 font-medium uppercase leading-tight text-neutral-500 focus:isolate data-[te-nav-active]:border-primary data-[te-nav-active]:text-goldenrod dark:data-[te-nav-active]:text-blue-600"
+                data-te-toggle="pill"
+                data-te-target="#tabs-profile02"
+                role="tab"
+                aria-controls="tabs-profile02"
+                aria-selected="false"
+                >Signup</a
+              >
+            </li>
+          </ul>
+
+          <!--Tabs content-->
+          <div class="mb-6 flex justify-center">
+            <!--div
+              class="hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+              id="tabs-home02"
+              role="tabpanel"
+              aria-labelledby="tabs-home-tab02"
+              data-te-tab-active
+            >
+              <h3
+                id="login_heading"
+                class="mb-2 mt-0 text-xl font-medium leading-tight text-primary"
+              >
+                Log into your account
+              </h3>
+              <h4 class="m-2">Email</h4>
+              <input
+                type="email"
+                id="login_email"
+                name="email"
+                class="login_form rounded"
+              />
+              <h4 class="m-2">Password</h4>
+              <input
+                type="password"
+                id="login_password"
+                name="password"
+                class="login_form rounded"
+              />
+              <div class="m-1">
+                Remember me
+                <input
+                  type="checkbox"
+                  id="login_remember"
+                  name="remember"
+                  value="remember"
+                  checked
+                />
+                <a href="#">Forgot password?</a>
+              </div>
+              <button
+                type="button"
+                onclick="on_login()"
+                class="w-1/4 text-white bg-blue-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900 text-center align-center"
+              >
+                Login</button
+              ><br />
+              Don’t have an account yet? <a href="#">Sign up</a>
+            </div-->
+
+            <!--Sign in-->
+            <div
+              class="hidden opacity-100 md:h-[30rem] h-screen transition-opacity duration-150 ease-linear data-[te-tab-active]:block w-full bg-white rounded-lg shadow md:mt-0 py-2 relative border-solid border-[1px] border-[#9c9c9c] dark:bg-gray-700"
+              id="tabs-home02"
+              role="tabpanel"
+              aria-labelledby="tabs-home-tab02"
+              data-te-tab-active
+            >
+              <div class="p-6 space-y-2 md:space-y-2 sm:p-4">
+                <h1
+                  class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
+                >
+                  Sign in to your account
+                </h1>
+                <div class="grid md:grid-cols-2">
+                  <div class="grid gap-2 px-2 h-fit">
+                    <div>
+                      <label
+                        for="login_email"
+                        class="block text-left mb-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+                        >Your email</label
+                      >
+                      <input
+                        type="email"
+                        name="email"
+                        id="login_email"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full md:w-3/4 p-2.5 login_form focus:outline-goldenrod dark:focus:outline-blue-600"
+                        placeholder="johndoe@gmail.com"
+                        required=""
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="login_password"
+                        class="block mb-2 text-sm font-medium text-gray-900 text-left dark:text-gray-100"
+                        >Password</label
+                      >
+                      <input
+                        type="password"
+                        name="password"
+                        id="login_password"
+                        placeholder="••••••••"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full md:w-3/4 p-2.5 login_form focus:outline-goldenrod dark:focus:outline-blue-600"
+                        required=""
+                      />
+                    </div>
+                    <div class="flex items-center justify-between md:w-4/5">
+                      <div class="flex items-start gap-2">
+                        <div class="flex items-center h-5">
+                          <input
+                            aria-describedby="remember"
+                            type="checkbox"
+                            class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300"
+                            required=""
+                            id="login_remember"
+                          />
+                        </div>
+                        <div class="ml-3 text-sm">
+                          <label
+                            for="remember"
+                            class="text-gray-500 dark:text-gray-50"
+                            >Remember me</label
+                          >
+                        </div>
+                      </div>
+                      <a
+                        href="#"
+                        class="text-sm font-medium text-goldenrod hover:underline dark:text-blue-600"
+                        >Forgot password?</a
+                      >
+                    </div>
+                    <button
+                      type="button"
+                      class="w-full md:w-4/5 text-white mt-3 bg-goldenrod font-semibold rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600"
+                      onclick="on_login()"
+                    >
+                      Sign in
+                    </button>
+                  </div>
+                  <div class="grid gap-2 px-2 h-fit md:mt-4">
+                    <p
+                      class="text-sm font-light text-gray-500 dark:text-gray-400"
+                    >
+                      Don’t have an account yet?
+                      <a
+                        href="#"
+                        class="font-medium text-goldenrod hover:underline dark:text-blue-600"
+                        >Sign up</a
+                      >
+                    </p>
+                    <!-- Separator between social media sign in and email/password sign in -->
+                    <div
+                      class="inline-flex items-center justify-center w-full relative"
+                    >
+                      <hr class="w-64 h-px my-8 bg-gray-200 border-0" />
+                      <span
+                        class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 dark:text-white dark:bg-gray-700 left-1/2 bg-white"
+                        >or continue with</span
+                      >
+                    </div>
+                    <div class="grid gap-4">
+                      <div
+                        class="flex flex-row items-center justify-center gap-2"
+                      >
+                        <!-- Facebook -->
+                        <button
+                          type="button"
+                          onclick="continue_with_facebook()"
+                          data-te-ripple-init
+                          data-te-ripple-color="light"
+                          class="hover:cursor-pointer flex items-center justify-center mx-1 h-9 w-9 rounded-full bg-blue-800 uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)]"
+                        >
+                          <!-- Facebook -->
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="mx-auto h-3.5 w-3.5"
+                            fill="white"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"
+                            />
+                          </svg>
+                        </button>
+
+                        <button
+                          type="button"
+                          onclick="continue_with_google()"
+                          class="hover:cursor-pointer flex items-center justify-center mx-1 h-9 w-9 rounded-full bg-blue-500 uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)]"
+                        >
+                          <svg
+                            class="mx-auto h-3.5 w-3.5"
+                            aria-hidden="true"
+                            focusable="false"
+                            data-prefix="fab"
+                            data-icon="google"
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 488 512"
+                          >
+                            <path
+                              fill="white"
+                              d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                            ></path>
+                          </svg>
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onclick="go2main_menu()"
+                        class="justify-self-center py-2 px-4 w-1/2 flex justify-center items-center bg-goldenrod text-white transition ease-in duration-200 text-center font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg dark:bg-blue-600"
+                      >
+                        Continue As Guest
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- sign-up-->
+            <div
+              class="hidden opacity-100 md:h-[30rem] h-screen transition-opacity duration-150 ease-linear data-[te-tab-active]:block w-full bg-white rounded-lg shadow md:mt-0 py-2 relative border-solid border-[1px] border-[#9c9c9c] dark:bg-gray-700"
+              id="tabs-profile02"
+              role="tabpanel"
+              aria-labelledby="tabs-profile-tab02"
+            ></div>
+          </div>
+
+          <!--div class="text-center">
+            <button
+              type="button"
+              onclick="continue_with_google()"
+              class="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg px-5 py-2.5 flex justify-center items-center w-1/2"
+            >
+              <svg
+                class="w-4 h-4 mr-2 -ml-1"
+                aria-hidden="true"
+                focusable="false"
+                data-prefix="fab"
+                data-icon="google"
+                role="img"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 488 512"
+              >
+                <path
+                  fill="currentColor"
+                  d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                ></path>
+              </svg>
+              Continue with Google
+            </button>
+            <div
+              class="g-signin2 m-1"
+              data-onsuccess="onSignIn"
+              data-theme="dark"
+              data-width="300"
+              data-height="40"
+              hidden
+            ></div>
+
+            <button
+              type="button"
+              onclick="continue_with_facebook()"
+              class="py-2 px-4 w-1/2 flex justify-center items-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white transition ease-in duration-200 text-center font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="currentColor"
+                class="mr-2"
+                viewBox="0 0 1792 1792"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759h-306v-759h-255v-296h255v-218q0-186 104-288.5t277-102.5q147 0 228 12z"
+                ></path>
+              </svg>
+              Continue with Facebook
+            </button>
+          </div-->
+
+          <div class="inline-flex items-center justify-center bg-red-50"></div>
+        </div>
+        <!--          End of login/signup screen-->
+
+        <!--      Screen 3 -Main Menu #menu#-->
+        <div
+          id="main_menu"
+          class="screen h-screen grid dark:text-white relative" hidden>
+          <div class="flex absolute top-6 right-0 gap-2 w-fit">
+            <div class="relative w-fit">
+              <button
+                data-tooltip-target="tooltip-animation-3"
+                data-modal-target="modal2"
+                type="button"
+                class="w-7 h-7 modal-button flex items-center justify-center bg-goldenrod font-semibold rounded-full focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                  class="w-3/4"
+                >
+                  <path
+                    d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"
+                    fill="white"
+                  />
+                </svg>
+              </button>
+              <div
+                id="tooltip-animation-3"
+                role="tooltip"
+                class="absolute -bottom-12 -right-1/4 z-10 w-24 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
+              >
+                Contact us
+                <div class="tooltip-arrow" data-popper-arrow></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex absolute top-6 left-0 w-fit">
+            <div class="relative w-fit">
+              <button
+                data-tooltip-target="tooltip-animation-2"
+                type="button"
+                class="w-7 h-7 modal-button flex items-center justify-center bg-goldenrod font-semibold rounded-full focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+                data-modal-target="modal1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 320 512"
+                  class="w-3/4"
+                >
+                  <path
+                    d="M80 160c0-35.3 28.7-64 64-64h32c35.3 0 64 28.7 64 64v3.6c0 21.8-11.1 42.1-29.4 53.8l-42.2 27.1c-25.2 16.2-40.4 44.1-40.4 74V320c0 17.7 14.3 32 32 32s32-14.3 32-32v-1.4c0-8.2 4.2-15.8 11-20.2l42.2-27.1c36.6-23.6 58.8-64.1 58.8-107.7V160c0-70.7-57.3-128-128-128H144C73.3 32 16 89.3 16 160c0 17.7 14.3 32 32 32s32-14.3 32-32zm80 320a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
+                    fill="white"
+                  />
+                </svg>
+              </button>
+              <div
+                id="tooltip-animation-2"
+                role="tooltip"
+                class="absolute -bottom-12 -left-1/4 z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
+              >
+                Help
+                <div class="tooltip-arrow" data-popper-arrow></div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white text-center md:my-6 rounded border-solid border-[1px] border-[#9c9c9c] h-full md:h-fit dark:bg-gray-700"
+          >
+            <div
+              id="main_menu_app_logo_div"
+              class="flex items-center justify-center w-full h-[10vh]"
+            >
+              <img
+                class="rounded-full w-[8vh] h-[8vh] m-1"
+                src="assets/img/main-logo-2022.png"
+                alt="intro alif logo"
+              />
+            </div>
+            <div
+              id="main_menu_heading_container_div"
+              class="flex items-center justify-center w-full h-[8vh]"
+            >
+              <h3
+                id="main_menu_heading"
+                class="m-0 mt-0 text-xl font-medium leading-tight text-primary"
+              >
+                Main Menu
+              </h3>
+            </div>
+            <div class="grid">
+              <button
+                type="button"
+                onclick="go2learn_menu()"
+                class="px-5 py-3 my-2 text-lg uppercase justify-self-center md:w-1/3 w-3/4 flex justify-center items-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                Start
+              </button>
+            </div>
+
+            <div class="flex items-center justify-center w-full h-[7vh] gap-3">
+              <span id="active_language_name">Modern Standard Arabic </span>
+              <img
+                id="active_language_icon"
+                src="assets/img/arabic.svg"
+                height="30px"
+                class="ml-1"
+              />
+              <a
+                href="javascript:void(0)"
+                onclick="go2lang_selection()"
+                class="font-semibold underline text-black dark:text-gray-100 dark:hover:text-blue-600 hover:text-goldenrod"
+                >Change</a
+              >
+            </div>
+
+            <div class="grid items-center w-full md:h-[10vh] h-[15vh]">
+              <div class="grid grid-cols-2 w-1/2 gap-2 justify-self-center">
+                <div>
+                  <b> Current Streak</b>
+                  <div>
+                    <span id="n_streak_days">12</span>
+                    <span id="day_days">days</span>
+                    <span id="streak_emoji">&#128293;</span>
+                  </div>
+                  <div>
+                    <span id="n_minutes_played">175</span> minutes played
+                  </div>
+                </div>
+                <div>
+                  <b>Learned</b>
+                  <div>Words: <span id="n_words_learned">68</span></div>
+                  <div>Verbs: <span id="n_verbs_learned">12</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center w-full h-[10vh]">
+              <div class="flex items-center justify-center w-full">
+                Today's streak:
+                <span id="today_n_minutes_streak" class="ml-1">0</span>/<span
+                  id="planned_n_minutes_streak"
+                  class="mr-1"
+                  >10</span
+                >
+                minutes
+                <img src="assets/img/clock.png" height="30px" class="ml-1" />
+              </div>
+            </div>
+
+            <div
+              class="flex items-center justify-center gap-36 w-full h-[10vh]"
+            >
+              <div id="progress">
+                <div class="grid gap-1 justify-items-center">
+                  <img src="assets/img/rocket.png" height="30px" class="ml-1" />
+                  <div>Progress</div>
+                </div>
+              </div>
+              <div
+                class="w-fit grid justify-items-center hover:text-goldenrod dark:hover:text-blue-700 -translate-y-1.5"
+                onclick="go2leaderboard()"
+              >
+                <button
+                  type="button"
+                  class="w-9 h-9 flex items-center justify-center bg-yellow-200 font-semibold rounded-full focus:ring-4 focus:outline-none focus:ring-blue-300 m-2"
+                >
+                  🥇
+                </button>
+                <span class="dark:text-white font-semibold">Leaderboard</span>
+              </div>
+            </div>
+            <div
+              class="flex justify-center items-center gap-10 my-2 hidden"
+            ></div>
+          </div>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-30 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+          <!--Modals-->
+          <!-- Add your HTML code for the modal backdrop and modal here -->
+          <div
+            class="hidden fixed modal-backdrop top-0 left-0 w-full h-full bg-black opacity-100 z-30 flex items-center justify-center"
+            data-backdrop-id="modal1"
+          >
+            <div
+              tabindex="-1"
+              aria-hidden="true"
+              class="m-auto modal hidden p-4 z-50 overflow-x-hidden overflow-y-auto opacity-100 h-fit w-5/6 md:w-[55%] bg-white rounded-lg shadow dark:bg-gray-700"
+              data-modal-id="modal1"
+            >
+              <!-- Modal content -->
+              <div class="grid h-fit gap-2">
+                <!-- Modal header -->
+                <div
+                  class="flex items-center md:px-6 px-2 h-fit justify-between border-solid-[1px] border-gray-300 rounded-t dark:border-gray-600"
+                >
+                  <h3
+                    class="text-xl font-semibold text-gray-900 lg:text-2xl dark:text-white"
+                  >
+                    Help
+                  </h3>
+                  <button
+                    class="text-gray-400 modal-close-button bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    data-modal-id="modal1"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                    >
+                      <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                      />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                  </button>
+                </div>
+                <!-- Modal body -->
+                <div class="grid md:grid-cols-custom_3">
+                  <div
+                    class="md:border-solid border-0 border-r border-gray-400 dark:border-gray-100 px-1 grid"
+                  >
+                    <iframe
+                      src="https://www.youtube.com/embed/RPkUJsqy3wQ"
+                      class="md:w-11/12 w-full h-64 justify-self-center"
+                      title="YouTube video player"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
+                  <div class="grid md:ml-4">
+                    <div class="grid overflow-y-auto h-36">
+                      <h3
+                        class="text-lg text-gray-900 dark:text-gray-200 m-1 px-2 md:px-0 underline"
+                      >
+                        Help Topics
+                      </h3>
+                      <ul class="list-none m-0 px-2">
+                        <li>placeholder</li>
+                        <li>placeholder</li>
+                      </ul>
+                    </div>
+                    <div class="grid overflow-y-auto h-36">
+                      <h3
+                        class="text-lg text-gray-900 dark:text-gray-200 m-1 px-2 md:px-0 underline"
+                      >
+                        FAQ's
+                      </h3>
+                      <ul class="list-none m-0 px-2">
+                        <li>placeholder</li>
+                        <li>placeholder</li>
+                        <li>placeholder</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="hidden fixed modal-backdrop top-0 left-0 w-full h-full bg-black opacity-100 z-30 flex items-center justify-center"
+            data-backdrop-id="modal2"
+          >
+            <div
+              tabindex="-1"
+              aria-hidden="true"
+              class="m-auto modal hidden p-4 z-50 overflow-x-hidden overflow-y-auto opacity-100 h-96 w-3/4 md:w-1/3 bg-white rounded-lg shadow dark:bg-gray-700"
+              data-modal-id="modal2"
+            >
+              <!-- Modal content -->
+              <div class="grid h-fit gap-2">
+                <!-- Modal header -->
+                <div
+                  class="flex items-center h-fit justify-between border-solid-[1px] border-gray-300 rounded-t dark:border-gray-600"
+                >
+                  <h3
+                    class="text-xl font-semibold text-gray-900 lg:text-2xl dark:text-white"
+                  >
+                    Contact us
+                  </h3>
+                  <button
+                    class="text-gray-400 modal-close-button bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    data-modal-id="modal2"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                    >
+                      <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                      />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                  </button>
+                </div>
+                <!-- Modal body -->
+                <div class="grid">
+                  <div class="grid justify-self-center w-full px-3 gap-2">
+                    <div>
+                      <label
+                        for="contactus_name"
+                        class="block text-left mb-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+                        >Your Name</label
+                      >
+                      <input
+                        type="text"
+                        name="name"
+                        id="contactus_name"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-4/5 p-2.5 login_form focus:outline-goldenrod dark:focus:outline-blue-600"
+                        placeholder="enter your name"
+                        required=""
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        for="contactus_email"
+                        class="block text-left mb-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+                        >Your Email</label
+                      >
+                      <input
+                        type="email"
+                        name="email"
+                        id="contactus_email"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-4/5 p-2.5 login_form focus:outline-goldenrod dark:focus:outline-blue-600"
+                        placeholder="johndoe@gmail.com"
+                        required=""
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        for="contactus_message"
+                        class="block mb-2 text-sm font-medium text-gray-900 text-left dark:text-gray-100"
+                        >Password</label
+                      >
+                      <input
+                        type="text"
+                        name="message"
+                        id="contactus_message"
+                        placeholder="enter your message"
+                        class="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:outline-goldenrod block w-4/5 p-2.5 login_form dark:focus:outline-blue-600"
+                        required=""
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onclick="contactus_onsubmit()"
+                      class="w-[88%] md:w-10/12 mt-2 text-white bg-goldenrod font-semibold rounded-lg text-sm px-6 py-2.5 text-center dark:bg-blue-600"
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--      End of main menu screen-->
+
+        <!--          Settings Section #settings#-->
+        <div
+          id="settings"
+          class="screen text-center h-screen overflow-scroll bg-white dark:bg-gray-700 dark:text-white" hidden>
+          <div
+            id="settings_app_logo_div"
+            class="flex items-center justify-center w-full h-[10vh]"
+          >
+            <img
+              class="rounded-full w-[8vh] h-[8vh] m-1"
+              src="assets/img/alif-logo.png"
+              alt="intro alif logo"
+            />
+          </div>
+          <h3
+            id="settings_heading"
+            class="mb-2 mt-0 text-xl font-medium leading-tight text-primary"
+          >
+            Settings
+          </h3>
+
+          <div class="inline-flex flex-col items-center justify-center">
+            <div>Quiz Time (Minutes)</div>
+
+            <select
+              id="quiz_time_minutes"
+              name="quiz_time_minutes"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-white dark:text-black dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 m-2 settings_form"
+            >
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+
+            <div>Daily Streak Goal (Minutes)</div>
+            <select
+              id="daily_goal_minutes"
+              name="daily_goal_minutes"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-white dark:text-black dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 m-2 settings_form"
+            >
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="25">25</option>
+              <option value="30">30</option>
+            </select>
+
+            <div>Script</div>
+            <select
+              id="quiz_script"
+              name="quiz_script"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 m-2 settings_form"
+              disabled
+            >
+              <option value="ar_rom" selected>
+                Arabic Script + Romanization (kalimah كلمة)
+              </option>
+              <option value="rom_only">Romanization Only (kalimah)</option>
+              <option value="ar_only">Arabic Script Only (كلمة)</option>
+            </select>
+            <div>
+              Play audio after quiz
+              <input
+                type="checkbox"
+                class="form-check-input settings_form"
+                name="play_audio"
+                checked
+                disabled
+              />
+            </div>
+            <button
+              class="bg-goldenrod dark:bg-blue-700 flex gap-2 items-center gap-2 w-32 flex items-center justify-center h-8 rounded-lg text-white font-semibold px-2"
+              id="toggleEl"
+            >
+              Light mode
+            </button>
+            <div>
+              Sound Effects
+              <input
+                type="checkbox"
+                class="form-check-input settings_form"
+                name="sound_effects"
+                checked
+                disabled
+              />
+            </div>
+          </div>
+          <div>
+            <button
+              type="button"
+              class="px-5 py-3 w-1/3 text-base font-semibold text-center text-white bg-goldenrod dark:bg-blue-700 rounded-lg dark:hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-black dark:focus:ring-blue-800 m-2"
+              onclick="update_settings()"
+            >
+              Update Settings
+            </button>
+            <button
+              type="button"
+              class="px-5 py-3 w-1/3 text-base font-semibold text-center text-white bg-goldenrod dark:bg-blue-700 rounded-lg dark:hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-black dark:focus:ring-blue-800 m-2"
+              onclick="go2main_menu()"
+            >
+              Discard Changes
+            </button>
+          </div>
+
+          <!-- 	      <p>Play music effects</p> -->
+
+          <br />
+          <hr />
+          <br />
+          <button
+            type="button"
+            class="w-1/2 text-white bg-red-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-red-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900 text-center align-center"
+          >
+            <div class="flex items-center justify-center w-full">
+              Clear all progress
+              <img src="assets/img/warning.png" height="25px" class="ml-1" />
+            </div>
+          </button>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 fill:black dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  blue-500
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--          End of settings section-->
+
+        <!--            Start menu #topic# #learn#-->
+        <div
+          id="learn_menu"
+          class="screen text-center bg-white dark:bg-gray-700 h-screen" hidden>
+          <div
+            id="learn_menu_app_logo_div"
+            class="flex items-center justify-center w-full h-[10vh]"
+          >
+            <img
+              class="rounded-full w-[8vh] h-[8vh] m-1"
+              src="assets/img/main-logo-2022.png"
+              alt="intro alif logo"
+            />
+          </div>
+          <div
+            id="learn_menu_heading_div"
+            class="flex items-center justify-center w-full h-[5vh]"
+          >
+            <h3
+              id="start_menu_heading"
+              class="mb-2 mt-0 text-xl font-medium leading-tight text-primary dark:text-white"
+            >
+              Start to Learn
+            </h3>
+          </div>
+          <div
+            id="learn_menu_main_topics_heading_div"
+            class="flex items-center justify-center w-full h-[5vh]"
+          >
+            <h4
+              id="start_menu_main_topics"
+              class="mb-2 mt-0 text-l font-medium leading-tight text-primary dark:text-white"
+            >
+              Main Topics
+            </h4>
+          </div>
+
+          <div
+            id="learn_menu_main_topics_content_div"
+            class="flex items-center justify-center w-full h-[30vh] overflow-y-auto"
+          >
+            <div>
+              <button
+                onclick="go2learn_topic(this)"
+                name="btn_topic-read_write"
+                type="button"
+                class="px-5 py-3 w-1/3 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                Reading - Writing
+              </button>
+              <button
+                onclick="go2learn_topic(this)"
+                name="btn_topic-vocab"
+                type="button"
+                class="px-5 py-3 w-1/3 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                Vocabulary
+              </button>
+              <button
+                type="button"
+                onclick="go2learn_topic(this)"
+                name="topic-verbs"
+                class="px-5 py-3 w-1/3 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                Verbs
+              </button>
+              <button
+                onclick="go2learn_topic(this)"
+                name="btn_topic-grammar"
+                type="button"
+                class="px-5 py-3 w-1/3 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                Grammar
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="learn_menu_further_topics_heading_div"
+            class="flex items-center justify-center w-full h-[5vh]"
+          >
+            <h4
+              id="learn_menu_further_topics_heading_h"
+              class="mb-2 mt-0 text-l font-medium leading-tight text-primary dark:text-white"
+            >
+              Further Topics (Soon)
+            </h4>
+          </div>
+
+          <div
+            id="learn_menu_further_topics_content_div"
+            class="flex items-center justify-center w-full h-[25vh] overflow-y-auto"
+          >
+            <div>
+              <button
+                onclick="go2learn_topic(this)"
+                name="btn_topic-conversation"
+                type="button"
+                onclick="go2learn_topic(this)"
+                name="topic-conversation"
+                class="md:px-5 px-3 py-3 w-1/3 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                Conversation
+              </button>
+
+              <button
+                onclick="go2learn_topic(this)"
+                name="btn_topic-expressions"
+                type="button"
+                class="md:px-5 px-2 py-3 w-1/3 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                Expressions
+              </button>
+              <button
+                onclick="go2learn_topic(this)"
+                name="btn_topic-pronunciation"
+                type="button"
+                class="md:px-5 px-2 py-3 w-1/3 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+              >
+                Pronunciation
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="learn_menu_back2_menu_div"
+            class="flex items-center justify-center w-full h-[10vh]"
+          >
+            <button
+              onclick="go2main_menu()"
+              type="button"
+              class="px-5 py-3 w-1/2 text-base font-medium text-center text-white bg-goldenrod font-semibold rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 m-2 dark:bg-blue-600"
+            >
+              Back to Menu
+            </button>
+          </div>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 fill:black dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  blue-500
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--            End of topic/learn menu-->
+
+        <!--Quiz Screen #quiz#            -->
+
+        <div
+          id="quiz"
+          class="screen text-center bg-white dark:bg-gray-700 relative h-screen md:h-fit"
+          style=""  hidden>
+          <div id="quiz_top_div" class="">
+            <!--            Top menu h=5-->
+            <div
+              id="top_menu"
+              class="flex justify-between items-center px-6 py-2 h-[4vh] mb-6"
+            >
+              <div
+                id="progress_div"
+                class="flex items-center justify-center align-center lg:w-1/6 md:w-1/5 w-1/4"
+              >
+                <div class="w-full rounded-full bg-black h-5">
+                  <div
+                    id="quiz_progress_bar"
+                    class="bg-goldenrod text-xs font-semibold text-white flex items-center px-4 leading-none rounded-full h-full dark:bg-blue-600"
+                    style="width: 50%"
+                  >
+                    25/50
+                  </div>
+                </div>
+              </div>
+              <div
+                id="time_div"
+                class="flex items-center md:-translate-x-[2rem]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 448 512"
+                  class="w-5 h-5 dark:fill-white"
+                >
+                  <path
+                    d="M176 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h16V98.4C92.3 113.8 16 200 16 304c0 114.9 93.1 208 208 208s208-93.1 208-208c0-41.8-12.3-80.7-33.5-113.2l24.1-24.1c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L355.7 143c-28.1-23-62.2-38.8-99.7-44.6V64h16c17.7 0 32-14.3 32-32s-14.3-32-32-32H224 176zm72 192V320c0 13.3-10.7 24-24 24s-24-10.7-24-24V192c0-13.3 10.7-24 24-24s24 10.7 24 24z"
+                  />
+                </svg>
+                <span id="time_remaining" class="m-1 dark:text-white"
+                  >3:12</span
+                >
+              </div>
+              <div id="accuracy_div" class="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                  class="w-5 h-5 dark:fill-white"
+                >
+                  <path
+                    d="M448 256A192 192 0 1 0 64 256a192 192 0 1 0 384 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 80a80 80 0 1 0 0-160 80 80 0 1 0 0 160zm0-224a144 144 0 1 1 0 288 144 144 0 1 1 0-288zM224 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"
+                  />
+                </svg>
+                <span id="quiz_accuracy" class="m-1 dark:text-white">91%</span>
+              </div>
+            </div>
+
+            <div id="quiz_main" class="flex flex-col gap-1 overflow-y-auto">
+              <h1
+                id="quiz_prompt"
+                class="quiz_items mb-2 text-2xl font-extrabold leading-none tracking-tight text-black dark:text-white"
+              >
+                Identify the corresponding Arabic word for the following:
+              </h1>
+              <h2>
+                <small
+                  id="quiz_item_label"
+                  class="quiz_items ml-2 text-2xl font-semibold text-goldenrod dark:text-blue-600"
+                  >forgetting</small
+                >
+              </h2>
+
+              <div id="quiz_extra" class="quiz_items"></div>
+              <div id="quiz_image" class="quiz_items"></div>
+              <div id="quiz_audio" class="quiz_items"></div>
+              <div id="quiz_tags" class="quiz_items"></div>
+              <div id="quiz_answer_div " class="h-6">
+                <div
+                  id="quiz_answer_space"
+                  class="quiz_items ml-2 text-xl font-semibold text-gray-500 dark:text-green-600"
+                ></div>
+                <div id="quiz_after_answer_space" class="quiz_items"></div>
+              </div>
+              <div id="quiz_answer_feedback" class="quiz_items"></div>
+            </div>
+            <div id="quiz_solution" class="md:h-[45vh] overflow-y-auto">
+              <div
+                id="quiz_mcq_options"
+                class="quiz_input quiz_options quiz_items"
+                style=""
+              ></div>
+              <div
+                id="quiz_seq_selection"
+                class="quiz_input quiz_options quiz_items"
+                hidden=""
+                style="display: none"
+              ></div>
+
+              <div
+                id="quiz_text_input"
+                class="quiz_input text-center hidden"
+                hidden=""
+                style="display: none"
+              >
+                <label
+                  for="large-input"
+                  class="block mb-2 text-sm font-medium dark:text-white"
+                  >Type in the answer in Arabic or in Latin letters</label
+                >
+                <div
+                  id="text_input_div"
+                  class="flex items-center justify-center align-center"
+                >
+                  <input
+                    type="text"
+                    id="answer_text_input"
+                    class="block w-3/4 p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xl focus:ring-blue-500 focus:border-blue-500 border-gray-600"
+                    style="text-align: center"
+                  />
+                </div>
+                <button
+                  id="check_text_answer"
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 w-2/3 rounded-lg"
+                >
+                  Check Answer
+                </button>
+              </div>
+
+              <div id="quiz_mini_keyboard"></div>
+
+              <div id="quiz_handwriting"></div>
+              <div id="quiz_audio_recording"></div>
+            </div>
+          </div>
+
+          <div
+            id="bottom_menu"
+            class="flex items-center justify-between md:px-6 px-2 mt-24 md:my-0 dark:text-white"
+          >
+            <div id="coins_div" class="flex items-center">
+              <img
+                id="coin_img"
+                class="rounded-full w-5 h-5 m-1 fill-goldenrod"
+                src="assets/img/coins-solid.svg"
+                alt="coin"
+              />
+              <span id="quiz_coin_count">173</span>
+            </div>
+            <div
+              id="mood_div"
+              class="flex items-center justify-center align-center"
+            >
+              Mood
+            </div>
+            <div
+              id="hints_div"
+              class="flex items-center justify-center align-center"
+            >
+              Hints
+            </div>
+          </div>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-14 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-2 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!--Quiz screen end            -->
+        <!--            Beginning of topic menu #topic#-->
+        <div
+          id="topic_menu"
+          class="screen text-center bg-white dark:bg-gray-700 h-screen"
+        >
+          <div
+            id="topic_menu_app_logo_div"
+            class="flex items-center justify-center w-full h-[10vh]"
+          >
+            <img
+              class="rounded-full w-[8vh] h-[8vh] m-1"
+              src="assets/img/alif-logo.png"
+              alt="intro alif logo"
+            />
+          </div>
+
+          <div id="topic_menu_top_section" class="h-[30vh] dark:text-white">
+            <h3
+              id="topic_menu_heading"
+              class="mb-2 mt-0 text-xl font-medium leading-tight text-primary"
+            >
+              Read/Write
+            </h3>
+            <button
+              onclick="go2quiz(this)"
+              id="topic_menu_quiz_button"
+              class="bg-goldenrod dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold w-1/5 py-2 px-2.5 rounded"
+            >
+              Quiz
+            </button>
+
+            <div class="inline-flex flex-items items-center justify-center m-1">
+              <div>Difficulty</div>
+              <select
+                id="quiz_difficulty"
+                name="quiz_difficulty"
+                class="bg-gray-50 font-semibold border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 m-1 settings_form"
+              >
+                <option value="easy" selected>Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+
+            <p id="topic_description">
+              Learn Arabic Alphabet, letter shapes and sounds, and diacritics.
+            </p>
+          </div>
+          <div
+            id="topic_menu_lesssons_heading_div"
+            class="flex items-center justify-center w-full h-[8vh]"
+          >
+            <h3
+              id="topic_lesson_list_heading"
+              class="mb-2 mt-0 text-xl font-medium font-bold leading-tight text-primary h-[5vh] dark:text-white"
+            >
+              Lessons
+            </h3>
+          </div>
+
+          <div
+            id="topic_menu_bottom_section"
+            class="h-[32vh] overflow-y-auto overflow-x-hidden"
+          >
+            <div id="lesson_list">
+              <div
+                id="lesson_table"
+                class="w-full text-sm text-left text-gray-500 dark:text-black px-2 grid"
+              >
+                <div
+                  id="table_body_lessons"
+                  class="flex gap-8 flex-wrap w-5/6 justify-self-center"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="back2learn_menu_btn_div"
+            class="flex items-center justify-center w-full h-[10vh]"
+          >
+            <button
+              onclick="go2learn_menu()"
+              type="button"
+              class="px-5 py-3 w-1/3 text-base font-semibold text-center text-white bg-goldenrod rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 m-2 w-2/3"
+            >
+              Learning Menu
+            </button>
+          </div>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700 opacity-100"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 fill:black dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  blue-500
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+          <!--Modal-->
+          <!-- Add your HTML code for the modal backdrop and modal here -->
+          <div
+            id="modalBackdrop"
+            class="hidden fixed top-0 left-0 w-full h-full bg-black opacity-100 z-50 flex items-center justify-center"
+          >
+            <div
+              id="modalEl"
+              tabindex="-1"
+              aria-hidden="true"
+              class="m-auto hidden p-4 overflow-x-hidden overflow-y-auto opacity-100 h-96 w-3/4 md:w-1/2 bg-white rounded-lg shadow dark:bg-gray-700"
+            >
+              <!-- Modal content -->
+              <div class="grid h-fit gap-2">
+                <!-- Modal header -->
+                <div
+                  class="flex items-center h-fit justify-between border-solid-[1px] border-gray-300 rounded-t dark:border-gray-600"
+                >
+                  <h3
+                    class="text-xl font-semibold text-gray-900 lg:text-2xl dark:text-white"
+                    id="lessonEl"
+                  >
+                    Topic Name
+                  </h3>
+                  <button
+                    id="close"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                    >
+                      <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                      />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                  </button>
+                </div>
+                <!-- Modal body -->
+                <div class="space-y-1">
+                  <div>
+                    <p class="flex justify-between w-1/4 dark:text-white">
+                      Completion:<span
+                        id="completionEl"
+                        class="dark:text-blue-700 text-goldenrod font-semibold"
+                        >69%</span
+                      >
+                    </p>
+                    <p class="flex justify-between w-1/4 dark:text-white">
+                      Accuracy:<span
+                        class="dark:text-blue-700 text-goldenrod font-semibold"
+                        id="accuracyEl"
+                        >69%</span
+                      >
+                    </p>
+                  </div>
+                  <div class="overflow-y-auto">
+                    <table
+                      class="min-w-full text-center font-light bg-white dark:bg-gray-900 my-4 p-2 border-solid border-[1px] border-[#9c9c9c]"
+                      id="table_materials"
+                    >
+                      <thead
+                        className="border-b font-medium dark:border-neutral-500"
+                      >
+                        <tr>
+                          <th
+                            className=" py-4 "
+                            scope="colgroup"
+                            class="dark:text-white"
+                          >
+                            Words
+                          </th>
+                          <th
+                            className="py-4 "
+                            scope="colgroup"
+                            class="dark:text-white"
+                          >
+                            Answer
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="table_body_materials"></tbody>
+                    </table>
+                  </div>
+                  <div class="flex w-full items-center justify-between">
+                    <button
+                      class="bg-goldenrod text-white dark:bg-blue-700 font-semibold w-1/3 h-12 flex items-center justify-center px-1 py-2 rounded"
+                      id="startEl"
+                    >
+                      Start Lesson
+                    </button>
+                    <button
+                      class="bg-goldenrod text-white dark:bg-blue-700 font-semibold w-1/3 h-12 flex items-center justify-center px-1 py-2 rounded"
+                      id="quizEl"
+                    >
+                      Start Quiz
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--            End of topic menu-->
+
+        <!--            Start of lesson screen #lesson#-->
+        <div
+          id="lesson"
+          class="screen text-center text-center bg-white dark:bg-gray-700 h-screen"
+        >
+          <div id="start_menu_top_section" class="grid overflow-y-auto">
+            <div
+              id="lesson_app_logo_div"
+              class="flex items-center justify-center w-full h-[10vh]"
+            >
+              <img
+                class="rounded-full w-[8vh] h-[8vh] m-1"
+                src="assets/img/alif-logo.png"
+                alt="intro alif logo"
+              />
+            </div>
+            <h3
+              id="start_menu_heading"
+              class="mb-2 mt-0 text-xl leading-tight text-primary dark:text-white"
+            >
+              Lesson:
+              <span id="lesson_title" class=""
+                >Letter sounds with diacritics</span
+              >
+            </h3>
+
+            <iframe
+              src="https://www.youtube.com/embed/DddX_IdZxOg"
+              class="w-2/3 h-64 justify-self-center"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+
+            <div
+              class="flex items-center my-2 justify-self-center w-3/4 justify-center gap-8"
+            >
+              <button
+                id="back_to_lessons"
+                class="bg-goldenrod dark:bg-blue-700 text-white font-semibold py-2 px-2 rounded"
+              >
+                More Lessons
+              </button>
+              <button
+                id="lesson_quiz_button"
+                class="bg-goldenrod dark:bg-blue-700 text-white font-semibold py-2 px-2.5 rounded"
+              >
+                Lesson Quiz
+              </button>
+            </div>
+          </div>
+          <div class="grid">
+            <div
+              id="lesson_reference_section"
+              class="h-40 overflow-y-auto dark:text-white w-2/3 justify-self-center"
+            >
+              <h3>References</h3>
+              Reference1<br />Reference1<br />
+            </div>
+          </div>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 fill:black dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  blue-500
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--            End of Lesson screen-->
+
+        <!--            after quiz start #after# #afterquiz# -->
+        <div
+          id="after_quiz"
+          class="screen text-center bg-white dark:bg-gray-700 h-screen grid"
+        >
+          <div
+            id="after_quiz_app_logo_div"
+            class="flex items-center justify-center w-full h-[6vh]"
+          >
+            <img
+              class="rounded-full w-[4vh] h-[4vh] m-1"
+              src="assets/img/alif-logo.png"
+              alt="intro alif logo"
+            />
+          </div>
+
+          <div
+            id="topic_menu_lesssons_heading_div"
+            class="flex items-center justify-center w-full h-[5vh]"
+          >
+            <h3
+              id="game_over_heading"
+              class="mb-2 mt-0 text-2xl font-medium leading-tight text-primary dark:text-white underline font-semibold"
+            >
+              Game Over
+            </h3>
+          </div>
+
+          <div class="dark:text-white">
+            <div id="game_over_stat" class="grid">
+              <div class="grid justify-self-center w-2/3">
+                <div class="flex justify-between">
+                  <div id="your_current_score_label" class="text-lg">
+                    Your score-
+                  </div>
+
+                  <div id="your_current_score_value" class="text-lg">92</div>
+                </div>
+                <div class="flex justify-between">
+                  <div id="your_current_accuracy_label" class="text-lg">
+                    Your accuracy-
+                  </div>
+
+                  <div id="your_current_accuracy_value" class="text-lg">
+                    95%
+                  </div>
+                </div>
+                <div class="flex justify-between">
+                  <div id="your_current_correct_label" class="text-lg">
+                    Correct-
+                  </div>
+
+                  <div class="flex text-lg">
+                    <span
+                      id="after_quiz_correct_count"
+                      class="text-goldenrod dark:text-blue-700"
+                      >7</span
+                    >/
+                    <span id="after_quiz_attempted_count">8</span>
+                  </div>
+                </div>
+                <div class="flex justify-between">
+                  <div id="your_score_today_label" class="text-lg">
+                    Total score today-
+                  </div>
+
+                  <div id="your_score_today_value" class="text-lg">150</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hidden"></div>
+          <div class="grid justify-self-center md:w-2/3 w-5/6">
+            <button
+              class="text-lg modal-button bg-goldenrod flex items-center justify-self-center justify-center dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold py-1 px-10 md:px-1 md:w-[70%] self-center w-full rounded-lg h-11"
+              data-modal-target="modal3"
+            >
+              Follow us
+            </button>
+          </div>
+          <div class="grid justify-self-center md:w-2/3 w-5/6">
+            <div class="grid gap-2 text-center my-2">
+              <div
+                class="flex justify-center md:gap-2 gap-4 items-center flex-col md:flex-row"
+              >
+                <input
+                  type="email"
+                  name="email"
+                  id="send_results_email"
+                  class="border border-gray-300 text-lg text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full md:w-1/3 py-1 md:p-2.5 login_form focus:outline-goldenrod dark:focus:outline-blue-600"
+                  placeholder="...enter your email"
+                  required=""
+                />
+                <button
+                  class="text-lg bg-goldenrod flex items-center justify-center dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold py-1 px-10 md:px-1 md:w-fit w-full rounded-lg h-11"
+                  onclick="send_quiz_results_to_email()"
+                >
+                  Send me quiz results
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="after_quiz_error_analysis_heading"
+            class="flex justify-center w-full h-[4vh]"
+          >
+            <h3
+              id="error_analysis_heading"
+              class="mb-2 mt-0 text-lg font-medium leading-tight text-primary dark:text-white underline"
+            >
+              Error Analysis
+            </h3>
+          </div>
+
+          <div
+            id="after_quiz_error_analysis_heading"
+            class="flex justify-center w-full dark:text-gray-100 h-[20vh] overflow-y-auto"
+          >
+            <table
+              id="after_quiz_accuracy_analysis_table"
+              class="text-center font-light bg-white dark:bg-gray-900 w-5/6 md:w-1/2 h-fit"
+            >
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Correct</th>
+                  <th>Actual</th>
+                </tr>
+              </thead>
+              <tbody id="after_quiz_accuracy_analysis_tbody"></tbody>
+            </table>
+          </div>
+
+          <div
+            id="after_quiz_error_analysis_heading"
+            class="flex items-center justify-center w-full z-60"
+          >
+            <button
+              onclick="go2main_menu()"
+              id="back_to_menu_btn"
+              class="bg-goldenrod dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold py-1 px-2 w-1/3 rounded h-9 mt-2"
+            >
+              Main Menu
+            </button>
+          </div>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 fill:black dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  blue-500
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+          <div
+            class="hidden fixed modal-backdrop top-0 left-0 w-full h-full bg-black opacity-100 z-30 flex items-center justify-center"
+            data-backdrop-id="modal3"
+          >
+            <div
+              tabindex="-1"
+              aria-hidden="true"
+              class="m-auto modal z-50 hidden p-4 overflow-x-hidden overflow-y-auto opacity-100 h-96 w-3/4 md:w-1/3 bg-white rounded-lg shadow dark:bg-gray-700"
+              data-modal-id="modal3"
+            >
+              <!-- Modal content -->
+              <div class="grid h-fit gap-2">
+                <!-- Modal header -->
+                <div
+                  class="flex items-center h-fit justify-between border-solid-[1px] border-gray-300 rounded-t dark:border-gray-600"
+                >
+                  <h3
+                    class="text-xl font-semibold text-gray-900 lg:text-2xl dark:text-white"
+                  >
+                    Follow us
+                  </h3>
+                  <button
+                    class="text-gray-400 modal-close-button bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    data-modal-id="modal3"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                    >
+                      <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                      />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                  </button>
+                </div>
+                <!-- Modal body -->
+                <div class="space-y-1">
+                  <div>
+                    <div id="follow_us_div" class="grid justify-center my-3">
+                      <div class="flex gap-1 items-center w-5/6 md:h-8 h-22">
+                        <div
+                          class="fb-like translate-y-0.5 md:mx-2"
+                          data-href="https://facebook.com/archampolu"
+                          data-width="100"
+                          data-layout="button"
+                          data-action="like"
+                          data-size="small"
+                          data-share="true"
+                        ></div>
+
+                        <script src="https://apis.google.com/js/platform.js"></script>
+                        <div class="w-24 mx-2">
+                          <div
+                            class="g-ytsubscribe"
+                            data-channelid="UCFxqaKvMQKOlsZ6WsFmEJOg"
+                            data-layout="default"
+                            data-count="default"
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--            End of after quiz-->
+        <!--Highscores screen-->
+        <div
+          id="highscores"
+          class="screen text-center bg-white dark:bg-gray-700 dark:text-white h-screen"
+        >
+          <div class="grid mt-2">
+            <h3
+              class="font-semibold m-2 text-xl font-semibold dark:text-white justify-self-center uppercase"
+            >
+              Leaderboard
+            </h3>
+          </div>
+          <div
+            class="mb-4 border-solid border-0 border-b border-gray-400 dark:border-gray-100"
+          >
+            <ul
+              class="flex flex-wrap font-medium text-center gap-4 list-none"
+              id="myTab"
+              data-tabs-toggle="#myTabContent"
+              role="tablist"
+            >
+              <li class="mr-2 dark:text-white" role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 text-goldenrod dark:text-blue-700 dark:text-white border-none bg-transparent text-lg underline-offset-[22px] underline decoration-4 underline-solid underline-goldenrod dark:underline-blue-700"
+                  id="week-tab"
+                  data-tabs-target="#week"
+                  type="button"
+                  role="tab"
+                  aria-controls="week"
+                  aria-selected="false"
+                >
+                  This week
+                </button>
+              </li>
+              <li class="mr-2" role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 dark:text-white border-none bg-transparent text-lg"
+                  id="month-tab"
+                  data-tabs-target="#month"
+                  type="button"
+                  role="tab"
+                  aria-controls="month"
+                  aria-selected="false"
+                >
+                  This Month
+                </button>
+              </li>
+
+              <li role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 dark:text-white border-none bg-transparent text-lg"
+                  id="all_time-tab"
+                  data-tabs-target="#all_time"
+                  type="button"
+                  role="tab"
+                  aria-controls="all_time"
+                  aria-selected="false"
+                >
+                  All time
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div id="highscores_selection"></div>
+          <div id="myTabContent">
+            <div
+              class="p-4 rounded-lg"
+              id="week"
+              role="tabpanel"
+              aria-labelledby="week-tab"
+            >
+              <table
+                class="min-w-full rounded text-center font-light bg-white dark:bg-gray-900 dark:text-gray-100 my-4 p-2 border-solid border-[1px] border-[#9c9c9c]"
+                id="highscores_table"
+              >
+                <thead class="font-medium dark:border-neutral-500">
+                  <tr>
+                    <th class="py-2" scope="colgroup">Player</th>
+                    <th class="py-2" scope="colgroup">Score</th>
+                  </tr>
+                </thead>
+                <tbody id="highscores_table_body"></tbody>
+              </table>
+            </div>
+            <div
+              class="hidden p-4 rounded-lg"
+              id="month"
+              role="tabpanel"
+              aria-labelledby="month-tab"
+            ></div>
+
+            <div
+              class="hidden p-4 rounded-lg"
+              id="all_time"
+              role="tabpanel"
+              aria-labelledby="all_time-tab"
+            ></div>
+          </div>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--Progress/Performance screen-->
+        <div
+          id="my_progress"
+          class="screen text-center bg-white dark:bg-gray-700 h-screen dark:text-white"
+        >
+          <div class="grid mt-1">
+            <h3
+              class="font-semibold m-2 text-xl font-semibold dark:text-white justify-self-center uppercase"
+            >
+              My Progress
+            </h3>
+            <div
+              class="px-2 gap-2 text-gray-700 mt-6 justify-self-center justify-center py-2 px-1 shadow w-11/12 bg-gray-100 dark:bg-gray-900 dark:text-white text-lg grid rounded"
+            >
+              <div>Overall accurracy</div>
+              <div class="text-4xl text-gray-800 font-semibold">75%</div>
+              <div class="text-2xl">
+                Correct(<span class="text-goldenrod dark:text-blue-700"
+                  >18/24</span
+                >)
+              </div>
+            </div>
+          </div>
+          <div
+            class="mb-4 border-solid border-0 border-b border-gray-400 dark:border-gray-100"
+          >
+            <ul
+              class="flex flex-wrap font-medium text-center gap-4 list-none"
+              id="myTab"
+              data-tabs-toggle="#myTabContent"
+              role="tablist"
+            >
+              <li class="mr-2 dark:text-white" role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 text-goldenrod dark:text-blue-700 dark:text-white border-none bg-transparent text-lg underline-offset-[22px] underline decoration-4 underline-solid underline-goldenrod dark:underline-blue-700"
+                  id="verbs-tab"
+                  data-tabs-target="#verbs"
+                  type="button"
+                  role="tab"
+                  aria-controls="verbs"
+                  aria-selected="false"
+                >
+                  Verbs
+                </button>
+              </li>
+              <li class="mr-2" role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 dark:text-white border-none bg-transparent text-lg"
+                  id="tenses-tab"
+                  data-tabs-target="#tenses"
+                  type="button"
+                  role="tab"
+                  aria-controls="tenses"
+                  aria-selected="false"
+                >
+                  Tenses
+                </button>
+              </li>
+
+              <li role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 dark:text-white border-none bg-transparent text-lg"
+                  id="pronouns-tab"
+                  data-tabs-target="#pronouns"
+                  type="button"
+                  role="tab"
+                  aria-controls="pronouns"
+                  aria-selected="false"
+                >
+                  Pronouns
+                </button>
+              </li>
+              <li role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 dark:text-white border-none bg-transparent text-lg"
+                  id="questions-tab"
+                  data-tabs-target="#questions"
+                  type="button"
+                  role="tab"
+                  aria-controls="questions"
+                  aria-selected="false"
+                >
+                  Questions
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div id="my_progress_selection"></div>
+          <div id="myTabContent">
+            <div
+              class="p-4 rounded-lg grid"
+              id="verbs"
+              role="tabpanel"
+              aria-labelledby="verbs-tab"
+            >
+              <p
+                class="text-2xl text-gray-500 dark:text-gray-400 justify-self-center m-1"
+              >
+                Verbs
+              </p>
+              <table
+                class="min-w-full rounded text-center font-light bg-white dark:bg-gray-900 dark:text-gray-100 my-4 p-2 border-solid border-[1px] border-[#9c9c9c]"
+                id="my_progress_table"
+              >
+                <thead class="font-medium dark:border-neutral-500">
+                  <tr>
+                    <th class="py-2" scope="colgroup">verbs</th>
+                    <th class="py-2" scope="colgroup">correct</th>
+                    <th class="py-2" scope="colgroup">incorrect</th>
+                    <th class="py-2" scope="colgroup">total</th>
+                    <th class="py-2" scope="colgroup">accuracy</th>
+                  </tr>
+                </thead>
+                <tbody id="my_progress_table_body"></tbody>
+              </table>
+            </div>
+            <div
+              class="hidden p-4 rounded-lg grid"
+              id="tenses"
+              role="tabpanel"
+              aria-labelledby="tenses-tab"
+            >
+              <p
+                class="text-2xl text-gray-500 dark:text-gray-400 justify-self-center m-1"
+              >
+                Tenses
+              </p>
+            </div>
+
+            <div
+              class="hidden p-4 rounded-lg grid"
+              id="pronouns"
+              role="tabpanel"
+              aria-labelledby="pronouns-tab"
+            >
+              <p
+                class="text-2xl text-gray-500 dark:text-gray-400 justify-self-center m-1"
+              >
+                Pronouns
+              </p>
+            </div>
+            <div
+              class="hidden p-4 rounded-lg grid"
+              id="questions"
+              role="tabpanel"
+              aria-labelledby="questions-tab"
+            >
+              <p
+                class="text-2xl text-gray-500 dark:text-gray-400 justify-self-center m-1"
+              >
+                Questions
+              </p>
+            </div>
+          </div>
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="error_analysis"
+          class="screen text-center bg-white dark:bg-gray-700 h-screen dark:text-white"
+        >
+          Error Analysis
+        </div>
+        <!--Shop screen-->
+        <div
+          id="shop"
+          class="screen bg-white h-screen dark:bg-gray-700 dark:text-white"
+        >
+          <div class="grid">
+            <h3
+              class="font-semibold m-2 text-xl font-semibold dark:text-white justify-self-center uppercase"
+            >
+              Shop
+            </h3>
+            <div
+              class="px-2 text-gray-700 mt-1 justify-self-center max-w-lg text-lg grid"
+            >
+              Use your coins to buy avatars , power-ups and themes
+              <p
+                class="text-base flex justify-center font-semibold my-2 justify-self-center w-1/2 text-black dark:text-gray-100 m-0"
+              >
+                You have
+                <span
+                  class="text-goldenrod dark:text-blue-700 mx-2 justify-self-center"
+                  >25</span
+                >
+                coins
+              </p>
+            </div>
+          </div>
+          <div
+            class="mb-4 border-solid border-0 border-b border-gray-400 dark:border-gray-100"
+          >
+            <ul
+              class="flex flex-wrap font-medium text-center gap-4 list-none"
+              id="myTab"
+              data-tabs-toggle="#myTabContent"
+              role="tablist"
+            >
+              <li class="mr-2 dark:text-white" role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 text-goldenrod dark:text-blue-700 dark:text-white border-none bg-transparent text-lg underline-offset-[22px] underline decoration-4 underline-solid underline-goldenrod dark:underline-blue-700"
+                  id="avatars-tab"
+                  data-tabs-target="#avatars"
+                  type="button"
+                  role="tab"
+                  aria-controls="profile"
+                  aria-selected="false"
+                >
+                  Avatars
+                </button>
+              </li>
+              <li class="mr-2" role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 dark:text-white border-none bg-transparent text-lg"
+                  id="powerups-tab"
+                  data-tabs-target="#powerups"
+                  type="button"
+                  role="tab"
+                  aria-controls="powerups"
+                  aria-selected="false"
+                >
+                  Power-ups
+                </button>
+              </li>
+
+              <li role="presentation">
+                <button
+                  class="hover:text-goldenrod font-medium dark:hover:text-blue-700 dark:text-white border-none bg-transparent text-lg"
+                  id="themes-tab"
+                  data-tabs-target="#themes"
+                  type="button"
+                  role="tab"
+                  aria-controls="themes"
+                  aria-selected="false"
+                >
+                  Themes
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div id="myTabContent">
+            <div
+              class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+              id="avatars"
+              role="tabpanel"
+              aria-labelledby="avatars-tab"
+            >
+              <p class="text-sm text-gray-500 dark:text-gray-400">avatars</p>
+            </div>
+            <div
+              class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+              id="powerups"
+              role="tabpanel"
+              aria-labelledby="powerups-tab"
+            >
+              <p class="text-sm text-gray-500 dark:text-gray-400">powerups</p>
+            </div>
+
+            <div
+              class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
+              id="themes"
+              role="tabpanel"
+              aria-labelledby="themes-tab"
+            >
+              <p class="text-sm text-gray-500 dark:text-gray-400">Themes</p>
+            </div>
+          </div>
+
+          <div
+            id="footer"
+            class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+          >
+            <div
+              class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+            >
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2main_menu()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Home</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2shop()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                  />
+                  <path
+                    d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Shop</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2settings()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Settings</span
+                >
+              </button>
+              <button
+                type="button"
+                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                onclick="go2profile()"
+              >
+                <svg
+                  class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                  />
+                </svg>
+                <span
+                  class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                  >Profile</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--End of Shop-->
+        <!--Start of profile screen-->
+        <div
+          id="profile"
+          class="screen text-center bg-white dark:bg-gray-700 dark:text-white h-screen"
+        >
+          <div class="grid w-full gap-4 rounded-sm dark:text-white">
+            <div class="grid bg-white shadow-sm">
+              <div class="grid h-fit bg-goldenrod dark:bg-blue-700">
+                <div
+                  class="relative top-1/2 z-10 block w-fit place-self-center"
+                >
+                  <img
+                    alt="avatar"
+                    src="./assets/img/default.png"
+                    class="h-36 w-36 rounded-full border-[12px] border-solid border-white dark:border-gray-700"
+                  />
+
+                  <form
+                    enctype="multipart/form-data"
+                    class="profile-selector absolute bottom-0 -right-1 flex h-10 w-10 flex-col rounded-full bg-white"
+                    id="profile_form"
+                  >
+                    <input
+                      class="h-full w-full opacity-0"
+                      type="file"
+                      name="upload"
+                      id="profile_form_upload"
+                    />
+                  </form>
+                </div>
+                <div
+                  class="relative grid md:h-72 h-96 w-full bg-white dark:bg-gray-700"
+                >
+                  <div class="gap-4 self-end font-semibold grid">
+                    <h3 class="font-semibold text-3xl">username</h3>
+                    <div
+                      class="flex justify-between items-center md:w-1/2 w-3/4 gap-2 justify-self-center flex-col md:flex-row"
+                    >
+                      <input
+                        type="text"
+                        name="username"
+                        class="border text-lg border-gray-300 px-2 mt-2 md:mt-0 placeholder:text-lg text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block md:w-1/2 w-full h-11 focus:outline-goldenrod dark:focus:outline-blue-600"
+                        placeholder="enter the new username"
+                        required=""
+                      />
+                      <button
+                        class="bg-goldenrod text-lg flex items-center justify-center dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold py-1 px-2 w-full md:w-1/2 rounded-lg h-12"
+                      >
+                        update username
+                      </button>
+                    </div>
+                    <div class="flex md:w-1/2 justify-self-center w-3/4 mt-3">
+                      <button
+                        class="bg-goldenrod text-lg flex items-center justify-center dark:bg-blue-700 dark:hover:bg-blue-700 text-white font-semibold py-1 px-2 w-full m rounded-lg h-12 justify-self-center"
+                        onclick="go2my_progress()"
+                      >
+                        Go to perfomances
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              id="footer"
+              class="fixed bottom-0 left-0 z-20 w-full h-16 bg-white border-t border-gray-200 dark:border-gray-600 shadow dark:bg-gray-700"
+            >
+              <div
+                class="grid h-full lg:max-w-[70%] grid-cols-4 mx-auto font-medium"
+              >
+                <button
+                  type="button"
+                  class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                  onclick="go2main_menu()"
+                >
+                  <svg
+                    class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                    />
+                  </svg>
+                  <span
+                    class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                    >Home</span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                  onclick="go2shop()"
+                >
+                  <svg
+                    class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"
+                    />
+                    <path
+                      d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"
+                    />
+                  </svg>
+                  <span
+                    class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                    >Shop</span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                  onclick="go2settings()"
+                >
+                  <svg
+                    class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 12.25V1m0 11.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M4 19v-2.25m6-13.5V1m0 2.25a2.25 2.25 0 0 0 0 4.5m0-4.5a2.25 2.25 0 0 1 0 4.5M10 19V7.75m6 4.5V1m0 11.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM16 19v-2"
+                    />
+                  </svg>
+                  <span
+                    class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                    >Settings</span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group bg-inherit dark:border-gray-600 dark:bg-inherit"
+                  onclick="go2profile()"
+                >
+                  <svg
+                    class="w-5 h-5 mb-2 text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"
+                    />
+                  </svg>
+                  <span
+                    class="text-sm text-black group-hover:text-goldenrod dark:group-hover:text-blue-600 dark:text-white"
+                    >Profile</span
+                  >
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--End of profile-->
+        <div
+          id="streak_calendar"
+          class="screen text-center bg-yellow-100 h-screen"
+        >
+          Streak Calendar
+        </div>
+        <div id="contact" class="screen text-center bg-stone-100 h-screen">
+          Contact Us
+        </div>
+
+        <!--          End of middle section-->
+      </div>
+      <div id="left_ads_section" class="">
+        Ads
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1461464026864680"
+          crossorigin="anonymous"
+        ></script>
+        <!-- alif-verbs-vertical -->
+        <ins
+          class="adsbygoogle"
+          style="display: block"
+          data-ad-client="ca-pub-1461464026864680"
+          data-ad-slot="5100857947"
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        ></ins>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+
+    <!--      End of app screens-->
+
+    <div id="ad_space2" class="">
+      <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1461464026864680"
+        crossorigin="anonymous"
+      ></script>
+      <!-- alif-verbs-vertical -->
+      <ins
+        class="adsbygoogle"
+        style="display: block"
+        data-ad-client="ca-pub-1461464026864680"
+        data-ad-slot="5100857947"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      ></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <!-- End your project here-->
+  </body>
+  <!-- Tailwind Elements JS -->
+  <script
+    type="text/javascript"
+    src="assets/js/vendor/tw-elements.umd.min.js"
+  ></script>
+  <!-- Custom scripts -->
+  <script type="text/javascript"></script>
+  <script type="text/javascript"></script>
+
+  <!-- For PWA implementation -->
+  <!-- </div> -->
+  <script src="assets/js/pwa_main.js"></script>
+</html>
