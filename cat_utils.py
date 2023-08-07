@@ -8,6 +8,7 @@ import hashlib
 from itertools import groupby
 from difflib import SequenceMatcher
 import copy
+import numpy as np
 
 sys.path.append("code_utils")
 import web_lib
@@ -36,6 +37,15 @@ def cos_sim(vector1,vector2):
   if len(vector1)==0 or len(vector2)==0: return 0
   result = 1 - spatial.distance.cosine(vector1, vector2)
   return result
+
+def get_chunk_vector(chunk,wv_model): #get a list of vectors from a space separated chunk of text
+  vec_list0=[]
+  split0=chunk.split(" ")
+  for token0 in split0:
+    try: tok_vec0=wv_model.wv[token0]
+    except: tok_vec0=np.zeros(wv_model.vector_size,dtype=np.float32) #np.zeros(wv_model.vector_size)
+    vec_list0.append(tok_vec0)
+  return np.array(vec_list0)
 
   
 
