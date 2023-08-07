@@ -52,6 +52,7 @@ def get_chunk_vector(chunk,wv_model): #get a list of vectors from a space separa
 #functions for extracting features from raw features
 def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should be "outcome" in next run
   special_tokens_list=ft_params.get("token_list",[])
+  src_item_list=ft_params.get("src_item_list",[])
   include_src_wv=ft_params.get("include_src_wv",False)
   include_trg_wv=ft_params.get("include_trg_wv",False)
   include_context_wv=ft_params.get("include_context_wv",False)
@@ -66,6 +67,7 @@ def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should b
   include_next_oh=ft_params.get("include_next_oh",False)
   include_trg_first_oh=ft_params.get("include_trg_first_oh",False)
   include_trg_last_oh=ft_params.get("include_trg_last_oh",False)
+
 
   label_list=[data_dict[outcome_key]]
   feature_list=[]
@@ -87,6 +89,11 @@ def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should b
     if key0=="trg" and include_trg_wv==False: continue
     if key0=="context" and include_context_wv==False: continue
     feature_list.extend(val_vec.tolist())
+
+  if src_item_list!=[]:
+    src_oh=is_in_one_hot(data_dict["src"],src_item_list)
+    feature_list.extend(src_oh)
+
   if include_context_trg_sim:
     context_trg_sim0=-1
     if sum(temp_vec_dict["trg"])!=0 and sum(temp_vec_dict["context"])!=0: 
