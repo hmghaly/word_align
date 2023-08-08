@@ -729,6 +729,11 @@ def read_file_from_to(fpath,to_ratio=None,from_ratio=0,from_loc=None,to_loc=None
     if line0: yield line0
   fopen0.close()
 
+def get_first_line(fpath):
+  fopen0=open(fpath)
+  first_line=fopen0.readline()
+  fopen0.close()
+  return first_line
 
 def get_last_line(fpath,chunk_size=4000):
   if not os.path.exists(fpath): return None
