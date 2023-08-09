@@ -152,17 +152,18 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
     actual_repl_dict[src_span0]=repl_trg0
     actual_repl_span_list.append((repl_src0,repl_trg0,src_span0))
   p_ft_dict_list=[]
-  used_span_dict={}
+  used_span_trg_dict={}
   for repl_src0,trg_repl_dict0,span0 in possible_repl_list:
     #p_key=(repl_src0,span0)
     actual_trg_repl0=actual_repl_dict.get(span0)
     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
     temp_ft_dict["src"]=repl_src0
     temp_ft_dict["span"]=span0
-    used_span_dict[span0]=True
+    
     #context0=temp_ft_dict.get("context","")
     trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
     for trg_repl0,freq0 in trg_repl_dict0.items():
+      used_span_trg_dict[(span0,trg_repl0)]=True
       temp_ft_dict1=copy.deepcopy(temp_ft_dict)
       temp_ft_dict1["trg"]=trg_repl0
       temp_ft_dict1["freq"]=freq0
@@ -174,12 +175,12 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
   if trg_tokens!=[]: #going over unprocessed actual edits - to get more positive instances
     for repl_src0,repl_trg0,repl_span0 in actual_repl_span_list:
       #print("????",repl_src0,repl_trg0,repl_span0)
-      if used_span_dict.get(repl_span0,False): continue
+      if used_span_trg_dict.get((repl_span0,repl_trg0),False): continue
       if repl_src0=="" or repl_trg0=="": continue
       if repl_src0.lower()== repl_trg0.lower(): continue
       if repl_src0[0].isdigit() or repl_trg0[0].isdigit(): continue
-      src_check=re.sub("[\d\w]","",repl_src0)
-      trg_check=re.sub("[\d\w]","",repl_trg0)
+      src_check=re.sub("[\d\W]","",repl_src0)
+      trg_check=re.sub("[\d\W]","",repl_trg0)
       if src_check=="" or trg_check=="": continue
       temp_ft_dict2=extract_context_ft(src_tokens,repl_span0,window_size=window_size,input_ft_dict={})
       temp_ft_dict2["src"]=repl_src0
