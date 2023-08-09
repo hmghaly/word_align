@@ -179,13 +179,13 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
       src_check=re.sub("[\d\w]","",repl_src0)
       trg_check=re.sub("[\d\w]","",repl_trg0)
       if src_check=="" or trg_check=="": continue
-      temp_ft_dict=extract_context_ft(repl_src0.split(" "),repl_span0,window_size=window_size)
-      temp_ft_dict["src"]=repl_src0
-      temp_ft_dict["trg"]=repl_trg0
-      temp_ft_dict["span"]=repl_span0
-      temp_ft_dict["freq"]=0
-      temp_ft_dict["outcome"]=1
-      final_repl_list.append(temp_ft_dict)
+      temp_ft_dict2=extract_context_ft(src_tokens,repl_span0,window_size=window_size)
+      temp_ft_dict2["src"]=repl_src0
+      temp_ft_dict2["trg"]=repl_trg0
+      temp_ft_dict2["span"]=repl_span0
+      temp_ft_dict2["freq"]=0
+      temp_ft_dict2["outcome"]=1
+      final_repl_list.append(temp_ft_dict2)
 
   return final_repl_list
 
