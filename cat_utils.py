@@ -586,12 +586,13 @@ def get_corr_freq_dict(file_gen): #iterting file lines, each line is json dict, 
   return corr_dict0
   # items=list(corr_dict.items())
   # items.sort(key=lambda x:-sum(x[1].values()))
-def filter_freq_dict(freq_dict,min_freq=2):
+def filter_freq_dict(freq_dict,min_freq=2,exclude_casing=True):
   new_freq_dict={}
   for key,val_dict in freq_dict.items():
     temp_val_dict={}
     for sub_key,freq in val_dict.items():
-      if freq<min_freq: continue
+      if min_freq!=None and freq<min_freq: continue
+      if exclude_casing and key.lower()==sub_key.lower(): continue
       temp_val_dict[sub_key]=freq
     if temp_val_dict!={}: new_freq_dict[key]=temp_val_dict
   return new_freq_dict
