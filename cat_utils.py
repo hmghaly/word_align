@@ -157,9 +157,10 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
     actual_trg_repl0=actual_repl_dict.get(span0)
     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
     temp_ft_dict["src"]=repl_src0
+    temp_ft_dict["span"]=span0
     context0=temp_ft_dict.get("context","")
     trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
-    
+
     #context_words_lower0=[v.lower() for v in context0.split(" ") if v!="|"]
 
     # print("repl_src0,trg_repl_dict0,span0",repl_src0,trg_repl_dict0,span0)
