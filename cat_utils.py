@@ -135,7 +135,7 @@ def is_in_one_hot(item0,list0):
   return one_hot0
 
 
-def extract_repl_raw_features_labels(src_tokens,trg_tokens,first_repl_dict,window_size=5): #check each possible replacement for context and other features
+def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5): #check each possible replacement for context and other features
   #src_tokens0,trg_tokens0=src_tokens,trg_tokens
   #possible_replacements=get_possible_replacements(src_tokens,first_repl_dict)
   final_repl_list=[]
@@ -147,18 +147,20 @@ def extract_repl_raw_features_labels(src_tokens,trg_tokens,first_repl_dict,windo
     if match_type=="equal": continue
     repl_src0=" ".join(repl_src_token0)
     repl_trg0=" ".join(repl_trg_token0)
-    a_key=(repl_src0,src_span0) #actual replacement key
-    actual_repl_dict[a_key]=repl_trg0
+    #a_key=(repl_src0,src_span0) #actual replacement key
+    actual_repl_dict[src_span0]=repl_trg0
 
   p_ft_dict_list=[]
   for repl_src0,trg_repl_dict0,span0 in possible_repl_list:
     #if repl_src0!="UK": continue
-    p_key=(repl_src0,span0)
-    actual_trg_repl0=actual_repl_dict.get(p_key)
+    #p_key=(repl_src0,span0)
+    actual_trg_repl0=actual_repl_dict.get(span0)
     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
     temp_ft_dict["src"]=repl_src0
     context0=temp_ft_dict.get("context","")
-    context_words_lower0=[v.lower() for v in context0.split(" ") if v!="|"]
+    trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
+    
+    #context_words_lower0=[v.lower() for v in context0.split(" ") if v!="|"]
 
     # print("repl_src0,trg_repl_dict0,span0",repl_src0,trg_repl_dict0,span0)
     # print(temp_ft_dict)
@@ -167,17 +169,65 @@ def extract_repl_raw_features_labels(src_tokens,trg_tokens,first_repl_dict,windo
       temp_ft_dict1=copy.deepcopy(temp_ft_dict)
       temp_ft_dict1["trg"]=trg_repl0
       temp_ft_dict1["freq"]=freq0
-      outcome=0
-      is_in_context=0
+      outcome=-1
+      #is_in_context=0
+      if trg_repl0==repl_src0: outcome=0
       if trg_repl0==actual_trg_repl0: outcome=1
-
-      repl_trg_tokens_lower=trg_repl0.lower().split()
-      if general.is_in(repl_trg_tokens_lower,context_words_lower0): is_in_context=1
       temp_ft_dict1["outcome"]=outcome
-      temp_ft_dict1["is_in_context"]=is_in_context
+
+      # repl_trg_tokens_lower=trg_repl0.lower().split()
+      # if general.is_in(repl_trg_tokens_lower,context_words_lower0): is_in_context=1
+      
+      # temp_ft_dict1["is_in_context"]=is_in_context
       #print(temp_ft_dict1)
       final_repl_list.append(temp_ft_dict1)
   return final_repl_list
+
+
+
+# def extract_repl_raw_features_labels_OLD(src_tokens,trg_tokens,first_repl_dict,window_size=5): #check each possible replacement for context and other features
+#   #src_tokens0,trg_tokens0=src_tokens,trg_tokens
+#   #possible_replacements=get_possible_replacements(src_tokens,first_repl_dict)
+#   final_repl_list=[]
+#   edit_list=compare_repl(src_tokens,trg_tokens)
+#   possible_repl_list=get_possible_replacements(src_tokens,first_repl_dict)
+#   actual_repl_dict={}
+#   for el in edit_list:
+#     match_type,repl_src_token0,repl_trg_token0,src_span0,trg_span0=el
+#     if match_type=="equal": continue
+#     repl_src0=" ".join(repl_src_token0)
+#     repl_trg0=" ".join(repl_trg_token0)
+#     a_key=(repl_src0,src_span0) #actual replacement key
+#     actual_repl_dict[a_key]=repl_trg0
+
+#   p_ft_dict_list=[]
+#   for repl_src0,trg_repl_dict0,span0 in possible_repl_list:
+#     #if repl_src0!="UK": continue
+#     p_key=(repl_src0,span0)
+#     actual_trg_repl0=actual_repl_dict.get(p_key)
+#     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
+#     temp_ft_dict["src"]=repl_src0
+#     context0=temp_ft_dict.get("context","")
+#     context_words_lower0=[v.lower() for v in context0.split(" ") if v!="|"]
+
+#     # print("repl_src0,trg_repl_dict0,span0",repl_src0,trg_repl_dict0,span0)
+#     # print(temp_ft_dict)
+#     # print("actual_trg_repl0",actual_trg_repl0)
+#     for trg_repl0,freq0 in trg_repl_dict0.items():
+#       temp_ft_dict1=copy.deepcopy(temp_ft_dict)
+#       temp_ft_dict1["trg"]=trg_repl0
+#       temp_ft_dict1["freq"]=freq0
+#       outcome=0
+#       is_in_context=0
+#       if trg_repl0==actual_trg_repl0: outcome=1
+
+#       repl_trg_tokens_lower=trg_repl0.lower().split()
+#       if general.is_in(repl_trg_tokens_lower,context_words_lower0): is_in_context=1
+#       temp_ft_dict1["outcome"]=outcome
+#       temp_ft_dict1["is_in_context"]=is_in_context
+#       #print(temp_ft_dict1)
+#       final_repl_list.append(temp_ft_dict1)
+#   return final_repl_list
 
 def extract_context_ft(src_tokens,src_repl_span,window_size=5,input_ft_dict={}):
   #temp_ft_dict={}
@@ -190,12 +240,12 @@ def extract_context_ft(src_tokens,src_repl_span,window_size=5,input_ft_dict={}):
   #full_window=src_tokens0[max(0,x0-window_size):x1+window_size+1]
 
   full_window=src_tokens[max(0,x0-window_size):x0]+["|"]+ src_tokens[x1+1:x1+window_size+1]
-  if x0>0: prev_token=src_tokens[x0-1]
-  if x1<len(src_tokens)-1: next_token=src_tokens[x1+1]
+  # if x0>0: prev_token=src_tokens[x0-1]
+  # if x1<len(src_tokens)-1: next_token=src_tokens[x1+1]
 
   input_ft_dict["context"]=" ".join(full_window)
-  input_ft_dict["prev_token"]=prev_token
-  input_ft_dict["next_token"]=next_token
+  # input_ft_dict["prev_token"]=prev_token
+  # input_ft_dict["next_token"]=next_token
   return input_ft_dict
 
 #==================================
