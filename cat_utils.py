@@ -184,7 +184,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
       temp_ft_dict["span"]=repl_span0
       temp_ft_dict["freq"]=0
       temp_ft_dict["outcome"]=1
-      final_repl_list.append(temp_ft_dict1)
+      final_repl_list.append(temp_ft_dict)
 
   return final_repl_list
 
