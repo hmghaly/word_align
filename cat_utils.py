@@ -173,13 +173,15 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
       final_repl_list.append(temp_ft_dict1)
   if trg_tokens!=[]: #going over unprocessed actual edits - to get more positive instances
     for repl_src0,repl_trg0,repl_span0 in actual_repl_span_list:
+      #print("????",repl_src0,repl_trg0,repl_span0)
       if used_span_dict.get(repl_span0,False): continue
       if repl_src0=="" or repl_trg0=="": continue
+      if repl_src0.lower()== repl_trg0.lower(): continue
       if repl_src0[0].isdigit() or repl_trg0[0].isdigit(): continue
       src_check=re.sub("[\d\w]","",repl_src0)
       trg_check=re.sub("[\d\w]","",repl_trg0)
       if src_check=="" or trg_check=="": continue
-      temp_ft_dict2=extract_context_ft(src_tokens,repl_span0,window_size=window_size)
+      temp_ft_dict2=extract_context_ft(src_tokens,repl_span0,window_size=window_size,input_ft_dict={})
       temp_ft_dict2["src"]=repl_src0
       temp_ft_dict2["trg"]=repl_trg0
       temp_ft_dict2["span"]=repl_span0
