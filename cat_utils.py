@@ -139,7 +139,9 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
   src_tokens=general.add_padding(src_tokens)
   trg_tokens=general.add_padding(trg_tokens)
   final_repl_list=[]
-  edit_list=compare_repl(src_tokens,trg_tokens)
+  if trg_tokens!=[]: edit_list=compare_repl(src_tokens,trg_tokens) #if we have both src and trg
+  else: edit_list=[] #if we have only src
+  
   possible_repl_list=get_possible_replacements(src_tokens,first_repl_dict)
   actual_repl_dict={}
   actual_repl_span_list=[]
