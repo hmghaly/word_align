@@ -142,6 +142,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
   edit_list=compare_repl(src_tokens,trg_tokens)
   possible_repl_list=get_possible_replacements(src_tokens,first_repl_dict)
   actual_repl_dict={}
+  actual_repl_span_list=[]
   for el in edit_list:
     match_type,repl_src_token0,repl_trg_token0,src_span0,trg_span0=el
     if match_type=="equal": continue
@@ -149,14 +150,17 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
     repl_trg0=" ".join(repl_trg_token0)
     #a_key=(repl_src0,src_span0) #actual replacement key
     actual_repl_dict[src_span0]=repl_trg0
+    actual_repl_span_list.append((repl_src0,repl_trg0,src_span0))
   p_ft_dict_list=[]
+  used_span_dict={}
   for repl_src0,trg_repl_dict0,span0 in possible_repl_list:
     #p_key=(repl_src0,span0)
     actual_trg_repl0=actual_repl_dict.get(span0)
     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
     temp_ft_dict["src"]=repl_src0
     temp_ft_dict["span"]=span0
-    context0=temp_ft_dict.get("context","")
+    used_span_dict[span0]=True
+    #context0=temp_ft_dict.get("context","")
     trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
     for trg_repl0,freq0 in trg_repl_dict0.items():
       temp_ft_dict1=copy.deepcopy(temp_ft_dict)
@@ -167,6 +171,21 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
       elif trg_repl0==actual_trg_repl0: outcome=1
       temp_ft_dict1["outcome"]=outcome
       final_repl_list.append(temp_ft_dict1)
+  if trg_tokens!=[]: #going over unprocessed actual edits - to get more positive instances
+    for repl_src0,repl_trg0,repl_span0 in actual_repl_span_list:
+      if used_span_dict.get(repl_span0,False): continue
+      if repl_src0[0].isdigit() or repl_src0[1].isdigit(): continue
+      src_check=re.sub("[\d\w]","",repl_src0)
+      trg_check=re.sub("[\d\w]","",repl_trg0)
+      if src_check=="" or trg_check=="": continue
+      temp_ft_dict=extract_context_ft(repl_src0,repl_span0,window_size=window_size)
+      temp_ft_dict["src"]=repl_src0
+      temp_ft_dict["trg"]=repl_trg0
+      temp_ft_dict["span"]=repl_span0
+      temp_ft_dict["freq"]=0
+      temp_ft_dict["outcome"]=1
+      final_repl_list.append(temp_ft_dict1)
+
   return final_repl_list
 
 
