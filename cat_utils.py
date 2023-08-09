@@ -136,8 +136,8 @@ def is_in_one_hot(item0,list0):
 
 
 def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5): #check each possible replacement for context and other features
-  #src_tokens0,trg_tokens0=src_tokens,trg_tokens
-  #possible_replacements=get_possible_replacements(src_tokens,first_repl_dict)
+  src_tokens=general.add_padding(src_tokens)
+  trg_tokens=general.add_padding(trg_tokens)
   final_repl_list=[]
   edit_list=compare_repl(src_tokens,trg_tokens)
   possible_repl_list=get_possible_replacements(src_tokens,first_repl_dict)
@@ -149,10 +149,8 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
     repl_trg0=" ".join(repl_trg_token0)
     #a_key=(repl_src0,src_span0) #actual replacement key
     actual_repl_dict[src_span0]=repl_trg0
-
   p_ft_dict_list=[]
   for repl_src0,trg_repl_dict0,span0 in possible_repl_list:
-    #if repl_src0!="UK": continue
     #p_key=(repl_src0,span0)
     actual_trg_repl0=actual_repl_dict.get(span0)
     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
@@ -160,29 +158,17 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
     temp_ft_dict["span"]=span0
     context0=temp_ft_dict.get("context","")
     trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
-
-    #context_words_lower0=[v.lower() for v in context0.split(" ") if v!="|"]
-
-    # print("repl_src0,trg_repl_dict0,span0",repl_src0,trg_repl_dict0,span0)
-    # print(temp_ft_dict)
-    # print("actual_trg_repl0",actual_trg_repl0)
     for trg_repl0,freq0 in trg_repl_dict0.items():
       temp_ft_dict1=copy.deepcopy(temp_ft_dict)
       temp_ft_dict1["trg"]=trg_repl0
       temp_ft_dict1["freq"]=freq0
       outcome=-1
-      #is_in_context=0
       if trg_repl0==repl_src0: outcome=0
-      if trg_repl0==actual_trg_repl0: outcome=1
+      elif trg_repl0==actual_trg_repl0: outcome=1
       temp_ft_dict1["outcome"]=outcome
-
-      # repl_trg_tokens_lower=trg_repl0.lower().split()
-      # if general.is_in(repl_trg_tokens_lower,context_words_lower0): is_in_context=1
-      
-      # temp_ft_dict1["is_in_context"]=is_in_context
-      #print(temp_ft_dict1)
       final_repl_list.append(temp_ft_dict1)
   return final_repl_list
+
 
 
 
