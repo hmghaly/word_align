@@ -174,7 +174,8 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
   if trg_tokens!=[]: #going over unprocessed actual edits - to get more positive instances
     for repl_src0,repl_trg0,repl_span0 in actual_repl_span_list:
       if used_span_dict.get(repl_span0,False): continue
-      if repl_src0[0].isdigit() or repl_src0[1].isdigit(): continue
+      if repl_src0=="" or repl_trg0=="": continue
+      if repl_src0[0].isdigit() or repl_trg0[0].isdigit(): continue
       src_check=re.sub("[\d\w]","",repl_src0)
       trg_check=re.sub("[\d\w]","",repl_trg0)
       if src_check=="" or trg_check=="": continue
