@@ -38,94 +38,147 @@ def cos_sim(vector1,vector2):
   result = 1 - spatial.distance.cosine(vector1, vector2)
   return result
 
-def get_chunk_vector(chunk,wv_model): #get a list of vectors from a space separated chunk of text
+
+def pad_list(list1,list_N): #trim list to a certain size, and pad it with empty strings if larger than this size
+  list1 = (list1 + list_N * [''])[:list_N]
+  return list1
+
+def get_chunk_vector(chunk_tokens,wv_model):
   vec_list0=[]
-  split0=chunk.split(" ")
-  for token0 in split0:
-    try: tok_vec0=wv_model.wv[token0]
-    except: tok_vec0=np.zeros(wv_model.vector_size,dtype=np.float32) #np.zeros(wv_model.vector_size)
+  if wv_model==None or wv_model=={}: return [] #np.array(vec_list0)
+  #vec_size0=wv_model.vector_size
+  empty_vec0=[0.]*wv_model.vector_size
+  #split0=chunk.split(" ")
+  for token0 in chunk_tokens:
+    if token0=="": tok_vec0= empty_vec0 #np.zeros(wv_model.vector_size,dtype=np.float32) #np.zeros(wv_model.vector_size)
+    else:
+      try: tok_vec0=wv_model.wv[token0].tolist()
+      except: tok_vec0= empty_vec0 #[0.]* #np.zeros(wv_model.vector_size,dtype=np.float32) #np.zeros(wv_model.vector_size)
     vec_list0.append(tok_vec0)
-  return np.array(vec_list0)
+  return vec_list0 #np.array(vec_list0)
+
+def extract_ft_lb(input_dict,params={}): #extract features and labels from an input dict with context, src, trg, and outcome
+  chunk_size0=params.get("chunk_size",5)
+  cur_wv_model0=params.get("wv_model")
+  context0=input_dict["context"]
+  src0=input_dict["src"]
+  trg0=input_dict["trg"]
+  outcome0=input_dict["outcome"]
+  context_split=context0.split("|")
+  context_pre_str,context_after_str=context_split
+  context_pre_tokens=context_pre_str.strip().split(" ")
+  context_after_tokens=context_after_str.strip().split(" ")
+  src_tokens0=src0.split(" ")
+  trg_tokens0=trg0.split(" ")
+  context_pre_tokens=list(reversed(context_pre_tokens)) #reverse to make sure previous words are always in the same location
+  src_tokens0=pad_list(src_tokens0,chunk_size0)
+  trg_tokens0=pad_list(trg_tokens0,chunk_size0)
+  context_pre_tokens=pad_list(context_pre_tokens,chunk_size0)
+  context_after_tokens=pad_list(context_after_tokens,chunk_size0)
+  # print("src_tokens0",src_tokens0)
+  # print("trg_tokens0",trg_tokens0)
+  # print("context_pre_tokens",context_pre_tokens)
+  # print("context_after_tokens",context_after_tokens)
+  combined_vec=[]
+  for item in [context_pre_tokens,context_after_tokens,src_tokens0,trg_tokens0]:
+    vec0=get_chunk_vector(item,cur_wv_model0)
+    combined_vec.extend(vec0)
+    vec_array=np.array(vec0)
+  return np.array(combined_vec), outcome0
+  
+
+
+# def get_chunk_vector(chunk,wv_model): #get a list of vectors from a space separated chunk of text
+#   vec_list0=[]
+#   split0=chunk.split(" ")
+#   for token0 in split0:
+#     try: tok_vec0=wv_model.wv[token0]
+#     except: tok_vec0=np.zeros(wv_model.vector_size,dtype=np.float32) #np.zeros(wv_model.vector_size)
+#     vec_list0.append(tok_vec0)
+#   return np.array(vec_list0)
 
   
 
-#functions for extracting features from raw features
-def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should be "outcome" in next run
-  special_tokens_list=ft_params.get("token_list",[])
-  src_item_list=ft_params.get("src_item_list",[])
-  include_src_wv=ft_params.get("include_src_wv",False)
-  include_trg_wv=ft_params.get("include_trg_wv",False)
-  include_context_wv=ft_params.get("include_context_wv",False)
+# #functions for extracting features from raw features
+# def dict2ft_lb(data_dict,wv_model,ft_params={},outcome_key="outcome"): #should be "outcome" in next run
+#   special_tokens_list=ft_params.get("token_list",[])
+#   src_item_list=ft_params.get("src_item_list",[])
+#   include_src_wv=ft_params.get("include_src_wv",False)
+#   include_trg_wv=ft_params.get("include_trg_wv",False)
+#   include_context_wv=ft_params.get("include_context_wv",False)
   
-  include_context_trg_sim=ft_params.get("include_context_trg_sim",False)
+#   include_context_trg_sim=ft_params.get("include_context_trg_sim",False)
 
-  include_freq=ft_params.get("include_freq",False)
-  include_is_in_context=ft_params.get("include_is_in_context",False)
-  include_paren_check=ft_params.get("include_paren_check",False) #if surrounded by parentheses
+#   include_freq=ft_params.get("include_freq",False)
+#   include_is_in_context=ft_params.get("include_is_in_context",False)
+#   include_paren_check=ft_params.get("include_paren_check",False) #if surrounded by parentheses
 
-  include_prev_oh=ft_params.get("include_prev_oh",False)
-  include_next_oh=ft_params.get("include_next_oh",False)
-  include_trg_first_oh=ft_params.get("include_trg_first_oh",False)
-  include_trg_last_oh=ft_params.get("include_trg_last_oh",False)
+#   include_prev_oh=ft_params.get("include_prev_oh",False)
+#   include_next_oh=ft_params.get("include_next_oh",False)
+#   include_trg_first_oh=ft_params.get("include_trg_first_oh",False)
+#   include_trg_last_oh=ft_params.get("include_trg_last_oh",False)
 
 
-  label_list=[data_dict[outcome_key]]
-  feature_list=[]
+#   label_list=[data_dict[outcome_key]]
+#   feature_list=[]
 
-  main_keys=["src","trg","context"]
-  temp_vec_dict={}
-  for key0 in main_keys:
-    if key0=="src" and include_src_wv==False: continue
-    if key0=="trg" and include_trg_wv==False and include_context_trg_sim==False: continue
-    if key0=="context" and include_context_wv==False and include_context_trg_sim==False: continue
+#   main_keys=["src","trg","context"]
+#   temp_vec_dict={}
+#   for key0 in main_keys:
+#     if key0=="src" and include_src_wv==False: continue
+#     if key0=="trg" and include_trg_wv==False and include_context_trg_sim==False: continue
+#     if key0=="context" and include_context_wv==False and include_context_trg_sim==False: continue
 
-    val0=data_dict[key0]
-    val_tokens=val0.split(" ")
-    val_tokens=[v for v in val_tokens if not v.lower().strip("_") in special_tokens_list]
-    try: val_vec=wv_model.wv.get_mean_vector(val_tokens)#.tolist()
-    except: val_vec=wv_model.wv.get_mean_vector([""])#.tolist()
-    temp_vec_dict[key0]=val_vec
+#     val0=data_dict[key0]
+#     val_tokens=val0.split(" ")
+#     val_tokens=[v for v in val_tokens if not v.lower().strip("_") in special_tokens_list]
+#     try: val_vec=wv_model.wv.get_mean_vector(val_tokens)#.tolist()
+#     except: val_vec=wv_model.wv.get_mean_vector([""])#.tolist()
+#     temp_vec_dict[key0]=val_vec
 
-    if key0=="trg" and include_trg_wv==False: continue
-    if key0=="context" and include_context_wv==False: continue
-    feature_list.extend(val_vec.tolist())
+#     if key0=="trg" and include_trg_wv==False: continue
+#     if key0=="context" and include_context_wv==False: continue
+#     feature_list.extend(val_vec.tolist())
 
-  if src_item_list!=[]:
-    src_oh=is_in_one_hot(data_dict["src"],src_item_list)
-    feature_list.extend(src_oh)
+#   if src_item_list!=[]:
+#     src_oh=is_in_one_hot(data_dict["src"],src_item_list)
+#     feature_list.extend(src_oh)
 
-  if include_context_trg_sim:
-    context_trg_sim0=-1
-    if sum(temp_vec_dict["trg"])!=0 and sum(temp_vec_dict["context"])!=0: 
-      context_trg_sim0=cos_sim(temp_vec_dict["trg"],temp_vec_dict["context"])
-    feature_list.append(context_trg_sim0)
-  if include_freq: feature_list.append(float(data_dict["freq"]))
-  if include_is_in_context: feature_list.append(data_dict["is_in_context"])
+#   if include_context_trg_sim:
+#     context_trg_sim0=-1
+#     if sum(temp_vec_dict["trg"])!=0 and sum(temp_vec_dict["context"])!=0: 
+#       context_trg_sim0=cos_sim(temp_vec_dict["trg"],temp_vec_dict["context"])
+#     feature_list.append(context_trg_sim0)
+#   if include_freq: feature_list.append(float(data_dict["freq"]))
+#   if include_is_in_context: feature_list.append(data_dict["is_in_context"])
 
-  if include_paren_check:
-    paren_check0=0.
-    if data_dict["prev_token"].lower().strip("_")=="(" and data_dict["next_token"].lower().strip("_")==")":paren_check0=1.
-    feature_list.append(paren_check0)
+#   if include_paren_check:
+#     paren_check0=0.
+#     if data_dict["prev_token"].lower().strip("_")=="(" and data_dict["next_token"].lower().strip("_")==")":paren_check0=1.
+#     feature_list.append(paren_check0)
 
-  if include_prev_oh:
-    prev_oh=is_in_one_hot(data_dict["prev_token"].lower().strip("_"),special_tokens_list)
-    feature_list.extend(prev_oh)
+#   if include_prev_oh:
+#     prev_oh=is_in_one_hot(data_dict["prev_token"].lower().strip("_"),special_tokens_list)
+#     feature_list.extend(prev_oh)
 
-  if include_next_oh:
-    next_oh=is_in_one_hot(data_dict["next_token"].lower().strip("_"),special_tokens_list)
-    feature_list.extend(next_oh)
-  trg_split=data_dict["trg"].split(" ")
-  if include_trg_first_oh:
-    first_trg_word=trg_split[0].strip("_").lower()
-    first_trg_oh=is_in_one_hot(first_trg_word,special_tokens_list)
-    feature_list.extend(first_trg_oh)
+#   if include_next_oh:
+#     next_oh=is_in_one_hot(data_dict["next_token"].lower().strip("_"),special_tokens_list)
+#     feature_list.extend(next_oh)
+#   trg_split=data_dict["trg"].split(" ")
+#   if include_trg_first_oh:
+#     first_trg_word=trg_split[0].strip("_").lower()
+#     first_trg_oh=is_in_one_hot(first_trg_word,special_tokens_list)
+#     feature_list.extend(first_trg_oh)
 
-  if include_trg_last_oh:
-    last_trg_word=trg_split[-1].strip("_").lower()
-    last_trg_oh=is_in_one_hot(last_trg_word,special_tokens_list)
-    feature_list.extend(first_trg_oh)
+#   if include_trg_last_oh:
+#     last_trg_word=trg_split[-1].strip("_").lower()
+#     last_trg_oh=is_in_one_hot(last_trg_word,special_tokens_list)
+#     feature_list.extend(first_trg_oh)
 
-  return feature_list,label_list
+#   return feature_list,label_list
+
+
+
 
 def is_in_one_hot(item0,list0):
   one_hot0=[0.]*len(list0)
