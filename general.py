@@ -747,6 +747,24 @@ def get_last_line(fpath,chunk_size=4000):
   return last_line
 
 
+#iter functions - 10 August 2023
+def get_iter_chunks(iterator,chunk_size,min_i=None): #iterate certain chunk size over an iterable, with a limit min_i, excluding all iterations before
+  cur_chunk=[]
+  item_i=0
+  while True:
+    try: cur_item=next(iterator)
+    except StopIteration: cur_item=None
+    if min_i!=None and item_i<min_i:
+      item_i+=1  
+      continue
+    if cur_item!=None: cur_chunk.append(cur_item)
+    if len(cur_chunk)==chunk_size or cur_item==None:
+      yield cur_chunk
+      cur_chunk=[]
+    if cur_item==None: break
+    item_i+=1
+
+
 #OS functions
 def create_dir(dir_path):
     if not os.path.exists(dir_path):
