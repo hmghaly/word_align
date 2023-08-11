@@ -83,9 +83,9 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   for item in [context_pre_tokens,context_after_tokens,src_tokens0,trg_tokens0]:
     vec0=get_chunk_vector(item,cur_wv_model0)
     combined_vec.extend(vec0)
-    vec_array=np.array(vec0)
-  return np.array(combined_vec), outcome0
-  
+    #vec_array=np.array(vec0)
+  return np.array(combined_vec).ravel(), outcome0
+
 
 
 # def get_chunk_vector(chunk,wv_model): #get a list of vectors from a space separated chunk of text
