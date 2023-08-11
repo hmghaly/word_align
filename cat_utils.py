@@ -60,10 +60,14 @@ def get_chunk_vector(chunk_tokens,wv_model):
 def extract_ft_lb(input_dict,params={}): #extract features and labels from an input dict with context, src, trg, and outcome
   chunk_size0=params.get("chunk_size",5)
   cur_wv_model0=params.get("wv_model")
+  outcome_positive=params.get("outcome_positive",True)
   context0=input_dict["context"]
   src0=input_dict["src"]
   trg0=input_dict["trg"]
   outcome0=input_dict["outcome"]
+  if outcome_positive:
+  	if outcome0==0: outcome0=0.5
+  	elif outcome0==-1: outcome0=0
   context_split=context0.split("|")
   context_pre_str,context_after_str=context_split
   context_pre_tokens=context_pre_str.strip().split(" ")
