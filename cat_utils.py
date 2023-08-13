@@ -201,10 +201,10 @@ def is_valid_repl(src_repl_str0,trg_repl_str0,excluded_words=all_excluded):
   if src_check=="" or trg_check=="": return False
   src_repl_tokens0=src_repl_str0.split(" ")
   
-  src_check_tokens=[v for v in src_repl_tokens0 if not v.strip("_") in excluded_words and not is_website(v) and not is_un_symbol(v)]
+  src_check_tokens=[v for v in src_repl_tokens0 if not general.is_punct(v.strip("_")) in excluded_words and not is_website(v) and not is_un_symbol(v)]
   if src_check_tokens==[]: return False
   trg_repl_tokens0=trg_repl_str0.split(" ")
-  trg_check_tokens=[v for v in trg_repl_tokens0 if not v.strip("_") in excluded_words and not is_website(v) and not is_un_symbol(v)]
+  trg_check_tokens=[v for v in trg_repl_tokens0 if not general.is_punct(v.strip("_")) in excluded_words and not is_website(v) and not is_un_symbol(v)]
   if trg_check_tokens==[]: return False
   return True
 
@@ -238,9 +238,11 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
     temp_ft_dict["span"]=span0
     
     #context0=temp_ft_dict.get("context","")
+    trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
+    apply_null=True #null replacement 
     
-    if actual_trg_repl0==None: trg_repl_dict0[repl_src0]=1 #copy src into trg - null edit - freq irrelevant
-    else: trg_repl_dict0[repl_src0]=0
+    if actual_trg_repl0!=None: apply_null=False #trg_repl_dict0[repl_src0]=1 
+    
 
     for trg_repl0,freq0 in trg_repl_dict0.items():
       used_span_trg_dict[(span0,trg_repl0)]=True
@@ -248,7 +250,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
       temp_ft_dict1["trg"]=trg_repl0
       temp_ft_dict1["freq"]=freq0
       outcome=0
-      #if trg_repl0==repl_src0: outcome=0
+      if apply_null and trg_repl0==repl_src0: outcome=1
       if trg_repl0==actual_trg_repl0: outcome=1
       temp_ft_dict1["outcome"]=outcome
       final_repl_list.append(temp_ft_dict1)
