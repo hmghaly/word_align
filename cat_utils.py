@@ -393,8 +393,11 @@ def extract_context_ft(src_tokens,src_repl_span,window_size=5,input_ft_dict={}):
   prev_token,next_token="",""
   x0,x1=src_repl_span
   #full_window=src_tokens0[max(0,x0-window_size):x1+window_size+1]
+  prev_tokens=src_tokens[max(0,x0-window_size):x0]
+  next_tokens=src_tokens[x1+1:x1+window_size+1]
+  #prev_tokens=[v for v in prev_tokens if v.strip("_")]
 
-  full_window=src_tokens[max(0,x0-window_size):x0]+["|"]+ src_tokens[x1+1:x1+window_size+1]
+  full_window=prev_tokens+["|"]+ next_tokens
   # if x0>0: prev_token=src_tokens[x0-1]
   # if x1<len(src_tokens)-1: next_token=src_tokens[x1+1]
 
