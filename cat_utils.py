@@ -60,7 +60,7 @@ def get_chunk_vector(chunk_tokens,wv_model):
 def extract_ft_lb(input_dict,params={}): #extract features and labels from an input dict with context, src, trg, and outcome
   chunk_size0=params.get("chunk_size",5)
   cur_wv_model0=params.get("wv_model")
-  outcome_positive=params.get("outcome_positive",True)
+  outcome_positive=params.get("outcome_positive",False)
   context0=input_dict["context"]
   src0=input_dict["src"]
   trg0=input_dict["trg"]
@@ -270,7 +270,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
       final_repl_list.append(temp_ft_dict2)
 
   return final_repl_list
-  
+
 
 # def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5): #check each possible replacement for context and other features
 #   src_tokens=general.add_padding(src_tokens)
