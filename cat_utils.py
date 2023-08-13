@@ -199,13 +199,14 @@ def is_valid_repl(src_repl_str0,trg_repl_str0,excluded_words=all_excluded):
   src_check=re.sub("[\d\W]","",src_repl_str0)
   trg_check=re.sub("[\d\W]","",trg_repl_str0)
   if src_check=="" or trg_check=="": return False
-  src_repl_tokens0=src_repl_str0.split(" ")
-  
-  src_check_tokens=[v for v in src_repl_tokens0 if not general.is_punct(v.strip("_")) in excluded_words and not is_website(v) and not is_un_symbol(v)]
-  if src_check_tokens==[]: return False
-  trg_repl_tokens0=trg_repl_str0.split(" ")
-  trg_check_tokens=[v for v in trg_repl_tokens0 if not general.is_punct(v.strip("_")) in excluded_words and not is_website(v) and not is_un_symbol(v)]
-  if trg_check_tokens==[]: return False
+  if general.is_punct(src_repl_str0.strip("_")): return False
+  if general.is_punct(trg_repl_str0.strip("_")): return False
+  # src_repl_tokens0=src_repl_str0.split(" ")  
+  # src_check_tokens=[v for v in src_repl_tokens0 if not general.is_punct(v.strip("_")) in excluded_words and not is_website(v) and not is_un_symbol(v)]
+  # if src_check_tokens==[]: return False
+  # trg_repl_tokens0=trg_repl_str0.split(" ")
+  # trg_check_tokens=[v for v in trg_repl_tokens0 if not general.is_punct(v.strip("_")) in excluded_words and not is_website(v) and not is_un_symbol(v)]
+  # if trg_check_tokens==[]: return False
   return True
 
 
