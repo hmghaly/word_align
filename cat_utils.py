@@ -257,16 +257,10 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
       final_repl_list.append(temp_ft_dict1)
   if trg_tokens!=[]: #going over unprocessed actual edits - to get more positive instances
     for repl_src0,repl_trg0,repl_span0 in actual_repl_span_list:
-      #print("????",repl_src0,repl_trg0,repl_span0)
-      if used_span_trg_dict.get((repl_span0,repl_trg0),False): continue
+      used_check=used_span_trg_dict.get((repl_span0,repl_trg0),False)
+      if used_check==True: continue
       is_valid_repl_check=is_valid_repl(repl_src0,repl_trg0)
       if is_valid_repl_check==False: continue
-      # if repl_src0=="" or repl_trg0=="": continue
-      # if repl_src0.lower()== repl_trg0.lower(): continue
-      # if repl_src0[0].isdigit() or repl_trg0[0].isdigit(): continue
-      # src_check=re.sub("[\d\W]","",repl_src0)
-      # trg_check=re.sub("[\d\W]","",repl_trg0)
-      # if src_check=="" or trg_check=="": continue
       temp_ft_dict2=extract_context_ft(src_tokens,repl_span0,window_size=window_size,input_ft_dict={})
       temp_ft_dict2["src"]=repl_src0
       temp_ft_dict2["trg"]=repl_trg0
@@ -276,6 +270,73 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5):
       final_repl_list.append(temp_ft_dict2)
 
   return final_repl_list
+  
+
+# def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5): #check each possible replacement for context and other features
+#   src_tokens=general.add_padding(src_tokens)
+#   trg_tokens=general.add_padding(trg_tokens)
+#   final_repl_list=[]
+#   if trg_tokens!=[]: edit_list=compare_repl(src_tokens,trg_tokens) #if we have both src and trg
+#   else: edit_list=[] #if we have only src
+  
+#   possible_repl_list=get_possible_replacements(src_tokens,first_repl_dict)
+#   actual_repl_dict={}
+#   actual_repl_span_list=[]
+#   for el in edit_list:
+#     match_type,repl_src_token0,repl_trg_token0,src_span0,trg_span0=el
+#     if match_type=="equal": continue
+#     repl_src0=" ".join(repl_src_token0)
+#     repl_trg0=" ".join(repl_trg_token0)
+#     #a_key=(repl_src0,src_span0) #actual replacement key
+#     actual_repl_dict[src_span0]=repl_trg0
+#     actual_repl_span_list.append((repl_src0,repl_trg0,src_span0))
+#   p_ft_dict_list=[]
+#   used_span_trg_dict={}
+#   for repl_src0,trg_repl_dict0,span0 in possible_repl_list:
+#     #p_key=(repl_src0,span0)
+#     actual_trg_repl0=actual_repl_dict.get(span0) #check the correspodning target (repl) for current span
+#     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
+#     temp_ft_dict["src"]=repl_src0
+#     temp_ft_dict["span"]=span0
+    
+#     #context0=temp_ft_dict.get("context","")
+#     trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
+#     apply_null=True #null replacement 
+    
+#     if actual_trg_repl0!=None: apply_null=False #trg_repl_dict0[repl_src0]=1 
+    
+
+#     for trg_repl0,freq0 in trg_repl_dict0.items():
+#       used_span_trg_dict[(span0,trg_repl0)]=True
+#       temp_ft_dict1=copy.deepcopy(temp_ft_dict)
+#       temp_ft_dict1["trg"]=trg_repl0
+#       temp_ft_dict1["freq"]=freq0
+#       outcome=0
+#       if apply_null and trg_repl0==repl_src0: outcome=1
+#       if trg_repl0==actual_trg_repl0: outcome=1
+#       temp_ft_dict1["outcome"]=outcome
+#       final_repl_list.append(temp_ft_dict1)
+#   if trg_tokens!=[]: #going over unprocessed actual edits - to get more positive instances
+#     for repl_src0,repl_trg0,repl_span0 in actual_repl_span_list:
+#       #print("????",repl_src0,repl_trg0,repl_span0)
+#       if used_span_trg_dict.get((repl_span0,repl_trg0),False): continue
+#       is_valid_repl_check=is_valid_repl(repl_src0,repl_trg0)
+#       if is_valid_repl_check==False: continue
+#       # if repl_src0=="" or repl_trg0=="": continue
+#       # if repl_src0.lower()== repl_trg0.lower(): continue
+#       # if repl_src0[0].isdigit() or repl_trg0[0].isdigit(): continue
+#       # src_check=re.sub("[\d\W]","",repl_src0)
+#       # trg_check=re.sub("[\d\W]","",repl_trg0)
+#       # if src_check=="" or trg_check=="": continue
+#       temp_ft_dict2=extract_context_ft(src_tokens,repl_span0,window_size=window_size,input_ft_dict={})
+#       temp_ft_dict2["src"]=repl_src0
+#       temp_ft_dict2["trg"]=repl_trg0
+#       temp_ft_dict2["span"]=repl_span0
+#       temp_ft_dict2["freq"]=0
+#       temp_ft_dict2["outcome"]=1
+#       final_repl_list.append(temp_ft_dict2)
+
+#   return final_repl_list
 
 
 
