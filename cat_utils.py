@@ -213,7 +213,7 @@ def is_valid_repl(src_repl_str0,trg_repl_str0,excluded_words=all_excluded):
 
 def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #check each possible replacement for context and other features
   window_size=params.get("window_size",5)
-  keep_null_repl=params.get("keep_null_repl",False)
+  null_repl_outcome=params.get("null_repl_outcome",0)
   src_tokens=general.add_padding(src_tokens)
   trg_tokens=general.add_padding(trg_tokens)
   final_repl_list=[]
@@ -253,7 +253,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #ch
       temp_ft_dict1["trg"]=trg_repl0
       temp_ft_dict1["freq"]=freq0
       outcome=0
-      if keep_null_repl and apply_null and trg_repl0==repl_src0: outcome=1
+      if apply_null and trg_repl0==repl_src0: outcome=null_repl_outcome
       if trg_repl0==actual_trg_repl0: outcome=1
       temp_ft_dict1["outcome"]=outcome
       final_repl_list.append(temp_ft_dict1)
