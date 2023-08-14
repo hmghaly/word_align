@@ -169,11 +169,11 @@ def indexing_pipeline(loc_iterator,src_i,trg_i,params={}): #iterator includes bo
       #cur_loc=fopen.tell()
       try: cur_loc,f0=next(loc_iterator) #fopen.readline()
       except StopIteration: cur_loc,f0=-1,""
+      
       #print([f0])
       cur_line=f0.strip("\n\r\t")
       line_split=cur_line.split("\t")
-      if len(line_split)>=max(src_i,trg_i): continue
-      elif f0!="":
+      if f0!="":
         src0,trg0=line_split[src_i],line_split[trg_i]
         src_toks=tok(src0)
         trg_toks=tok(trg0) #will need to use general purpose tokenization later
@@ -187,11 +187,6 @@ def indexing_pipeline(loc_iterator,src_i,trg_i,params={}): #iterator includes bo
         trg_sent_fwd_index=index_sent_toks(filtered_trg,cur_loc)
         src_fwd_index0.extend(src_sent_fwd_index)
         trg_fwd_index0.extend(trg_sent_fwd_index)
-        # for s_i,s_tok0 in enumerate(src_toks):
-        #   if s_tok0.isupper():
-        #     src_fwd_index0.append((s_tok0,cur_loc+0.001*s_i))
-            #print((s_tok0,counter+0.001*s_i))
-        #bitext_list.append((counter,cur_loc,src0,trg0))
       counter+=1
       #if counter>1000: break
     src_inv_index=get_inv_index(src_fwd_index0)
