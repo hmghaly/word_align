@@ -101,6 +101,27 @@ def check_dict_multi_keys(dict0,possible_key_list): #if we're not fully sure whi
 
 
 ####################### STRINGS ###########################
+#string operations
+def is_un_symbol(str0):
+  out=False
+  if str0[0].isupper() and str0[-1].isdigit() and "/" in str0: out=True
+  return out
+
+def is_website(str0):
+  out=False
+  if str0.lower().startswith("http:") or str0.lower().startswith("https:"): out=True
+  return out
+
+def is_money(str0):
+  out=False
+  if str0.startswith("$") or str0[-1].isdigit(): out=True
+  return out
+
+def is_number(str0):
+  out=False
+  if re.sub("[\d\.\,]","",str0)=="": out=True
+  return out
+
 
 def str2key(str0): #create_id, create_key, create_text_id
   str0=unescape(str0)
