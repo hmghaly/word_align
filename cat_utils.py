@@ -474,15 +474,15 @@ def extract_context_ft(src_tokens,src_repl_span,window_size=5,input_ft_dict={}):
 
 
 
-def is_un_symbol(str0):
-  out=False
-  if str0[0].isupper() and str0[-1].isdigit() and "/" in str0: out=True
-  return out
+# def is_un_symbol(str0):
+#   out=False
+#   if str0[0].isupper() and str0[-1].isdigit() and "/" in str0: out=True
+#   return out
 
-def is_website(str0):
-    out=False
-    if str0.lower().startswith("http:") or str0.lower().startswith("https:"): out=True
-    return out
+# def is_website(str0):
+#     out=False
+#     if str0.lower().startswith("http:") or str0.lower().startswith("https:"): out=True
+#     return out
 
 
 
@@ -835,10 +835,11 @@ def get_first_freq_dict(freq_dict):
   return dict(iter(grouped0))
 
 
-def get_possible_replacements(sent_tokens,first_repl_dict): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
+def get_possible_replacements(sent_tokens,first_repl_dict,exclude_sent_start=True): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
   new_sent_tokens=list(sent_tokens)
   valid_replacements=[]
   for word0 in list(set(sent_tokens)):
+    if exclude_sent_start and word0=="<s>": continue
     all_corr=first_repl_dict.get(word0,[]) #get the corresponding equivalents/freq to the current word
     for corr_key0,corr_freq_val_dict0 in all_corr:
       found_spans=general.is_in(corr_key0.split(),sent_tokens)
