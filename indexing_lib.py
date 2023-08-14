@@ -167,7 +167,7 @@ def indexing_pipeline(loc_iterator,src_i,trg_i,params={}): #iterator includes bo
     while cur_line!="":
       if counter%5000==0: print(counter)
       #cur_loc=fopen.tell()
-      cur_loc,f0=next(iterator) #fopen.readline()
+      cur_loc,f0=next(loc_iterator) #fopen.readline()
       #print([f0])
       cur_line=f0.strip("\n\r\t")
       line_split=cur_line.split("\t")
