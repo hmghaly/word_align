@@ -69,7 +69,7 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   include_context_trg_sim=params.get("include_context_trg_sim",False)
   include_freq=params.get("include_freq",False)
   include_freq_log=params.get("include_freq_log",False)
-  include_edit_types_oh=params.get("include_freq_log",False)
+  include_edit_types_oh=params.get("include_edit_types_oh",False)
   
   edit_types=params.get("edit_types",["other","acronym","acronym-s","capitalization","compunding","hyphenation"])
   cur_special_tokens=params.get("special_tokens",[]) #special tokens are high frequency tokens which are excluded from calculation of text vector but are important as one-hot features to determine immediate context
