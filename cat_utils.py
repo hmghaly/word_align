@@ -80,6 +80,8 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   include_prev_oh=params.get("include_prev_oh",False) #if src=trg
   include_next_oh=params.get("include_next_oh",False) #if src=trg
 
+  output_debug_dict=params.get("output_debug_dict",False) #if src=trg
+
   # include_paren_check=params.get("include_paren_check",False) #if surrounded by parentheses
   # include_start_check=params.get("include_start_check",False) #if repl at the start of  
   # include_end_check=params.get("include_end_check",False) #if repl at the end of sentence
@@ -128,28 +130,42 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   # print("trg_tokens0",trg_tokens0)
   # print("context_pre_tokens",context_pre_tokens)
   # print("context_after_tokens",context_after_tokens)
+  debug_dict={}
   combined_vec=[]
   if include_chunks_wv: #include fixed length vec for all chunk tokens
+    temp=[]
     for item in [context_pre_tokens,context_after_tokens,src_tokens0,trg_tokens0]:
       cur_vec=[]
       for item_tok in item:
-        combined_vec.extend(cur_vec_dict.get(item_tok,empty_vec0))
+        found_vec=cur_vec_dict.get(item_tok,empty_vec0)
+        combined_vec.extend(found_vec)
+        temp.extend(found_vec)
+    debug_dict["include_chunks_wv"]=temp
   
   if include_null_repl_check: #check if src=trg
     repl_is_null=0
     if src0==trg0:repl_is_null=1 
     combined_vec.append(repl_is_null)
+    debug_dict["include_null_repl_check"]=repl_is_null
 
   if include_src_trg_char_ratio: #include src/trg len ratio
     src_trg_char_ratio=len(input_dict["src"])/len(input_dict["trg"])
     combined_vec.append(src_trg_char_ratio)
+    debug_dict["include_src_trg_char_ratio"]=src_trg_char_ratio
+
   if include_trg_src_char_ratio: #include trg/src len ratio
     trg_src_char_ratio=len(input_dict["trg"])/len(input_dict["src"])
     combined_vec.append(trg_src_char_ratio)
+    debug_dict["include_trg_src_char_ratio"]=trg_src_char_ratio
+
   if include_freq: #include freq
-    combined_vec.append(input_dict["freq"])
+    freq0=input_dict["freq"]
+    combined_vec.append(freq0)
+    debug_dict["include_freq"]=freq0
   if include_freq_log: #include freq log
-    combined_vec.append(math.log(input_dict["freq"]+1))
+    log_freq0=math.log(input_dict["freq"]+1)
+    combined_vec.append(log_freq0)
+    debug_dict["include_freq_log"]=log_freq0
 
   if include_context_trg_sim: #include cos similarity between trg and context
     context_vec=[]
@@ -171,20 +187,26 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
       mean_trg_vec=np.array(trg_vec).mean(axis=0)
       context_trg_cos_sim=cos_sim(mean_trg_vec,mean_context_vec)
     combined_vec.append(context_trg_cos_sim)
+    debug_dict["include_context_trg_sim"]=context_trg_cos_sim
 
   if include_prev_oh:
     cur_prev_oh=is_in_one_hot(prev_token0.lower().strip("_"),cur_special_tokens)
     combined_vec.extend(cur_prev_oh)
+    debug_dict["include_prev_oh"]=context_trg_cos_sim
+
   if include_next_oh:
     cur_next_oh=is_in_one_hot(next_token0.lower().strip("_"),cur_special_tokens)
     combined_vec.extend(cur_next_oh)
+    debug_dict["include_next_oh"]=cur_next_oh
 
   if include_edit_types_oh:
     cur_edit_type_str=identify_edit_type(src0,trg0)
-    cur_edit_type_of=is_in_one_hot(cur_edit_type_str,edit_types)
-    combined_vec.extend(cur_next_oh)
-
-  return np.array(combined_vec), outcome0
+    #print("cur_edit_type_str",cur_edit_type_str)
+    cur_edit_type_oh=is_in_one_hot(cur_edit_type_str,edit_types)
+    combined_vec.extend(cur_edit_type_oh)
+    debug_dict["include_edit_types_oh"]=cur_edit_type_oh
+  if output_debug_dict: return np.array(combined_vec), outcome0, debug_dict
+  else: return np.array(combined_vec), outcome0
 
 # def extract_ft_lb_OLD(input_dict,params={}): #extract features and labels from an input dict with context, src, trg, and outcome
 #   chunk_size0=params.get("chunk_size",5)
