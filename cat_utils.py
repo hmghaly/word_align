@@ -69,8 +69,12 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   include_context_trg_sim=params.get("include_context_trg_sim",False)
   include_freq=params.get("include_freq",False)
   include_freq_log=params.get("include_freq_log",False)
-  edit_types=params.get("edit_types",[])
+  include_edit_types_oh=params.get("include_freq_log",False)
+  
+  edit_types=params.get("edit_types",["other","acronym","acronym-s","capitalization","compunding","hyphenation"])
   cur_special_tokens=params.get("special_tokens",[]) #special tokens are high frequency tokens which are excluded from calculation of text vector but are important as one-hot features to determine immediate context
+  cur_stop_tokens=params.get("stop_tokens",[]) #special tokens are high frequency tokens which are excluded from calculation of text vector but are important as one-hot features to determine immediate context
+  
   include_null_repl_check=params.get("include_null_repl_check",False) #if src=trg
 
   include_prev_oh=params.get("include_prev_oh",False) #if src=trg
@@ -150,13 +154,13 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   if include_context_trg_sim: #include cos similarity between trg and context
     context_vec=[]
     for c_tok in context_tokens_uq:
-      if c_tok in cur_special_tokens: continue
+      if c_tok in cur_stop_tokens: continue
       cur_vec0=cur_vec_dict[c_tok]
       if sum(cur_vec0)==0: continue
       context_vec.append(cur_vec0)
     trg_vec=[]
     for t_tok in trg_tokens_uq:
-      if t_tok in cur_special_tokens: continue
+      if t_tok in cur_stop_tokens: continue
       cur_vec0=cur_vec_dict[t_tok]
       if sum(cur_vec0)==0: continue
       trg_vec.append(cur_vec0)
@@ -174,6 +178,12 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   if include_next_oh:
     cur_next_oh=is_in_one_hot(next_token0.lower().strip("_"),cur_special_tokens)
     combined_vec.extend(cur_next_oh)
+
+  if include_edit_types_oh:
+    cur_edit_type_str=identify_edit_type(src0,trg0)
+    cur_edit_type_of=is_in_one_hot(cur_edit_type_str,edit_types)
+    combined_vec.extend(cur_next_oh)
+
   return np.array(combined_vec), outcome0
 
 # def extract_ft_lb_OLD(input_dict,params={}): #extract features and labels from an input dict with context, src, trg, and outcome
@@ -822,7 +832,7 @@ def identify_edit_type(src_str,trg_str):
   no_dash_key_str="".join([v for v in key.split(" ") if v.strip("_")!="-"])
   no_dash_subkey_str="".join([v for v in sub_key.split(" ") if v.strip("_")!="-"])
 
-  edit_type="other"
+  edit_type="other" #["other","acronym","acronym-s","capitalization","compunding","hyphenation"]
   if key.isupper():
     if key=="".join([v for v in sub_key if v.isupper()]) or key.lower()=="".join([v[0].lower() for v in sub_key.split(" ")]):
       edit_type="acronym"
