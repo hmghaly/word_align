@@ -8,6 +8,7 @@ import hashlib
 from itertools import groupby
 from difflib import SequenceMatcher
 import copy
+import math
 import numpy as np
 
 sys.path.append("code_utils")
@@ -57,10 +58,33 @@ def get_chunk_vector(chunk_tokens,wv_model):
     vec_list0.append(tok_vec0)
   return vec_list0 #np.array(vec_list0)
 
+
 def extract_ft_lb(input_dict,params={}): #extract features and labels from an input dict with context, src, trg, and outcome
   chunk_size0=params.get("chunk_size",5)
   cur_wv_model0=params.get("wv_model")
   outcome_positive=params.get("outcome_positive",False)
+
+  include_chunks_wv=params.get("include_chunks_wv",False) #include a fixed numbers of wv features for both the pre/after context, src and trg chunks
+
+  include_context_trg_sim=params.get("include_context_trg_sim",False)
+  include_freq=params.get("include_freq",False)
+  include_freq_log=params.get("include_freq_log",False)
+  edit_types=params.get("edit_types",[])
+  cur_special_tokens=params.get("special_tokens",[]) #special tokens are high frequency tokens which are excluded from calculation of text vector but are important as one-hot features to determine immediate context
+  include_null_repl_check=params.get("include_null_repl_check",False) #if src=trg
+
+  include_prev_oh=params.get("include_prev_oh",False) #if src=trg
+  include_next_oh=params.get("include_next_oh",False) #if src=trg
+
+  # include_paren_check=params.get("include_paren_check",False) #if surrounded by parentheses
+  # include_start_check=params.get("include_start_check",False) #if repl at the start of  
+  # include_end_check=params.get("include_end_check",False) #if repl at the end of sentence
+  include_src_trg_char_ratio=params.get("include_src_trg_char_ratio",False) #check character ratio between src/trg
+  include_trg_src_char_ratio=params.get("include_trg_src_char_ratio",False) #check character ratio between trg/src
+  include_src_trg_token_ratio=params.get("include_src_trg_token_ratio",False) #check token ratio between src/trg
+  include_trg_src_token_ratio=params.get("include_trg_src_token_ratio",False) #check token ratio between trg/src
+
+
   context0=input_dict["context"]
   src0=input_dict["src"]
   trg0=input_dict["trg"]
@@ -79,16 +103,172 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   trg_tokens0=pad_list(trg_tokens0,chunk_size0)
   context_pre_tokens=pad_list(context_pre_tokens,chunk_size0)
   context_after_tokens=pad_list(context_after_tokens,chunk_size0)
+  prev_token0=context_pre_tokens[0]
+  next_token0=context_after_tokens[0]
+  #print("prev_token0",prev_token0,"next_token0",next_token0)
+
+
+
+  all_cur_tokens=list(set(context_pre_tokens+context_after_tokens+src_tokens0+trg_tokens0))
+  context_tokens_uq=list(set(context_pre_tokens+context_after_tokens))
+  trg_tokens_uq=list(set(trg_tokens0))
+  cur_vec_dict={}
+  empty_vec0=[0.]*cur_wv_model0.vector_size
+  for token0 in all_cur_tokens:
+    try: tok_vec0=cur_wv_model0.wv[token0].tolist()
+    except: tok_vec0= empty_vec0 
+    cur_vec_dict[token0]=tok_vec0
+    #print(token0,sum(tok_vec0))
+
   # print("src_tokens0",src_tokens0)
   # print("trg_tokens0",trg_tokens0)
   # print("context_pre_tokens",context_pre_tokens)
   # print("context_after_tokens",context_after_tokens)
   combined_vec=[]
-  for item in [context_pre_tokens,context_after_tokens,src_tokens0,trg_tokens0]:
-    vec0=get_chunk_vector(item,cur_wv_model0)
-    combined_vec.extend(vec0)
-    #vec_array=np.array(vec0)
-  return np.array(combined_vec).ravel(), outcome0
+  if include_chunks_wv: #include fixed length vec for all chunk tokens
+    for item in [context_pre_tokens,context_after_tokens,src_tokens0,trg_tokens0]:
+      cur_vec=[]
+      for item_tok in item:
+        combined_vec.extend(cur_vec_dict.get(item_tok,empty_vec0))
+  
+  if include_null_repl_check: #check if src=trg
+    repl_is_null=0
+    if src0==trg0:repl_is_null=1 
+    combined_vec.append(repl_is_null)
+
+  if include_src_trg_char_ratio: #include src/trg len ratio
+    src_trg_char_ratio=len(input_dict["src"])/len(input_dict["trg"])
+    combined_vec.append(src_trg_char_ratio)
+  if include_trg_src_char_ratio: #include trg/src len ratio
+    trg_src_char_ratio=len(input_dict["trg"])/len(input_dict["src"])
+    combined_vec.append(trg_src_char_ratio)
+  if include_freq: #include freq
+    combined_vec.append(input_dict["freq"])
+  if include_freq_log: #include freq log
+    combined_vec.append(math.log(input_dict["freq"]+1))
+
+  if include_context_trg_sim: #include cos similarity between trg and context
+    context_vec=[]
+    for c_tok in context_tokens_uq:
+      if c_tok in cur_special_tokens: continue
+      cur_vec0=cur_vec_dict[c_tok]
+      if sum(cur_vec0)==0: continue
+      context_vec.append(cur_vec0)
+    trg_vec=[]
+    for t_tok in trg_tokens_uq:
+      if t_tok in cur_special_tokens: continue
+      cur_vec0=cur_vec_dict[t_tok]
+      if sum(cur_vec0)==0: continue
+      trg_vec.append(cur_vec0)
+    #print("context_vec",len(context_vec),"trg_vec",len(trg_vec))
+    if context_vec==[] or trg_vec==[]: context_trg_cos_sim=-1
+    else:
+      mean_context_vec=np.array(context_vec).mean(axis=0)
+      mean_trg_vec=np.array(trg_vec).mean(axis=0)
+      context_trg_cos_sim=cos_sim(mean_trg_vec,mean_context_vec)
+    combined_vec.append(context_trg_cos_sim)
+
+  if include_prev_oh:
+    cur_prev_oh=is_in_one_hot(prev_token0.lower().strip("_"),cur_special_tokens)
+    combined_vec.extend(cur_prev_oh)
+  if include_next_oh:
+    cur_next_oh=is_in_one_hot(next_token0.lower().strip("_"),cur_special_tokens)
+    combined_vec.extend(cur_next_oh)
+  return np.array(combined_vec), outcome0
+
+# def extract_ft_lb_OLD(input_dict,params={}): #extract features and labels from an input dict with context, src, trg, and outcome
+#   chunk_size0=params.get("chunk_size",5)
+#   cur_wv_model0=params.get("wv_model")
+#   outcome_positive=params.get("outcome_positive",False)
+
+#   include_context_trg_sim=ft_params.get("include_context_trg_sim",False)
+#   include_freq=ft_params.get("include_freq",False)
+#   include_freq_log=ft_params.get("include_freq_log",False)
+#   edit_types=ft_params.get("edit_types",[])
+#   cur_excluded_tokens=ft_params.get("excluded_tokens",[])
+
+#   include_paren_check=ft_params.get("include_paren_check",False) #if surrounded by parentheses
+#   include_start_check=ft_params.get("include_start_check",False) #if repl at the start of  
+#   include_end_check=ft_params.get("include_end_check",False) #if repl at the end of sentence
+#   include_src_trg_char_ratio=ft_params.get("include_src_trg_char_ratio",False) #check character ratio between src/trg
+#   include_trg_src_char_ratio=ft_params.get("include_trg_src_char_ratio",False) #check character ratio between trg/src
+#   include_src_trg_token_ratio=ft_params.get("include_src_trg_token_ratio",False) #check token ratio between src/trg
+#   include_trg_src_token_ratio=ft_params.get("include_trg_src_token_ratio",False) #check token ratio between trg/src
+
+
+#   context0=input_dict["context"]
+#   src0=input_dict["src"]
+#   trg0=input_dict["trg"]
+#   outcome0=input_dict["outcome"]
+#   if outcome_positive:
+#     if outcome0==0: outcome0=0.5
+#     elif outcome0==-1: outcome0=0
+#   context_split=context0.split("|")
+#   context_pre_str,context_after_str=context_split
+#   context_pre_tokens=context_pre_str.strip().split(" ")
+#   context_after_tokens=context_after_str.strip().split(" ")
+#   src_tokens0=src0.split(" ")
+#   trg_tokens0=trg0.split(" ")
+#   context_pre_tokens=list(reversed(context_pre_tokens)) #reverse to make sure previous words are always in the same location
+#   src_tokens0=pad_list(src_tokens0,chunk_size0)
+#   trg_tokens0=pad_list(trg_tokens0,chunk_size0)
+#   context_pre_tokens=pad_list(context_pre_tokens,chunk_size0)
+#   context_after_tokens=pad_list(context_after_tokens,chunk_size0)
+
+#   all_cur_tokens=list(set(context_pre_tokens+context_after_tokens+src_tokens0+trg_tokens0))
+#   context_tokens_uq=list(set(context_pre_tokens+context_after_tokens))
+#   trg_tokens_uq=list(set(trg_tokens0))
+#   cur_vec_dict={}
+#   empty_vec0=[0.]*wv_model.vector_size
+#   for token0 in all_cur_tokens:
+#     try: tok_vec0=wv_model.wv[token0].tolist()
+#     except: tok_vec0= empty_vec0 #[0.]* #np.zeros(wv_model.vector_size,dtype=np.float32) #np.zeros(wv_model.vector_size)
+#     cur_vec_dict[token0]=tok_vec0
+
+#   # print("src_tokens0",src_tokens0)
+#   # print("trg_tokens0",trg_tokens0)
+#   # print("context_pre_tokens",context_pre_tokens)
+#   # print("context_after_tokens",context_after_tokens)
+#   combined_vec=[]
+#   for item in [context_pre_tokens,context_after_tokens,src_tokens0,trg_tokens0]:
+#     cur_vec=[]
+#     for item_tok in item:
+#       combined_vec.extend(cur_vec_dict.get(item_tok,empty_vec0))
+
+#   if include_src_trg_char_ratio:
+#     src_trg_char_ratio=len(input_dict["src"])/len(input_dict["trg"])
+#     combined_vec.append(src_trg_char_ratio)
+#   if include_trg_src_char_ratio:
+#     trg_src_char_ratio=len(input_dict["trg"])/len(input_dict["src"])
+#     combined_vec.append(trg_src_char_ratio)
+#   if include_freq:
+#     combined_vec.append(input_dict["freq"])
+#   if include_freq_log:
+#     combined_vec.append(math.log(input_dict["freq"]+1))
+
+#   if include_context_trg_sim:
+#     context_vec=[]
+#     for c_tok in context_tokens_uq:
+#       if c_tok in cur_excluded_tokens: continue
+#       cur_vec0=cur_vec_dict[c_tok]
+#       if sum(cur_vec0)==0: continue
+#       context_vec.append(cur_vec0)
+#     mean_context_vec=[]
+#     trg_vec=[]
+#     for t_tok in trg_tokens_uq:
+#       if t_tok in cur_excluded_tokens: continue
+#       cur_vec0=cur_vec_dict[t_tok]
+#       if sum(cur_vec0)==0: continue
+#       trg_vec.append(cur_vec0)
+#     mean_trg_vec=[]
+#     contect_trg_co_sim=cos_sim(mean_trg_vec,mean_trg_vec)
+#     combined_vec.append(contect_trg_co_sim)
+
+
+#     #vec0=get_chunk_vector(item,cur_wv_model0)
+#     #combined_vec.extend(vec0)
+#     #vec_array=np.array(vec0)
+#   return np.array(combined_vec).ravel(), outcome0
 
 
 
@@ -213,7 +393,7 @@ def is_valid_repl(src_repl_str0,trg_repl_str0,excluded_words=all_excluded):
 
 def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #check each possible replacement for context and other features
   window_size=params.get("window_size",5)
-  null_repl_outcome=params.get("null_repl_outcome",0)
+  null_repl_outcome=params.get("null_repl_outcome",0) #default value for no replacment (src=trg)
   src_tokens=general.add_padding(src_tokens)
   trg_tokens=general.add_padding(trg_tokens)
   final_repl_list=[]
