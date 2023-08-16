@@ -792,7 +792,7 @@ def get_iter_chunks(iterator,chunk_size,min_i=None): #iterate certain chunk size
 #file write opertation
 def log_something(text0,fpath0):
   fopen0=open(fpath0,"a")
-  fopen0.write(text0+"\n")
+  fopen0.write(text0.strip("\n")+"\n")
   fopen0.close()
 
 #OS functions
