@@ -439,6 +439,8 @@ def is_valid_repl(src_repl_str0,trg_repl_str0,excluded_words=all_excluded):
 def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #check each possible replacement for context and other features
   window_size=params.get("window_size",5)
   null_repl_outcome=params.get("null_repl_outcome",0) #default value for no replacment (src=trg)
+  include_null_repl=params.get("include_null_repl",False) #whether to include null replacments or not
+
   src_tokens=general.add_padding(src_tokens)
   trg_tokens=general.add_padding(trg_tokens)
   final_repl_list=[]
@@ -466,7 +468,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #ch
     temp_ft_dict["span"]=span0
     
     #context0=temp_ft_dict.get("context","")
-    trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
+    if include_null_repl: trg_repl_dict0[repl_src0]=0 #copy src into trg - null edit - freq irrelevant
     apply_null=True #null replacement 
     
     if actual_trg_repl0!=None: apply_null=False #trg_repl_dict0[repl_src0]=1 
@@ -497,6 +499,15 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #ch
       final_repl_list.append(temp_ft_dict2)
 
   return final_repl_list
+
+
+def get_span_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}):
+  repl_list0=extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params=params)
+  repl_list0.sort(key=lambda x:x["span"])
+  grouped=[(key,list(group)) for key,group in groupby(repl_list0,lambda x:x["span"])]
+  span_repl_dict=dict(iter(grouped))
+  return span_repl_dict
+
 
 
 # def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,window_size=5): #check each possible replacement for context and other features
