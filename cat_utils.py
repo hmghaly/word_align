@@ -80,6 +80,9 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
   include_prev_oh=params.get("include_prev_oh",False) #if src=trg
   include_next_oh=params.get("include_next_oh",False) #if src=trg
 
+  include_prev_wv=params.get("include_prev_wv",False) #wv for prev token
+  include_next_wv=params.get("include_next_wv",False) #wv for next token
+
   output_debug_dict=params.get("output_debug_dict",False) #if src=trg
 
   # include_paren_check=params.get("include_paren_check",False) #if surrounded by parentheses
@@ -141,6 +144,16 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
         combined_vec.extend(found_vec)
         temp.extend(found_vec)
     debug_dict["include_chunks_wv"]=temp
+
+  if include_prev_wv:
+    found_vec=cur_vec_dict.get(prev_token0,empty_vec0)
+    combined_vec.extend(found_vec)  
+    debug_dict["include_prev_wv"]=found_vec
+  if include_next_wv:
+    found_vec=cur_vec_dict.get(next_token0,empty_vec0)
+    combined_vec.extend(found_vec)  
+    debug_dict["include_next_wv"]=found_vec
+
   
   if include_null_repl_check: #check if src=trg
     repl_is_null=0
