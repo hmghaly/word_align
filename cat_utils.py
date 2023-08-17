@@ -461,6 +461,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #ch
   p_ft_dict_list=[]
   used_span_trg_dict={}
   for repl_src0,trg_repl_dict0,span0 in possible_repl_list:
+    if temp_ft_dict["context"]=='|': continue
     #p_key=(repl_src0,span0)
     actual_trg_repl0=actual_repl_dict.get(span0) #check the correspodning target (repl) for current span
     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
