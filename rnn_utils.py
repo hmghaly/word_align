@@ -732,7 +732,7 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
 
 
 class load_nn:
-  def __init__(self,model_fpath,network_def,extraction_params=None) -> None:
+  def __init__(self,model_fpath,network_def,extraction_fn=None,extraction_params=None) -> None:
     self.model_data_dict={}
     self.model=None
     if not os.path.exists(model_fpath): return 
@@ -745,7 +745,8 @@ class load_nn:
     self.last_epoch=self.model_data_dict.get("last_epoch")
     self.last_batch_i=self.model_data_dict.get("last_batch_i")
     self.cur_state_dict=self.model_data_dict.get("state_dict",{}) #top state dict
-    self.ft_lb_extraction_fn=self.model_data_dict.get("ft_lb_extraction_fn")
+    if extraction_fn!=None: self.ft_lb_extraction_fn=extraction_fn
+    else self.ft_lb_extraction_fn=self.model_data_dict.get("ft_lb_extraction_fn")
     #model = one_layer_net(cur_params["n_input"], cur_params["n_hidden"], cur_params["n_output"])
     self.n_input=self.cur_params["n_input"]
     self.n_hidden=self.cur_params["n_hidden"]
