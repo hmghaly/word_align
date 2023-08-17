@@ -2,7 +2,7 @@ import random
 import dill as pickle
 from collections import OrderedDict
 import numpy as np
-import os,json
+import os,json, copy
 
 try:
   import torch
