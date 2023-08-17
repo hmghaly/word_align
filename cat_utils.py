@@ -466,7 +466,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #ch
     actual_trg_repl0=actual_repl_dict.get(span0) #check the correspodning target (repl) for current span
     temp_ft_dict=extract_context_ft(src_tokens,span0,window_size=window_size)
     if temp_ft_dict["context"]=='|': continue
-    
+
     temp_ft_dict["src"]=repl_src0
     temp_ft_dict["span"]=span0
     
@@ -480,6 +480,8 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #ch
     for trg_repl0,freq0 in trg_repl_dict0.items():
       used_span_trg_dict[(span0,trg_repl0)]=True
       temp_ft_dict1=copy.deepcopy(temp_ft_dict)
+      if temp_ft_dict1["context"]=='|': continue
+      
       temp_ft_dict1["trg"]=trg_repl0
       temp_ft_dict1["freq"]=freq0
       outcome=0
