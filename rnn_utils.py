@@ -2,7 +2,13 @@ import random
 import dill as pickle
 from collections import OrderedDict
 import numpy as np
-import os,json, copy
+import os,json, copy, sys
+
+sys.path.append("code_utils")
+import cat_utils
+import general
+
+
 
 try:
   import torch
@@ -561,8 +567,8 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
     epoch_train_loss_total=model_data_dict.get("epoch_train_loss_total",0)
     epoch_dev_loss_total=model_data_dict.get("epoch_dev_loss_total",0)
 
-    if data_ratio!=None: data_iterator=read_file_from_to(data_fpath,to_ratio=data_ratio)
-    else: data_iterator=read_file_from_to(data_fpath)
+    if data_ratio!=None: data_iterator=general.read_file_from_to(data_fpath,to_ratio=data_ratio)
+    else: data_iterator=general.read_file_from_to(data_fpath)
     batch_iterator=general.get_iter_chunks(data_iterator, chunk_size=batch_size0,min_i=last_batch_i)
     for batch_i, cur_batch in enumerate(batch_iterator):
       last_batch_i=model_data_dict.get("last_batch_i")
