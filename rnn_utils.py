@@ -745,6 +745,7 @@ class load_nn:
     self.last_epoch=self.model_data_dict.get("last_epoch")
     self.last_batch_i=self.model_data_dict.get("last_batch_i")
     self.cur_state_dict=self.model_data_dict.get("state_dict",{}) #top state dict
+    self.ft_lb_extraction_fn=self.model_data_dict.get("ft_lb_extraction_fn")
     #model = one_layer_net(cur_params["n_input"], cur_params["n_hidden"], cur_params["n_output"])
     self.n_input=self.cur_params["n_input"]
     self.n_hidden=self.cur_params["n_hidden"]
@@ -758,7 +759,7 @@ class load_nn:
     self.wv_model=Word2Vec.load(cur_wv_path)
     self.extraction_params["wv_model"]=self.wv_model
   def pred(self,raw_input_dict):
-    input_vector,input_lb=extract_ft_lb(raw_input_dict,self.extraction_params)
+    input_vector,input_lb=self.ft_lb_extraction_fn(raw_input_dict,self.extraction_params)
     input_tensor=to_tensor(input_vector)
     nn_out=self.model(input_tensor)
     return nn_out.item()
