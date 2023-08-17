@@ -2,7 +2,10 @@ import random
 import dill as pickle
 from collections import OrderedDict
 import numpy as np
-import os,json, copy, sys, time
+import os,json, copy, sys, time, random
+
+import gensim
+from gensim.models import Word2Vec
 
 sys.path.append("code_utils")
 import cat_utils
