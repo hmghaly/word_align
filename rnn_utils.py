@@ -466,7 +466,7 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
   is_rnn0=params.get("is_rnn",False)
 
   train_ratio0=params.get("train_ratio",0.8)
-  ft_lb_extraction_fn=params.get("ft_lb_extraction_fn",extract_ft_lb)
+  ft_lb_extraction_fn=params.get("ft_lb_extraction_fn")
   #ft_lb_extraction_params=params.get("ft_lb_extraction_params",{})
   data_ratio=params.get("data_ratio") #the ration of the data we should use from data file
   #data_gen=read_file_from_to(data_fpath,to_ratio=0.0001)
