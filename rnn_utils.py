@@ -746,7 +746,7 @@ class load_nn:
     self.last_batch_i=self.model_data_dict.get("last_batch_i")
     self.cur_state_dict=self.model_data_dict.get("state_dict",{}) #top state dict
     if extraction_fn!=None: self.ft_lb_extraction_fn=extraction_fn
-    else self.ft_lb_extraction_fn=self.model_data_dict.get("ft_lb_extraction_fn")
+    else: self.ft_lb_extraction_fn=self.model_data_dict.get("ft_lb_extraction_fn")
     #model = one_layer_net(cur_params["n_input"], cur_params["n_hidden"], cur_params["n_output"])
     self.n_input=self.cur_params["n_input"]
     self.n_hidden=self.cur_params["n_hidden"]
