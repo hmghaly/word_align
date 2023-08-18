@@ -481,7 +481,7 @@ def extract_repl_instances(src_tokens,trg_tokens,first_repl_dict,params={}): #ch
       used_span_trg_dict[(span0,trg_repl0)]=True
       temp_ft_dict1=copy.deepcopy(temp_ft_dict)
       if temp_ft_dict1["context"]=='|': continue
-      
+
       temp_ft_dict1["trg"]=trg_repl0
       temp_ft_dict1["freq"]=freq0
       outcome=0
@@ -1152,6 +1152,39 @@ def repl_phrase(sent_tokens,phrase_to_be_replaced,new_phrase): #replace a phrase
     last_i=span_j0+1
   new_tokens.extend(sent_tokens[last_i:])
   return new_tokens
+
+#18 Aug 23
+def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt"):
+  used_locs=[]
+  valid_repl_instances=[]
+  repl_inst_wt_list.sort(key=lambda x:x.get("sort_by",0))
+  for cur_repl_inst0 in repl_inst_wt_list:
+    x0,x1 = cur_repl_inst0["span"]
+    cur_locs=list(range(x0,x1+1))
+    found_in_used_check=any([v in used_locs for v in cur_locs])
+    if found_in_used_check: continue
+    else:
+      used_locs.extend(cur_locs)
+      valid_repl_instances.append(cur_repl_inst0)
+      #print(">>>",cur_repl_inst0)
+  valid_repl_instances.sort(key=lambda x:x["span"])
+  new_sent_tokens=[]
+  prev_i=0
+  for valid_item0 in valid_repl_instances:
+    span0=valid_item0["span"]
+    trg0=valid_item0["trg"]
+    x0,x1=span0
+    prev_chunk=sent_tokens[prev_i:x0]
+    cur_chunk=trg0.split(" ")
+    prev_i=x1+1
+    new_sent_tokens.extend(prev_chunk+cur_chunk)
+  new_sent_tokens.extend(sent_tokens[prev_i:])
+  return new_sent_tokens
+
+
+
+
+
 
 
 
