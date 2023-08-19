@@ -228,6 +228,7 @@ romanization_dict={'أ': ('2', 'a'), 'ا': ('aa', 'a'), 'إ': ('2i', 'i'), 'آ':
 
 class analyze_ar_text: #analyze a word with diacritics in different ways
   def __init__(self,text0,shape_dict=ar_shape_dict,romanize_dict=romanization_dict,lang="msa",exclude_waaw_jamaa3ah=True):
+    text0=text0.strip()
     self.chunks=[]
     self.word_letter_shapes_plain=[]
     self.word_letter_shapes=[]
@@ -259,6 +260,7 @@ class analyze_ar_text: #analyze a word with diacritics in different ways
 
 class analyze_ar_word: #analyze a word with diacritics in different ways
   def __init__(self,word0,shape_dict=ar_shape_dict,romanize_dict=romanization_dict,lang="msa",exclude_waaw_jamaa3ah=True):
+    word0=word0.strip()
     word_split=word0.split("_")
     self.word=word_split[0]
     self.word_params=""
