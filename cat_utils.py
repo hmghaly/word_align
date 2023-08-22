@@ -1154,11 +1154,15 @@ def repl_phrase(sent_tokens,phrase_to_be_replaced,new_phrase): #replace a phrase
   return new_tokens
 
 #18 Aug 23
-def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt"):
+def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_freq=None):
   used_locs=[]
   valid_repl_instances=[]
   repl_inst_wt_list.sort(key=lambda x:x.get("sort_by",0))
   for cur_repl_inst0 in repl_inst_wt_list:
+    cur_wt=cur_repl_inst0.get("wt")
+    cur_freq=cur_repl_inst0.get("freq")
+    if cur_wt!=None and cur_wt<min_wt: continue
+    if min_freq!=None and cur_freq!=None and cur_freq<min_freq: continue
     x0,x1 = cur_repl_inst0["span"]
     cur_locs=list(range(x0,x1+1))
     found_in_used_check=any([v in used_locs for v in cur_locs])
@@ -1221,6 +1225,60 @@ def para2sents(text):
   return sents0
 
 
+
+#============ Pre-editing pipeline ========================
+def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5):
+  sent_tokens0=add_padding(tok(sent_str))
+  span_repl_items=extract_repl_instances(sent_tokens0,[],first_token_dict)
+  new_items=[]
+  for item0 in span_repl_items:
+    if item0["context"]=='|': continue
+    try: wt0=nn_model_obj.pred(item0)
+    except: wt0=0
+    #print(item0,wt0)
+    if wt0<pred_threshold: continue
+    item0["wt"]=wt0
+    new_items.append(item0)
+  pre_edited_sent_tokens=repl_span_phrase(sent_tokens0,new_items,sort_by="wt")
+  if pre_edited_sent_tokens[0]=="<s>": pre_edited_sent_tokens=pre_edited_sent_tokens[1:]
+  if pre_edited_sent_tokens[-1]=="</s>": pre_edited_sent_tokens=pre_edited_sent_tokens[:-1]
+  return pre_edited_sent_tokens
+
+def pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5):
+  cur_docx_edit_list=get_docx_paras_edits(docx_fpath)
+  new_edit_pre_edit_list=[]
+  for docx_para_edit_item in cur_docx_edit_list:
+    para_path0,original0,final0,edited0=docx_para_edit_item
+    original_tokens=general.tok(original0)
+    final_tokens=general.tok(final0)
+    if original0.strip()=="" or final0.strip()=="": pre_edit_out=original0
+    pre_edit_out_tokens=pre_edit(original0,nn_model_obj,first_token_dict,pred_threshold)
+    pre_edit_out_str=general.de_tok2str(pre_edit_out_tokens)
+    pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens)
+    token_edited_html=get_edit_html(original_tokens,final_tokens)
+    new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
+  return new_edit_pre_edit_list
+
+def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_table_template.html"):
+  table_content0=""
+  for i0,tag_item0 in enumerate(edit_list):
+    original0,final0,edited0=tag_item0
+    table_class="table-light"
+    if i0%2!=0: table_class="table-dark text-dark"
+    cur_tr0='<tr class="%s"><td>%s</td><td>%s</td><td>%s</td></tr>'%(table_class,original0,final0,edited0)
+    table_content0+=cur_tr0
+
+  #template_fpath="templates/pre-editing_table_template.html"
+  template_fopen=open(template_fpath)
+  template_content=template_fopen.read()
+  template_fopen.close()
+  template_dom_obj=web_lib.DOM(template_content)
+  repl_dict={"#data_display_table_body":table_content0}
+  out_html=template_dom_obj.replace(repl_dict)
+
+  out_fopen=open(out_fpath,"w")
+  out_fopen.write(out_html)
+  out_fopen.close()
 
 
 
