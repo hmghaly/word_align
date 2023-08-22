@@ -714,6 +714,11 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
     epoch_dict[epoch]=model.state_dict()
     model_data_dict["epoch_dict"]=epoch_dict
 
+    epoch_loss_dict=model_data_dict.get("epoch_loss_dict",{}) #loss values for each epoch
+    epoch_loss_dict[epoch]={"train":round(epoch_train_avg,4),"dev":round(epoch_dev_avg,4)}
+    model_data_dict["epoch_loss_dict"]=epoch_loss_dict
+
+
     model_data_dict["n_train"]=epoch_train_counter
     model_data_dict["n_dev"]=epoch_dev_counter
     training_progress_list=model_data_dict.get("training_progress_list",[])+[(epoch,round(epoch_train_avg,6),round(epoch_dev_avg,6))]
