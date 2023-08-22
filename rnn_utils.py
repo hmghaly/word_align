@@ -777,6 +777,9 @@ class load_nn:
     cur_wv_path=self.extraction_params.get("wv_fpath","")
     self.wv_model=Word2Vec.load(cur_wv_path)
     self.extraction_params["wv_model"]=self.wv_model
+  def update_state_dict(self,new_state_dict):
+    self.model.load_state_dict(new_state_dict)
+    self.model.eval()
   def pred(self,raw_input_dict):
     input_vector,input_lb=self.ft_lb_extraction_fn(raw_input_dict,self.extraction_params)
     input_tensor=to_tensor(input_vector)
