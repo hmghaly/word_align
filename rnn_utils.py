@@ -743,7 +743,9 @@ class load_nn:
 
     self.model_data_dict=torch.load(model_fpath)
     self.cur_params=self.model_data_dict.get("params",{})
-    self.extraction_params=self.model_data_dict["feature_params"]
+    if extraction_params!=None: self.extraction_params=extraction_params
+    else: self.extraction_params=self.model_data_dict["feature_params"]
+    
     self.training_progress_list=self.model_data_dict.get("training_progress_list",[])
     self.best_dev_loss=self.model_data_dict.get("best_dev_loss",1)
     self.last_epoch=self.model_data_dict.get("last_epoch")
