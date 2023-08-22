@@ -1262,7 +1262,7 @@ def para2sents(text):
 
 #============ Pre-editing pipeline ========================
 def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5):
-  sent_tokens0=add_padding(tok(sent_str))
+  sent_tokens0=general.add_padding(tok(sent_str))
   span_repl_items=extract_repl_instances(sent_tokens0,[],first_token_dict)
   new_items=[]
   for item0 in span_repl_items:
