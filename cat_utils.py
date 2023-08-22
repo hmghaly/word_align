@@ -1276,22 +1276,24 @@ def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5):
   pre_edited_sent_tokens,valid_repl=repl_span_phrase(sent_tokens0,new_items,sort_by="wt")
   if pre_edited_sent_tokens[0]=="<s>": pre_edited_sent_tokens=pre_edited_sent_tokens[1:]
   if pre_edited_sent_tokens[-1]=="</s>": pre_edited_sent_tokens=pre_edited_sent_tokens[:-1]
-  return pre_edited_sent_tokens
+  return pre_edited_sent_tokens,valid_repl
 
 def pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5):
   cur_docx_edit_list=get_docx_paras_edits(docx_fpath)
   new_edit_pre_edit_list=[]
+  all_repl_inst_list=[]
   for docx_para_edit_item in cur_docx_edit_list:
     para_path0,original0,final0,edited0=docx_para_edit_item
     original_tokens=general.tok(original0)
     final_tokens=general.tok(final0)
     if original0.strip()=="" or final0.strip()=="": pre_edit_out=original0
-    pre_edit_out_tokens=pre_edit(original0,nn_model_obj,first_token_dict,pred_threshold)
+    pre_edit_out_tokens,valid_repl=pre_edit(original0,nn_model_obj,first_token_dict,pred_threshold)
     pre_edit_out_str=general.de_tok2str(pre_edit_out_tokens)
     pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens)
     token_edited_html=get_edit_html(original_tokens,final_tokens)
     new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
-  return new_edit_pre_edit_list
+    all_repl_inst_list.extend(valid_repl)
+  return new_edit_pre_edit_list,all_repl_inst_list
 
 def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_table_template.html"):
   table_content0=""
