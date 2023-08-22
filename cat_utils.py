@@ -1154,7 +1154,7 @@ def repl_phrase(sent_tokens,phrase_to_be_replaced,new_phrase): #replace a phrase
   return new_tokens
 
 #18 Aug 23
-def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_freq=None):
+def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_freq=None): #apply a list of replacement instances with their weight/freq to tokenized sentence - sort instances by weight and exclude overlapping instances - outputs new sentence and valid replacemnt instances
   used_locs=[]
   valid_repl_instances=[]
   repl_inst_wt_list.sort(key=lambda x:x.get("sort_by",0))
@@ -1163,6 +1163,7 @@ def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_f
     cur_freq=cur_repl_inst0.get("freq")
     if cur_wt!=None and cur_wt<min_wt: continue
     if min_freq!=None and cur_freq!=None and cur_freq<min_freq: continue
+    #print(">>>>>", cur_repl_inst0)
     x0,x1 = cur_repl_inst0["span"]
     cur_locs=list(range(x0,x1+1))
     found_in_used_check=any([v in used_locs for v in cur_locs])
@@ -1175,6 +1176,7 @@ def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_f
   new_sent_tokens=[]
   prev_i=0
   for valid_item0 in valid_repl_instances:
+    #print("valid_item0",valid_item0)
     span0=valid_item0["span"]
     trg0=valid_item0["trg"]
     x0,x1=span0
@@ -1183,7 +1185,39 @@ def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_f
     prev_i=x1+1
     new_sent_tokens.extend(prev_chunk+cur_chunk)
   new_sent_tokens.extend(sent_tokens[prev_i:])
-  return new_sent_tokens
+  return new_sent_tokens, valid_repl_instances
+
+
+# def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_freq=None):
+#   used_locs=[]
+#   valid_repl_instances=[]
+#   repl_inst_wt_list.sort(key=lambda x:x.get("sort_by",0))
+#   for cur_repl_inst0 in repl_inst_wt_list:
+#     cur_wt=cur_repl_inst0.get("wt")
+#     cur_freq=cur_repl_inst0.get("freq")
+#     if cur_wt!=None and cur_wt<min_wt: continue
+#     if min_freq!=None and cur_freq!=None and cur_freq<min_freq: continue
+#     x0,x1 = cur_repl_inst0["span"]
+#     cur_locs=list(range(x0,x1+1))
+#     found_in_used_check=any([v in used_locs for v in cur_locs])
+#     if found_in_used_check: continue
+#     else:
+#       used_locs.extend(cur_locs)
+#       valid_repl_instances.append(cur_repl_inst0)
+#       #print(">>>",cur_repl_inst0)
+#   valid_repl_instances.sort(key=lambda x:x["span"])
+#   new_sent_tokens=[]
+#   prev_i=0
+#   for valid_item0 in valid_repl_instances:
+#     span0=valid_item0["span"]
+#     trg0=valid_item0["trg"]
+#     x0,x1=span0
+#     prev_chunk=sent_tokens[prev_i:x0]
+#     cur_chunk=trg0.split(" ")
+#     prev_i=x1+1
+#     new_sent_tokens.extend(prev_chunk+cur_chunk)
+#   new_sent_tokens.extend(sent_tokens[prev_i:])
+#   return new_sent_tokens
 
 
 
@@ -1239,7 +1273,7 @@ def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5):
     if wt0<pred_threshold: continue
     item0["wt"]=wt0
     new_items.append(item0)
-  pre_edited_sent_tokens=repl_span_phrase(sent_tokens0,new_items,sort_by="wt")
+  pre_edited_sent_tokens,valid_repl=repl_span_phrase(sent_tokens0,new_items,sort_by="wt")
   if pre_edited_sent_tokens[0]=="<s>": pre_edited_sent_tokens=pre_edited_sent_tokens[1:]
   if pre_edited_sent_tokens[-1]=="</s>": pre_edited_sent_tokens=pre_edited_sent_tokens[:-1]
   return pre_edited_sent_tokens
