@@ -576,7 +576,7 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
     for batch_i, cur_batch in enumerate(batch_iterator):
       last_batch_i=model_data_dict.get("last_batch_i")
       if last_batch_i!=None and batch_i<=last_batch_i:
-        print(f"batch already used {batch_i}- last_batch_i: {last_batch_i}")
+        #print(f"batch already used {batch_i}- last_batch_i: {last_batch_i}")
         continue
       #print("batch_i",batch_i, "cur_batch",len(cur_batch))
       t0=time.time()
@@ -697,8 +697,15 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
       model_data_dict["latest_state_dict"]=model.state_dict()
       torch.save(model_data_dict, model_fpath)
 
+    #resetting counters
+    model_data_dict["epoch_train_counter"]=0
+    model_data_dict["epoch_dev_counter"]=0
+    model_data_dict["epoch_train_loss_total"]=0
+    model_data_dict["epoch_dev_loss_total"]=0      
 
-    model_data_dict["last_batch_i"]=None
+
+
+    model_data_dict["last_batch_i"]=None #resetting last batch to none after the end of the epoch, to avoid restarting in the middle batches at the new epoch
     #end of batch - save model
     epoch_train_avg=epoch_train_loss_total/epoch_train_counter
     epoch_dev_avg=epoch_dev_loss_total/epoch_dev_counter
