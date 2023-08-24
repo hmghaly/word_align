@@ -279,6 +279,9 @@ def softmax(x):
     e_x = np.exp(x - np.max(x)) # max(x) subtracted for numerical stability
     return e_x / np.sum(e_x)
 
+def get_model_n_params(nn_model_obj):
+  return sum(p.numel() for p in nn_model_obj.model.parameters() if p.requires_grad)
+
 def get_params(state_dict0): #get network parameters from state dict/understand network architecture from state dict
   params={}
   all_layers=[]

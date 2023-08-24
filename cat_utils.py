@@ -145,6 +145,7 @@ def extract_ft_lb(input_dict,params={}): #extract features and labels from an in
         temp.extend(found_vec)
     debug_dict["include_chunks_wv"]=temp
 
+
   if include_prev_wv:
     found_vec=cur_vec_dict.get(prev_token0,empty_vec0)
     combined_vec.extend(found_vec)  
@@ -1270,10 +1271,10 @@ def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5):
     try: wt0=nn_model_obj.pred(item0)
     except: wt0=0
     #print(item0,wt0)
-    if wt0<pred_threshold: continue
+    #if wt0<pred_threshold: continue
     item0["wt"]=wt0
     new_items.append(item0)
-  pre_edited_sent_tokens,valid_repl=repl_span_phrase(sent_tokens0,new_items,sort_by="wt")
+  pre_edited_sent_tokens,valid_repl=repl_span_phrase(sent_tokens0,new_items,sort_by="wt",min_wt=pred_threshold)
   if pre_edited_sent_tokens[0]=="<s>": pre_edited_sent_tokens=pre_edited_sent_tokens[1:]
   if pre_edited_sent_tokens[-1]=="</s>": pre_edited_sent_tokens=pre_edited_sent_tokens[:-1]
   return pre_edited_sent_tokens,valid_repl
