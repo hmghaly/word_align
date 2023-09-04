@@ -5,6 +5,7 @@ from itertools import groupby
 from difflib import SequenceMatcher
 
 
+from datetime import datetime
 
 
 if sys.version[0]=="3": 
@@ -18,6 +19,11 @@ else:
 
 def now():
   return time.time()
+
+def today():
+  date_str=datetime.today().strftime('%Y-%m-%d')
+  return date_str
+
 
 #from difflib import SequenceMatcher
 def unescape(text_with_html_entities):
