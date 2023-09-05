@@ -904,7 +904,7 @@ def identify_edit_type(src_str,trg_str,max_ndiff=2,excluded_tokens=all_excluded)
     edit_type="capitalization"
   elif src_str.isdigit() and re.findall("\d+",trg_str)==[]:
     edit_type="number"
-  elif src_str[0].isdigit() and src_str[-2:].lower() in ["st","nd","rd","th"]  and re.findall("\d+",trg_str)==[]:
+  elif src_str[0].isdigit() and len(src_str.split(" "))==1 and src_str[-2:].lower() in ["st","nd","rd","th"]  and re.findall("\d+",trg_str)==[]:
     edit_type="number"
 
   elif general.norm_unicode(src_str)==general.norm_unicode(trg_str): edit_type="unicode" #deal with accents, diacrtiics and other unicode elements
