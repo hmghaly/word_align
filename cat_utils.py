@@ -902,6 +902,10 @@ def identify_edit_type(src_str,trg_str,max_ndiff=2,excluded_tokens=all_excluded)
   elif src_str.replace("or","our")==trg_str: edit_type="or-our"
   elif key.lower()==sub_key.lower():
     edit_type="capitalization"
+  elif src_str.isdigit() and re.findall("\d+",trg_str)==[]:
+    edit_type="number"
+  elif src_str[0].isdigit() and src_str[-2:].lower() in ["st","nd","rd","th"]  and re.findall("\d+",trg_str)==[]:
+    edit_type="number"
 
   elif general.norm_unicode(src_str)==general.norm_unicode(trg_str): edit_type="unicode" #deal with accents, diacrtiics and other unicode elements
   elif len(re.split("\W+",src_str))==1 and len(re.split("\W+",trg_str))==1: #only one word src/trg
