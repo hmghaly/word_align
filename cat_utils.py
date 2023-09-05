@@ -905,9 +905,11 @@ def identify_edit_type(src_str,trg_str,max_ndiff=2,excluded_tokens=all_excluded)
 
   elif general.norm_unicode(src_str)==general.norm_unicode(trg_str): edit_type="unicode" #deal with accents, diacrtiics and other unicode elements
   elif len(re.split("\W+",src_str))==1 and len(re.split("\W+",trg_str))==1: #only one word src/trg
-    if src_str in excluded_tokens or trg_str in excluded_tokens: edit_type="spelling-excluded"
+    if src_str in excluded_tokens or trg_str in excluded_tokens or src_str[0].isdigit() or src_str[-1].isdigit() or trg_str[0].isdigit() or trg_str[-1].isdigit(): 
+        edit_type="spelling-excluded"
     elif stemmer.stem(src_str)==stemmer.stem(trg_str): edit_type="inflection" #should use lemmas - but pattern is unstable
     elif cur_ndiff0<max_ndiff: edit_type="spelling"
+    else:  edit_type="different-word"
     
   elif key.isupper():
     if key=="".join([v for v in sub_key if v.isupper()]) or key.lower()=="".join([v[0].lower() for v in sub_key.split(" ")]):
