@@ -23,6 +23,13 @@ if ver[0]==2:
   import HTMLParser
   #HTMLParser.HTMLParser().unescape('Suzy &amp; John')  
 
+import difflib
+from nltk.stem.snowball import SnowballStemmer
+
+from pattern.en import lemma #make sure to install
+
+stemmer = SnowballStemmer("english")
+
 excluded_punc_tokens=["<s>","</s>",".","(",")",",",";","[","]",":","?","/","#","”","“","'s"]
 excluded_words=["the","a","an","and","or", "of","in","on","at","to","by","with","for","from","about","against",
 "is","are","was","were", "be","being", "has","have","had","it","its","they","as",
@@ -877,15 +884,28 @@ class docx:
     os.rename(self.TEMP_ZIP, self.TEMP_DOCX)
     shutil.rmtree(self.TEMP_FOLDER)
 
+
+def get_ndiff(str0,str1):
+  cur_ndiff=sum([i[0] != ' '  for i in difflib.ndiff(str0, str1)])/2
+  return cur_ndiff
+
 #Editing project
-def identify_edit_type(src_str,trg_str):
+def identify_edit_type(src_str,trg_str,max_ndiff=2):
   key=src_str
   sub_key=trg_str
   no_dash_key_str="".join([v for v in key.split(" ") if v.strip("_")!="-"])
   no_dash_subkey_str="".join([v for v in sub_key.split(" ") if v.strip("_")!="-"])
+  cur_ndiff0=get_ndiff(src_str,trg_str)
 
   edit_type="other" #["other","acronym","acronym-s","capitalization","compunding","hyphenation"]
-  if key.isupper():
+  if src_str.replace("s","z")!=trg_str: edit_type="s-z"
+  elif src_str.replace("or","our")!=trg_str: edit_type="or-our"
+  elif general.norm_unicode(src_str)==general.norm_unicode(trg_str): edit_type="unicode" #deal with accents, diacrtiics and other unicode elements
+  elif len(re.split("\W+",src_str))==1 and len(re.split("\W+",trg_str))==1: #only one word src/trg
+  	if lemma(src_str)==lemma(trg_str): edit_type="inflection"
+  	elif cur_ndiff0<max_ndiff: edit_type="spelling"
+    
+  elif key.isupper():
     if key=="".join([v for v in sub_key if v.isupper()]) or key.lower()=="".join([v[0].lower() for v in sub_key.split(" ")]):
       edit_type="acronym"
   elif key[-1]=="s" and len(key)>2 and key[:-1].isupper(): #SDGs IEDs
