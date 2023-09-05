@@ -26,7 +26,7 @@ if ver[0]==2:
 import difflib
 from nltk.stem.snowball import SnowballStemmer
 
-from pattern.en import lemma #make sure to install
+#from pattern.en import lemma #make sure to install
 
 stemmer = SnowballStemmer("english")
 
@@ -902,7 +902,7 @@ def identify_edit_type(src_str,trg_str,max_ndiff=2):
   elif src_str.replace("or","our")==trg_str: edit_type="or-our"
   elif general.norm_unicode(src_str)==general.norm_unicode(trg_str): edit_type="unicode" #deal with accents, diacrtiics and other unicode elements
   elif len(re.split("\W+",src_str))==1 and len(re.split("\W+",trg_str))==1: #only one word src/trg
-  	if lemma(src_str)==lemma(trg_str): edit_type="inflection"
+  	if stemmer.stem(src_str)==stemmer.stem(trg_str): edit_type="inflection" #should use lemmas - but pattern is unstable
   	elif cur_ndiff0<max_ndiff: edit_type="spelling"
     
   elif key.isupper():
