@@ -890,7 +890,7 @@ def get_ndiff(str0,str1):
   return cur_ndiff
 
 #Editing project
-def identify_edit_type(src_str,trg_str,max_ndiff=2):
+def identify_edit_type(src_str,trg_str,max_ndiff=2,excluded_tokens=all_excluded):
   key=src_str
   sub_key=trg_str
   no_dash_key_str="".join([v for v in key.split(" ") if v.strip("_")!="-"])
@@ -900,9 +900,13 @@ def identify_edit_type(src_str,trg_str,max_ndiff=2):
   edit_type="other" #["other","acronym","acronym-s","capitalization","compunding","hyphenation"]
   if src_str.replace("s","z")==trg_str: edit_type="s-z"
   elif src_str.replace("or","our")==trg_str: edit_type="or-our"
+  elif key.lower()==sub_key.lower():
+    edit_type="capitalization"
+
   elif general.norm_unicode(src_str)==general.norm_unicode(trg_str): edit_type="unicode" #deal with accents, diacrtiics and other unicode elements
   elif len(re.split("\W+",src_str))==1 and len(re.split("\W+",trg_str))==1: #only one word src/trg
-  	if stemmer.stem(src_str)==stemmer.stem(trg_str): edit_type="inflection" #should use lemmas - but pattern is unstable
+    if src_str in excluded_tokens or trg_str in excluded_tokens: edit_type="spelling-excluded"
+  	elif stemmer.stem(src_str)==stemmer.stem(trg_str): edit_type="inflection" #should use lemmas - but pattern is unstable
   	elif cur_ndiff0<max_ndiff: edit_type="spelling"
     
   elif key.isupper():
@@ -911,8 +915,6 @@ def identify_edit_type(src_str,trg_str,max_ndiff=2):
   elif key[-1]=="s" and len(key)>2 and key[:-1].isupper(): #SDGs IEDs
     if key[:-1]=="".join([v for v in sub_key if v.isupper()]) or key[:-1].lower()=="".join([v[0].lower() for v in sub_key.split(" ")]):
       edit_type="acronym-s"
-  elif key.lower()==sub_key.lower():
-    edit_type="capitalization"
   elif key.replace(" ","")==sub_key.replace(" ",""):
     edit_type="compunding"
   elif no_dash_key_str==no_dash_subkey_str:
