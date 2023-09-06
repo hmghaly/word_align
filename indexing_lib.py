@@ -198,8 +198,8 @@ def indexing_pipeline(loc_iterator,src_i,trg_i,params={}): #iterator includes bo
       line_split=cur_line.split("\t")
       if f0!="":
         src0,trg0=line_split[src_i],line_split[trg_i]
-        src_toks=tok(src0)
-        trg_toks=tok(trg0) #will need to use general purpose tokenization later
+        src_toks=general.tok(src0)
+        trg_toks=general.tok(trg0) #will need to use general purpose tokenization later
         src_filter_params={"exclude_numbers":True, "excluded_words":excluded_src_tokens}
         trg_filter_params={"exclude_numbers":True, "excluded_words":excluded_src_tokens}
         filtered_src=filter_toks(src_toks,params=src_filter_params) #src_toks,trg_toks
@@ -235,8 +235,8 @@ def counting_pipeline(loc_iterator,src_i,trg_i,params={}): #iterator includes bo
       line_split=cur_line.split("\t")
       if f0!="":
         src0,trg0=line_split[src_i],line_split[trg_i]
-        src_toks=tok(src0)
-        trg_toks=tok(trg0) #will need to use general purpose tokenization later
+        src_toks=general.tok(src0)
+        trg_toks=general.tok(trg0) #will need to use general purpose tokenization later
         src_filter_params={"exclude_numbers":True, "excluded_words":excluded_src_tokens}
         trg_filter_params={"exclude_numbers":True, "excluded_words":excluded_src_tokens}
         filtered_src=filter_toks(src_toks,params=src_filter_params) #src_toks,trg_toks
