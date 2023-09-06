@@ -215,3 +215,44 @@ def indexing_pipeline(loc_iterator,src_i,trg_i,params={}): #iterator includes bo
     src_inv_index=get_inv_index(src_fwd_index0)
     trg_inv_index=get_inv_index(trg_fwd_index0)
     return src_inv_index,trg_inv_index
+
+
+def counting_pipeline(loc_iterator,src_i,trg_i,params={}): #iterator includes both line str and line loc within a file
+    cur_line="-"
+    src_fwd_index0,trg_fwd_index0=[],[]
+    src_counter_dict,trg_counter_dict={},{}
+    counter=0
+    bitext_list=[]
+    #t0=time.time()
+    while cur_line!="":
+      if counter%5000==0: print(counter)
+      #cur_loc=fopen.tell()
+      try: cur_loc,f0=next(loc_iterator) #fopen.readline()
+      except StopIteration: cur_loc,f0=-1,""
+      
+      #print([f0])
+      cur_line=f0.strip("\n\r\t")
+      line_split=cur_line.split("\t")
+      if f0!="":
+        src0,trg0=line_split[src_i],line_split[trg_i]
+        src_toks=tok(src0)
+        trg_toks=tok(trg0) #will need to use general purpose tokenization later
+        src_filter_params={"exclude_numbers":True, "excluded_words":excluded_src_tokens}
+        trg_filter_params={"exclude_numbers":True, "excluded_words":excluded_src_tokens}
+        filtered_src=filter_toks(src_toks,params=src_filter_params) #src_toks,trg_toks
+        filtered_trg=filter_toks(trg_toks,params=trg_filter_params)
+        for s_tok0 in filtered_src: 
+        	if s_tok0!="": src_counter_dict[s_tok0]=src_counter_dict.get(s_tok0,0)+1
+        for t_tok0 in filtered_trg: 
+        	if t_tok0!="": trg_counter_dict[t_tok0]=trg_counter_dict.get(t_tok0,0)+1
+        # src_sent_fwd_index=index_sent_toks(filtered_src,cur_loc)
+        # trg_sent_fwd_index=index_sent_toks(filtered_trg,cur_loc)
+        # src_sent_fwd_index=index_sent_toks(filtered_src,cur_loc)
+        # trg_sent_fwd_index=index_sent_toks(filtered_trg,cur_loc)
+        # src_fwd_index0.extend(src_sent_fwd_index)
+        # trg_fwd_index0.extend(trg_sent_fwd_index)
+      counter+=1
+      #if counter>1000: break
+    # src_inv_index=get_inv_index(src_fwd_index0)
+    # trg_inv_index=get_inv_index(trg_fwd_index0)
+    return src_counter_dict,trg_counter_dict
