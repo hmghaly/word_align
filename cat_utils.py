@@ -900,6 +900,7 @@ def identify_edit_type(src_str,trg_str,max_ndiff=2,excluded_tokens=all_excluded)
   edit_type="other" #["other","acronym","acronym-s","capitalization","compunding","hyphenation"]
   if src_str.replace("s","z")==trg_str: edit_type="s-z"
   elif src_str.replace("or","our")==trg_str: edit_type="or-our"
+  elif re.sub('er$', 're', src_str)==trg_str or re.sub('ers$', 'res', src_str)==trg_str: edit_type="er-re"  
   elif key.lower()==sub_key.lower():
     edit_type="capitalization"
   elif src_str.isdigit() and re.findall("\d+",trg_str)==[]:
