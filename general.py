@@ -777,6 +777,14 @@ def get_last_line(fpath,chunk_size=4000):
   fopen0.close()
   return last_line
 
+def seek_read_line(fpath,seek_to):
+  fopen0=open(fpath)
+  fopen0.seek(seek_to)
+  cur_line=fopen0.readline()
+  fopen0.close()
+  return cur_line
+
+
 
 #iter functions - 10 August 2023
 def get_iter_chunks(iterator,chunk_size,min_i=None): #iterate certain chunk size over an iterable, with a limit min_i, excluding all iterations before
