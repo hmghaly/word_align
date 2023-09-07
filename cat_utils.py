@@ -1188,8 +1188,8 @@ def repl_phrase(sent_tokens,phrase_to_be_replaced,new_phrase): #replace a phrase
 def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_freq=None): #apply a list of replacement instances with their weight/freq to tokenized sentence - sort instances by weight and exclude overlapping instances - outputs new sentence and valid replacemnt instances
   used_locs=[]
   valid_repl_instances=[]
-  #repl_inst_wt_list.sort(key=lambda x:x.get("sort_by",0))
-  repl_inst_wt_list.sort(key=lambda x:(-x.get(sort_by,0), -x.get("freq",0)))
+  repl_inst_wt_list.sort(key=lambda x:-x.get(sort_by,0))
+  #repl_inst_wt_list.sort(key=lambda x:(-x.get(sort_by,0), -x.get("freq",0)))
   for cur_repl_inst0 in repl_inst_wt_list:
     cur_wt=cur_repl_inst0.get("wt")
     cur_freq=cur_repl_inst0.get("freq")
