@@ -651,7 +651,7 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
         batch_dev_counter+=1
         batch_dev_loss_total+=loss.item()
 
-        dev_analysis_list=analyze_binary_output(output_tensor,yhat,dev_analysis_list)
+        dev_analysis_list=analyze_binary_output([lb0],yhat.tolist(),dev_analysis_list)
 
       epoch_train_counter+=batch_train_counter
       epoch_dev_counter+=batch_dev_counter
