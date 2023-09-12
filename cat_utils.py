@@ -1157,7 +1157,7 @@ def get_possible_replacements(sent_tokens,first_repl_dict,exclude_sent_start=Tru
 
 
 #============ Replacement model ===================
-def apply_replace(sent_tokens,first_repl_dict): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
+def apply_replace_OLD(sent_tokens,first_repl_dict): #use the repl dict (with keys as first word, value is a list of triplets (repl_src,repl_trg,wt))
   new_sent_tokens=list(sent_tokens)
   valid_replacements=[]
   for word0 in list(set(sent_tokens)):
@@ -1169,6 +1169,25 @@ def apply_replace(sent_tokens,first_repl_dict): #use the repl dict (with keys as
     repl_src,repl_trg,repl_wt=repl0
     new_sent_tokens=repl_phrase(new_sent_tokens,repl_src,repl_trg)
   return new_sent_tokens
+
+
+def get_repl_list(sent_tokens,first_repl_dict): #all possible "flat" replacements, with their freq {src:xxx,trg:xxx,span:xxx,freq:xxx} 
+  initial_repl_list=get_possible_replacements(sent_tokens,first_repl_dict)
+  all_instances=[]
+  for src0,trg_dict0,span0 in initial_repl_list:
+    for trg0,freq0 in trg_dict0.items():
+      temp_dict={}
+      temp_dict["src"]=src0
+      temp_dict["trg"]=trg0
+      temp_dict["freq"]=freq0
+      temp_dict["span"]=span0
+      all_instances.append(temp_dict)
+  return all_instances
+
+def apply_freq_repl(sent_tokens,first_repl_dict): #apply a first token dictionary sorted by frequency
+  repl_inst_wt_list=get_repl_list(sent_tokens,first_repl_dict)
+  new_sent_tokens,valid_repl_list=repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="freq")
+  return new_sent_tokens,valid_repl_list
 
 
 

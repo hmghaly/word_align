@@ -466,6 +466,20 @@ def seq_nn(n_input,n_hidden,n_out,n_layers):
   )
   return model0
 
+
+def analyze_binary_output(actual_list,pred_list,analysis_list): #compare items of predicted and actual lists, to analyze recall and precision .. etc
+  for i0,cur_actual0 in enumerate(actual_list):
+    cur_pred=pred_list[i0]
+    cur_pred_rounded=round(cur_pred)
+    is_correct=cur_pred_rounded==cur_actual0
+    cur_item_dict=analysis_list[i0]
+    temp_item_val_dict=cur_item_dict.get(cur_actual0,{})
+    temp_item_val_dict[is_correct]=temp_item_val_dict.get(is_correct,0)+1
+    cur_item_dict[cur_actual0]=temp_item_val_dict
+    analysis_list[i0]=cur_item_dict
+  return analysis_list
+
+
 def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterion):
   n_input0=params["n_input"]#=n_input #np.array(cur_vec).shape[-1] #cur_wv_model.vector_size #np.array(first_item[1]).shape[-1]
   n_output0=params["n_output"] #1 #np.array(cur_vec).shape[-1] #np.array(first_item[2]).shape[-1]
@@ -528,6 +542,9 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
   model_data_dict["network_def"]=nn_class #check
   model_data_dict["ft_lb_extraction_fn"]=ft_lb_extraction_fn
 
+  
+
+
 
   if os.path.exists(model_fpath):
     temp_line=f"found model: {model_fpath}"
@@ -562,6 +579,8 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
   for epoch in range(n_epochs0):
     epoch_train_counter,epoch_dev_counter=0,0
     epoch_train_loss_total,epoch_dev_loss_total=0,0
+    train_analysis_list=[{}]*n_output0
+    dev_analysis_list=[{}]*n_output0
     model.zero_grad()
 
     if last_epoch!=None and epoch<=last_epoch: 
@@ -626,46 +645,14 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
         yhat = model(input_tensor).to(device)
         #negative0,positive0,acr0=[],[],[]
 
-        # if dev_i<1000:
-        #   valid=False
-        #   if raw0["outcome"]==1 and positive_counter<5:
-        #     #positive0.append((raw0,lb0,yhat.item()))
-        #     valid=True
-        #     positive_counter+=1
-        #   elif raw0["outcome"]==0 and negative_counter<5:
-        #     valid=True
-        #     negative_counter+=1
-        #   elif raw0["src"].isupper() and acr_counter<5:
-        #     valid=True
-        #     acr_counter+=1
-            #acr0.append((raw0,lb0,yhat.item()))
-          # if valid:
-          #   print(raw0["src"],">>>",raw0["trg"])
-          #   print(raw0["context"])
-          #   print(lb0,round(yhat.item(),4))
-          #   print("---")
-
-        # combined=negative0[:5]+positive0[:5]+acr0[:5]
-        # for a in combined:
-        #   raw0,outcome0,pred0=a
-        #   print("combined",len(combined), raw0["src"],">>>",raw0["trg"], "==", raw0["context"])
-        #   print(outcome0,round(pred0,4))
-        #   print("---")
-
-
-
-          # if raw0["outcome"]==1 and dev_i<100: valid=True
-          # if raw0["src"].isupper() and raw0["outcome"]==1: valid=True
-          # if dev_i<10: valid=True
-          # if valid:
-          #   print(raw0)
-          #   print(dev_i,lb0,yhat.item())
-          #   print("----")
 
         #loss = loss_criterion(yhat, lb0)
         loss = loss_criterion(yhat, output_tensor)
         batch_dev_counter+=1
         batch_dev_loss_total+=loss.item()
+
+        dev_analysis_list=analyze_binary_output(output_tensor,yhat,dev_analysis_list)
+
       epoch_train_counter+=batch_train_counter
       epoch_dev_counter+=batch_dev_counter
       epoch_train_loss_total+=batch_train_loss_total
@@ -681,7 +668,7 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
       t2=time.time()
       batch_elapsed=t2-t0
       #print("batch_i",batch_i, "cur_batch",len(cur_batch), "batch_train_avg",round(batch_train_avg,4),"batch_dev_avg",round(batch_dev_avg,4))
-      temp_line=f"epoch: {epoch} - batch_i: {batch_i} - cur_batch: {len(cur_batch)} - elapsed: {round(batch_elapsed,2)} - batch_train_avg: {round(batch_train_avg,4)} - batch_dev_avg: {round(batch_dev_avg,4)}"
+      temp_line=f"epoch: {epoch} - batch_i: {batch_i} - elapsed: {round(batch_elapsed,2)} - batch_train_avg: {round(batch_train_avg,4)} - batch_dev_avg: {round(batch_dev_avg,4)} - {dev_analysis_list}"
       print(temp_line)
       log_something(temp_line,log_fpath)
 
