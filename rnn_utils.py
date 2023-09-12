@@ -479,6 +479,20 @@ def analyze_binary_output(actual_list,pred_list,analysis_list): #compare items o
     analysis_list[i0]=cur_item_dict
   return analysis_list
 
+def get_accuracy_analysis(analyis_list0): #analyze the output of analyze_binary_output, for accuracy: [{0: {True: 9546, False: 9}, 1: {False: 106, True: 339}}]
+  analyis_list0.sort()
+  new_list=[]
+  for temp_dict0 in analyis_list0:
+    cur_items=list(temp_dict0.items())
+    new_items_dict={}
+    for a,b_dict in cur_items:
+      cur_accuracy=b_dict.get(True,0)/sum(b_dict.values())
+      b_dict["accuracy"]=round(cur_accuracy,2)
+      new_items_dict[a]=b_dict
+    new_list.append(new_items_dict)
+  return new_list
+
+
 
 def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterion):
   n_input0=params["n_input"]#=n_input #np.array(cur_vec).shape[-1] #cur_wv_model.vector_size #np.array(first_item[1]).shape[-1]
@@ -669,7 +683,8 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
       t2=time.time()
       batch_elapsed=t2-t0
       #print("batch_i",batch_i, "cur_batch",len(cur_batch), "batch_train_avg",round(batch_train_avg,4),"batch_dev_avg",round(batch_dev_avg,4))
-      temp_line=f"epoch: {epoch} - batch_i: {batch_i} - elapsed: {round(batch_elapsed,2)} - batch_train_avg: {round(batch_train_avg,4)} - batch_dev_avg: {round(batch_dev_avg,4)} - {dev_analysis_list}"
+      dev_accuracy_analysis_list=get_accuracy_analysis(dev_analysis_list)
+      temp_line=f"epoch: {epoch} - batch_i: {batch_i} - elapsed: {round(batch_elapsed,2)} - batch_train_avg: {round(batch_train_avg,4)} - batch_dev_avg: {round(batch_dev_avg,4)} - {dev_accuracy_analysis_list}"
       print(temp_line)
       log_something(temp_line,log_fpath)
 
