@@ -684,7 +684,8 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
       batch_elapsed=t2-t0
       #print("batch_i",batch_i, "cur_batch",len(cur_batch), "batch_train_avg",round(batch_train_avg,4),"batch_dev_avg",round(batch_dev_avg,4))
       dev_accuracy_analysis_list=get_accuracy_analysis(dev_analysis_list)
-      temp_line=f"epoch: {epoch} - batch_i: {batch_i} - elapsed: {round(batch_elapsed,2)} - batch_train_avg: {round(batch_train_avg,4)} - batch_dev_avg: {round(batch_dev_avg,4)} - {dev_accuracy_analysis_list}"
+      dev_accuracy_analysis_list_sorted=sorted(list(dev_accuracy_analysis_list[0].items()))
+      temp_line=f"epoch: {epoch} - batch_i: {batch_i} - elapsed: {round(batch_elapsed,2)} - batch_train_avg: {round(batch_train_avg,4)} - batch_dev_avg: {round(batch_dev_avg,4)} - {dev_accuracy_analysis_list_sorted}"
       print(temp_line)
       log_something(temp_line,log_fpath)
 
