@@ -580,7 +580,7 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
     epoch_train_counter,epoch_dev_counter=0,0
     epoch_train_loss_total,epoch_dev_loss_total=0,0
     train_analysis_list=[{}]*n_output0
-    dev_analysis_list=[{}]*n_output0
+    
     model.zero_grad()
 
     if last_epoch!=None and epoch<=last_epoch: 
@@ -623,6 +623,7 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
       batch_train_counter,batch_dev_counter=0,0
       batch_train_loss_total,batch_dev_loss_total=0,0
       #print("train_data",len(train_data),"dev_data",len(dev_data))
+      dev_analysis_list=[{}]*n_output0
 
       for train_i,train_item in enumerate(train_data):
         raw0,ft_vec0,lb0=train_item
