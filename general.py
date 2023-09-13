@@ -1,4 +1,4 @@
-import re, os, shelve, unicodedata, sys, json, time
+import re, os, shelve, unicodedata, sys, json, time, random, string
 #import pandas as pd
 import re
 from itertools import groupby
@@ -23,6 +23,10 @@ def now():
 def today():
   date_str=datetime.today().strftime('%Y-%m-%d')
   return date_str
+
+
+def gen_id(size=6): #generate a random id of specific size
+  return ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
 
 
 #from difflib import SequenceMatcher
