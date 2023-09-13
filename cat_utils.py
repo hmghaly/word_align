@@ -1003,6 +1003,50 @@ def get_edit_html(tokens1,tokens2):
   return final_str
 
 
+#13 Sept
+def get_edits_pairs(tokens1,tokens2):
+  match_obj=SequenceMatcher(None,tokens1,tokens2)
+  final_list=[]
+  seq_pair_list=[]
+  for a in match_obj.get_opcodes():
+    match_type,x0,x1,y0,y1=a
+    from_seq0=tokens1[x0:x1]
+    to_seq0=tokens2[y0:y1]
+    seq_pair_list.append((from_seq0,to_seq0))
+  return seq_pair_list
+
+def edit_pairs2html_spans(tokens1,tokens2):
+  cur_seq_pairs=get_edits_pairs(tokens1,tokens2)
+  chunks=[]
+  for pair0 in cur_seq_pairs:
+    from_seq0,to_seq0=pair0
+    if from_seq0==to_seq0:
+      cur_chunk=general.de_tok2str(to_seq0)
+    else:
+      cur_id=general.gen_id(4)
+      from_str=general.de_tok2str(from_seq0)
+      to_str=general.de_tok2str(to_seq0)
+      cur_chunk=f'<span id="{cur_id}" class="replacement tentative"><span class="from_repl">{from_str}</span> <span class="to_repl">{to_str}</span></span>'
+    chunks.append(cur_chunk)
+  return " ".join(chunks)
+
+
+
+
+# def get_edit_html_NEW(tokens1,tokens2,use_spans=True):
+#   edit_list=get_seq_edits(tokens1,tokens2)
+#   final_str_items=[]
+#   for edit_type0,chunk0 in edit_list:
+#     cur_chunk_str=general.de_tok2str(chunk0)
+#     cur_chunk_str=safe_xml(cur_chunk_str)
+#     if edit_type0=="delete": final_str_items.append('<del>%s</del>'%cur_chunk_str)
+#     elif edit_type0=="insert": final_str_items.append('<ins>%s</ins>'%cur_chunk_str)
+#     else: final_str_items.append(cur_chunk_str)
+#   final_str=" ".join(final_str_items)
+#   return final_str
+
+
+
 def safe_xml(txt):
   txt=txt.replace("&","&amp;")
   txt=txt.replace("<","&lt;")
@@ -1371,12 +1415,12 @@ def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_tab
 
 
 
-
+def gen_para_id():
+  return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 
 ##################### OLD #########################
-def gen_para_id():
-  return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
 
 
 #OLD
