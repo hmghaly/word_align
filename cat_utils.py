@@ -1375,7 +1375,7 @@ def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5): #pre-ed
   if pre_edited_sent_tokens[-1]=="</s>": pre_edited_sent_tokens=pre_edited_sent_tokens[:-1]
   return pre_edited_sent_tokens,valid_repl
 
-def pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5):
+def pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5,pre_edit_original=True): #prediting the original of a docx file
   cur_docx_edit_list=get_docx_paras_edits(docx_fpath)
   new_edit_pre_edit_list=[]
   all_repl_inst_list=[]
@@ -1384,13 +1384,63 @@ def pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5):
     original_tokens=general.tok(original0)
     final_tokens=general.tok(final0)
     if original0.strip()=="" or final0.strip()=="": pre_edit_out=original0
-    pre_edit_out_tokens,valid_repl=pre_edit(original0,nn_model_obj,first_token_dict,pred_threshold)
+    if pre_edit_original: pre_edit_out_tokens,valid_repl=pre_edit(original0,nn_model_obj,first_token_dict,pred_threshold)
+    else: pre_edit_out_tokens,valid_repl=pre_edit(original0,nn_model_obj,first_token_dict,pred_threshold) #if we want to pre-edit the final
+
     pre_edit_out_str=general.de_tok2str(pre_edit_out_tokens)
     pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens)
     token_edited_html=get_edit_html(original_tokens,final_tokens)
     new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
     all_repl_inst_list.extend(valid_repl)
   return new_edit_pre_edit_list,all_repl_inst_list
+
+def analyze_pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5,pre_edit_original=True): #check how much of the actual replacements the model was able to predict
+  analysis_dict={}
+  n_human_edits=0 #excluding capitalization
+  n_model_edits=0
+  n_correct_model_edits=0
+  n_incorrect_model_edits=0
+
+  cur_docx_edit_list=get_docx_paras_edits(docx_fpath)
+  new_edit_pre_edit_list=[]
+  all_repl_inst_list=[]
+  for docx_para_edit_item in cur_docx_edit_list:
+    para_path0,original0,final0,edited0=docx_para_edit_item
+    original_tokens= general.add_padding(general.tok(original0)) 
+    final_tokens=general.add_padding(general.tok(final0)) 
+    if original0.strip()=="" or final0.strip()=="": pre_edit_out=original0
+    if pre_edit_original: pre_edit_out_tokens,valid_repl=pre_edit(original0,nn_model_obj,first_token_dict,pred_threshold)
+    else: pre_edit_out_tokens,valid_repl=pre_edit(final0,nn_model_obj,first_token_dict,pred_threshold) #if we want to pre-edit the final
+    n_model_edits+=len(valid_repl)
+
+    valid_compare_repl_spans_dict={} #check which spans are used in the human edits (excluding capitalization edits)
+    compare_repl_list=compare_repl(original_tokens,final_tokens)
+    for repl_item in compare_repl_list:
+      if repl_item[0]=="equal": continue
+      if " ".join(repl_item[1]).lower()==" ".join(repl_item[2]).lower(): continue
+      n_human_edits+=1
+      valid_compare_repl_spans_dict[repl_item[3]]=True
+
+
+    pre_edit_out_str=general.de_tok2str(pre_edit_out_tokens)
+    pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens)
+    token_edited_html=get_edit_html(original_tokens,final_tokens)
+    new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
+    for model_rep_inst in all_repl_inst_list:
+    	cur_span=model_rep_inst["span"]
+    	if valid_compare_repl_spans_dict.get(cur_span,False): n_correct_model_edits+=1
+        else: n_incorrect_model_edits+=1
+    	all_repl_inst_list.extend(valid_repl)
+  analysis_dict["n_human_edits"]=n_human_edits
+  analysis_dict["n_model_edits"]=n_model_edits
+  analysis_dict["n_correct_model_edits"]=n_correct_model_edits
+  analysis_dict["n_incorrect_model_edits"]=n_incorrect_model_edits
+  analysis_dict["simple_recall"]=n_correct_model_edits/n_human_edits
+  analysis_dict["simple_precision"]=n_correct_model_edits/n_model_edits
+
+
+  return new_edit_pre_edit_list,all_repl_inst_list,analysis_dict
+
 
 def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_table_template.html"):
   table_content0=""
