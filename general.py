@@ -321,10 +321,15 @@ def de_tok2str(tokens): #detokenize tokens into string
   return detok_str0
 
 
-def add_padding(token_list):
+def add_padding(token_list): #add sentence start/end marker to a list of tokens
   if len(token_list)==0: return ["<s>","</s>"]
   if token_list[0]=="<s>" and token_list[-1]=="</s>": return token_list
   return ["<s>"]+token_list+["</s>"]
+
+def remove_padding(token_list): #remove sentence start/end marker to a list of tokens
+  if token_list[0]=="<s>": token_list=token_list[1:]
+  if token_list[-1]=='</s>': token_list=token_list[:-1]
+  return token_list
 
 
 
