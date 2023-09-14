@@ -1396,6 +1396,8 @@ def pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5,pr
     all_repl_inst_list.extend(valid_repl)
   return new_edit_pre_edit_list,all_repl_inst_list
 
+
+
 def analyze_pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5,pre_edit_original=True): #check how much of the actual replacements the model was able to predict
   analysis_dict={}
   n_human_edits=0 #excluding capitalization
@@ -1418,30 +1420,38 @@ def analyze_pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshol
     valid_compare_repl_spans_dict={} #check which spans are used in the human edits (excluding capitalization edits)
     compare_repl_list=compare_repl(original_tokens,final_tokens)
     for repl_item in compare_repl_list:
+      
       if repl_item[0]=="equal": continue
       if " ".join(repl_item[1]).lower()==" ".join(repl_item[2]).lower(): continue
+      #print("repl_item",repl_item)
       n_human_edits+=1
       valid_compare_repl_spans_dict[repl_item[3]]=True
 
-
+    #print("valid_compare_repl_spans_dict",valid_compare_repl_spans_dict)
     pre_edit_out_str=general.de_tok2str(pre_edit_out_tokens)
     pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens)
     token_edited_html=get_edit_html(original_tokens,final_tokens)
     new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
-    for model_rep_inst in all_repl_inst_list:
-      cur_span=model_rep_inst["span"]
+    for model_repl_inst in valid_repl:
+      cur_span=model_repl_inst["span"]
       if valid_compare_repl_spans_dict.get(cur_span,False): n_correct_model_edits+=1
       else: n_incorrect_model_edits+=1
-      all_repl_inst_list.extend(valid_repl)
+      all_repl_inst_list.append(model_repl_inst)
+      #all_repl_inst_list.extend(valid_repl)
   analysis_dict["n_human_edits"]=n_human_edits
   analysis_dict["n_model_edits"]=n_model_edits
   analysis_dict["n_correct_model_edits"]=n_correct_model_edits
   analysis_dict["n_incorrect_model_edits"]=n_incorrect_model_edits
-  analysis_dict["simple_recall"]=round(n_correct_model_edits/n_human_edits,2)
-  analysis_dict["simple_precision"]=round(n_correct_model_edits/n_model_edits,2)
+  recall0=0
+  precision0=0
+  if n_human_edits>0: recall0=round(n_correct_model_edits/n_human_edits,2)
+  if n_model_edits>0: precision0=round(n_correct_model_edits/n_model_edits,2)
+  analysis_dict["simple_recall"]=recall0
+  analysis_dict["simple_precision"]=precision0
 
 
   return new_edit_pre_edit_list,all_repl_inst_list,analysis_dict
+
 
 
 def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_table_template.html"):
