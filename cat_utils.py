@@ -990,7 +990,7 @@ def get_edit_info(para_content):
 
 
 #7 july
-def get_edit_html(tokens1,tokens2):
+def get_edit_html_OLD(tokens1,tokens2):
   edit_list=get_seq_edits(tokens1,tokens2)
   final_str_items=[]
   for edit_type0,chunk0 in edit_list:
@@ -1015,7 +1015,7 @@ def get_edits_pairs(tokens1,tokens2):
     seq_pair_list.append((from_seq0,to_seq0))
   return seq_pair_list
 
-def edit_pairs2html_spans(tokens1,tokens2):
+def get_edit_html(tokens1,tokens2): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
   cur_seq_pairs=get_edits_pairs(tokens1,tokens2)
   chunks=[]
   for pair0 in cur_seq_pairs:
@@ -1251,8 +1251,8 @@ def repl_phrase(sent_tokens,phrase_to_be_replaced,new_phrase): #replace a phrase
 def repl_span_phrase(sent_tokens,repl_inst_wt_list,sort_by="wt",min_wt=0.5,min_freq=None): #apply a list of replacement instances with their weight/freq to tokenized sentence - sort instances by weight and exclude overlapping instances - outputs new sentence and valid replacemnt instances
   used_locs=[]
   valid_repl_instances=[]
-  repl_inst_wt_list.sort(key=lambda x:-x.get(sort_by,0))
-  #repl_inst_wt_list.sort(key=lambda x:(-x.get(sort_by,0), -x.get("freq",0)))
+  #repl_inst_wt_list.sort(key=lambda x:-x.get(sort_by,0))
+  repl_inst_wt_list.sort(key=lambda x:(-x.get(sort_by,0), -x.get("freq",0)))
   for cur_repl_inst0 in repl_inst_wt_list:
     cur_wt=cur_repl_inst0.get("wt")
     cur_freq=cur_repl_inst0.get("freq")
@@ -1356,19 +1356,21 @@ def para2sents(text):
 
 
 #============ Pre-editing pipeline ========================
-def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5):
+def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5): #pre-edit a sentence giveb the first token dict and a neural network model object with prediction
   sent_tokens0=general.add_padding(general.tok(sent_str))
   span_repl_items=extract_repl_instances(sent_tokens0,[],first_token_dict)
   new_items=[]
   for item0 in span_repl_items:
     if item0["context"]=='|': continue
+    #if nn_model_obj==None: wt0=0
     try: wt0=nn_model_obj.pred(item0)
     except: wt0=0
     #print(item0,wt0)
     #if wt0<pred_threshold: continue
     item0["wt"]=wt0
     new_items.append(item0)
-  pre_edited_sent_tokens,valid_repl=repl_span_phrase(sent_tokens0,new_items,sort_by="wt",min_wt=pred_threshold)
+  if nn_model_obj!=None: pre_edited_sent_tokens,valid_repl=repl_span_phrase(sent_tokens0,new_items,sort_by="wt",min_wt=pred_threshold)
+  else: pre_edited_sent_tokens,valid_repl=repl_span_phrase(sent_tokens0,new_items,sort_by="freq",min_wt=0)
   if pre_edited_sent_tokens[0]=="<s>": pre_edited_sent_tokens=pre_edited_sent_tokens[1:]
   if pre_edited_sent_tokens[-1]=="</s>": pre_edited_sent_tokens=pre_edited_sent_tokens[:-1]
   return pre_edited_sent_tokens,valid_repl
