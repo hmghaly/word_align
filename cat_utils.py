@@ -1016,6 +1016,8 @@ def get_edits_pairs(tokens1,tokens2):
   return seq_pair_list
 
 def get_edit_html(tokens1,tokens2): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
+  tokens1=general.remove_padding(tokens1)
+  tokens2=general.remove_padding(tokens2)  
   cur_seq_pairs=get_edits_pairs(tokens1,tokens2)
   chunks=[]
   for pair0 in cur_seq_pairs:
@@ -1435,8 +1437,8 @@ def analyze_pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshol
   analysis_dict["n_model_edits"]=n_model_edits
   analysis_dict["n_correct_model_edits"]=n_correct_model_edits
   analysis_dict["n_incorrect_model_edits"]=n_incorrect_model_edits
-  analysis_dict["simple_recall"]=n_correct_model_edits/n_human_edits
-  analysis_dict["simple_precision"]=n_correct_model_edits/n_model_edits
+  analysis_dict["simple_recall"]=round(n_correct_model_edits/n_human_edits,2)
+  analysis_dict["simple_precision"]=round(n_correct_model_edits/n_model_edits,2)
 
 
   return new_edit_pre_edit_list,all_repl_inst_list,analysis_dict
