@@ -327,6 +327,7 @@ def add_padding(token_list): #add sentence start/end marker to a list of tokens
   return ["<s>"]+token_list+["</s>"]
 
 def remove_padding(token_list): #remove sentence start/end marker to a list of tokens
+  if len(token_list)<2: return token_list 
   if token_list[0]=="<s>": token_list=token_list[1:]
   if token_list[-1]=='</s>': token_list=token_list[:-1]
   return token_list
