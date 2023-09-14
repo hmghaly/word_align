@@ -1427,10 +1427,10 @@ def analyze_pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshol
     token_edited_html=get_edit_html(original_tokens,final_tokens)
     new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
     for model_rep_inst in all_repl_inst_list:
-    	cur_span=model_rep_inst["span"]
-    	if valid_compare_repl_spans_dict.get(cur_span,False): n_correct_model_edits+=1
-        else: n_incorrect_model_edits+=1
-    	all_repl_inst_list.extend(valid_repl)
+      cur_span=model_rep_inst["span"]
+      if valid_compare_repl_spans_dict.get(cur_span,False): n_correct_model_edits+=1
+      else: n_incorrect_model_edits+=1
+      all_repl_inst_list.extend(valid_repl)
   analysis_dict["n_human_edits"]=n_human_edits
   analysis_dict["n_model_edits"]=n_model_edits
   analysis_dict["n_correct_model_edits"]=n_correct_model_edits
