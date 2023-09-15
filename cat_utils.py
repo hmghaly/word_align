@@ -1015,7 +1015,7 @@ def get_edits_pairs(tokens1,tokens2):
     seq_pair_list.append((from_seq0,to_seq0))
   return seq_pair_list
 
-def get_edit_html(tokens1,tokens2,class_name="any"): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
+def get_edit_html(tokens1,tokens2,main_class_name): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
   tokens1=general.remove_padding(tokens1)
   tokens2=general.remove_padding(tokens2)  
   cur_seq_pairs=get_edits_pairs(tokens1,tokens2)
@@ -1028,7 +1028,7 @@ def get_edit_html(tokens1,tokens2,class_name="any"): #edit_pairs2html_spans: ide
       cur_id=general.gen_id(4)
       from_str=general.de_tok2str(from_seq0)
       to_str=general.de_tok2str(to_seq0)
-      cur_chunk=f'<span id="{cur_id}" class="replacement {class_name} tentative"><span class="from_repl">{from_str}</span> <span class="to_repl">{to_str}</span></span>'
+      cur_chunk=f'<span id="{cur_id}" class="replacement {main_class_name} tentative"><span class="from_repl">{from_str}</span> <span class="to_repl">{to_str}</span></span>'
     chunks.append(cur_chunk)
   return " ".join(chunks)
 
