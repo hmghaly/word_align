@@ -1429,8 +1429,8 @@ def analyze_pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshol
 
     #print("valid_compare_repl_spans_dict",valid_compare_repl_spans_dict)
     pre_edit_out_str=general.de_tok2str(pre_edit_out_tokens)
-    pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens)
-    token_edited_html=get_edit_html(original_tokens,final_tokens)
+    pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens,class_name="automatic")
+    token_edited_html=get_edit_html(original_tokens,final_tokens,class_name="human")
     new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
     #new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
     for model_repl_inst in valid_repl:
