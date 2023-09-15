@@ -1015,7 +1015,7 @@ def get_edits_pairs(tokens1,tokens2):
     seq_pair_list.append((from_seq0,to_seq0))
   return seq_pair_list
 
-def get_edit_html(tokens1,tokens2): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
+def get_edit_html(tokens1,tokens2,class_name="any"): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
   tokens1=general.remove_padding(tokens1)
   tokens2=general.remove_padding(tokens2)  
   cur_seq_pairs=get_edits_pairs(tokens1,tokens2)
@@ -1028,7 +1028,7 @@ def get_edit_html(tokens1,tokens2): #edit_pairs2html_spans: identify spans of ed
       cur_id=general.gen_id(4)
       from_str=general.de_tok2str(from_seq0)
       to_str=general.de_tok2str(to_seq0)
-      cur_chunk=f'<span id="{cur_id}" class="replacement tentative"><span class="from_repl">{from_str}</span> <span class="to_repl">{to_str}</span></span>'
+      cur_chunk=f'<span id="{cur_id}" class="replacement {class_name} tentative"><span class="from_repl">{from_str}</span> <span class="to_repl">{to_str}</span></span>'
     chunks.append(cur_chunk)
   return " ".join(chunks)
 
@@ -1390,8 +1390,8 @@ def pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5,pr
     else: pre_edit_out_tokens,valid_repl=pre_edit(original0,nn_model_obj,first_token_dict,pred_threshold) #if we want to pre-edit the final
 
     pre_edit_out_str=general.de_tok2str(pre_edit_out_tokens)
-    pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens)
-    token_edited_html=get_edit_html(original_tokens,final_tokens)
+    pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens,class_name="automatic")
+    token_edited_html=get_edit_html(original_tokens,final_tokens,class_name="human")
     new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
     all_repl_inst_list.extend(valid_repl)
   return new_edit_pre_edit_list,all_repl_inst_list
@@ -1432,6 +1432,7 @@ def analyze_pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshol
     pre_edit_html=get_edit_html(original_tokens,pre_edit_out_tokens)
     token_edited_html=get_edit_html(original_tokens,final_tokens)
     new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
+    #new_edit_pre_edit_list.append((para_path0,original0,final0,edited0,token_edited_html,pre_edit_out_str,pre_edit_html))
     for model_repl_inst in valid_repl:
       cur_span=model_repl_inst["span"]
       if valid_compare_repl_spans_dict.get(cur_span,False): n_correct_model_edits+=1
