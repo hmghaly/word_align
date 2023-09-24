@@ -874,7 +874,7 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
 
     batch_train_size=int(batch_size0*train_ratio0)
     batch_dev_size=int(batch_size0*(1-train_ratio0))
-    print("batch_train_size",batch_train_size,"batch_dev_size",batch_dev_size)
+    #print("batch_train_size",batch_train_size,"batch_dev_size",batch_dev_size)
 
 
     batch_train_iterator=general.get_iter_chunks(train_iter, chunk_size=batch_train_size,min_i=last_batch_i)
@@ -948,9 +948,10 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
       # model_data_dict["dev_counter"]=model_data_dict.get("dev_counter",0)+batch_dev_counter
       # model_data_dict["train_loss_total"]=model_data_dict.get("train_loss_total",0)+batch_train_loss_total
       # model_data_dict["dev_loss_total"]=model_data_dict.get("dev_loss_total",0)+batch_dev_loss_total
+      batch_train_avg,batch_dev_avg=-1,-1
 
-      batch_train_avg=batch_train_loss_total/batch_train_counter
-      batch_dev_avg=batch_dev_loss_total/batch_dev_counter
+      if batch_train_counter>0: batch_train_avg=batch_train_loss_total/batch_train_counter
+      if batch_dev_counter>0: batch_dev_avg=batch_dev_loss_total/batch_dev_counter
       t2=time.time()
       batch_elapsed=t2-t0
       #print("batch_i",batch_i, "cur_batch",len(cur_batch), "batch_train_avg",round(batch_train_avg,4),"batch_dev_avg",round(batch_dev_avg,4))
