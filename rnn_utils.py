@@ -986,8 +986,9 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
 
     model_data_dict["last_batch_i"]=None #resetting last batch to none after the end of the epoch, to avoid restarting in the middle batches at the new epoch
     #end of batch - save model
-    epoch_train_avg=epoch_train_loss_total/epoch_train_counter
-    epoch_dev_avg=epoch_dev_loss_total/epoch_dev_counter
+    epoch_train_avg,epoch_dev_avg=-1,-1
+    if epoch_train_counter>0: epoch_train_avg=epoch_train_loss_total/epoch_train_counter
+    if epoch_dev_counter>0: epoch_dev_avg=epoch_dev_loss_total/epoch_dev_counter
     #print(epoch, ">>>>> epoch_train_avg",round(epoch_train_avg,4),"epoch_dev_avg",round(epoch_dev_avg,4))
     temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)}"
     print(temp_line)
