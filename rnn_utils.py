@@ -753,8 +753,20 @@ def get_accuracy_analysis(analyis_list0): #analyze the output of analyze_binary_
 #         # print("saved to:",model_fpath)
 #     torch.save(model_data_dict, model_fpath)    
 
+def create_iter(iter_params): #use any iter parameters to create a generator
+  cur_iter_fn=iter_params.get("function")
+  cur_iter_fpath=iter_params.get("fpath")
+  cur_from_ratio=iter_params.get("from_ratio")
+  cur_to_ratio=iter_params.get("to_ratio")
+  cur_yield_loc=iter_params.get("yield_loc",True)
+  cur_apply_json=iter_params.get("apply_json",True)
+  #read_file_from_to(data_fpath,from_ratio=0.005,to_ratio=0.006,yield_loc=True,apply_json=True)
+  cur_gen=cur_iter_fn(cur_iter_fpath,from_ratio=cur_from_ratio,to_ratio=cur_to_ratio,yield_loc=cur_yield_loc,apply_json=cur_apply_json)
+  return cur_gen
 
-def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params,loss_criterion):
+
+
+def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,feature_ex_params,loss_criterion):
   n_input0=params["n_input"]#=n_input #np.array(cur_vec).shape[-1] #cur_wv_model.vector_size #np.array(first_item[1]).shape[-1]
   n_output0=params["n_output"] #1 #np.array(cur_vec).shape[-1] #np.array(first_item[2]).shape[-1]
   n_hidden0=params["n_hidden"]
@@ -875,6 +887,10 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
     batch_train_size=int(batch_size0*train_ratio0)
     batch_dev_size=int(batch_size0*(1-train_ratio0))
     #print("batch_train_size",batch_train_size,"batch_dev_size",batch_dev_size)
+    #train_iter_params
+#     train_gen=read_file_from_to(data_fpath,to_ratio=0.005,yield_loc=True,apply_json=True)
+# dev_gen=read_file_from_to(data_fpath,from_ratio=0.005,to_ratio=0.006,yield_loc=True,apply_json=True)
+    #train_iter=general.read_file_from_to(train_iter_params["fpath"],to_ratio=train_iter_params.get("to_ratio"),to_ratio=train_iter_params.get("to_ratio"))
 
 
     batch_train_iterator=general.get_iter_chunks(train_iter, chunk_size=batch_train_size,min_i=last_batch_i)
