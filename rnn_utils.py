@@ -883,6 +883,7 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
       cur_batch_train,cur_batch_dev=cur_batch_train_dev
       last_batch_i=model_data_dict.get("last_batch_i")
       if last_batch_i!=None and batch_i<=last_batch_i: continue
+      t0=time.time()
       #dev_data=cur_batch_items[train_size:]
       train_data,dev_data=[],[]
       for train_item in cur_batch_train:
