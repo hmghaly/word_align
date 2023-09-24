@@ -494,264 +494,264 @@ def get_accuracy_analysis(analyis_list0): #analyze the output of analyze_binary_
 
 
 
-def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterion):
-  n_input0=params["n_input"]#=n_input #np.array(cur_vec).shape[-1] #cur_wv_model.vector_size #np.array(first_item[1]).shape[-1]
-  n_output0=params["n_output"] #1 #np.array(cur_vec).shape[-1] #np.array(first_item[2]).shape[-1]
-  n_hidden0=params["n_hidden"]
-  n_layers0=params.get("n_layers",1)
-  LR=params.get("LR",0.0001)
-  n_epochs0=params.get("n_epochs",100)
-  batch_size0=params.get("batch_size",1000)
-  exp_name0=params.get("exp_name","exp")
-  matching_in_out0=params.get("matching_in_out",False)
-  is_rnn0=params.get("is_rnn",False)
+# def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterion):
+#   n_input0=params["n_input"]#=n_input #np.array(cur_vec).shape[-1] #cur_wv_model.vector_size #np.array(first_item[1]).shape[-1]
+#   n_output0=params["n_output"] #1 #np.array(cur_vec).shape[-1] #np.array(first_item[2]).shape[-1]
+#   n_hidden0=params["n_hidden"]
+#   n_layers0=params.get("n_layers",1)
+#   LR=params.get("LR",0.0001)
+#   n_epochs0=params.get("n_epochs",100)
+#   batch_size0=params.get("batch_size",1000)
+#   exp_name0=params.get("exp_name","exp")
+#   matching_in_out0=params.get("matching_in_out",False)
+#   is_rnn0=params.get("is_rnn",False)
 
-  train_ratio0=params.get("train_ratio",0.8)
-  ft_lb_extraction_fn=params.get("ft_lb_extraction_fn")
-  #ft_lb_extraction_params=params.get("ft_lb_extraction_params",{})
-  data_ratio=params.get("data_ratio") #the ration of the data we should use from data file
-  #data_gen=read_file_from_to(data_fpath,to_ratio=0.0001)
+#   train_ratio0=params.get("train_ratio",0.8)
+#   ft_lb_extraction_fn=params.get("ft_lb_extraction_fn")
+#   #ft_lb_extraction_params=params.get("ft_lb_extraction_params",{})
+#   data_ratio=params.get("data_ratio") #the ration of the data we should use from data file
+#   #data_gen=read_file_from_to(data_fpath,to_ratio=0.0001)
 
-  optimizer_name=params.get("optimizer","sgd") #
-  model_dir=params.get("model_dir","models")
-  main_params_items=[exp_name0,data_ratio,n_input0,n_output0,n_hidden0,n_layers0,LR,batch_size0]
-  main_params_items_str="-".join([str(v) for v in main_params_items])
-  model_name=params.get("model_name","model-%s.model"%main_params_items_str)
-  if not os.path.exists(model_dir): os.makedirs(model_dir)
-  model_fpath=os.path.join(model_dir,model_name)
-  print(model_fpath)
+#   optimizer_name=params.get("optimizer","sgd") #
+#   model_dir=params.get("model_dir","models")
+#   main_params_items=[exp_name0,data_ratio,n_input0,n_output0,n_hidden0,n_layers0,LR,batch_size0]
+#   main_params_items_str="-".join([str(v) for v in main_params_items])
+#   model_name=params.get("model_name","model-%s.model"%main_params_items_str)
+#   if not os.path.exists(model_dir): os.makedirs(model_dir)
+#   model_fpath=os.path.join(model_dir,model_name)
+#   print(model_fpath)
 
-  log_fpath=os.path.join(model_fpath+".txt")
-  log_something(model_fpath,log_fpath)
+#   log_fpath=os.path.join(model_fpath+".txt")
+#   log_something(model_fpath,log_fpath)
 
-  feature_ex_params_copy=copy.deepcopy(feature_ex_params) #remove the model object from parameters to easily log
-  feature_ex_params_copy.pop('wv_model', None)
-  log_something(str(feature_ex_params_copy),log_fpath)
-
-
+#   feature_ex_params_copy=copy.deepcopy(feature_ex_params) #remove the model object from parameters to easily log
+#   feature_ex_params_copy.pop('wv_model', None)
+#   log_something(str(feature_ex_params_copy),log_fpath)
 
 
-  model = nn_class(n_input0, n_hidden0, n_output0,n_layers0).to(device)  # 2 represents two neurons in one hidden layer
-  if optimizer_name=="sgd": optimizer = torch.optim.SGD(model.parameters(), lr=LR)#.to(device)
-  elif optimizer_name=="adam": optimizer = torch.optim.Adam(model.parameters(), lr=LR)#.to(device)
-  else: optimizer = torch.optim.Adam(model.parameters(), lr=LR)#.to(device)
-
-  print(model)
-  log_something(str(model),log_fpath)
 
 
-  #model_fname="output/one_layer_vec3_FULL.model"
-  training_progress_list=[]
-  best_dev_loss=1
-  last_epoch=None
-  last_batch_i=None
+#   model = nn_class(n_input0, n_hidden0, n_output0,n_layers0).to(device)  # 2 represents two neurons in one hidden layer
+#   if optimizer_name=="sgd": optimizer = torch.optim.SGD(model.parameters(), lr=LR)#.to(device)
+#   elif optimizer_name=="adam": optimizer = torch.optim.Adam(model.parameters(), lr=LR)#.to(device)
+#   else: optimizer = torch.optim.Adam(model.parameters(), lr=LR)#.to(device)
 
-  train_counter,dev_counter=0,0
-  train_loss_total,dev_loss_total=0,0
+#   print(model)
+#   log_something(str(model),log_fpath)
 
-  model_data_dict={}
 
-  model_data_dict["params"]=params
-  model_data_dict["feature_params"]=feature_ex_params_copy
-  model_data_dict["network_def"]=nn_class #check
-  model_data_dict["ft_lb_extraction_fn"]=ft_lb_extraction_fn
+#   #model_fname="output/one_layer_vec3_FULL.model"
+#   training_progress_list=[]
+#   best_dev_loss=1
+#   last_epoch=None
+#   last_batch_i=None
+
+#   train_counter,dev_counter=0,0
+#   train_loss_total,dev_loss_total=0,0
+
+#   model_data_dict={}
+
+#   model_data_dict["params"]=params
+#   model_data_dict["feature_params"]=feature_ex_params_copy
+#   model_data_dict["network_def"]=nn_class #check
+#   model_data_dict["ft_lb_extraction_fn"]=ft_lb_extraction_fn
 
   
 
 
 
-  if os.path.exists(model_fpath):
-    temp_line=f"found model: {model_fpath}"
-    print(temp_line)
-    #print("found model:",model_fpath)
-    log_something(temp_line,log_fpath)
-    model_data_dict=torch.load(model_fpath)
-    training_progress_list=model_data_dict.get("training_progress_list",[])
-    best_dev_loss=model_data_dict.get("best_dev_loss",1)
-    temp_line=f"best_dev_loss: {best_dev_loss}"
-    print(temp_line)
-    log_something(temp_line,log_fpath)
+#   if os.path.exists(model_fpath):
+#     temp_line=f"found model: {model_fpath}"
+#     print(temp_line)
+#     #print("found model:",model_fpath)
+#     log_something(temp_line,log_fpath)
+#     model_data_dict=torch.load(model_fpath)
+#     training_progress_list=model_data_dict.get("training_progress_list",[])
+#     best_dev_loss=model_data_dict.get("best_dev_loss",1)
+#     temp_line=f"best_dev_loss: {best_dev_loss}"
+#     print(temp_line)
+#     log_something(temp_line,log_fpath)
 
-    last_epoch=model_data_dict.get("last_epoch")
-    last_batch_i=model_data_dict.get("last_batch_i")
-    latest_state_dict=model_data_dict.get("latest_state_dict",{})
-    top_state_dict=model_data_dict.get("state_dict",{})
+#     last_epoch=model_data_dict.get("last_epoch")
+#     last_batch_i=model_data_dict.get("last_batch_i")
+#     latest_state_dict=model_data_dict.get("latest_state_dict",{})
+#     top_state_dict=model_data_dict.get("state_dict",{})
     
-    if latest_state_dict=={}: 
-      cur_state_dict=top_state_dict
-      print("loaded top model")
-    else: 
-      cur_state_dict=latest_state_dict
-      print("loaded latest model")
-    #cur_state_dict=model_data_dict.get("state_dict",{})
-    model.load_state_dict(cur_state_dict)
-    model.train()
+#     if latest_state_dict=={}: 
+#       cur_state_dict=top_state_dict
+#       print("loaded top model")
+#     else: 
+#       cur_state_dict=latest_state_dict
+#       print("loaded latest model")
+#     #cur_state_dict=model_data_dict.get("state_dict",{})
+#     model.load_state_dict(cur_state_dict)
+#     model.train()
 
 
 
 
-  for epoch in range(n_epochs0):
-    epoch_train_counter,epoch_dev_counter=0,0
-    epoch_train_loss_total,epoch_dev_loss_total=0,0
-    train_analysis_list=[{}]*n_output0
+#   for epoch in range(n_epochs0):
+#     epoch_train_counter,epoch_dev_counter=0,0
+#     epoch_train_loss_total,epoch_dev_loss_total=0,0
+#     train_analysis_list=[{}]*n_output0
     
-    model.zero_grad()
+#     model.zero_grad()
 
-    if last_epoch!=None and epoch<=last_epoch: 
-      print(f"epoch already used {epoch}- last_epoch: {last_epoch}")
-      continue
+#     if last_epoch!=None and epoch<=last_epoch: 
+#       print(f"epoch already used {epoch}- last_epoch: {last_epoch}")
+#       continue
 
-    epoch_train_counter=model_data_dict.get("epoch_train_counter",0)
-    epoch_dev_counter=model_data_dict.get("epoch_dev_counter",0)
-    epoch_train_loss_total=model_data_dict.get("epoch_train_loss_total",0)
-    epoch_dev_loss_total=model_data_dict.get("epoch_dev_loss_total",0)
+#     epoch_train_counter=model_data_dict.get("epoch_train_counter",0)
+#     epoch_dev_counter=model_data_dict.get("epoch_dev_counter",0)
+#     epoch_train_loss_total=model_data_dict.get("epoch_train_loss_total",0)
+#     epoch_dev_loss_total=model_data_dict.get("epoch_dev_loss_total",0)
 
-    if data_ratio!=None: data_iterator=general.read_file_from_to(data_fpath,to_ratio=data_ratio)
-    else: data_iterator=general.read_file_from_to(data_fpath)
-    batch_iterator=general.get_iter_chunks(data_iterator, chunk_size=batch_size0,min_i=last_batch_i)
-    for batch_i, cur_batch in enumerate(batch_iterator):
-      last_batch_i=model_data_dict.get("last_batch_i")
-      if last_batch_i!=None and batch_i<=last_batch_i:
-        #print(f"batch already used {batch_i}- last_batch_i: {last_batch_i}")
-        continue
-      #print("batch_i",batch_i, "cur_batch",len(cur_batch))
-      t0=time.time()
-      cur_batch_items=[]
-      for item_str in cur_batch:
-        cur_raw_ft_dict=json.loads(item_str)
-        if cur_raw_ft_dict["src"]==cur_raw_ft_dict["trg"]: continue
-        if cur_raw_ft_dict["src"]=='<s> </s>': continue
-        if cur_raw_ft_dict["trg"]=='<s> </s>': continue
-        try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
-        except: continue
-        # if cur_lb==0: cur_lb=0.5
-        # elif cur_lb==-1: cur_lb=0
-        cur_batch_items.append((cur_raw_ft_dict,cur_ft,cur_lb))
-      train_size=int(len(cur_batch_items)*train_ratio0)
-      train_data=cur_batch_items[:train_size]
-      dev_data=cur_batch_items[train_size:]
-      t1=time.time()
-      elapsed=t1-t0
-      temp_line=f"feature extraction: elapsed: {round(elapsed,2)} - train_data: {len(train_data)} - dev data: {len(dev_data)}"
+#     if data_ratio!=None: data_iterator=general.read_file_from_to(data_fpath,to_ratio=data_ratio)
+#     else: data_iterator=general.read_file_from_to(data_fpath)
+#     batch_iterator=general.get_iter_chunks(data_iterator, chunk_size=batch_size0,min_i=last_batch_i)
+#     for batch_i, cur_batch in enumerate(batch_iterator):
+#       last_batch_i=model_data_dict.get("last_batch_i")
+#       if last_batch_i!=None and batch_i<=last_batch_i:
+#         #print(f"batch already used {batch_i}- last_batch_i: {last_batch_i}")
+#         continue
+#       #print("batch_i",batch_i, "cur_batch",len(cur_batch))
+#       t0=time.time()
+#       cur_batch_items=[]
+#       for item_str in cur_batch:
+#         cur_raw_ft_dict=json.loads(item_str)
+#         if cur_raw_ft_dict["src"]==cur_raw_ft_dict["trg"]: continue
+#         if cur_raw_ft_dict["src"]=='<s> </s>': continue
+#         if cur_raw_ft_dict["trg"]=='<s> </s>': continue
+#         try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
+#         except: continue
+#         # if cur_lb==0: cur_lb=0.5
+#         # elif cur_lb==-1: cur_lb=0
+#         cur_batch_items.append((cur_raw_ft_dict,cur_ft,cur_lb))
+#       train_size=int(len(cur_batch_items)*train_ratio0)
+#       train_data=cur_batch_items[:train_size]
+#       dev_data=cur_batch_items[train_size:]
+#       t1=time.time()
+#       elapsed=t1-t0
+#       temp_line=f"feature extraction: elapsed: {round(elapsed,2)} - train_data: {len(train_data)} - dev data: {len(dev_data)}"
 
-      batch_train_counter,batch_dev_counter=0,0
-      batch_train_loss_total,batch_dev_loss_total=0,0
-      #print("train_data",len(train_data),"dev_data",len(dev_data))
-      dev_analysis_list=[{}]*n_output0
+#       batch_train_counter,batch_dev_counter=0,0
+#       batch_train_loss_total,batch_dev_loss_total=0,0
+#       #print("train_data",len(train_data),"dev_data",len(dev_data))
+#       dev_analysis_list=[{}]*n_output0
 
-      for train_i,train_item in enumerate(train_data):
-        raw0,ft_vec0,lb0=train_item
-        input_tensor=to_tensor(ft_vec0).to(device)
-        output_tensor=to_tensor([lb0]).to(device)
-        yhat = model(input_tensor).to(device)
-        loss = loss_criterion(yhat, output_tensor)
-        #print("loss",loss,"yhat",yhat,"output_tensor",output_tensor)
-        #loss = loss_criterion(yhat, lb0)
-        loss.backward()
-        optimizer.step()
-        optimizer.zero_grad()
-        batch_train_counter+=1
-        batch_train_loss_total+=loss.item()
-      positive_counter,negative_counter,acr_counter=0,0,0
-      for dev_i,dev_item in enumerate(dev_data):
-        raw0,ft_vec0,lb0=dev_item
-        input_tensor=to_tensor(ft_vec0).to(device)
-        output_tensor=to_tensor([lb0]).to(device)
-        yhat = model(input_tensor).to(device)
-        #negative0,positive0,acr0=[],[],[]
-
-
-        #loss = loss_criterion(yhat, lb0)
-        loss = loss_criterion(yhat, output_tensor)
-        batch_dev_counter+=1
-        batch_dev_loss_total+=loss.item()
-
-        dev_analysis_list=analyze_binary_output([lb0],yhat.tolist(),dev_analysis_list)
-
-      epoch_train_counter+=batch_train_counter
-      epoch_dev_counter+=batch_dev_counter
-      epoch_train_loss_total+=batch_train_loss_total
-      epoch_dev_loss_total+=batch_dev_loss_total
-
-      # model_data_dict["train_counter"]=model_data_dict.get("train_counter",0)+batch_train_counter
-      # model_data_dict["dev_counter"]=model_data_dict.get("dev_counter",0)+batch_dev_counter
-      # model_data_dict["train_loss_total"]=model_data_dict.get("train_loss_total",0)+batch_train_loss_total
-      # model_data_dict["dev_loss_total"]=model_data_dict.get("dev_loss_total",0)+batch_dev_loss_total
-
-      batch_train_avg=batch_train_loss_total/batch_train_counter
-      batch_dev_avg=batch_dev_loss_total/batch_dev_counter
-      t2=time.time()
-      batch_elapsed=t2-t0
-      #print("batch_i",batch_i, "cur_batch",len(cur_batch), "batch_train_avg",round(batch_train_avg,4),"batch_dev_avg",round(batch_dev_avg,4))
-      dev_accuracy_analysis_list=get_accuracy_analysis(dev_analysis_list)
-      dev_accuracy_analysis_list_sorted=sorted(list(dev_accuracy_analysis_list[0].items()))
-      temp_line=f"epoch: {epoch} - batch_i: {batch_i} - elapsed: {round(batch_elapsed,2)} - batch_train_avg: {round(batch_train_avg,4)} - batch_dev_avg: {round(batch_dev_avg,4)} - {dev_accuracy_analysis_list_sorted}"
-      print(temp_line)
-      log_something(temp_line,log_fpath)
-
-      model_data_dict["epoch_train_counter"]=epoch_train_counter
-      model_data_dict["epoch_dev_counter"]=epoch_dev_counter
-      model_data_dict["epoch_train_loss_total"]=epoch_train_loss_total
-      model_data_dict["epoch_dev_loss_total"]=epoch_dev_loss_total      
-
-      # epoch_train_counter=model_data_dict.get("epoch_train_counter",0)
-      # epoch_dev_counter=model_data_dict.get("epoch_dev_counter",0)
-      # epoch_train_loss_total=model_data_dict.get("epoch_train_loss_total",0)
-      # epoch_dev_loss_total=model_data_dict.get("epoch_dev_loss_total",0)
+#       for train_i,train_item in enumerate(train_data):
+#         raw0,ft_vec0,lb0=train_item
+#         input_tensor=to_tensor(ft_vec0).to(device)
+#         output_tensor=to_tensor([lb0]).to(device)
+#         yhat = model(input_tensor).to(device)
+#         loss = loss_criterion(yhat, output_tensor)
+#         #print("loss",loss,"yhat",yhat,"output_tensor",output_tensor)
+#         #loss = loss_criterion(yhat, lb0)
+#         loss.backward()
+#         optimizer.step()
+#         optimizer.zero_grad()
+#         batch_train_counter+=1
+#         batch_train_loss_total+=loss.item()
+#       positive_counter,negative_counter,acr_counter=0,0,0
+#       for dev_i,dev_item in enumerate(dev_data):
+#         raw0,ft_vec0,lb0=dev_item
+#         input_tensor=to_tensor(ft_vec0).to(device)
+#         output_tensor=to_tensor([lb0]).to(device)
+#         yhat = model(input_tensor).to(device)
+#         #negative0,positive0,acr0=[],[],[]
 
 
-      model_data_dict["last_batch_i"]=batch_i
-      model_data_dict["latest_state_dict"]=model.state_dict()
-      torch.save(model_data_dict, model_fpath)
+#         #loss = loss_criterion(yhat, lb0)
+#         loss = loss_criterion(yhat, output_tensor)
+#         batch_dev_counter+=1
+#         batch_dev_loss_total+=loss.item()
 
-    #resetting counters
-    model_data_dict["epoch_train_counter"]=0
-    model_data_dict["epoch_dev_counter"]=0
-    model_data_dict["epoch_train_loss_total"]=0
-    model_data_dict["epoch_dev_loss_total"]=0      
+#         dev_analysis_list=analyze_binary_output([lb0],yhat.tolist(),dev_analysis_list)
+
+#       epoch_train_counter+=batch_train_counter
+#       epoch_dev_counter+=batch_dev_counter
+#       epoch_train_loss_total+=batch_train_loss_total
+#       epoch_dev_loss_total+=batch_dev_loss_total
+
+#       # model_data_dict["train_counter"]=model_data_dict.get("train_counter",0)+batch_train_counter
+#       # model_data_dict["dev_counter"]=model_data_dict.get("dev_counter",0)+batch_dev_counter
+#       # model_data_dict["train_loss_total"]=model_data_dict.get("train_loss_total",0)+batch_train_loss_total
+#       # model_data_dict["dev_loss_total"]=model_data_dict.get("dev_loss_total",0)+batch_dev_loss_total
+
+#       batch_train_avg=batch_train_loss_total/batch_train_counter
+#       batch_dev_avg=batch_dev_loss_total/batch_dev_counter
+#       t2=time.time()
+#       batch_elapsed=t2-t0
+#       #print("batch_i",batch_i, "cur_batch",len(cur_batch), "batch_train_avg",round(batch_train_avg,4),"batch_dev_avg",round(batch_dev_avg,4))
+#       dev_accuracy_analysis_list=get_accuracy_analysis(dev_analysis_list)
+#       dev_accuracy_analysis_list_sorted=sorted(list(dev_accuracy_analysis_list[0].items()))
+#       temp_line=f"epoch: {epoch} - batch_i: {batch_i} - elapsed: {round(batch_elapsed,2)} - batch_train_avg: {round(batch_train_avg,4)} - batch_dev_avg: {round(batch_dev_avg,4)} - {dev_accuracy_analysis_list_sorted}"
+#       print(temp_line)
+#       log_something(temp_line,log_fpath)
+
+#       model_data_dict["epoch_train_counter"]=epoch_train_counter
+#       model_data_dict["epoch_dev_counter"]=epoch_dev_counter
+#       model_data_dict["epoch_train_loss_total"]=epoch_train_loss_total
+#       model_data_dict["epoch_dev_loss_total"]=epoch_dev_loss_total      
+
+#       # epoch_train_counter=model_data_dict.get("epoch_train_counter",0)
+#       # epoch_dev_counter=model_data_dict.get("epoch_dev_counter",0)
+#       # epoch_train_loss_total=model_data_dict.get("epoch_train_loss_total",0)
+#       # epoch_dev_loss_total=model_data_dict.get("epoch_dev_loss_total",0)
+
+
+#       model_data_dict["last_batch_i"]=batch_i
+#       model_data_dict["latest_state_dict"]=model.state_dict()
+#       torch.save(model_data_dict, model_fpath)
+
+#     #resetting counters
+#     model_data_dict["epoch_train_counter"]=0
+#     model_data_dict["epoch_dev_counter"]=0
+#     model_data_dict["epoch_train_loss_total"]=0
+#     model_data_dict["epoch_dev_loss_total"]=0      
 
 
 
-    model_data_dict["last_batch_i"]=None #resetting last batch to none after the end of the epoch, to avoid restarting in the middle batches at the new epoch
-    #end of batch - save model
-    epoch_train_avg=epoch_train_loss_total/epoch_train_counter
-    epoch_dev_avg=epoch_dev_loss_total/epoch_dev_counter
-    #print(epoch, ">>>>> epoch_train_avg",round(epoch_train_avg,4),"epoch_dev_avg",round(epoch_dev_avg,4))
-    temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)}"
-    print(temp_line)
-    log_something(temp_line,log_fpath)
+#     model_data_dict["last_batch_i"]=None #resetting last batch to none after the end of the epoch, to avoid restarting in the middle batches at the new epoch
+#     #end of batch - save model
+#     epoch_train_avg=epoch_train_loss_total/epoch_train_counter
+#     epoch_dev_avg=epoch_dev_loss_total/epoch_dev_counter
+#     #print(epoch, ">>>>> epoch_train_avg",round(epoch_train_avg,4),"epoch_dev_avg",round(epoch_dev_avg,4))
+#     temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)}"
+#     print(temp_line)
+#     log_something(temp_line,log_fpath)
 
 
-    model_data_dict["last_epoch"]=epoch
+#     model_data_dict["last_epoch"]=epoch
 
-    epoch_dict=model_data_dict.get("epoch_dict",{}) #state dict for each epoch
-    epoch_dict[epoch]=model.state_dict()
-    model_data_dict["epoch_dict"]=epoch_dict
+#     epoch_dict=model_data_dict.get("epoch_dict",{}) #state dict for each epoch
+#     epoch_dict[epoch]=model.state_dict()
+#     model_data_dict["epoch_dict"]=epoch_dict
 
-    epoch_loss_dict=model_data_dict.get("epoch_loss_dict",{}) #loss values for each epoch
-    epoch_loss_dict[epoch]={"train":round(epoch_train_avg,4),"dev":round(epoch_dev_avg,4)}
-    model_data_dict["epoch_loss_dict"]=epoch_loss_dict
-
-
-    model_data_dict["n_train"]=epoch_train_counter
-    model_data_dict["n_dev"]=epoch_dev_counter
-    training_progress_list=model_data_dict.get("training_progress_list",[])+[(epoch,round(epoch_train_avg,6),round(epoch_dev_avg,6))]
-    #training_progress_list.append((epoch0,round(avg_train_loss,6),round(avg_dev_loss,6)))
-    model_data_dict["training_progress_list"]=training_progress_list
+#     epoch_loss_dict=model_data_dict.get("epoch_loss_dict",{}) #loss values for each epoch
+#     epoch_loss_dict[epoch]={"train":round(epoch_train_avg,4),"dev":round(epoch_dev_avg,4)}
+#     model_data_dict["epoch_loss_dict"]=epoch_loss_dict
 
 
-    if epoch_dev_avg < best_dev_loss:
-        best_dev_loss = epoch_dev_avg
-        model_data_dict["best_dev_loss"]=best_dev_loss
-        model_data_dict["state_dict"]=model.state_dict()
+#     model_data_dict["n_train"]=epoch_train_counter
+#     model_data_dict["n_dev"]=epoch_dev_counter
+#     training_progress_list=model_data_dict.get("training_progress_list",[])+[(epoch,round(epoch_train_avg,6),round(epoch_dev_avg,6))]
+#     #training_progress_list.append((epoch0,round(avg_train_loss,6),round(avg_dev_loss,6)))
+#     model_data_dict["training_progress_list"]=training_progress_list
 
-        #torch.save(rnn.state_dict(), model_fname)
-        temp_line=f"epoch: {epoch} - best_dev_loss: {round(best_dev_loss,6)} - saved to {model_fpath}"
-        print(temp_line)
-        log_something(temp_line,log_fpath)
-        # print(epoch, "best_dev_loss",best_dev_loss)
-        # print("saved to:",model_fpath)
-    torch.save(model_data_dict, model_fpath)    
+
+#     if epoch_dev_avg < best_dev_loss:
+#         best_dev_loss = epoch_dev_avg
+#         model_data_dict["best_dev_loss"]=best_dev_loss
+#         model_data_dict["state_dict"]=model.state_dict()
+
+#         #torch.save(rnn.state_dict(), model_fname)
+#         temp_line=f"epoch: {epoch} - best_dev_loss: {round(best_dev_loss,6)} - saved to {model_fpath}"
+#         print(temp_line)
+#         log_something(temp_line,log_fpath)
+#         # print(epoch, "best_dev_loss",best_dev_loss)
+#         # print("saved to:",model_fpath)
+#     torch.save(model_data_dict, model_fpath)    
 
 
 def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params,loss_criterion):
@@ -883,15 +883,15 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
       cur_batch_train,cur_batch_dev=cur_batch_train_dev
       last_batch_i=model_data_dict.get("last_batch_i")
       if last_batch_i!=None and batch_i<=last_batch_i: continue
-      dev_data=cur_batch_items[train_size:]
+      #dev_data=cur_batch_items[train_size:]
       train_data,dev_data=[],[]
-      for train_item_str in cur_batch_train:
-        cur_raw_ft_dict=json.loads(train_item_str)
+      for train_item in cur_batch_train:
+        cur_raw_ft_dict=train_item #json.loads(train_item_str)
         try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
         except: continue
         train_data.append((cur_raw_ft_dict,cur_ft,cur_lb))
-      for dev_item_str in cur_batch_dev:
-        cur_raw_ft_dict=json.loads(dev_item_str)
+      for dev_item in cur_batch_dev:
+        cur_raw_ft_dict=dev_item #json.loads(dev_item_str)
         try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
         except: continue
         dev_data.append((cur_raw_ft_dict,cur_ft,cur_lb))
