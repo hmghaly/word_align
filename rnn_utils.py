@@ -874,6 +874,7 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
 
     batch_train_size=batch_size0*train_ratio0
     batch_dev_size=batch_size0*(1-train_ratio0)
+    print("batch_train_size",batch_train_size,"batch_dev_size",batch_dev_size)
 
 
     batch_train_iterator=general.get_iter_chunks(train_iter, chunk_size=batch_train_size,min_i=last_batch_i)
