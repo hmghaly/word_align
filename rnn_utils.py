@@ -754,9 +754,9 @@ def get_accuracy_analysis(analyis_list0): #analyze the output of analyze_binary_
 #     torch.save(model_data_dict, model_fpath)    
 
 def create_iter(iter_params): #use any iter parameters to create a generator
-  cur_iter_fn=iter_params.get("function")
+  cur_iter_fn=iter_params.get("function",general.read_file_from_to)
   cur_iter_fpath=iter_params.get("fpath")
-  cur_from_ratio=iter_params.get("from_ratio")
+  cur_from_ratio=iter_params.get("from_ratio",0)
   cur_to_ratio=iter_params.get("to_ratio")
   cur_yield_loc=iter_params.get("yield_loc",True)
   cur_apply_json=iter_params.get("apply_json",True)
