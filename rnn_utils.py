@@ -934,7 +934,9 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
         output_tensor=to_tensor([lb0]).to(device)
         yhat = model(input_tensor).to(device)
         yhat_new = yhat.view(output_tensor.shape)
-        loss = loss_criterion(yhat_new, output_tensor)
+        output_tensor_new = output_tensor.view(yhat.shape)
+        loss = loss_criterion(yhat, output_tensor_new)
+
         #print("loss",loss,"yhat",yhat,"output_tensor",output_tensor)
         #loss = loss_criterion(yhat, lb0)
         loss.backward()
@@ -948,13 +950,13 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
         input_tensor=to_tensor(ft_vec0).to(device)
         output_tensor=to_tensor([lb0]).to(device)
         yhat = model(input_tensor).to(device)
-        yhat_new = yhat.view(output_tensor.shape)
+        output_tensor_new = output_tensor.view(yhat.shape)
         #yhat = yhat.view(output_tensor.shape)
         #negative0,positive0,acr0=[],[],[]
 
 
         #loss = loss_criterion(yhat, lb0)
-        loss = loss_criterion(yhat_new, output_tensor)
+        loss = loss_criterion(yhat, output_tensor_new)
         batch_dev_counter+=1
         batch_dev_loss_total+=loss.item()
 
