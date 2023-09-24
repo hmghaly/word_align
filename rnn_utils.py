@@ -879,20 +879,20 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
     batch_train_iterator=general.get_iter_chunks(train_iter, chunk_size=batch_train_size,min_i=last_batch_i)
     batch_dev_iterator=general.get_iter_chunks(dev_iter, chunk_size=batch_dev_size,min_i=last_batch_i)
 
-    for batch_i, cur_batch_train_dev in enumerate(zip(batch_train_iterator,batch_dev_iterator)):
+    for batch_i, cur_batch_train_dev in enumerate(zip(batch_train_iterator,batch_dev_iterator)): 
       cur_batch_train,cur_batch_dev=cur_batch_train_dev
       last_batch_i=model_data_dict.get("last_batch_i")
       if last_batch_i!=None and batch_i<=last_batch_i: continue
       t0=time.time()
       #dev_data=cur_batch_items[train_size:]
       train_data,dev_data=[],[]
-      for train_item in cur_batch_train:
+      for train_i,train_item in cur_batch_train: #iterators include both the index and item
         cur_raw_ft_dict=train_item #json.loads(train_item_str)
         cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
         # try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
         # except: continue
         train_data.append((cur_raw_ft_dict,cur_ft,cur_lb))
-      for dev_item in cur_batch_dev:
+      for dev_i,dev_item in cur_batch_dev:
         cur_raw_ft_dict=dev_item #json.loads(dev_item_str)
         try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
         except: continue
