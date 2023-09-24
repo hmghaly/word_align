@@ -1377,7 +1377,7 @@ def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5): #pre-ed
   if pre_edited_sent_tokens[-1]=="</s>": pre_edited_sent_tokens=pre_edited_sent_tokens[:-1]
   return pre_edited_sent_tokens,valid_repl
 
-def pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5,pre_edit_original=True): #prediting the original of a docx file
+def pre_edit_docx_OLD(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5,pre_edit_original=True): #prediting the original of a docx file
   cur_docx_edit_list=get_docx_paras_edits(docx_fpath)
   new_edit_pre_edit_list=[]
   all_repl_inst_list=[]
