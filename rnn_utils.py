@@ -960,7 +960,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
 
 
         #dev_analysis_list=analyze_binary_output([lb0],yhat.tolist(),dev_analysis_list)
-        dev_analysis_list=analyze_binary_output(output_tensor.tolist(),yhat.tolist(),dev_analysis_list)
+        dev_analysis_list=analyze_binary_output(output_tensor.flatten().tolist(),yhat.flatten().tolist(),dev_analysis_list)
 
       epoch_train_counter+=batch_train_counter
       epoch_dev_counter+=batch_dev_counter
