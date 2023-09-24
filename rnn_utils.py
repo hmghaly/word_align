@@ -870,7 +870,7 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
     # else: data_iterator=general.read_file_from_to(data_fpath)
 
 
-    batch_iterator=general.get_iter_chunks(data_iterator, chunk_size=batch_size0,min_i=last_batch_i)
+    #batch_iterator=general.get_iter_chunks(data_iterator, chunk_size=batch_size0,min_i=last_batch_i)
 
     batch_train_size=batch_size0*train_ratio0
     batch_dev_size=batch_size0*(1-train_ratio0)
