@@ -754,7 +754,7 @@ def training_pipeline(nn_class,data_fpath,params,feature_ex_params,loss_criterio
     torch.save(model_data_dict, model_fpath)    
 
 
-def training_pipeline_NEW(nn_class,train_iter,params,feature_ex_params,loss_criterion,dev_iter=None):
+def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params,loss_criterion):
   n_input0=params["n_input"]#=n_input #np.array(cur_vec).shape[-1] #cur_wv_model.vector_size #np.array(first_item[1]).shape[-1]
   n_output0=params["n_output"] #1 #np.array(cur_vec).shape[-1] #np.array(first_item[2]).shape[-1]
   n_hidden0=params["n_hidden"]
