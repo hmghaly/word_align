@@ -888,8 +888,9 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
       train_data,dev_data=[],[]
       for train_item in cur_batch_train:
         cur_raw_ft_dict=train_item #json.loads(train_item_str)
-        try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
-        except: continue
+        cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
+        # try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
+        # except: continue
         train_data.append((cur_raw_ft_dict,cur_ft,cur_lb))
       for dev_item in cur_batch_dev:
         cur_raw_ft_dict=dev_item #json.loads(dev_item_str)
@@ -901,6 +902,7 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
       t1=time.time()
       elapsed=t1-t0
       temp_line=f"feature extraction: elapsed: {round(elapsed,2)} - train_data: {len(train_data)} - dev data: {len(dev_data)}"
+      print(temp_line)
 
       batch_train_counter,batch_dev_counter=0,0
       batch_train_loss_total,batch_dev_loss_total=0,0
