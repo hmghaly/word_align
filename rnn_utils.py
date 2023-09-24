@@ -887,6 +887,8 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     batch_train_size=int(batch_size0*train_ratio0)
     batch_dev_size=int(batch_size0*(1-train_ratio0))
     #print("batch_train_size",batch_train_size,"batch_dev_size",batch_dev_size)
+    train_iter=create_iter(train_iter_params)
+    dev_iter=create_iter(dev_iter_params)
     #train_iter_params
 #     train_gen=read_file_from_to(data_fpath,to_ratio=0.005,yield_loc=True,apply_json=True)
 # dev_gen=read_file_from_to(data_fpath,from_ratio=0.005,to_ratio=0.006,yield_loc=True,apply_json=True)
