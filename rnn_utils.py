@@ -866,8 +866,8 @@ def training_pipeline_iter(nn_class,train_iter,dev_iter,params,feature_ex_params
     epoch_train_loss_total=model_data_dict.get("epoch_train_loss_total",0)
     epoch_dev_loss_total=model_data_dict.get("epoch_dev_loss_total",0)
 
-    if data_ratio!=None: data_iterator=general.read_file_from_to(data_fpath,to_ratio=data_ratio)
-    else: data_iterator=general.read_file_from_to(data_fpath)
+    # if data_ratio!=None: data_iterator=general.read_file_from_to(data_fpath,to_ratio=data_ratio)
+    # else: data_iterator=general.read_file_from_to(data_fpath)
 
 
     batch_iterator=general.get_iter_chunks(data_iterator, chunk_size=batch_size0,min_i=last_batch_i)
