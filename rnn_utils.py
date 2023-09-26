@@ -1218,7 +1218,10 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
         raw0,ft_vec0,lb0=train_item
         input_tensor=to_tensor(ft_vec0).to(device)
         output_tensor=to_tensor([lb0]).to(device)
-        yhat = model(input_tensor).to(device)
+        try: yhat = model(input_tensor).to(device)
+        except Exception as e:
+          print("error:",e)
+          continue
         #yhat_new = yhat.view(output_tensor.shape)
         #output_tensor_new = output_tensor.view(yhat.shape)
         loss = loss_criterion(yhat, output_tensor)
@@ -1237,7 +1240,11 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
         raw0,ft_vec0,lb0=dev_item
         input_tensor=to_tensor(ft_vec0).to(device)
         output_tensor=to_tensor([lb0]).to(device)
-        yhat = model(input_tensor).to(device)
+        try: yhat = model(input_tensor).to(device)
+        except Exception as e:
+          print("error:",e)
+          continue
+
         #output_tensor_new = output_tensor.view(yhat.shape)
         #yhat = yhat.view(output_tensor.shape)
         #negative0,positive0,acr0=[],[],[]
