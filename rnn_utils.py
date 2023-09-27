@@ -91,6 +91,11 @@ def to_tensor(list1):
 def norm_input(list1):
   return stats.zscore(list1, axis=None)
 
+def pad_list(list1,N,pad_with=0):
+  list1 += [pad_with] * (N - len(list1))
+  return list1
+
+
 
 import dill as pickle
 import types
