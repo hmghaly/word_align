@@ -10,6 +10,7 @@ from gensim.models import Word2Vec
 sys.path.append("code_utils")
 import cat_utils
 import general
+from scipy import stats
 
 
 
@@ -86,6 +87,9 @@ except:
 
 def to_tensor(list1):
   return torch.tensor(list1,dtype=torch.float32)
+
+def norm_input(list1):
+  return stats.zscore(list1, axis=None)
 
 
 import dill as pickle
