@@ -455,7 +455,7 @@ class model_pred:
     return all_pred_dicts  
 
 #=========================================== New pipeline and loading =========================
-def seq_nn(n_input,n_hidden,n_out,n_layers):
+def seq_nn_OLD(n_input,n_hidden,n_out,n_layers):
   model0 = nn.Sequential(
       nn.Linear(n_input, n_hidden),
       nn.ReLU(),
@@ -465,6 +465,23 @@ def seq_nn(n_input,n_hidden,n_out,n_layers):
       nn.Sigmoid()
   )
   return model0
+
+
+def seq_nn(n_input,n_hidden,n_output,n_layers,layer_size_ratio=0.5):
+  model = nn.Sequential()
+  cur_layer_n_hidden=n_hidden
+  model.add_module("dense0", nn.Linear(n_input, cur_layer_n_hidden))
+  model.add_module("act0", nn.ReLU())
+  for layer_i in range(n_layers):
+    layer_label=str(layer_i+1)
+    new_layer_n_hidden=int(cur_layer_n_hidden*layer_size_ratio)
+    model.add_module("dense"+layer_label, nn.Linear(cur_layer_n_hidden, new_layer_n_hidden))
+    model.add_module("act"+layer_label, nn.ReLU())
+    cur_layer_n_hidden=new_layer_n_hidden
+  model.add_module("output", nn.Linear( cur_layer_n_hidden, n_output))
+  model.add_module("outact", nn.Sigmoid())  
+  return model
+
 
 
 def analyze_binary_output(actual_list,pred_list,analysis_list): #compare items of predicted and actual lists, to analyze recall and precision .. etc
