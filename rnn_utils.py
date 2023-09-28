@@ -1373,6 +1373,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
         # print("saved to:",model_fpath)
     torch.save(model_data_dict, model_fpath)
 
+#most recent - Sept 2023
 class load_nn:
   def __init__(self,model_fpath,network_def,extraction_fn=None,extraction_params=None,epoch_i=None) -> None:
     self.model_data_dict={}
@@ -1408,7 +1409,8 @@ class load_nn:
     self.model.load_state_dict(self.cur_state_dict)
     self.model.eval()
     cur_wv_path=self.extraction_params.get("wv_fpath","")
-    self.wv_model=Word2Vec.load(cur_wv_path)
+    if cur_wv_path=="": self.wv_model=None
+    else: self.wv_model=Word2Vec.load(cur_wv_path)
     self.extraction_params["wv_model"]=self.wv_model
   def update_state_dict(self,new_state_dict):
     self.model.load_state_dict(new_state_dict)
