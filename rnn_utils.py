@@ -1362,7 +1362,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     model_data_dict["epoch_tn"]=0
     model_data_dict["epoch_fn"]=0
 
-    model_data_dict["metric_list"]=model_data_dict.get("metric_list",[])+metric_dict
+    model_data_dict["metric_list"]=model_data_dict.get("metric_list",[])+[metric_dict]
 
 
 
