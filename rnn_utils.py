@@ -1376,8 +1376,10 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     if epoch_dev_counter>0: epoch_dev_avg=epoch_dev_loss_total/epoch_dev_counter
 
 
+    epoch_dev_accuracy_analysis_list=get_accuracy_analysis(epoch_dev_analysis_list)
+    epoch_dev_accuracy_analysis_list_sorted=sorted(list(epoch_dev_accuracy_analysis_list[0].items()))
     #print(epoch, ">>>>> epoch_train_avg",round(epoch_train_avg,4),"epoch_dev_avg",round(epoch_dev_avg,4))
-    temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)} - {epoch_dev_analysis_list}"
+    temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)} - {epoch_dev_accuracy_analysis_list_sorted}"
     print(temp_line)
     log_something(temp_line,log_fpath)
 
