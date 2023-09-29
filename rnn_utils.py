@@ -1196,6 +1196,8 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     epoch_fp=model_data_dict.get("epoch_fp",0)
     epoch_fn=model_data_dict.get("epoch_fn",0)
 
+    epoch_dev_analysis_list=[{}]*n_output0
+
 
 
 
@@ -1301,6 +1303,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
 
         #dev_analysis_list=analyze_binary_output([lb0],yhat.tolist(),dev_analysis_list)
         dev_analysis_list=analyze_binary_output(output_tensor.flatten().tolist(),yhat.flatten().tolist(),dev_analysis_list)
+        epoch_dev_analysis_list=analyze_binary_output(output_tensor.flatten().tolist(),yhat.flatten().tolist(),epoch_dev_analysis_list)
 
       epoch_train_counter+=batch_train_counter
       epoch_dev_counter+=batch_dev_counter
@@ -1374,7 +1377,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
 
 
     #print(epoch, ">>>>> epoch_train_avg",round(epoch_train_avg,4),"epoch_dev_avg",round(epoch_dev_avg,4))
-    temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)} - {metric_dict}"
+    temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)} - {epoch_dev_analysis_list}"
     print(temp_line)
     log_something(temp_line,log_fpath)
 
