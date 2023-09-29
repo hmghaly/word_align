@@ -1351,9 +1351,10 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     model_data_dict["epoch_train_loss_total"]=0
     model_data_dict["epoch_dev_loss_total"]=0
 
-    epoch_precision0=epoch_tp/(epoch_tp+epoch_fp)
-    epoch_recall0=epoch_tp/(epoch_tp+epoch_fn)
-    epoch_f_score= (2 * epoch_precision0 * epoch_recall0) / (epoch_precision0 + epoch_recall0)
+    epoch_precision0,epoch_recall0,epoch_f_score=0,0,0
+    if (epoch_tp+epoch_fp)>0: epoch_precision0=epoch_tp/(epoch_tp+epoch_fp)
+    if (epoch_tp+epoch_fn)>0: epoch_recall0=epoch_tp/(epoch_tp+epoch_fn)
+    if (epoch_precision0 + epoch_recall0)>0: epoch_f_score= (2 * epoch_precision0 * epoch_recall0) / (epoch_precision0 + epoch_recall0)
     metric_dict={"P":round(epoch_precision0,4),"R":round(epoch_recall0,4),"F1":round(epoch_f_score,4)}
 
     model_data_dict["epoch_tp"]=0
