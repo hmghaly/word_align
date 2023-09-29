@@ -1282,8 +1282,8 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
           #print("error:",e)
           continue
         #if lb0==1: 
-        pred_val= round(float(yhat.item()))
-        actual_val=lb
+        # pred_val= round(float(yhat.item()))
+        # actual_val=lb0
         # if actual_val==1: #positives
         #   pass
         # else:
