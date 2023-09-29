@@ -1281,10 +1281,17 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
         except Exception as e:
           #print("error:",e)
           continue
+        #if lb0==1: 
+        pred_val= round(float(yhat.item()))
+        actual_val=lb
+        # if actual_val==1: #positives
+        #   pass
+        # else:
+        #   pass
 
-        if round(float(yhat.item()))==1: #positive prediction
-          if lb0==1: epoch_tp+=1 #true positive
-          else: epoch_fp+=1 #false negative
+        if round(float(yhat.item()))==1: #positive prediction - predict the outcome to be one
+          if lb0==1: epoch_tp+=1 #true positive - if the outcome is actually one
+          else: epoch_fp+=1 #false positive
         else:
           if lb0==1: epoch_fn+=1 #false negative
           else: epoch_tn+=1 #true negative
@@ -1387,6 +1394,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     print(temp_line)
     log_something(temp_line,log_fpath)
     print(metric_dict)
+    log_something(str(metric_dict))
 
 
     model_data_dict["last_epoch"]=epoch
