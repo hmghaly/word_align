@@ -1359,6 +1359,10 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     if (epoch_tp+epoch_fn)>0: epoch_recall0=epoch_tp/(epoch_tp+epoch_fn)
     if (epoch_precision0 + epoch_recall0)>0: epoch_f_score= (2 * epoch_precision0 * epoch_recall0) / (epoch_precision0 + epoch_recall0)
     metric_dict={"P":round(epoch_precision0,4),"R":round(epoch_recall0,4),"F1":round(epoch_f_score,4)}
+    metric_dict["tp"]=epoch_tp
+    metric_dict["fp"]=epoch_fp
+    metric_dict["tn"]=epoch_tn
+    metric_dict["fn"]=epoch_fn
 
     model_data_dict["epoch_tp"]=0
     model_data_dict["epoch_fp"]=0
@@ -1382,6 +1386,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)} - {epoch_dev_accuracy_analysis_list_sorted}"
     print(temp_line)
     log_something(temp_line,log_fpath)
+    print(metric_dict)
 
 
     model_data_dict["last_epoch"]=epoch
