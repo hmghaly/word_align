@@ -1394,7 +1394,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     print(temp_line)
     log_something(temp_line,log_fpath)
     print(metric_dict)
-    log_something(str(metric_dict))
+    log_something(str(metric_dict),log_fpath)
 
 
     model_data_dict["last_epoch"]=epoch
