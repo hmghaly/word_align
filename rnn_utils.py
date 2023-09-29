@@ -1177,6 +1177,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
   for epoch in range(n_epochs0):
     epoch_train_counter,epoch_dev_counter=0,0
     epoch_train_loss_total,epoch_dev_loss_total=0,0
+    epoch_tp,epoch_tn,epoch_fp,epoch_fn=0,0,0,0 #true/false positive/negative
     train_analysis_list=[{}]*n_output0
 
     model.zero_grad()
@@ -1189,6 +1190,14 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     epoch_dev_counter=model_data_dict.get("epoch_dev_counter",0)
     epoch_train_loss_total=model_data_dict.get("epoch_train_loss_total",0)
     epoch_dev_loss_total=model_data_dict.get("epoch_dev_loss_total",0)
+
+    epoch_tp=model_data_dict.get("epoch_tp",0) #on dev set
+    epoch_tn=model_data_dict.get("epoch_tn",0)
+    epoch_fp=model_data_dict.get("epoch_fp",0)
+    epoch_fn=model_data_dict.get("epoch_fn",0)
+
+
+
 
     # if data_ratio!=None: data_iterator=general.read_file_from_to(data_fpath,to_ratio=data_ratio)
     # else: data_iterator=general.read_file_from_to(data_fpath)
@@ -1271,6 +1280,13 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
           #print("error:",e)
           continue
 
+        if round(float(yhat.item()))==1: #positive prediction
+          if lb0==1: epoch_tp+=1 #true positive
+          else: epoch_fp+=1 #false negative
+        else:
+          if lb0==1: epoch_fn+=1 #false negative
+          else: epoch_tn+=1 #true negative
+
         #output_tensor_new = output_tensor.view(yhat.shape)
         #yhat = yhat.view(output_tensor.shape)
         #negative0,positive0,acr0=[],[],[]
@@ -1313,6 +1329,12 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
       model_data_dict["epoch_train_loss_total"]=epoch_train_loss_total
       model_data_dict["epoch_dev_loss_total"]=epoch_dev_loss_total
 
+
+      model_data_dict["epoch_tp"]=epoch_tp
+      model_data_dict["epoch_fp"]=epoch_fp
+      model_data_dict["epoch_tn"]=epoch_tn
+      model_data_dict["epoch_fn"]=epoch_fn
+
       # epoch_train_counter=model_data_dict.get("epoch_train_counter",0)
       # epoch_dev_counter=model_data_dict.get("epoch_dev_counter",0)
       # epoch_train_loss_total=model_data_dict.get("epoch_train_loss_total",0)
@@ -1329,6 +1351,18 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     model_data_dict["epoch_train_loss_total"]=0
     model_data_dict["epoch_dev_loss_total"]=0
 
+    epoch_precision0=epoch_tp/(epoch_tp+epoch_fp)
+    epoch_recall0=epoch_tp/(epoch_tp+epoch_fn)
+    epoch_f_score= (2 * epoch_precision0 * epoch_recall0) / (epoch_precision0 + epoch_recall0)
+    metric_dict={"P":round(epoch_precision0,4),"R":round(epoch_recall0,4),"F1":round(epoch_f_score,4)}
+
+    model_data_dict["epoch_tp"]=0
+    model_data_dict["epoch_fp"]=0
+    model_data_dict["epoch_tn"]=0
+    model_data_dict["epoch_fn"]=0
+
+    model_data_dict["metric_list"]=model_data_dict.get("metric_list",[])+metric_dict
+
 
 
     model_data_dict["last_batch_i"]=None #resetting last batch to none after the end of the epoch, to avoid restarting in the middle batches at the new epoch
@@ -1336,8 +1370,10 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     epoch_train_avg,epoch_dev_avg=-1,-1
     if epoch_train_counter>0: epoch_train_avg=epoch_train_loss_total/epoch_train_counter
     if epoch_dev_counter>0: epoch_dev_avg=epoch_dev_loss_total/epoch_dev_counter
+
+
     #print(epoch, ">>>>> epoch_train_avg",round(epoch_train_avg,4),"epoch_dev_avg",round(epoch_dev_avg,4))
-    temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)}"
+    temp_line=f"epoch: {epoch} - epoch_train_avg: {round(epoch_train_avg,4)} - epoch_dev_avg: {round(epoch_dev_avg,4)} - {metric_dict}"
     print(temp_line)
     log_something(temp_line,log_fpath)
 
