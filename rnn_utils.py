@@ -1152,9 +1152,13 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     model_data_dict=torch.load(model_fpath)
     training_progress_list=model_data_dict.get("training_progress_list",[])
     best_dev_loss=model_data_dict.get("best_dev_loss",1)
-    temp_line=f"best_dev_loss: {best_dev_loss}"
+    best_f1=model_data_dict.get("best_f1",0)
+
+    temp_line=f"best_dev_loss: {best_dev_loss} - best_f1: {best_f1}"
     print(temp_line)
     log_something(temp_line,log_fpath)
+
+
 
     last_epoch=model_data_dict.get("last_epoch")
     last_batch_i=model_data_dict.get("last_batch_i")
@@ -1380,6 +1384,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
 
 
 
+
     model_data_dict["last_batch_i"]=None #resetting last batch to none after the end of the epoch, to avoid restarting in the middle batches at the new epoch
     #end of batch - save model
     epoch_train_avg,epoch_dev_avg=-1,-1
@@ -1414,11 +1419,19 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
     #training_progress_list.append((epoch0,round(avg_train_loss,6),round(avg_dev_loss,6)))
     model_data_dict["training_progress_list"]=training_progress_list
 
+    if epoch_f_score>best_f1: 
+      best_f1=epoch_f_score
+      model_data_dict["best_f1"]=best_f1
+      model_data_dict["state_dict"]=model.state_dict()
+      temp_line=f"epoch: {epoch} - best_f1: {round(best_f1,6)} - saved to {model_fpath}"
+      print(temp_line)
+      log_something(temp_line,log_fpath)
+
 
     if epoch_dev_avg < best_dev_loss:
         best_dev_loss = epoch_dev_avg
         model_data_dict["best_dev_loss"]=best_dev_loss
-        model_data_dict["state_dict"]=model.state_dict()
+        model_data_dict["state_dict_best_loss"]=model.state_dict()
 
         #torch.save(rnn.state_dict(), model_fname)
         temp_line=f"epoch: {epoch} - best_dev_loss: {round(best_dev_loss,6)} - saved to {model_fpath}"
