@@ -1139,6 +1139,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
   model_data_dict["feature_params"]=feature_ex_params_copy
   model_data_dict["network_def"]=nn_class #check
   model_data_dict["ft_lb_extraction_fn"]=ft_lb_extraction_fn
+  best_f1=0
 
 
 
