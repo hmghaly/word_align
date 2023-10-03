@@ -1235,7 +1235,8 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
       train_data,dev_data=[],[]
       for train_i,train_item in cur_batch_train: #iterators include both the index and item
         cur_raw_ft_dict=train_item #json.loads(train_item_str)
-        cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
+        try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
+        except: continue
         # try: cur_ft,cur_lb=ft_lb_extraction_fn(cur_raw_ft_dict,params=feature_ex_params)
         # except: continue
         train_data.append((cur_raw_ft_dict,cur_ft,cur_lb))
