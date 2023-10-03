@@ -459,8 +459,8 @@ class model_pred:
     preds0=out2labels(rnn_out_flat,self.standard_labels) 
     all_pred_dicts=[]
     for pr0 in preds0:
-    	cur_dict0=dict(iter(pr0))
-    	all_pred_dicts.append(cur_dict0)
+        cur_dict0=dict(iter(pr0))
+        all_pred_dicts.append(cur_dict0)
     return all_pred_dicts  
 
 #=========================================== New pipeline and loading =========================
@@ -1444,7 +1444,7 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
 
 #most recent - Sept 2023
 class load_nn:
-  def __init__(self,model_fpath,network_def,extraction_fn=None,extraction_params=None,epoch_i=None) -> None:
+  def __init__(self,model_fpath,network_def,extraction_fn=None,extraction_params=None,epoch_i=None,cur_wv_path=None) -> None:
     self.model_data_dict={}
     self.model=None
     if not os.path.exists(model_fpath): return 
@@ -1477,10 +1477,13 @@ class load_nn:
     self.model = network_def(self.n_input, self.n_hidden, self.n_output, self.n_layers)
     self.model.load_state_dict(self.cur_state_dict)
     self.model.eval()
-    cur_wv_path=self.extraction_params.get("wv_fpath","")
-    if cur_wv_path=="": self.wv_model=None
-    else: self.wv_model=Word2Vec.load(cur_wv_path)
-    self.extraction_params["wv_model"]=self.wv_model
+    if cur_wv_path!=None:
+      self.wv_model=Word2Vec.load(cur_wv_path)
+    else:   
+      cur_wv_path=self.extraction_params.get("wv_fpath","")
+      if cur_wv_path=="": self.wv_model=None
+      else: self.wv_model=Word2Vec.load(cur_wv_path)
+      self.extraction_params["wv_model"]=self.wv_model
   def update_state_dict(self,new_state_dict):
     self.model.load_state_dict(new_state_dict)
     self.model.eval()
