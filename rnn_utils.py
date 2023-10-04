@@ -1448,8 +1448,10 @@ class load_nn:
   def __init__(self,model_fpath,network_def,extraction_fn=None,extraction_params=None,epoch_i=None,cur_wv_path=None) -> None:
     self.model_data_dict={}
     self.model=None
-    if not os.path.exists(model_fpath): return 
-
+    if not os.path.exists(model_fpath): 
+      print(f"path does not exist: {model_fpath}")
+      return 
+      
     self.model_data_dict=torch.load(model_fpath)
     self.cur_params=self.model_data_dict.get("params",{})
     if extraction_params!=None: self.extraction_params=extraction_params
