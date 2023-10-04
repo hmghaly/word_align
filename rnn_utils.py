@@ -1445,13 +1445,13 @@ def training_pipeline_iter(nn_class,train_iter_params,dev_iter_params,params,fea
 
 #most recent - Sept 2023
 class load_nn:
-  def __init__(self,model_fpath,network_def,extraction_fn=None,extraction_params=None,epoch_i=None,cur_wv_path=None) -> None:
+  def __init__(self,model_fpath,network_def,extraction_fn=None,extraction_params=None,epoch_i=None,wv_model=None,wv_fpath=None) -> None:
     self.model_data_dict={}
     self.model=None
     if not os.path.exists(model_fpath): 
       print(f"path does not exist: {model_fpath}")
       return 
-      
+
     self.model_data_dict=torch.load(model_fpath)
     self.cur_params=self.model_data_dict.get("params",{})
     if extraction_params!=None: self.extraction_params=extraction_params
@@ -1480,13 +1480,17 @@ class load_nn:
     self.model = network_def(self.n_input, self.n_hidden, self.n_output, self.n_layers)
     self.model.load_state_dict(self.cur_state_dict)
     self.model.eval()
-    if cur_wv_path!=None:
-      self.wv_model=Word2Vec.load(cur_wv_path)
+
+    self.wv_model=None
+    if wv_model!=None:
+      self.wv_model=wv_model #Word2Vec.load(cur_wv_path)
+    elif wv_fpath!=None and wv_fpath!="":
+      self.wv_model=Word2Vec.load(wv_fpath)
     else:   
       cur_wv_path=self.extraction_params.get("wv_fpath","")
       if cur_wv_path=="": self.wv_model=None
       else: self.wv_model=Word2Vec.load(cur_wv_path)
-      self.extraction_params["wv_model"]=self.wv_model
+    self.extraction_params["wv_model"]=self.wv_model
   def update_state_dict(self,new_state_dict):
     self.model.load_state_dict(new_state_dict)
     self.model.eval()
