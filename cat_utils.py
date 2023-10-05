@@ -1577,13 +1577,41 @@ def analyze_pre_edit_docx(docx_fpath,nn_model_obj,first_token_dict,pred_threshol
 
 
 
-def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_table_template.html"):
+# def edit_list2html_OLD(edit_list,out_fpath,template_fpath="templates/pre-editing_table_template.html"):
+#   table_content0=""
+#   for i0,tag_item0 in enumerate(edit_list):
+#     original0,final0,edited0=tag_item0
+#     table_class="table-light"
+#     if i0%2!=0: table_class="table-dark text-dark"
+#     cur_tr0='<tr class="%s"><td>%s</td><td>%s</td><td>%s</td></tr>'%(table_class,original0,final0,edited0)
+#     table_content0+=cur_tr0
+
+#   #template_fpath="templates/pre-editing_table_template.html"
+#   template_fopen=open(template_fpath)
+#   template_content=template_fopen.read()
+#   template_fopen.close()
+#   template_dom_obj=web_lib.DOM(template_content)
+#   repl_dict={"#data_display_table_body":table_content0}
+#   out_html=template_dom_obj.replace(repl_dict)
+
+#   out_fopen=open(out_fpath,"w")
+#   out_fopen.write(out_html)
+#   out_fopen.close()
+
+def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_table_template.html",headers=["original","final","edited"]): #first sub item should be the ID of the para
+  header_cells_str="".join(["<th>%s</th>"%v for v in headers])
+  header_content0='<tr>%s</tr>'%header_cells_str
   table_content0=""
   for i0,tag_item0 in enumerate(edit_list):
-    original0,final0,edited0=tag_item0
+    para_id0=tag_item0[0]
+    cell_content_list=tag_item0[1:]
+    td_str0="".join(["<td>%s</td>"%v for v in cell_content_list])
+    print(td_str0)
+    #original0,final0,edited0=tag_item0
     table_class="table-light"
     if i0%2!=0: table_class="table-dark text-dark"
-    cur_tr0='<tr class="%s"><td>%s</td><td>%s</td><td>%s</td></tr>'%(table_class,original0,final0,edited0)
+    cur_tr0='<tr class="%s" name="%s">%s</tr>'%(table_class,para_id0,td_str0)
+    #cur_tr0='<tr class="%s" name="%s"><td>%s</td><td>%s</td><td>%s</td></tr>'%(table_class,para_id0,original0,final0,edited0)
     table_content0+=cur_tr0
 
   #template_fpath="templates/pre-editing_table_template.html"
@@ -1591,14 +1619,12 @@ def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_tab
   template_content=template_fopen.read()
   template_fopen.close()
   template_dom_obj=web_lib.DOM(template_content)
-  repl_dict={"#data_display_table_body":table_content0}
+  repl_dict={"#data_display_table_body":table_content0,"#data_table_headers":header_content0}
   out_html=template_dom_obj.replace(repl_dict)
 
   out_fopen=open(out_fpath,"w")
   out_fopen.write(out_html)
   out_fopen.close()
-
-
 
 
 
