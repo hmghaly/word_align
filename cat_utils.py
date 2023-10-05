@@ -1004,7 +1004,7 @@ def get_edit_html_OLD(tokens1,tokens2):
 
 
 #13 Sept
-def get_edits_pairs(tokens1,tokens2):
+def get_edits_pairs_OLD(tokens1,tokens2):
   match_obj=SequenceMatcher(None,tokens1,tokens2)
   final_list=[]
   seq_pair_list=[]
@@ -1015,7 +1015,7 @@ def get_edits_pairs(tokens1,tokens2):
     seq_pair_list.append((from_seq0,to_seq0))
   return seq_pair_list
 
-def get_edit_html(tokens1,tokens2,main_class_name): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
+def get_edit_html_OLD(tokens1,tokens2,main_class_name): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
   tokens1=general.remove_padding(tokens1)
   tokens2=general.remove_padding(tokens2)  
   cur_seq_pairs=get_edits_pairs(tokens1,tokens2)
@@ -1032,7 +1032,50 @@ def get_edit_html(tokens1,tokens2,main_class_name): #edit_pairs2html_spans: iden
     chunks.append(cur_chunk)
   return " ".join(chunks)
 
+#5 Oct 2023
+def get_edits_pairs(tokens1,tokens2,window_size=5): #make all changes as replacements - add sentence boundaries for whole segment edits
+  tokens1=general.add_padding(tokens1)
+  tokens2=general.add_padding(tokens2)
+  match_obj=SequenceMatcher(None,tokens1,tokens2)
+  final_list=[]
+  for a in match_obj.get_opcodes():
+    match_type,x0,x1,y0,y1=a
+    from_seq0=tokens1[x0:x1]
+    to_seq0=tokens2[y0:y1]
+    if match_type in ["insert","delete"]: #for insertaions/deletions, get preceding+following token to make it a replacement
+      x0=x0-1
+      x1=x1+1
+      y0=y0-1
+      y1=y1+1
+    old0=tokens1[x0:x1]
+    new0=tokens2[y0:y1]
+    # span_old0=(x0,x1-1) #adjust the end of the span to reflect the index of the last token
+    # span_new0=(y0,y1-1)
+    if match_type=="equal": repl_str_pair=""
+    else: repl_str_pair="%s | %s"%(" ".join(old0)," ".join(new0))
+    repl_str_pair=repl_str_pair.replace("<s>","_ss_").replace("</s>","_se_")
+    final_list.append((from_seq0,to_seq0,match_type,repl_str_pair))
+  return final_list
 
+#5 Oct 2023
+def get_edit_html(tokens1,tokens2,main_class_name): #edit_pairs2html_spans: identify spans of edits for two sequences of words, include span ids and classes to work with javascript
+  # tokens1=general.remove_padding(tokens1)
+  # tokens2=general.remove_padding(tokens2)  
+  cur_seq_pairs=get_edits_pairs(tokens1,tokens2)
+  chunks=[]
+  for pair0 in cur_seq_pairs:
+    from_seq0,to_seq0,match_type,repl_str_pair=pair0
+    if from_seq0==to_seq0:
+      cur_chunk=general.de_tok2str(to_seq0)
+    else:
+      cur_id=general.gen_id(4)
+      from_str=general.de_tok2str(from_seq0)
+      to_str=general.de_tok2str(to_seq0)
+      cur_chunk=f'<span id="{cur_id}" class="replacement {main_class_name} {match_type} tentative" name="{repl_str_pair}"><span class="from_repl from_initial">{from_str}</span> <span class="to_repl to_initial">{to_str}</span></span>'
+    chunks.append(cur_chunk)
+  final_html_chunk=" ".join(chunks)
+  final_html_chunk=final_html_chunk.replace("<s>","").replace("</s>","").strip()
+  return final_html_chunk
 
 
 # def get_edit_html_NEW(tokens1,tokens2,use_spans=True):
