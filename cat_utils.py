@@ -1606,7 +1606,7 @@ def edit_list2html(edit_list,out_fpath,template_fpath="templates/pre-editing_tab
     para_id0=tag_item0[0]
     cell_content_list=tag_item0[1:]
     td_str0="".join(["<td>%s</td>"%v for v in cell_content_list])
-    print(td_str0)
+    #print(td_str0)
     #original0,final0,edited0=tag_item0
     table_class="table-light"
     if i0%2!=0: table_class="table-dark text-dark"
