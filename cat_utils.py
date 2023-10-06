@@ -1052,7 +1052,7 @@ def get_edits_pairs(tokens1,tokens2,window_size=5): #make all changes as replace
     # span_old0=(x0,x1-1) #adjust the end of the span to reflect the index of the last token
     # span_new0=(y0,y1-1)
     if match_type=="equal": repl_str_pair=""
-    else: repl_str_pair="%s | %s"%(" ".join(old0)," ".join(new0))
+    else: repl_str_pair="%s | %s"%(general.de_tok2str(old0),general.de_tok2str(new0))
     repl_str_pair=repl_str_pair.replace("<s>","_ss_").replace("</s>","_se_")
     final_list.append((from_seq0,to_seq0,match_type,repl_str_pair))
   return final_list
