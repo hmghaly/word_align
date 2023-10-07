@@ -1,5 +1,5 @@
 import random
-import dill as pickle
+
 from collections import OrderedDict
 import numpy as np
 import os,json, copy, sys, time, random
@@ -15,6 +15,7 @@ from scipy import stats
 
 
 try:
+  import dill as pickle
   import torch
   from torch import nn
   import torch.optim as optim
