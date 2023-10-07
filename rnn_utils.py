@@ -784,7 +784,7 @@ def create_iter(iter_params): #use any iter parameters to create a generator
   cur_iter_fn=iter_params.get("function",general.read_file_from_to)
   gen0=iter_params.get("gen") #if a generator is provided as a parameter input
   if gen0!=None: 
-    for item0 in gen0: yield item0
+    for item0 in enumerate(gen0): yield item0
     return
   cur_iter_fpath=iter_params.get("fpath")
   cur_from_ratio=iter_params.get("from_ratio",0)
