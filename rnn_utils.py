@@ -793,7 +793,8 @@ def create_iter(iter_params): #use any iter parameters to create a generator
   cur_apply_json=iter_params.get("apply_json",True)
   #read_file_from_to(data_fpath,from_ratio=0.005,to_ratio=0.006,yield_loc=True,apply_json=True)
   cur_gen=cur_iter_fn(cur_iter_fpath,from_ratio=cur_from_ratio,to_ratio=cur_to_ratio,yield_loc=cur_yield_loc,apply_json=cur_apply_json)
-  return cur_gen
+  for item0 in cur_gen: yield item0
+  return 
 
 
 
