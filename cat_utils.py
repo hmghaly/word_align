@@ -1401,7 +1401,7 @@ def para2sents(text):
 
 
 #============ Pre-editing pipeline ========================
-def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5): #pre-edit a sentence giveb the first token dict and a neural network model object with prediction
+def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5): #pre-edit a sentence given the first token dict and a neural network model object with prediction
   sent_tokens0=general.add_padding(general.tok(sent_str))
   span_repl_items=extract_repl_instances(sent_tokens0,[],first_token_dict)
   new_items=[]
@@ -1419,6 +1419,12 @@ def pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5): #pre-ed
   if pre_edited_sent_tokens[0]=="<s>": pre_edited_sent_tokens=pre_edited_sent_tokens[1:]
   if pre_edited_sent_tokens[-1]=="</s>": pre_edited_sent_tokens=pre_edited_sent_tokens[:-1]
   return pre_edited_sent_tokens,valid_repl
+
+def pre_edit_html(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5):
+  original_tokens=general.tok(sent_str)
+  pre_edited_sent_tokens,valid_repl=pre_edit(sent_str,nn_model_obj,first_token_dict,pred_threshold=0.5)
+  pre_edit_html=get_edit_html(original_tokens,pre_edited_sent_tokens,main_class_name="automatic")
+  return pre_edit_html, valid_repl
 
 def pre_edit_docx_OLD(docx_fpath,nn_model_obj,first_token_dict,pred_threshold=0.5,pre_edit_original=True): #prediting the original of a docx file
   cur_docx_edit_list=get_docx_paras_edits(docx_fpath)
