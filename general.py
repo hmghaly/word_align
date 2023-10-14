@@ -797,6 +797,38 @@ def seek_read_line(fpath,seek_to):
   return cur_line
 
 
+def shuffle_file_lines(input_fpath,output_fpath,n=50):
+  shuffled_fopen=open(output_fpath,"w")
+  gen_list=[]
+  for i0 in range(n):
+    start_ratio,end_ratio=round(i0/n,1),round((i0+1)/n,1)
+    cur_gen=read_file_from_to(input_fpath,from_ratio=start_ratio,to_ratio=end_ratio,yield_loc=False)
+    gen_list.append(cur_gen)
+  flag=True
+  counter=0
+  line_counter=0
+  cur_item_list=[]
+  while flag==True:
+    flag=False
+    temp_item_list=[]
+    for cur_gen in gen_list:
+      try: cur_item=next(cur_gen)
+      except StopIteration: cur_item=None
+      if cur_item==None or cur_item=="": continue
+      temp_item_list.append(cur_item)
+    if temp_item_list!=[]: flag=True
+    cur_item_list.extend(temp_item_list)
+    if len(cur_item_list)>10000:
+      random.shuffle(cur_item_list)
+      shuffled_fopen.writelines(cur_item_list)
+      cur_item_list=[]
+    counter+=1#len(cur_item_list)
+    line_counter+=len(temp_item_list)
+    if counter>0 and counter%10000==0: print(counter,line_counter)
+  shuffled_fopen.writelines(cur_item_list)  
+  shuffled_fopen.close()
+  return line_counter
+
 
 #iter functions - 10 August 2023
 def get_iter_chunks(iterator,chunk_size,min_i=None): #iterate certain chunk size over an iterable, with a limit min_i, excluding all iterations before
