@@ -17,6 +17,7 @@ else:
     import HTMLParser
     htmlp = HTMLParser.HTMLParser() #To decode html entities in the tika output
 
+################## Time and IDs ####################
 def now():
   return time.time()
 
@@ -45,10 +46,42 @@ def similar(a, b):
 ##################### LISTS ###########################
 #advanced list operations
 def avg(list1):
-  return float(sum(list1))/len(list1)	
+  return float(sum(list1))/len(list1)   
 
 def flatten(l):
   return [item for sublist in l for item in sublist]
+
+def get_metrics(pred,actual,metrics_dict={}): #update precision/recall values with each prediction/actual pair
+  tp=metrics_dict.get("tp",0)
+  tn=metrics_dict.get("tn",0)
+  fp=metrics_dict.get("fp",0)
+  fn=metrics_dict.get("fn",0)
+  if round(pred)==1:
+    if round(actual)==1: tp+=1
+    else: fp+=1
+  else:
+    if round(actual)==1: fn+=1
+    else: tn+=1
+  precision0,recall0,f_score=0,0,0
+  if (tp+fp)>0: precision0=tp/(tp+fp)
+  if (tp+fn)>0: recall0=tp/(tp+fn)
+  if (precision0 + recall0)>0: f_score= (2 * precision0 * recall0) / (precision0 + recall0)
+  metrics_dict["tp"]=tp
+  metrics_dict["tn"]=tn
+  metrics_dict["fp"]=fp
+  metrics_dict["fn"]=fn
+
+  metrics_dict["precision"]=precision0
+  metrics_dict["recall"]=recall0
+  metrics_dict["f_score"]=f_score
+  return metrics_dict
+
+def get_list_metrics(pred_vals,actual_vals):
+  cur_metrics_dict={}
+  for a,b in zip(pred_vals,actual_vals):
+    cur_metrics_dict=get_metrics(a,b,cur_metrics_dict)  
+  return cur_metrics_dict
+
 
 def split_train_test(all_data0,train_ratio=0.8):
   train_size=int(len(all_data0)*train_ratio)
@@ -512,11 +545,11 @@ def tok_simple(txt,full=False): #this tokenization scheme splits around punctuat
     else: 
         txt=txt.replace("://","__url__")
         txt=re.sub("^(\W)",r" \1 ", txt)
-        txt=re.sub("(\W)$",r" \1 ", txt)	
+        txt=re.sub("(\W)$",r" \1 ", txt)    
         txt=re.sub("\s(\W)",r" \1 ", txt)
         txt=re.sub("(\W)\s",r" \1 ", txt)
-        txt=re.sub("(\W)(\W)",r" \1 \2", txt)	
-        txt=txt.replace("__url__","://")	
+        txt=re.sub("(\W)(\W)",r" \1 \2", txt)   
+        txt=txt.replace("__url__","://")    
     out=re.split("\s+",txt)
     return [v for v in out if v]
 
@@ -693,10 +726,10 @@ def append2file(item,fpath): #add line to file
   file_open.close()  
 
 def read(fpath):
-	file_open=open(fpath)
-	content=file_open.read()
-	file_open.close()
-	return content
+    file_open=open(fpath)
+    content=file_open.read()
+    file_open.close()
+    return content
 
 def read_json(fpath):
     with open(fpath) as file_open0:
