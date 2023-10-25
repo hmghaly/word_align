@@ -1162,6 +1162,23 @@ def compare_repl(tokens1,tokens2,window_size=5): #make all changes as replacemen
   return final_list
 
 
+def tok_mapping(tokens1,tokens2): #map each src tok index to corr trg token index
+  match_obj=SequenceMatcher(None,tokens1,tokens2)
+  map12={}
+  map21={}
+  final_list=[]
+  for a in match_obj.get_opcodes():
+    match_type,x0,x1,y0,y1=a
+    if match_type=="replace":
+      map12[x0]=y0
+      map21[y0]=x0
+    if match_type=="equal":
+      for i0,j0 in zip(range(x0,x1),range(y0,y1)):
+        map12[i0]=j0
+        map21[j0]=i0
+  return map12,map21
+
+
 def get_corr_freq_dict(file_gen): #iterting file lines, each line is json dict, with keys "src","trg"
   corr_dict0={}
   for line0 in file_gen:
