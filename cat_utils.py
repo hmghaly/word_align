@@ -1161,7 +1161,7 @@ def compare_repl(tokens1,tokens2,window_size=5): #make all changes as replacemen
     final_list.append((match_type,old0,new0,span_old0,span_new0))
   return final_list
 
-
+#25 Oct 23
 def tok_mapping(tokens1,tokens2): #map each src tok index to corr trg token index
   match_obj=SequenceMatcher(None,tokens1,tokens2)
   map12={}
@@ -1177,6 +1177,79 @@ def tok_mapping(tokens1,tokens2): #map each src tok index to corr trg token inde
         map12[i0]=j0
         map21[j0]=i0
   return map12,map21
+
+#27 Oct 23
+def apply_xml_para_txt(xml_str,new_text): #apply text within the para xml to match as much as possible the text already within the tags
+  xml_str=xml_str.replace('</w:t></w:r><w:r><w:t>',"")
+  #print(xml_str)
+  tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', xml_str))
+  open_tags=[]
+  tag_counter_dict={}
+  start_i=0
+  last_open_tag_str=""
+  tok_counter=0
+  tag_tok_list=[]
+  start_tags_str=""
+  text_flag=False
+  for ti_, t in enumerate(tags): #iterate over tags
+    tag_str,tag_start,tag_end=t.group(0), t.start(), t.end()
+    tag_str_lower=tag_str.lower()
+    tag_name=re.findall(r'</?(.+?)[\s>]',tag_str_lower)[0]
+    tag_type=""
+    if tag_str.startswith('</'): tag_type="closing"
+    elif tag_str.startswith('<!'): tag_type="comment"
+    elif tag_str_lower.endswith('/>') or tag_name in ["input","link","meta","img","br","hr"]: tag_type="s" #standalone
+    else: tag_type="opening"
+    if len(open_tags)>0 and open_tags[-1].split("_")[0]=="script": #avoid identifying < > chars in javascript as tags
+      if not (tag_name=="script" and tag_type== "closing"): continue
+    
+    
+    inter_text=xml_str[start_i:tag_start] #intervening text since last tag
+    if tag_str=="</w:instrText>": #handle hyperlink content as a tag not text
+      open_tags.append(inter_text)
+      #print(">>>> open_tags",open_tags)
+    elif inter_text=="": pass #just proceed to next tag
+    else:
+      prev_tags="".join(open_tags)
+      cur_toks=general.tok(inter_text)
+      if cur_toks==[]: cur_toks=[""] #if a text between tags is empty, we consider it a list of one empty string
+      #print(">>>>>",prev_tags,"inter_text:",inter_text)
+      temp_prev_tag_list=[""]*len(cur_toks)
+      if len(temp_prev_tag_list)>0: temp_prev_tag_list[0]=prev_tags
+      for tag_str0,text0 in zip(temp_prev_tag_list,cur_toks):
+        if len(tag_tok_list)==0: 
+          start_tags_str=tag_str0
+          tag_str0=""
+        tag_tok_list.append((tag_str0,text0))
+      #print(prev_tags,cur_toks)
+      open_tags=[]
+      text_flag=True
+    open_tags.append(tag_str)
+    start_i=tag_end
+    
+  inter_text=xml_str[start_i:]
+  remaining_tags="".join(open_tags)
+  text_toks=[v[1] for v in tag_tok_list]
+  out_toks=general.tok(new_text)
+  cur_map12,cur_map21=tok_mapping(out_toks,text_toks)
+  final_str=""
+  final_str+=start_tags_str
+  de_tok_space_list0=general.de_tok_space(out_toks)
+  prev_i=0
+  for i0,token_space0 in enumerate(de_tok_space_list0):
+    token0,space0=token_space0
+    corr_i=cur_map12.get(i0)
+    temp_prev_tag_str=""
+    if corr_i!=None:
+      cur_prev_tags=[v[0] for v in tag_tok_list[prev_i:corr_i+1]]
+      temp_prev_tag_str="".join(cur_prev_tags)
+      prev_i=corr_i+1
+    final_str+=temp_prev_tag_str+token0+space0
+  cur_prev_tags=[v[0] for v in tag_tok_list[prev_i:]]
+  temp_prev_tag_str="".join(cur_prev_tags)
+  final_str+=temp_prev_tag_str
+  final_str+=remaining_tags
+  return final_str
 
 
 def get_corr_freq_dict(file_gen): #iterting file lines, each line is json dict, with keys "src","trg"
