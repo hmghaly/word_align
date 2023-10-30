@@ -772,7 +772,7 @@ def apply_docx_paras(docx_fpath,content_dict,out_fpath):
   docx_obj=docx(docx_fpath)
   docx_paras,docx_paras_dict=docx_obj.extract_paras()
   repl_dict={}
-  for key0,text0 in content_dict:
+  for key0,text0 in content_dict.items():
     original_xml=docx_paras_dict[key0]
     new_xml=apply_xml_para_txt(original_xml,text0)
     repl_dict[key0]=(original_xml,new_xml)
