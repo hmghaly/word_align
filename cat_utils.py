@@ -768,6 +768,19 @@ def tsv2dict(tsv_fpath0,skip_first=False):
   return out_dict
 
 
+def apply_docx_paras(docx_fpath,content_dict,out_fpath):
+  docx_obj=docx(docx_fpath)
+  docx_paras,docx_paras_dict=docx_obj.extract_paras()
+  repl_dict={}
+  for key0,text0 in content_dict:
+    original_xml=docx_paras_dict[key0]
+    new_xml=apply_xml_para_txt(original_xml,text0)
+    repl_dict[key0]=(original_xml,new_xml)
+  docx_obj.repl_paras(repl_dict)
+  docx_obj.save_as(out_fpath)
+
+  #docx_paras_dict=dict(iter(docx_paras))
+
 #2 June 2023
 class docx:
   def __init__(self,docx_fpath,keep_copy=True): #openning the docx file, by unzipping it
@@ -795,6 +808,26 @@ class docx:
     #shutil.make_archive(self.OUT_ZIP, 'zip', self.TEMP_FOLDER)
     shutil.make_archive(self.TEMP_ZIP.replace(".zip", ""), 'zip', self.TEMP_FOLDER)
     os.rename(self.TEMP_ZIP, out_fpath)
+  def repl_paras(self,repl_dict): # repl_dict key: para path, val: (original para xml, new para xml)
+    repl_list=[]
+    for key0,repl_pair in repl_dict.items():
+      para_path=key0.split("|")[0]
+      repl_list.append((para_path,repl_pair))
+    repl_list.sort()
+    grouped=[(key,[v[1] for v in list(group)]) for key,group in groupby(repl_list,lambda x:x[0])]
+    for para_path,pair_grp0 in grouped:
+      cur_file_path=os.path.join(self.TEMP_FOLDER,para_path)
+      cur_file_open=open(cur_file_path)
+      cur_file_content=cur_file_open.read()
+      cur_file_open.close()
+      for from0,to0 in pair_grp0:
+        cur_file_content=cur_file_content.replace(from0,to0)
+      cur_file_open=open(cur_file_path,"w")
+      cur_file_open.write(cur_file_content)
+      cur_file_open.close()
+
+
+
   def extract_paras(self,cat_file_path=""): 
     self.paras=[]
     self.para_path_dict={}
