@@ -1,9 +1,10 @@
 from sqlitedict import SqliteDict #Make sure to install it 
 import os, json
+import zlib, pickle, sqlite3
 
-def open_sqld(sqld_fpath):
+def open_sqld(sqld_fpath,encode_fn=json.dumps, decode_fn=json.loads):
   if not os.path.exists(sqld_fpath): return None
-  mydict = SqliteDict(sqld_fpath, encode=json.dumps, decode=json.loads, autocommit=True)
+  mydict = SqliteDict(sqld_fpath, encode=encode_fn, decode=decode_fn, autocommit=True)
   return mydict
 
 
@@ -65,3 +66,9 @@ def dict2sqld(input_dict,sqld_fpath):
     sql_dict0.commit()
     sql_dict0.close()
     return True   
+
+def my_encode(obj):
+    return sqlite3.Binary(zlib.compress(pickle.dumps(obj, pickle.HIGHEST_PROTOCOL)))
+
+def my_decode(obj):
+    return pickle.loads(zlib.decompress(bytes(obj)))    
