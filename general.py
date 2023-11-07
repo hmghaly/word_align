@@ -736,7 +736,18 @@ def read_json(fpath):
         cur_dict0=json.load(file_open0)
     return cur_dict0
 
-
+#6 Nov 2023
+def remove_dupl(fpath): #remove duplicate lines from a file
+  temp_fpath=fpath+"0"
+  seen = set()
+  with open(fpath, 'r') as fin, open(temp_fpath, 'w') as fout:
+    for line in fin:
+      h = hash(line)
+      if h not in seen:
+        fout.write(line)
+        seen.add(h)
+  shutil.copy(temp_fpath,fpath)
+  os.remove(temp_fpath)
 
 
 ####################### PICKLE AND SHELVE ######################

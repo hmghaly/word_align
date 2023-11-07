@@ -599,3 +599,29 @@ def get_page_info(url):
   page_info_dict["text_items"]=text_items
   
   return page_info_dict  
+
+def get_title(html_content):
+  title0=""
+  title_found=re.findall('(?i)<title>(.+?)</title>',html_content)
+  if title_found: title0=title_found[0]
+  return title0
+
+def get_desc(html_content):
+  desc0=""
+  desc_tag_found=re.findall('(?i)<meta name="description" .+>',text)
+  if desc_tag_found:
+    desc_tag0=desc_tag[0]
+    desc_found=re.findall('(?i)content="(.+?)"',desc_tag0)
+    if desc_found: desc0=desc_found[0]
+  return desc0  
+
+def get_emails(html_content):
+  emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', str(html_content))
+  emails=list(set(emails))
+  valid_emails=[]
+  for em0 in emails:
+    em_dom=em0.split("@")[-1]
+    check=re.findall("[a-zA-Z]",em_dom)
+    if not check: continue
+    valid_emails.append(em0)
+  return valid_emails
