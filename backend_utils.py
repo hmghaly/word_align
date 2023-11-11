@@ -317,6 +317,45 @@ def get_wsgi_cookie(environ):
       cookie_dict[key]=val
   return cookie_dict
 
+
+#11 Nov 23
+def get_wsgi_form_data(form_post_str): #get form dict from binary posted data, to include posted files
+    split_content=form_post_str.split(b"\r\n") #split the content by linebreak
+    form_items=[]
+    cur_obj={}
+    for sp in split_content:
+        if sp.startswith(b'----'): continue #skip if it is a form boundary - TODO only do this if the following line is conctent disposition
+        if sp.startswith(b'Content-Disposition:'):
+            if cur_obj!={}: 
+                if cur_obj.get("content")!=None: cur_obj["content"]=cur_obj["content"].strip()#.strip(b' \n\r')
+                if cur_obj.get("filename")==None: cur_obj["content"]=cur_obj["content"].decode()
+                form_items.append(cur_obj)
+                cur_obj={}
+            semicolon_split=sp.split(b";") #e.g. Content-Disposition: form-data; name="uploaded_file"; filename="apprenhensive.png"
+            for sp in semicolon_split[1:]:
+                equal_split=sp.split(b"=")
+                if len(equal_split)!=2: continue
+                key,val=equal_split
+                key_str=key.decode().strip()
+                val_str=val.decode().strip(' "\n\r')
+                cur_obj[key_str]=val_str #val.strip(b'" \n\r')
+            cur_obj["content"]=b""
+        elif sp.startswith(b'Content-Type:'): #get the file type
+            cur_obj["type"]=sp.split(b":")[1].strip(b"\n\r")
+        else:
+            if cur_obj.get("content")!=None: cur_obj["content"]+=sp+b"\r\n"#.strip(b' \n\r')
+
+    if cur_obj!={}: 
+        if cur_obj.get("content")!=None: cur_obj["content"]=cur_obj["content"].strip()
+        if cur_obj.get("filename")==None: cur_obj["content"]=cur_obj["content"].decode()
+        form_items.append(cur_obj)
+    form_dict0={}
+    for f_item0 in form_items:
+        name0=f_item0.get("name")
+        if name0!=None: form_dict0[name0]=f_item0
+
+    return form_dict0
+
 def generate_uuid():
     return str(uuid.uuid4())
 
