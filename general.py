@@ -775,6 +775,13 @@ def count_plus(counter_shelve_fpath,count_key="count"):
 
 
 ################## OS FUNCTIONS ##########################
+def read_file(fpath0):
+    fopen0=open(fpath0)
+    content0=fopen0.read()
+    fopen0.close()
+    return content0
+
+
 #file operations
 def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding to a percentage of file size
   file_size=os.stat(fpath).st_size
