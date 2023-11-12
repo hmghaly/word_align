@@ -901,7 +901,8 @@ def get_iter_chunks(iterator,chunk_size,min_i=None): #iterate certain chunk size
 #file write opertation
 def append_line(text0,fpath0): #append a line to text file
   fopen0=open(fpath0,"a")
-  fopen0.write(text0.strip("\n")+"\n")
+  text0=text0.replace("\n"," ")
+  fopen0.write(text0+"\n")
   fopen0.close()
 
 #OS functions
