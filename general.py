@@ -276,6 +276,20 @@ multi_dot_words_lower=["e.g.","i.e.","u.s.a.","u.k.","o.k."," v."," vs."," v.s."
 multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
 dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
 diac=u'\u064e\u064f\u0650\u0651\u0652\u064c\u064b\u064d\ufc62'
+def tok_ar_diac(text):
+  diac_list=[]
+  for i0,dia0 in enumerate(diac):
+    if not dia0 in text: continue
+    place_holder0=f'_diac{i0}_'
+    text=text.replace(dia0,place_holder0)
+    diac_list.append((place_holder0,dia0))
+
+  text=re.sub("(\W)",r" \1 ",text)
+  for a,b in diac_list:
+    text=text.replace(a,b)
+  tokens=[v for v in re.split("\s+",text) if v]
+  return tokens
+
 
 import unicodedata
 def char_is_punct(char0):
