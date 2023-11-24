@@ -1,6 +1,6 @@
 from pymongo.mongo_client import MongoClient
 import pymongo
-import os, json
+import os, json, time
 
 def mongo_find(query,collection,page_i=1,n_limit=10):
     t0=time.time()
