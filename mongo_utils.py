@@ -42,13 +42,13 @@ def mongo_find(query,collection,page_i=1,n_limit=10):
     out_dict["elapsed"]=t1-t0
     return out_dict
 
-def mongo_insert_many(cur_list,cur_client):
+def mongo_insert_many(cur_list,cur_collection):
     out_dict={}
     if len(cur_list)==0: 
         out_dict["n_inserted"]=0
         return out_dict
     try:
-        result_many = accounts_collection.insert_many(cur_list, ordered=False)
+        result_many = cur_collection.insert_many(cur_list, ordered=False)
         out_dict["n_inserted"]=len(result_many.inserted_ids)
     except pymongo.errors.BulkWriteError as e:
         with_errors=e.details['writeErrors']
