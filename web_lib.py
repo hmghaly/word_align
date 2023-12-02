@@ -655,6 +655,9 @@ def get_page_text(page_url):
   text=text.replace("<p>","_br_<p>")
   text=text.replace("</title>","</title>_br_")
   text=text.replace("</li>","</li>_br_")
+  text=text.replace("</div>","</div>_br_")
+  text=text.replace("</label>","</label>_br_")
+  text=text.replace("</button>","</button>_br_")
   
   text=re.sub('(</h\d>)',r'_br_\1',text) #to add line break at headings
   text=re.sub('(<h\d\b.*?>)',r'_br_\1',text)
