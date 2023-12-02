@@ -626,9 +626,9 @@ def get_emails(html_content):
     valid_emails.append(em0)
   return valid_emails
 
-def get_page_text(page_url):
+def get_page_paras(page_url):
   try:text=get_page_content(page_url)
-  except: return ""
+  except: return []
   # (REMOVE <SCRIPT> to </script> and variations)
   pattern = r'<[ ]*script.*?\/[ ]*script[ ]*>'  # mach any char zero or more times
   text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
