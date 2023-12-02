@@ -647,7 +647,7 @@ def get_page_text(page_url):
   # (REMOVE HTML DOCTYPE <!DOCTYPE html to > and variations)
   pattern = r'<[ ]*\![ ]*DOCTYPE.*?>'  # mach any char zero or more times
   text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
-  tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', text))
+  tags=list(re.findall('<[^<>]*?>|\<\!\-\-.+?\-\-\>', text))
   for tag0 in list(set(tags)): text=text.replace(tag0,tag0.lower()) #make sure al tag names are in lower case
 
 
