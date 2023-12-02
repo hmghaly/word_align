@@ -653,6 +653,7 @@ def get_page_text(page_url):
 
   text=text.replace("</p>","_br_</p>") #to put a line break at the end of paragraph elements
   text=text.replace("<p>","_br_<p>")
+  text=text.replace("</title>","</title>_br_")
   text=text.replace("</li>","</li>_br_")
   
   text=re.sub('(</h\d>)',r'_br_\1',text) #to add line break at headings
@@ -661,6 +662,8 @@ def get_page_text(page_url):
   text=re.sub('(<li\b.*?>)',r'_br_\1',text) #and at lists
   text=text.replace("<br>","_br_")
   text=re.sub('<[^<>]*?>','',text)
+  text=re.sub('[\n\r\t]+',"_br_",text)
+  text=re.sub('\s+'," ",text)
   paras=[v.strip() for v in text.split("_br_") if v.strip()]
 
   return paras
