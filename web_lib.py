@@ -667,6 +667,6 @@ def get_page_text(page_url):
   text=re.sub('<[^<>]*?>','',text)
   text=re.sub('[\n\r\t]+',"_br_",text)
   text=re.sub('\s+'," ",text)
-  paras=[v.strip() for v in text.split("_br_") if v.strip()]
+  paras=[v.strip() for v in text.split("_br_") if v.strip() and not (v[0]=='<' and v[-1]=='>') ]
 
   return paras
