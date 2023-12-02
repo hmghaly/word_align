@@ -647,4 +647,20 @@ def get_page_text(page_url):
   # (REMOVE HTML DOCTYPE <!DOCTYPE html to > and variations)
   pattern = r'<[ ]*\![ ]*DOCTYPE.*?>'  # mach any char zero or more times
   text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
-  return text
+  tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', text))
+  for tag0 in list(set(tags)): text=text.replace(tag0,tag0.lower()) #make sure al tag names are in lower case
+
+
+  text=text.replace("</p>","_br_</p>") #to put a line break at the end of paragraph elements
+  text=text.replace("<p>","_br_<p>")
+  text=text.replace("</li>","</li>_br_")
+  
+  text=re.sub('(</h\d>)',r'_br_\1',text) #to add line break at headings
+  text=re.sub('(<h\d\b.*?>)',r'_br_\1',text)
+  text=re.sub('(<p\b.*?>)',r'_br_\1',text) #and at paragraphs
+  text=re.sub('(<li\b.*?>)',r'_br_\1',text) #and at lists
+  text=text.replace("<br>","_br_")
+  text=re.sub('<[^<>]*?>','',text)
+  paras=[v.strip() for v in text.split("_br_") if v.strip()]
+
+  return paras
