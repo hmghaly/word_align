@@ -300,6 +300,20 @@ def tok_ar_diac(text):
   return tokens
 
 
+def tok_multiling(text): 
+  tokens=[]
+  text=re.sub(u'[\u064e\u064f\u0650\u0651\u0652\u064c\u064b\u064d\u0640\ufc62]','',text) #remove arabic diacritics
+  text=re.sub('(\d+)(\w)',r'\1 \2',text) #handle numbers in chinese and japanese
+  chunks=re.findall("\w+",text)
+  for c in chunks:
+    if ord(c[0])>10000 or ord(c[-1])>10000: 
+      check_end_digits=re.findall('([0-9]+)$',c)
+      if check_end_digits!=[]: c=c[:len(check_end_digits[0])]
+      tokens.extend(list(c)) #if japanese or chinese, split by character
+      tokens.extend(check_end_digits)
+    else: tokens.append(c) #else, get the full token
+  return tokens
+
 import unicodedata
 def char_is_punct(char0):
   unicode_check=unicodedata.category(char0)
