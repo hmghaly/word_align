@@ -51,6 +51,15 @@ def avg(list1):
 def flatten(l):
   return [item for sublist in l for item in sublist]
 
+def unique(list0): #get the unique items of a list in order
+  used_dict={}
+  list1=[]
+  for item0 in list0:
+    if used_dict.get(item0,False): continue
+    list1.append(item0)
+    used_dict[item0]=True
+  return list1
+
 def get_metrics(pred,actual,metrics_dict={}): #update precision/recall values with each prediction/actual pair
   tp=metrics_dict.get("tp",0)
   tn=metrics_dict.get("tn",0)
