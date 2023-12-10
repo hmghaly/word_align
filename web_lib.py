@@ -60,6 +60,7 @@ class DOM:
     self.description=""
     self.title=""
     self.keywords=""
+    self.content=general.unescape(self.content) 
     #tags=list(re.finditer('<([^<>]*?)>', self.content)) #'<[^<>]*?>|\<\!\-\-.+?\-\-\>'
     tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
     open_tags=[""]
@@ -87,6 +88,7 @@ class DOM:
         if not last_open_tag.lower().split("_")[0] in ["script","style","noscript","xml"]: 
           inter_text_stripped=inter_text.strip('\r\n\t ').replace("&times;","")
           if inter_text_stripped!="": 
+            inter_text+=" "
             self.text_items.append(inter_text)
             self.text_items_tags.append((last_open_tag_str,inter_text))
             if tag_type=="closing" and len(open_tags)>0 and tag_name==open_tags[-1].split("_")[0]: self.simple_tag_text_items.append((last_open_tag_str,inter_text_stripped))
