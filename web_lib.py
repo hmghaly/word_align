@@ -274,9 +274,9 @@ class DOM:
 
       #   old_title=re.findall('(?i)<title.+?/title>')
     return repl_pairs
-  def replace(self,repl_dict0,except_ids=[]):
+  def replace(self,repl_dict0,except_ids=[],id_suffix=None):
     new_content=str(self.content)
-    cur_repl_pairs=self.get_repl_pairs(repl_dict0,except_ids=except_ids)
+    cur_repl_pairs=self.get_repl_pairs(repl_dict0,except_ids=except_ids,id_suffix=id_suffix)
     for a,b in cur_repl_pairs:
       # print(a,b)
       # print("---")
