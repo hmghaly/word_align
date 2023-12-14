@@ -316,6 +316,12 @@ def get_page_content(url0):
   #content0=unescape(content0)  
   return content0
 
+#14 Dec 23
+def get_page_dom_text(url0):
+  html_content0=get_page_content(url0)
+  dom0=DOM(html_content0)
+  return dom0.text
+
       
 class web_page_OLD:
   def __init__(self,url):
