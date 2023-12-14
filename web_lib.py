@@ -51,6 +51,7 @@ class DOM:
     self.actual_ids=[] #a list of IDs actually used, can help us spot duplicate IDs
     self.class_id_dict={} #map each class name to the assigned ids of elements with that class
     self.text_items=[]
+    self.text=""
     self.simple_tag_text_items=[] #non-nested items with a text
     self.text_items_tags=[]
     self.tag_id_list=[] #list of assigned IDs
@@ -176,6 +177,7 @@ class DOM:
           self.class_id_dict[cls0]=self.class_id_dict.get(cls0,[])+[assigned_tag_id]
     self.text_items="".join(self.text_items).split("<br>")
     self.text_items=[v for v in self.text_items if v]
+    self.text="\n".join(text_items)
 
   def get_html(self,assigned_tag_id0,html_content0=''):
     cur_el=self.tag_dict.get(assigned_tag_id0)
