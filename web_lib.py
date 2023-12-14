@@ -177,7 +177,7 @@ class DOM:
           self.class_id_dict[cls0]=self.class_id_dict.get(cls0,[])+[assigned_tag_id]
     self.text_items="".join(self.text_items).split("<br>")
     self.text_items=[v for v in self.text_items if v]
-    self.text="\n".join(text_items)
+    self.text="\n".join(self.text_items)
 
   def get_html(self,assigned_tag_id0,html_content0=''):
     cur_el=self.tag_dict.get(assigned_tag_id0)
