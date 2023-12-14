@@ -249,7 +249,7 @@ class DOM:
       else: new_outer_html=""
       repl_list.append((cur_outer_html,new_outer_html))
     return repl_list
-  def get_repl_pairs(self,cur_repl_dict0,except_ids=[]):
+  def get_repl_pairs(self,cur_repl_dict0,except_ids=[],id_suffix=None):
     repl_pairs=[]
     for key0,val0 in cur_repl_dict0.items():
       if val0==None: continue
@@ -257,7 +257,9 @@ class DOM:
       else: new_content0,new_attrs0=val0 #replacement dict has the values as tuples of new content and new attrs
       if new_content0==None and new_attrs0=={}: continue
       if key0.startswith("#"): #we follow jquery selectors, # indicates selection by ID, while . indicates selection by class name
-        if key0[1:] in except_ids: continue
+        temp_id0=key0[1:]
+        if temp_id0 in except_ids: continue
+        if id_suffix!=None: new_attrs0["id"]="%s_%s"%(temp_id0,id_suffix) #if we want to make unique ids by adding a suffix to it
         repl_pairs.extend(self.apply_content_by_id(key0[1:],new_content0,new_attrs0))
       elif key0.startswith("."):
         repl_pairs.extend(self.apply_content_by_class(key0[1:],new_content0,new_attrs0,except_ids=except_ids))
