@@ -310,9 +310,11 @@ def read_page(url, timeout0=5): #return requests obj
 #   status_code=op.status_code
 #   html_content=op.text
 def get_page_content(url0):
-  page_obj=read_page(url0)
-  content0=page_obj.text
-  content0=general.unescape(content0)  
+  try:
+    page_obj=read_page(url0)
+    content0=page_obj.text
+    content0=general.unescape(content0)  
+  except: content0=""
   #content0=unescape(content0)  
   return content0
 
