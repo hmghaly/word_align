@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import gensim
 from gensim.models import KeyedVectors
 import gensim.downloader as api
 import time, json, re, os, sys
