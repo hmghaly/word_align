@@ -37,12 +37,21 @@ class doc2vec_text:
     self.words=words
     self.tags=[]
 
+def prep_words(doc_words,max_doc_n_words=500,lower=True,exclude_numbers=True,excluded_words=["the","of","a","in","on"]):
+  if lower: doc_words=[v.lower() for v in doc_words]
+  if exclude_numbers: doc_words=[v for v in doc_words if not v.isdigit()]
+  doc_words=[v for v in doc_words if not v in excluded_words]
+  return doc_words[:max_doc_n_words]
+
+
+
 def doc2vec_train(doc_word_list,vector_size=50, min_count=2, epochs=30,max_doc_n_words=500,lower=True,exclude_numbers=True,excluded_words=["the","of","a","in","on"]):
   data_for_training=[]
   for doc_words0 in  doc_word_list:  
-    if lower: doc_words0=[v.lower() for v in doc_words0]
-    if exclude_numbers: doc_words0=[v for v in doc_words0 if not v.isdigit()]
-    doc_words0=[v for v in doc_words0 if not v in excluded_words]
+    # if lower: doc_words0=[v.lower() for v in doc_words0]
+    # if exclude_numbers: doc_words0=[v for v in doc_words0 if not v.isdigit()]
+    # doc_words0=[v for v in doc_words0 if not v in excluded_words]
+    doc_words0=prep_words(doc_words0,max_doc_n_words=max_doc_n_words,lower=lower,exclude_numbers=exclude_numbers,excluded_words=excluded_words)
     cur_obj=doc2vec_text(doc_words0[:max_doc_n_words])
     data_for_training.append(cur_obj)
   print("started training")
