@@ -46,6 +46,9 @@ def doc2vec_train(doc_word_list,vector_size=50, min_count=2, epochs=30,max_doc_n
   doc2vec_model = gensim.models.doc2vec.Doc2Vec(vector_size=vector_size, min_count=min_count, epochs=epochs)
   doc2vec_model.build_vocab(data_for_training)
   doc2vec_model.train(data_for_training, total_examples=doc2vec_model.corpus_count, epochs=doc2vec_model.epochs)
+  meta_dict={}
+  meta_dict["max_doc_n_words"]=max_doc_n_words
+  doc2vec_model.comment=json.dumps(meta_dict)
   return doc2vec_model
 
 def get_avg_doc2vec(doc_word_list):
