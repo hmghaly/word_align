@@ -37,9 +37,12 @@ class doc2vec_text:
     self.words=words
     self.tags=[]
 
-def doc2vec_train(doc_word_list,vector_size=50, min_count=2, epochs=30,max_doc_n_words=500):
+def doc2vec_train(doc_word_list,vector_size=50, min_count=2, epochs=30,max_doc_n_words=500,lower=True,exclude_numbers=True,excluded_words=["the","of","a","in","on"]):
   data_for_training=[]
   for doc_words0 in  doc_word_list:  
+    if lower: doc_words0=[v.lower() for v in doc_words0]
+    if exclude_numbers: doc_words0=[v for v in doc_words0 if not v.isdigit()]
+    doc_words0=[v for v in doc_words0 if not v in excluded_words]
     cur_obj=doc2vec_text(doc_words0[:max_doc_n_words])
     data_for_training.append(cur_obj)
   print("started training")
@@ -48,6 +51,8 @@ def doc2vec_train(doc_word_list,vector_size=50, min_count=2, epochs=30,max_doc_n
   doc2vec_model.train(data_for_training, total_examples=doc2vec_model.corpus_count, epochs=doc2vec_model.epochs)
   meta_dict={}
   meta_dict["max_doc_n_words"]=max_doc_n_words
+  meta_dict["lower"]=lower
+  meta_dict["excluded_words"]=excluded_words
   doc2vec_model.comment=json.dumps(meta_dict)
   return doc2vec_model
 
