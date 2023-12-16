@@ -321,7 +321,8 @@ def get_page_content(url0):
 #14 Dec 23
 def get_page_dom_text(url0):
   html_content0=get_page_content(url0)
-  dom0=DOM(html_content0)
+  try: dom0=DOM(html_content0)
+  except: return ""
   return dom0.text
 
       
