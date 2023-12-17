@@ -18,6 +18,19 @@ def get_workbook_obj(path0,dtype0=str):
 def get_sheet_obj(wb_obj,sheet):
   return wb_obj[sheet]
 
+
+#17 Dec 23
+#get arbitrary keys and values from the sheet content by specifying key column(s) and val column(s)
+def get_sheet_keys_values(sheet_obj,key_cols,val_cols,join_key_by="|"):
+  key_val_dict={}
+  for i0,row_dict0 in sheet_obj.iterrows():
+    cur_keys=[row_dict0.get(k,"") for k in key_cols]
+    cur_vals=[row_dict0.get(k,"") for k in val_cols]
+    key_str0=join_key_by.join(cur_keys)
+    key_val_dict[key_str0]=cur_vals
+  return key_val_dict
+
+
 def get_wb_sheet_list(path1,sheet1,key_col1,val_col1):
   wb_obj1=get_workbook_obj(path1)
   sheet_obj1=wb_obj1[sheet1]
