@@ -73,7 +73,10 @@ def doc2vec_train(doc_word_list,vector_size=50, min_count=2, epochs=30,max_doc_n
 #given the url, doc2vec model, and the vec dict
 def classify_url(url0,d2v_model,cat_vec_dict):
   content=web_lib.get_page_dom_text(url0)
-  words=general.tok_multiling(content)
+  return classify_url_content(content,d2v_model,cat_vec_dict)
+
+def classify_url_content(url_content0,d2v_model,cat_vec_dict):
+  words=general.tok_multiling(url_content0)
   cur_words=prep_words(words,max_doc_n_words=1000) #need cleaner organization
   cur_vec=d2v_model.infer_vector(cur_words)
   pred_list0=[]
