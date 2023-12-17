@@ -26,6 +26,10 @@ en_stop_words=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you
                "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 
                'won', "won't", 'wouldn', "wouldn't"]
 
+
+sys.path.append("code_utils")
+import web_lib,general
+
 from gensim import utils
 from numpy import array
 import numpy as np
@@ -65,8 +69,22 @@ def doc2vec_train(doc_word_list,vector_size=50, min_count=2, epochs=30,max_doc_n
   doc2vec_model.comment=json.dumps(meta_dict)
   return doc2vec_model
 
-def get_avg_doc2vec(doc_word_list):
-  pass
+#17 Dec 23
+#given the url, doc2vec model, and the vec dict
+def classify_url(url0,d2v_model,cat_vec_dict):
+  content=web_lib.get_page_dom_text(url0)
+  words=general.tok_multiling(content)
+  cur_words=prep_words(words,max_doc_n_words=1000) #need cleaner organization
+  cur_vec=d2v_model.infer_vector(cur_words)
+  pred_list0=[]
+  for id0,vec0 in cat_vec_dict.items():
+    sim0=cos_sim(cur_vec,vec0)
+    pred_list0.append((id0, round(sim0,4)))
+  pred_list0.sort(key=lambda x:-x[-1])
+  return pred_list0
+
+# def get_avg_doc2vec(doc_word_list):
+#   pass
 
 
 def norm(str0): #to normalize category name
