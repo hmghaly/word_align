@@ -151,6 +151,14 @@ def check_dict_multi_keys(dict0,possible_key_list): #if we're not fully sure whi
     if val0!=None: return key0,val0
   return key0,val0
 
+#17 Dec 23
+#combine a list of dictionaries into one dictionary 
+def combine_dict_list(list_of_dicts):
+  combined_dict={}
+  for dict0 in list_of_dicts:
+    for key,val in dict0.items(): combined_dict[key]=val
+  return combined_dict
+
 
 ####################### STRINGS ###########################
 #string operations
