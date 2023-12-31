@@ -411,6 +411,29 @@ def remove_padding(token_list): #remove sentence start/end marker to a list of t
   return token_list
 
 
+#======== subwords, charachter chunks
+def get_char_chunks(word0,max_chunk_size=7,exclude_inside_chunks=False):
+  all_chunks=[]
+  if exclude_inside_chunks: #include only chunks from beginning or from end
+    for size0 in range(1,max_chunk_size+1):
+        if size0>len(word0): continue
+        cur_span=(0,size0)
+        cur_chunk=word0[:size0]
+        all_chunks.append((cur_chunk, cur_span))
+        if len(word0)==size0: continue #from the end
+        cur_span=(len(word0)-size0,len(word0))
+        cur_chunk=word0[len(word0)-size0:]
+        all_chunks.append((cur_chunk, cur_span))
+
+  else: #include all internal chunks
+      for size0 in range(1,max_chunk_size+1):
+        for char_i in range(0,len(word0)-size0+1):
+          cur_chunk=word0[char_i:char_i+size0]
+          span=(char_i,char_i+size0)
+          all_chunks.append((cur_chunk, span))
+  return all_chunks
+
+
 
 #==== for applications such as spell checking or creating word vectors
 def get_neighbor_offsets(word_i,sent_words,max_offset=3):
