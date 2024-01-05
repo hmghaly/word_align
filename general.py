@@ -1012,7 +1012,7 @@ def creation_date(path_to_file):
 #if these values are set to None, the function gets all the files under this directory with the specified filetype
 def list_dir(dir_path, start_mtime=None, end_mtime=None, output_file='',file_type='doc'):
     all_files=[]
-    fopen=open(output_file,'w')
+    
     walk=os.walk(dir_path)
     counter=0
     for folder_path, folders, files in walk:
@@ -1037,11 +1037,16 @@ def list_dir(dir_path, start_mtime=None, end_mtime=None, output_file='',file_typ
                     all_files.append(file_path)
                     #print file_path, time.ctime(file_mtime)
                     #all_files.append([file_path, time.ctime(file_mtime)])
-                    line='%s\n'%(file_path)
-                    fopen.write(line)
+                    # line='%s\n'%(file_path)
+                    # fopen.write(line)
             except:
                 pass
-    fopen.close()
+    if output_file!="":
+      fopen=open(output_file,'w')
+      for file_path in all_files:
+        line='%s\n'%(file_path)
+        fopen.write(line)
+      fopen.close()
     return all_files
 
 
