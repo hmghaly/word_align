@@ -57,6 +57,7 @@ class DOM:
     self.tag_id_list=[] #list of assigned IDs
     self.all_links=[]
     self.all_images=[]
+    self.xpath_list=[] #list of open tags with their attrs, and the corresponding tag ID
     self.mismatch_debug_items=[]
     self.description=""
     self.title=""
@@ -65,6 +66,7 @@ class DOM:
     #tags=list(re.finditer('<([^<>]*?)>', self.content)) #'<[^<>]*?>|\<\!\-\-.+?\-\-\>'
     tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
     open_tags=[""]
+    open_tags_attr_xpath_list=[]
     tag_counter_dict={}
     start_i=0
     last_open_tag_str=""
@@ -119,6 +121,7 @@ class DOM:
 
       if tag_type=="closing" and len(open_tags)>0: #if it is a closing tag,
         if tag_name==open_tags[-1].split("_")[0]: #we check if the tag name matches the last open tag name
+          cur_open_tag_id=open_tags[-1]
           el_to_close=self.tag_dict[open_tags[-1]] #and then identify the element corresponding to the last open tag
           tmp_open_i0,tmp_open_i1=el_to_close.open_tag_i0,el_to_close.open_tag_i1 #retrieve the start and end indexes/locations from the open tag
           tmp_inner_html=self.content[tmp_open_i1:tag_start] #then get inner html
@@ -130,6 +133,8 @@ class DOM:
           
             
           open_tags=open_tags[:-1]
+          if open_tags_attr_xpath_list: open_tags_attr_xpath_list=open_tags_attr_xpath_list[:-1]
+          self.xpath_list.append((open_tags_attr_xpath_list,cur_open_tag_id))
         else: 
           debug_line_items0=("open_tags",open_tags, "tag_name",tag_name,"tag_str",tag_str,self.content[tag_end-200:tag_end])
           self.mismatch_debug_items.append(debug_line_items0)
@@ -137,7 +142,7 @@ class DOM:
 
 
 
-      else:
+      else: #if it is an openning or stand alone tags
         self.tag_id_list.append(assigned_tag_id)
         cur_el=element()
         cur_el.open_tag=tag_str 
@@ -172,6 +177,7 @@ class DOM:
         if tag_type=="opening": 
           cur_el.close_tag='</%s>'%tag_name #for regular tags with open-close
           open_tags.append(assigned_tag_id)
+          open_tags_attr_xpath_list.append((tag_name,cur_el.attrs))
         self.tag_dict[assigned_tag_id]=cur_el
         for cls0 in cur_class_list:
           self.class_id_dict[cls0]=self.class_id_dict.get(cls0,[])+[assigned_tag_id]
