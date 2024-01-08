@@ -24,8 +24,6 @@ def filter_toks(tok_list0,params={}):
     exclude_punc=False
     ignore_ar_pre_suf=False
 
-
-
   if params.get("lower",True): tok_list0=[v.lower() for v in tok_list0] #make all words lower case or not
   
   if cur_excluded_words!=[]: tok_list0=[v if not v in cur_excluded_words else "" for v in tok_list0] #ignore stop words
@@ -2064,12 +2062,12 @@ def walign(src_sent,trg_sent,params0={}):
   return results
 
 
-def bert_walign(src_tokens,trg_tokens,align_layer=8,n_epochs=8,max_dist=2,max_span=6):
-  bert_out0=get_bert_align_list(src_toks0,trg_toks0,align_layer=align_layer)
+def bert_walign(src_tokens,trg_tokens,tokenizer,model,align_layer=8,n_epochs=8,max_dist=2,max_span=6):
+  bert_out0=get_bert_align_list(src_toks0,trg_toks0,tokenizer=tokenizer,model=model, align_layer=align_layer)
   aligned_path0=get_aligned_path(bert_out0,n_epochs=n_epochs,max_dist=max_dist,max_span=max_span)
   return aligned_path0
 
-def get_bert_align_list(src_tokens,trg_tokens,align_layer=8):
+def get_bert_align_list(src_tokens,trg_tokens,tokenizer,model,align_layer=8):
   #token_src, token_tgt = [tokenizer.tokenize(word) for word in sent_src], [tokenizer.tokenize(word) for word in sent_tgt]
   token_src, token_tgt = [tokenizer.tokenize(word) for word in src_tokens], [tokenizer.tokenize(word) for word in trg_tokens]
   wid_src, wid_tgt = [tokenizer.convert_tokens_to_ids(x) for x in token_src], [tokenizer.convert_tokens_to_ids(x) for x in token_tgt]
