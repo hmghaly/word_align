@@ -921,9 +921,9 @@ def read_nlines(fpath,seek_to=0,n_lines=10):
   fopen0=open(fpath)
   fopen0.seek(seek_to)
   for _ in range(n_lines):
-    cur_pos=fopen0.tell()
     cur_line=fopen0.readline()
-    line_list.append((cur_pos,cur_line.strip()))
+    cur_pos=fopen0.tell()
+    line_list.append((cur_line.strip(),cur_pos))
 
   fopen0.close()
   return line_list
