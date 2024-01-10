@@ -312,6 +312,7 @@ def create_open_tag(tag_name0,tag_attrs0={},self_closing=False):
 
 def read_page(url, timeout0=5): #return requests obj
   op=requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout0)
+  op.encoding = op.apparent_encoding
   return op
 #   status_code=op.status_code
 #   html_content=op.text
@@ -644,7 +645,9 @@ def get_emails(html_content):
     em_dom=em0.split("@")[-1]
     check=re.findall("[a-zA-Z]",em_dom)
     if not check: continue
-    valid_emails.append(em0)
+    if em0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
+
+    valid_emails.append(em0.strip("."))
   return valid_emails
 
 def get_page_paras(page_url):
