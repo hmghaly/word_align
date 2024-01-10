@@ -916,6 +916,19 @@ def seek_read_line(fpath,seek_to):
   return cur_line
 
 
+def read_nlines(fpath,seek_to=0,n_lines=10):
+  line_list=[]
+  fopen0=open(fpath)
+  fopen0.seek(seek_to)
+  for _ in range(n_lines):
+    cur_pos=fopen0.tell()
+    cur_line=fopen0.readline()
+    line_list.append((cur_pos,cur_line.strip()))
+
+  fopen0.close()
+  return line_list
+
+
 def shuffle_file_lines(input_fpath,output_fpath,n=50):
   shuffled_fopen=open(output_fpath,"w")
   gen_list=[]
@@ -1143,6 +1156,9 @@ def read_zip_lines(zip_fpath0,zipped_file_name0): #iterate line by line of a tar
     yield output #a.decode("utf-8")
   archive0.close()
   return 
+
+# def iter_zipfile(zip_file_obj,zipped_file_name0=None):
+#   pass
 
 def read_zip_one_line(zip_fpath0,zipped_file_name0): #just the first line in the target zipped file
   archive0 = zipfile.ZipFile(zip_fpath0, 'r')
