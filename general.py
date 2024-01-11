@@ -191,8 +191,9 @@ def str2key(str0): #create_id, create_key, create_text_id
 from difflib import SequenceMatcher
 
 TAG_RE = re.compile(r'<[^>]+>')
-def remove_tags(text):
-  return TAG_RE.sub('', text)
+def remove_tags(text,repl_with=""): #can also replace with spaces
+  removed=TAG_RE.sub(repl_with, text)
+  return re.sub("\s+"," ",removed) #remove extra spaces #TAG_RE.sub(repl_with, text)
 
 def is_alpha(text):
   removed=re.sub("[\W\d]","",text)

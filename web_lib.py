@@ -571,8 +571,12 @@ def get_page_info(url):
     if href0.lower().startswith("javascript"): continue
     if href0=="": continue
     if href0.startswith("tel:"):
-      phone_numbers.append(href0)
+      phone_numbers.append(href0.replace("tel:",""))
       continue
+    if href0.startswith("mailto:"):
+      emails.append(href0.replace("mailto:",""))
+      continue
+
     if href0.split(".")[-1].lower() in ["pdf","png","jpg"]: continue
     if not href0.lower().startswith("http"): href0=join_url(url,href0) #url0.strip("/")+"/"+href0.strip("/")
     anchor0=re.sub("\s+"," ",anchor0).strip()
@@ -600,7 +604,9 @@ def get_page_info(url):
 
   #processing addresses
   for key0,val0 in page_dom_obj.tag_dict.items():
-    if key0.startswith("address_"): addresses.append(general.remove_tags(val0.inner_html))
+    class0=val0.attrs.get("class","")
+    if key0.startswith("address_"): addresses.append(general.remove_tags(val0.inner_html," "))
+    if "address" in class0.lower(): addresses.append(general.remove_tags(val0.inner_html," "))
 
   #processing emails
   emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
