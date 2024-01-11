@@ -923,6 +923,7 @@ def read_nlines(fpath,seek_to=0,n_lines=10):
   for _ in range(n_lines):
     cur_line=fopen0.readline()
     cur_pos=fopen0.tell()
+    if cur_line=="": break
     line_list.append((cur_line.strip(),cur_pos))
 
   fopen0.close()
