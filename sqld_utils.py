@@ -2,9 +2,9 @@ from sqlitedict import SqliteDict #Make sure to install it
 import os, json
 import zlib, pickle, sqlite3
 
-def open_sqld(sqld_fpath,encode_fn=json.dumps, decode_fn=json.loads):
-  if not os.path.exists(sqld_fpath): return None
-  mydict = SqliteDict(sqld_fpath, encode=encode_fn, decode=decode_fn, autocommit=True)
+def open_sqld(sqld_fpath,encode_fn=json.dumps, decode_fn=json.loads,create=False,autocommit=True):
+  if not create and not os.path.exists(sqld_fpath): return None #if the file doesn't exist and not to be created, return none
+  mydict = SqliteDict(sqld_fpath, encode=encode_fn, decode=decode_fn, autocommit=autocommit)
   return mydict
 
 
