@@ -311,7 +311,7 @@ def create_open_tag(tag_name0,tag_attrs0={},self_closing=False):
   return final_open_tag
 
 def read_page(url, timeout0=5): #return requests obj
-  op=requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout0)
+  op=requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout0, allow_redirects=True)
   op.encoding = op.apparent_encoding
   return op
 #   status_code=op.status_code
@@ -543,7 +543,11 @@ def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
 
 def get_page_info(url):
   page_info_dict={}
-  page_content=get_page_content(url)
+
+  page_obj=read_page(url)
+  page_content=general.unescape(page_obj.text)
+  final_url=page_obj.url
+  #page_content=get_page_content(url)
   page_content=page_content.replace("\r","\n").replace("\t","\n")
   #page_content=page_content.replace("\r\n","|")#.replace("\r","|")
   t0=time.time()
@@ -582,7 +586,8 @@ def get_page_info(url):
       continue
 
     if href0.split(".")[-1].lower() in ["pdf","png","jpg"]: continue
-    if not href0.lower().startswith("http"): href0=join_url(url,href0) #url0.strip("/")+"/"+href0.strip("/")
+    if href0.split(".")[-1].isdigit(): continue
+    if not href0.lower().startswith("http"): href0=join_url(final_url,href0) #url0.strip("/")+"/"+href0.strip("/")
     anchor0=re.sub("\s+"," ",anchor0).strip()
     if "facebook" in href0 or "twitter" in href0 or "linkedin" in href0: social_links.append(href0.lower())
     #print(href0,anchor0)
@@ -596,7 +601,7 @@ def get_page_info(url):
     if "logo" in img0.attrs.get("alt","").lower() or "logo" in img0.src.lower(): 
       src0=img0.src
       if src0.startswith("//"):src0="http://"+src0
-      elif not src0.startswith("http"): src0=join_url(url,src0)
+      elif not src0.startswith("http"): src0=join_url(final_url,src0)
       logos.append(src0)
       #print(src0)
 
@@ -629,7 +634,7 @@ def get_page_info(url):
 
   #print("elapsed",elapsed)
   
-  page_info_dict["url"]=url
+  page_info_dict["url"]=final_url
   page_info_dict["lang"]=lang0
   page_info_dict["title"]=title0
   page_info_dict["description"]=description0
