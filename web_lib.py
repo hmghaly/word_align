@@ -552,6 +552,7 @@ def get_page_info(url):
   #print("dom_elapsed",dom_elapsed)
 
   t0=time.time()
+  lang0=""
   title0=page_dom_obj.title.strip()
   description0=page_dom_obj.description.strip()
   keywords0=page_dom_obj.keywords.strip()
@@ -605,6 +606,12 @@ def get_page_info(url):
     text_items.extend(it0.split("\n"))
   text_items=[v.strip() for v in text_items if v.strip()]
 
+  html_attrs={}
+  html_tag=page_dom_obj.tag_dict.get("html_0")
+  if html_tag!=None: html_attrs=html_tag.attrs
+  lang0=html_attrs.get("lang","")
+
+
   #processing addresses
   for key0,val0 in page_dom_obj.tag_dict.items():
     class0=val0.attrs.get("class","")
@@ -621,6 +628,7 @@ def get_page_info(url):
   #print("elapsed",elapsed)
   page_info_dict={}
   page_info_dict["url"]=url
+  page_info_dict["lang"]=lang0
   page_info_dict["title"]=title0
   page_info_dict["description"]=description0
   page_info_dict["keywords"]=keywords0
