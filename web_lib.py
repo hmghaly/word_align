@@ -62,6 +62,8 @@ class DOM:
     self.description=""
     self.title=""
     self.keywords=""
+    self.lang=""
+    self.meta_lang=""
     self.content=general.unescape(self.content) 
     #tags=list(re.finditer('<([^<>]*?)>', self.content)) #'<[^<>]*?>|\<\!\-\-.+?\-\-\>'
     tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
@@ -159,6 +161,8 @@ class DOM:
 
         if tag_name=="meta" and cur_el.attrs.get("name","")=="description":self.description=cur_el.attrs.get("content","")
         if tag_name=="meta" and cur_el.attrs.get("name","")=="keywords":self.keywords=cur_el.attrs.get("content","")
+        if tag_name=="meta" and cur_el.attrs.get("http-equiv","")=="content-language":self.meta_lang=cur_el.attrs.get("content","")
+        if tag_name=="html": self.lang=cur_el.attrs.get("lang","")
         if cur_el.attrs.get("href")!=None: cur_el.href=cur_el.attrs.get("href") #self.all_links.append(cur_el.attrs.get("href"))
         if cur_el.attrs.get("src")!=None: cur_el.src=cur_el.attrs.get("src")
         if tag_name=="img": self.all_images.append(cur_el)
