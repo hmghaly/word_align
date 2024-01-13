@@ -547,8 +547,10 @@ def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
 
 def get_page_info(url):
   page_info_dict={}
+  page_info_dict["url"]=url
 
-  page_obj=read_page(url)
+  try: page_obj=read_page(url)
+  except: return page_info_dict
   page_content=general.unescape(page_obj.text)
   final_url=page_obj.url
   #page_content=get_page_content(url)
@@ -642,7 +644,7 @@ def get_page_info(url):
 
   #print("elapsed",elapsed)
   
-  page_info_dict["url"]=final_url
+  page_info_dict["final_url"]=final_url
   page_info_dict["lang"]=lang0
   page_info_dict["meta_lang"]=meta_lang0
   page_info_dict["title"]=title0
