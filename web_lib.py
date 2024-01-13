@@ -646,10 +646,11 @@ def get_page_info(url):
   elapsed=round(t1-t0,2)
 
   #print("elapsed",elapsed)
+  if lang0=="" and meta_lang0!="": lang0=meta_lang0
   
   page_info_dict["final_url"]=final_url
   page_info_dict["lang"]=lang0
-  page_info_dict["meta_lang"]=meta_lang0
+  #page_info_dict["meta_lang"]=meta_lang0
   page_info_dict["title"]=title0
   page_info_dict["description"]=description0
   page_info_dict["keywords"]=keywords0
