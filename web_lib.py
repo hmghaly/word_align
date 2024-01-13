@@ -595,7 +595,7 @@ def get_page_info(url):
       emails.append(href0.replace("mailto:",""))
       continue
 
-    if href0.split(".")[-1].lower() in ["pdf","png","jpg"]: continue
+    if href0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
     if href0.split(".")[-1].isdigit(): continue
     if not href0.lower().startswith("http"): href0=join_url(final_url,href0) #url0.strip("/")+"/"+href0.strip("/")
     anchor0=re.sub("\s+"," ",anchor0).strip()
@@ -637,7 +637,10 @@ def get_page_info(url):
 
   #processing emails
   cur_emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
-  emails.extend(cur_emails)
+  for email0 in cur_emails:
+    if email0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
+    if email0.split(".")[-1].isdigit(): continue
+    emails.append(email0.strip("."))
   emails=list(set([v.lower() for v in emails]))
   t1=time.time()
   elapsed=round(t1-t0,2)
