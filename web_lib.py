@@ -561,6 +561,7 @@ def get_page_info(url):
   links=[]
   emails=[]
   addresses=[]
+  social_links=[]
 
   #processing links
   raw_links=page_dom_obj.all_links
@@ -580,9 +581,11 @@ def get_page_info(url):
     if href0.split(".")[-1].lower() in ["pdf","png","jpg"]: continue
     if not href0.lower().startswith("http"): href0=join_url(url,href0) #url0.strip("/")+"/"+href0.strip("/")
     anchor0=re.sub("\s+"," ",anchor0).strip()
+    if "facebook" in href0 or "twitter" in href0 or "linkedin" in href0: social_links.append(href0.lower())
     #print(href0,anchor0)
     links.append((href0,anchor0))
   links=list(set(links)) 
+  social_links=list(set(social_links))
 
   #processing images/get logos
   raw_images=page_dom_obj.all_images
@@ -609,10 +612,12 @@ def get_page_info(url):
     if "address" in class0.lower(): addresses.append(general.remove_tags(val0.inner_html," "))
 
   #processing emails
-  emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
+  cur_emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
+  emails.extend(cur_emails)
   emails=list(set([v.lower() for v in emails]))
   t1=time.time()
   elapsed=round(t1-t0,2)
+
   #print("elapsed",elapsed)
   page_info_dict={}
   page_info_dict["url"]=url
@@ -621,10 +626,13 @@ def get_page_info(url):
   page_info_dict["keywords"]=keywords0
   page_info_dict["phone_numbers"]=phone_numbers
   page_info_dict["links"]=links
+  page_info_dict["social_links"]=social_links
   page_info_dict["emails"]=emails
   page_info_dict["addresses"]=addresses
   page_info_dict["logos"]=logos
   page_info_dict["text_items"]=text_items
+  page_info_dict["text"]=page_dom_obj.text
+  
   
   return page_info_dict  
 
