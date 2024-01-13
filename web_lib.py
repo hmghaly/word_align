@@ -542,11 +542,13 @@ def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
 
 
 def get_page_info(url):
+  page_info_dict={}
   page_content=get_page_content(url)
   page_content=page_content.replace("\r","\n").replace("\t","\n")
   #page_content=page_content.replace("\r\n","|")#.replace("\r","|")
   t0=time.time()
-  page_dom_obj=DOM(page_content)
+  try: page_dom_obj=DOM(page_content)
+  except: return page_info_dict
   t1=time.time()
   dom_elapsed=round(t1-t0)
   #print("dom_elapsed",dom_elapsed)
@@ -626,7 +628,7 @@ def get_page_info(url):
   elapsed=round(t1-t0,2)
 
   #print("elapsed",elapsed)
-  page_info_dict={}
+  
   page_info_dict["url"]=url
   page_info_dict["lang"]=lang0
   page_info_dict["title"]=title0
@@ -638,7 +640,7 @@ def get_page_info(url):
   page_info_dict["emails"]=emails
   page_info_dict["addresses"]=addresses
   page_info_dict["logos"]=logos
-  page_info_dict["text_items"]=text_items
+  #page_info_dict["text_items"]=text_items
   page_info_dict["text"]=page_dom_obj.text
   
   
