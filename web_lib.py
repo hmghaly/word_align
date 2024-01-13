@@ -563,9 +563,13 @@ def get_page_info(url):
 
   t0=time.time()
   lang0=""
+
   title0=page_dom_obj.title.strip()
   description0=page_dom_obj.description.strip()
   keywords0=page_dom_obj.keywords.strip()
+  lang0=page_dom_obj.lang
+  meta_lang0=page_dom_obj.meta_lang
+
   phone_numbers=[]
   logos=[]
   text_items=[]
@@ -617,10 +621,10 @@ def get_page_info(url):
     text_items.extend(it0.split("\n"))
   text_items=[v.strip() for v in text_items if v.strip()]
 
-  html_attrs={}
-  html_tag=page_dom_obj.tag_dict.get("html_0")
-  if html_tag!=None: html_attrs=html_tag.attrs
-  lang0=html_attrs.get("lang","")
+  # html_attrs={}
+  # html_tag=page_dom_obj.tag_dict.get("html_0")
+  # if html_tag!=None: html_attrs=html_tag.attrs
+  # lang0=html_attrs.get("lang","")
 
 
   #processing addresses
@@ -640,6 +644,7 @@ def get_page_info(url):
   
   page_info_dict["url"]=final_url
   page_info_dict["lang"]=lang0
+  page_info_dict["meta_lang"]=meta_lang0
   page_info_dict["title"]=title0
   page_info_dict["description"]=description0
   page_info_dict["keywords"]=keywords0
