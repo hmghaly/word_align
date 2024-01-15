@@ -898,16 +898,37 @@ def get_first_line(fpath):
   fopen0.close()
   return first_line
 
-def get_last_line(fpath,chunk_size=4000):
+#14 Jan 2024
+def get_last_line(fpath,mode="r",chunk_size=4000):
   if not os.path.exists(fpath): return None
+  if mode=="rb": line_break=b"\n"
+  else: line_break="\n"
+  cur_size0=chunk_size
+
   file_size=os.stat(fpath).st_size
-  fopen0=open(fpath)
-  fopen0.seek(file_size-chunk_size)
-  cur_chunk=fopen0.read(chunk_size)
-  chunk_split=[v for v in cur_chunk.split("\n") if v]
-  last_line=chunk_split[-1]
+  fopen0=open(fpath,mode=mode)
+  fopen0.seek(file_size-cur_size0)
+  cur_chunk=fopen0.read(cur_size0).strip(line_break)
+  while not line_break in cur_chunk:
+    cur_size0+=chunk_size
+    fopen0.seek(file_size-cur_size0)
+    cur_chunk=fopen0.read(cur_size0).strip(line_break)
+
+  chunk_split=[v for v in cur_chunk.split(line_break) if v]
+  last_line=chunk_split[-1].strip(line_break)
   fopen0.close()
   return last_line
+
+# def get_last_line(fpath,chunk_size=4000):
+#   if not os.path.exists(fpath): return None
+#   file_size=os.stat(fpath).st_size
+#   fopen0=open(fpath)
+#   fopen0.seek(file_size-chunk_size)
+#   cur_chunk=fopen0.read(chunk_size)
+#   chunk_split=[v for v in cur_chunk.split("\n") if v]
+#   last_line=chunk_split[-1]
+#   fopen0.close()
+#   return last_line
 
 def seek_read_line(fpath,seek_to):
   fopen0=open(fpath)
@@ -1105,7 +1126,7 @@ def number_file_lines(main_file_path,numbering_file_path):
   main_fopen.close()
   file_locs_fopen.close()
 
-def get_line(line_num, main_file_obj,locs_file_obj,str_size=6):
+def get_line(line_num, main_file_obj,locs_file_obj,str_size=6): #for files with fixed length lines
   lookup_i=line_num*str_size
   locs_file_obj.seek(lookup_i)
   chars=locs_file_obj.read(str_size)
@@ -1119,7 +1140,17 @@ def get_line(line_num, main_file_obj,locs_file_obj,str_size=6):
 ########################## ZIP FILES ##################
 ###Utilities - zip files functions copy to general soon
 
-import os, tempfile, json, zipfile
+import os, tempfile, json, zipfile, zlib
+
+def compress(str0, br_repl=b"|n|"): #compress string using zlib
+  compressed=zlib.compress(str0.encode()) 
+  compressed=compressed.replace(b"\n",br_repl)
+  return compressed
+
+def decompress(compressed_str0, br_repl=b"|n|"): #decompress str using zlib
+  compressed_str0=compressed_str0.replace(br_repl,b"\n")
+  decompressed0=zlib.decompress(compressed_str0) 
+  return decompressed0.decode()
 
 def write_lines_tmp(line_item_list0):
   tmp = tempfile.NamedTemporaryFile(delete=False)
