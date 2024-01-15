@@ -691,7 +691,7 @@ def get_emails(html_content):
     check=re.findall("[a-zA-Z]",em_dom)
     if not check: continue
     if em0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
-    if em0.split(".").isdigit(): continue
+    if em0.split(".")[-1].isdigit(): continue
     valid_emails.append(em0.strip(".-"))
   return list(set(valid_emails))
 
