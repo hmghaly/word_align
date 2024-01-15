@@ -673,14 +673,26 @@ def get_title(html_content):
   if title_found: title0=title_found[0]
   return title0
 
+#15 Jan 2024
 def get_desc(html_content):
-  desc0=""
-  desc_tag_found=re.findall('(?i)<meta name="description" .+>',html_content)
-  if desc_tag_found:
-    desc_tag0=desc_tag_found[0]
-    desc_found=re.findall('(?i)content="(.+?)"',desc_tag0)
-    if desc_found: desc0=desc_found[0]
-  return desc0  
+  desc_out=""
+  meta_tags=re.findall('(?i)<meta.+?>',html_content)
+  for meta0 in meta_tags: 
+    meta_attrs=get_attrs(meta0)
+    attr_name=meta_attrs.get("name","")
+    if attr_name.lower()=="description" or attr_name.lower()=="og:description":
+      attr_desc_out=meta_attrs.get("content","")
+      if attr_desc_out!="": desc_out=attr_desc_out
+    #print(meta_attrs)
+  return desc_out
+# def get_desc(html_content):
+#   desc0=""
+#   desc_tag_found=re.findall('(?i)<meta name="description" .+>',html_content)
+#   if desc_tag_found:
+#     desc_tag0=desc_tag_found[0]
+#     desc_found=re.findall('(?i)content="(.+?)"',desc_tag0)
+#     if desc_found: desc0=desc_found[0]
+#   return desc0  
 
 def get_emails(html_content):
   emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', str(html_content))
