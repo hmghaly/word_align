@@ -677,7 +677,7 @@ def get_desc(html_content):
   desc0=""
   desc_tag_found=re.findall('(?i)<meta name="description" .+>',html_content)
   if desc_tag_found:
-    desc_tag0=desc_tag[0]
+    desc_tag0=desc_tag_found[0]
     desc_found=re.findall('(?i)content="(.+?)"',desc_tag0)
     if desc_found: desc0=desc_found[0]
   return desc0  
