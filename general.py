@@ -907,11 +907,13 @@ def get_last_line(fpath,mode="r",chunk_size=4000):
 
   file_size=os.stat(fpath).st_size
   fopen0=open(fpath,mode=mode)
-  fopen0.seek(file_size-cur_size0)
+  cur_pos=max(0,file_size-cur_size0)
+  fopen0.seek(cur_pos)
   cur_chunk=fopen0.read(cur_size0).strip(line_break)
   while not line_break in cur_chunk:
     cur_size0+=chunk_size
-    fopen0.seek(file_size-cur_size0)
+    cur_pos=max(0,file_size-cur_size0)
+    fopen0.seek(cur_pos)
     cur_chunk=fopen0.read(cur_size0).strip(line_break)
 
   chunk_split=[v for v in cur_chunk.split(line_break) if v]
