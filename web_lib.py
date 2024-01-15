@@ -676,11 +676,14 @@ def get_title(html_content):
 #15 Jan 2024
 def get_desc(html_content):
   desc_out=""
+  desc_property_list=["description", "og:description"]
   meta_tags=re.findall('(?i)<meta.+?>',html_content)
   for meta0 in meta_tags: 
     meta_attrs=get_attrs(meta0)
-    attr_name=meta_attrs.get("name","")
-    if attr_name.lower()=="description" or attr_name.lower()=="og:description":
+    attr_name=meta_attrs.get("name","") #og:description
+    attr_property=meta_attrs.get("property","") #og:description
+    
+    if attr_name.lower() in desc_property_list or attr_property.lower() in desc_property_list: 
       attr_desc_out=meta_attrs.get("content","")
       if attr_desc_out!="": desc_out=attr_desc_out
     #print(meta_attrs)
