@@ -16,8 +16,10 @@ def download_file(file_url):
   return decoded_content0
 
 def get_attrs(tag0): #get attributes within an html/xml tags
-  #found_attrs=re.findall('(\S+)="(.+?)"',tag0) #'''(\S+)=["'](.+?)["']'''
-  found_attrs=re.findall('''(\S+)=["'](.+?)["']''',tag0)
+  # found_attrs0=re.findall('(\S+)="(.+?)"',tag0) #'''(\S+)=["'](.+?)["']'''
+  # found_attrs1=re.findall("(\S+)='(.+?)'",tag0) #"(\S+)='(.+?)'"
+  # found_attrs= found_attrs0+found_attrs1#re.findall('''(\S+)=["'](.+?)["']''',tag0)
+  found_attrs=re.findall('''(\S+)=["'](.*?)["']''',tag0)
   return dict(iter(found_attrs))
 
 class element:
