@@ -15,8 +15,9 @@ def download_file(file_url):
     decoded_content0 = download.content.decode('utf-8')
   return decoded_content0
 
-def get_attrs(tag0):
-  found_attrs=re.findall('(\S+)="(.+?)"',tag0)
+def get_attrs(tag0): #get attributes within an html/xml tags
+  #found_attrs=re.findall('(\S+)="(.+?)"',tag0) #'''(\S+)=["'](.+?)["']'''
+  found_attrs=re.findall('''(\S+)=["'](.+?)["']''',tag0)
   return dict(iter(found_attrs))
 
 class element:
@@ -690,8 +691,38 @@ def get_emails(html_content):
     check=re.findall("[a-zA-Z]",em_dom)
     if not check: continue
     if em0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
-    valid_emails.append(em0.strip("."))
-  return valid_emails
+    if em0.split(".").isdigit(): continue
+    valid_emails.append(em0.strip(".-"))
+  return list(set(valid_emails))
+
+def get_page_lang(html_content):
+  html_tags=re.findall('(?i)<html.+?>',html_content)
+  if len(html_tags)==0: return ""
+  html_tag_attrs=get_attrs(html_tags[0])
+  lang_attr=html_tag_attrs.get("lang")
+  if lang_attr!=None: return lang_attr
+  lang_xml_attr=html_tag_attrs.get("xml:lang")
+  if lang_xml_attr!=None: return lang_xml_attr
+  return ""
+
+
+
+
+def get_page_summary(url):
+  page_info_dict={}
+  try: page_obj=read_page(url)
+  except: return page_info_dict
+  page_content=general.unescape(page_obj.text)
+  page_content=page_content.replace("\n"," ")
+  final_url=page_obj.url
+  page_info_dict["url"]=final_url
+  page_info_dict["title"]=get_title(page_content)
+  page_info_dict["desc"]=get_desc(page_content)
+  page_info_dict["emails"]=get_emails(page_content)
+  page_info_dict["lang"]=get_page_lang(page_content)
+  return page_info_dict
+
+
 
 def get_page_paras(page_url):
   try:text=get_page_content(page_url)
