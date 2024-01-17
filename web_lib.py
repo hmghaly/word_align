@@ -707,7 +707,9 @@ def get_emails(html_content,max_name_len=50):
   found_em_domain=re.finditer('\@[\w\-\.]+',str(html_content))
   for a in found_em_domain:
     cur_domain=a.group(0).strip(".")
-    cur_domain_last=cur_domain.split(".")[-1]
+    cur_domain_split=cur_domain.split(".")
+    if len(cur_domain_split)<2: continue
+    cur_domain_last=cur_domain_split[-1]
     if cur_domain_last.isdigit(): continue
     if cur_domain_last.lower() in ["pdf","png","jpg","jpeg"]: continue
 
