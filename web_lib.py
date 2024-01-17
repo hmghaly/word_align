@@ -318,7 +318,9 @@ def create_open_tag(tag_name0,tag_attrs0={},self_closing=False):
   return final_open_tag
 
 def read_page(url, timeout0=5): #return requests obj
-  op=requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout0, allow_redirects=True)
+  session = requests.Session()
+  session.max_redirects = 3
+  op=session.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout0, allow_redirects=True)
   op.encoding = "utf-8" #op.apparent_encoding
   return op
 #   status_code=op.status_code
