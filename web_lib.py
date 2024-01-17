@@ -712,7 +712,7 @@ def get_emails(html_content,max_name_len=50):
     if cur_domain_last.lower() in ["pdf","png","jpg","jpeg"]: continue
 
     x0=a.start()
-    prev0=text[x0-max_name_len:x0]
+    prev0=html_content[x0-max_name_len:x0]
     if prev0[-1] in "\n\t\r "+string.punctuation: continue
     check=re.findall("[\w\.]+$",prev0)
     if check:
