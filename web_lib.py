@@ -16,10 +16,10 @@ def download_file(file_url):
   return decoded_content0
 
 def get_attrs(tag0): #get attributes within an html/xml tags
-  # found_attrs0=re.findall('(\S+)="(.+?)"',tag0) #'''(\S+)=["'](.+?)["']'''
-  # found_attrs1=re.findall("(\S+)='(.+?)'",tag0) #"(\S+)='(.+?)'"
-  # found_attrs= found_attrs0+found_attrs1#re.findall('''(\S+)=["'](.+?)["']''',tag0)
-  found_attrs=re.findall('''(\S+)=["'](.*?)["']''',tag0)
+  found_attrs0=re.findall('(\S+)="(.+?)"',tag0) #'''(\S+)=["'](.+?)["']'''
+  found_attrs1=re.findall("(\S+)='(.+?)'",tag0) #"(\S+)='(.+?)'"
+  found_attrs= found_attrs0+found_attrs1#re.findall('''(\S+)=["'](.+?)["']''',tag0)
+  #found_attrs=re.findall('''(\S+)=["'](.*?)["']''',tag0)
   return dict(iter(found_attrs))
 
 class element:
@@ -719,7 +719,7 @@ def get_page_lang(html_content):
   lang_attr=html_tag_attrs.get("lang")
   if lang_attr!=None: return lang_attr
   lang_xml_attr=html_tag_attrs.get("xml:lang")
-  if lang_xml_attr!=None: return lang_xml_attr
+  if lang_xml_attr!=None: return lang_xml_attr #if tag_name=="meta" and cur_el.attrs.get("http-equiv","")=="content-language":self.meta_lang=cur_el.attrs.get("content","")
   return ""
 
 
