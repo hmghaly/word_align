@@ -1,5 +1,6 @@
 #a librry for all the utilities we need for scraping data from the web
 import requests, re, sys, time
+import string
 from urllib.parse import urljoin, urlsplit
 sys.path.append("code_utils")
 import general
@@ -701,18 +702,36 @@ def get_desc(html_content):
 #     if desc_found: desc0=desc_found[0]
 #   return desc0  
 
-def get_emails(html_content):
-  emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', str(html_content))
-  emails=list(set(emails))
-  valid_emails=[]
-  for em0 in emails:
-    em_dom=em0.split("@")[-1]
-    check=re.findall("[a-zA-Z]",em_dom)
-    if not check: continue
-    if em0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
-    if em0.split(".")[-1].isdigit(): continue
-    valid_emails.append(em0.strip(".-"))
-  return list(set(valid_emails))
+def get_emails(html_content,max_name_len=50):
+  all_emails=[]
+  found_em_domain=re.finditer('\@[\w\-\.]+',str(html_content))
+  for a in found_em_domain:
+    cur_domain=a.group(0).strip(".")
+    cur_domain_last=cur_domain.split(".")[-1]
+    if cur_domain_last.isdigit(): continue
+    if cur_domain_last.lower() in ["pdf","png","jpg","jpeg"]: continue
+
+    x0=a.start()
+    prev0=text[x0-max_name_len:x0]
+    if prev0[-1] in "\n\t\r "+string.punctuation: continue
+    check=re.findall("[\w\.]+$",prev0)
+    if check:
+      cur_email=check[0]+cur_domain
+      all_emails.append(cur_email)
+  return list(set(all_emails))
+
+# def get_emails(html_content):
+#   emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', str(html_content))
+#   emails=list(set(emails))
+#   valid_emails=[]
+#   for em0 in emails:
+#     em_dom=em0.split("@")[-1]
+#     check=re.findall("[a-zA-Z]",em_dom)
+#     if not check: continue
+#     if em0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
+#     if em0.split(".")[-1].isdigit(): continue
+#     valid_emails.append(em0.strip(".-"))
+#   return list(set(valid_emails))
 
 def get_page_lang(html_content):
   html_tags=re.findall('(?i)<html.+?>',html_content)
@@ -729,9 +748,9 @@ def get_page_lang(html_content):
 
 def get_page_summary(url):
   page_info_dict={}
-  page_obj=read_page(url)
-  # try: page_obj=read_page(url)
-  # except: return page_info_dict
+  #page_obj=read_page(url)
+  try: page_obj=read_page(url)
+  except: return page_info_dict
   page_content=general.unescape(page_obj.text)
   page_content=page_content.replace("\n"," ")
   final_url=page_obj.url
