@@ -729,8 +729,9 @@ def get_page_lang(html_content):
 
 def get_page_summary(url):
   page_info_dict={}
-  try: page_obj=read_page(url)
-  except: return page_info_dict
+  page_obj=read_page(url)
+  # try: page_obj=read_page(url)
+  # except: return page_info_dict
   page_content=general.unescape(page_obj.text)
   page_content=page_content.replace("\n"," ")
   final_url=page_obj.url
