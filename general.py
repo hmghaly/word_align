@@ -940,14 +940,14 @@ def seek_read_line(fpath,seek_to):
   return cur_line
 
 
-def read_nlines(fpath,seek_to=0,n_lines=10):
+def read_nlines(fpath,seek_to=0,n_lines=10,mode="r"):
   line_list=[]
-  fopen0=open(fpath)
+  fopen0=open(fpath,mode)
   fopen0.seek(seek_to)
   for _ in range(n_lines):
     cur_line=fopen0.readline()
     cur_pos=fopen0.tell()
-    if cur_line=="": break
+    if len(cur_line)==0: break
     line_list.append((cur_line.strip(),cur_pos))
 
   fopen0.close()
