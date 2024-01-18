@@ -322,7 +322,8 @@ def read_page(url, timeout0=5): #return requests obj
   session = requests.Session()
   session.max_redirects = 3
   op=session.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout0, allow_redirects=True)
-  op.encoding = "utf-8" #op.apparent_encoding
+  #op.encoding = "utf-8" #op.apparent_encoding
+  op.encoding = op.apparent_encoding
   return op
 #   status_code=op.status_code
 #   html_content=op.text
