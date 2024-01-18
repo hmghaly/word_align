@@ -715,7 +715,7 @@ def get_emails(html_content,max_name_len=50):
 
     x0=a.start()
     prev0=html_content[x0-max_name_len:x0]
-    if prev0[-1] in "\n\t\r "+string.punctuation: continue
+    if len(prev0)>0 and prev0[-1] in "\n\t\r "+string.punctuation: continue
     check=re.findall("[\w\.]+$",prev0)
     if check:
       cur_email=check[0]+cur_domain
