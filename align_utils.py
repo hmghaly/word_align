@@ -1,4 +1,4 @@
-import time, json, shelve, os, re, sys
+import time, json, shelve, os, re, sys, itertools
 from itertools import groupby
 from math import log
 import random
