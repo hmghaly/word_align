@@ -3,6 +3,9 @@ from itertools import groupby
 from math import log
 import random
 
+try: import torch
+except: pass
+
 
 #from general import * 
 sys.path.append("code_utils")
@@ -2068,7 +2071,7 @@ def bert_walign(src_tokens,trg_tokens,tokenizer,model,align_layer=8,n_epochs=8,m
   return aligned_path0
 
 def get_bert_align_list(src_tokens,trg_tokens,tokenizer,model,align_layer=8):
-  import torch
+
   #token_src, token_tgt = [tokenizer.tokenize(word) for word in sent_src], [tokenizer.tokenize(word) for word in sent_tgt]
   token_src, token_tgt = [tokenizer.tokenize(word) for word in src_tokens], [tokenizer.tokenize(word) for word in trg_tokens]
   wid_src, wid_tgt = [tokenizer.convert_tokens_to_ids(x) for x in token_src], [tokenizer.convert_tokens_to_ids(x) for x in token_tgt]
