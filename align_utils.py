@@ -2063,7 +2063,7 @@ def walign(src_sent,trg_sent,params0={}):
 
 
 def bert_walign(src_tokens,trg_tokens,tokenizer,model,align_layer=8,n_epochs=8,max_dist=2,max_span=6):
-  bert_out0=get_bert_align_list(src_toks0,trg_toks0,tokenizer=tokenizer,model=model, align_layer=align_layer)
+  bert_out0=get_bert_align_list(src_tokens,trg_tokens,tokenizer=tokenizer,model=model, align_layer=align_layer)
   aligned_path0=get_aligned_path(bert_out0,n_epochs=n_epochs,max_dist=max_dist,max_span=max_span)
   return aligned_path0
 
