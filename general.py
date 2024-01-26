@@ -1,4 +1,4 @@
-import re, os, shelve, unicodedata, sys, json, time, random, string
+import re, os, shelve, unicodedata, sys, json, time, random, string, base64
 #import pandas as pd
 import re
 from itertools import groupby
@@ -1146,11 +1146,13 @@ import os, tempfile, json, zipfile, zlib
 
 def compress(str0, br_repl=b"|n|"): #compress string using zlib
   compressed=zlib.compress(str0.encode()) 
-  compressed=compressed.replace(b"\n",br_repl)
+  compressed=base64.b85encode(compressed)
+  #compressed=compressed.replace(b"\n",br_repl)
   return compressed
 
 def decompress(compressed_str0, br_repl=b"|n|"): #decompress str using zlib
-  compressed_str0=compressed_str0.replace(br_repl,b"\n")
+  #compressed_str0=compressed_str0.replace(br_repl,b"\n")
+  compressed_str0=base64.b85decode(compressed_str0)
   decompressed0=zlib.decompress(compressed_str0) 
   return decompressed0.decode()
 
