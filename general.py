@@ -1144,15 +1144,16 @@ def get_line(line_num, main_file_obj,locs_file_obj,str_size=6): #for files with 
 
 import os, tempfile, json, zipfile, zlib
 
-def compress(str0, br_repl=b"|n|"): #compress string using zlib
+default_br_repl=b"......"
+def compress(str0, br_repl=default_br_repl): #compress string using zlib
   compressed=zlib.compress(str0.encode()) 
-  compressed=base64.b85encode(compressed)
-  #compressed=compressed.replace(b"\n",br_repl)
+  #compressed=base64.b85encode(compressed)
+  compressed=compressed.replace(b"\n",br_repl)
   return compressed
 
-def decompress(compressed_str0, br_repl=b"|n|"): #decompress str using zlib
-  #compressed_str0=compressed_str0.replace(br_repl,b"\n")
-  compressed_str0=base64.b85decode(compressed_str0)
+def decompress(compressed_str0, br_repl=default_br_repl): #decompress str using zlib
+  compressed_str0=compressed_str0.replace(br_repl,b"\n")
+  #compressed_str0=base64.b85decode(compressed_str0)
   decompressed0=zlib.decompress(compressed_str0) 
   return decompressed0.decode()
 
