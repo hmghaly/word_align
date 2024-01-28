@@ -159,6 +159,18 @@ def combine_dict_list(list_of_dicts):
     for key,val in dict0.items(): combined_dict[key]=val
   return combined_dict
 
+#28 Jan 24
+def parse_dict(json_dict,parents=[],n=0,final_kv_list=[]): #create a recursive, linear list of keys/values from a nested dict/json
+  for k, v in json_dict.items():
+    new_parents=parents+[k]
+    if isinstance(v, list): v=dict(iter(enumerate(v))) 
+    if isinstance(v, dict):
+      final_kv_list.append((new_parents,v))
+      final_kv_list=parse_dict(v,new_parents, n+1,final_kv_list)
+    else:
+      final_kv_list.append((new_parents,v))
+  return final_kv_list
+
 
 ####################### STRINGS ###########################
 #string operations
