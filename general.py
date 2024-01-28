@@ -1,4 +1,4 @@
-import re, os, shelve, unicodedata, sys, json, time, random, string, base64
+import re, os, shelve, unicodedata, sys, json, time, random, string, base64, copy
 #import pandas as pd
 import re
 from itertools import groupby
@@ -163,9 +163,10 @@ def combine_dict_list(list_of_dicts):
 def parse_dict(json_dict,parents=[],n=0,final_kv_list=[]): #create a recursive, linear list of keys/values from a nested dict/json
   for k, v in json_dict.items():
     new_parents=parents+[k]
+    original_v=copy.deepcopy(v)
     if isinstance(v, list): v=dict(iter(enumerate(v))) 
     if isinstance(v, dict):
-      final_kv_list.append((new_parents,v))
+      final_kv_list.append((new_parents,original_v))
       final_kv_list=parse_dict(v,new_parents, n+1,final_kv_list)
     else:
       final_kv_list.append((new_parents,v))
