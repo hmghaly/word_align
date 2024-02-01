@@ -781,6 +781,32 @@ def apply_docx_paras(docx_fpath,content_dict,out_fpath):
 
   #docx_paras_dict=dict(iter(docx_paras))
 
+#1 Feb 2024
+def extract_docx_paras(fpath): 
+  paras=[]
+  cur_tag_name="w:p"
+  if fpath.lower().endswith(".docx"): main_dir="word"
+  if fpath.lower().endswith(".pptx"): 
+    main_dir="ppt/slides"
+    cur_tag_name="a:p"
+  if fpath.lower().endswith(".xlsx"): main_dir="xl" #not really supported
+
+  with zipfile.ZipFile(fpath, "r") as f:
+      for xml_fname in f.namelist():
+        if not xml_fname.endswith(".xml"): continue
+        if not xml_fname.lower().startswith(main_dir): continue
+        print(xml_fname)
+        xml_data = f.read(xml_fname)
+        xml_data=xml_data.decode("utf-8")
+        xml_dom_obj=web_lib.DOM(xml_data)
+        cur_paras=xml_dom_obj.get_el_by_tag_name(cur_tag_name)
+        tmp_xml_path=os.path.join(main_dir,xml_fname)
+        for para0 in cur_paras:
+          para_hash=simple_hash(para0)
+          cur_para_key="%s|%s"%(tmp_xml_path,para_hash)
+          paras.append((cur_para_key,para0))
+  return paras
+
 #2 June 2023
 class docx:
   def __init__(self,docx_fpath,keep_copy=True): #openning the docx file, by unzipping it
