@@ -795,7 +795,7 @@ def extract_docx_paras(fpath):
       for xml_fname in f.namelist():
         if not xml_fname.endswith(".xml"): continue
         if not xml_fname.lower().startswith(main_dir): continue
-        print(xml_fname)
+        #print(xml_fname)
         xml_data = f.read(xml_fname)
         xml_data=xml_data.decode("utf-8")
         xml_dom_obj=web_lib.DOM(xml_data)
