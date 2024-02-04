@@ -1152,10 +1152,28 @@ def get_line(line_num, main_file_obj,locs_file_obj,str_size=6): #for files with 
 
 
 
-########################## ZIP FILES ##################
+########################## ZIP FILES AND COMPRESSION ##################
 ###Utilities - zip files functions copy to general soon
 
 import os, tempfile, json, zipfile, zlib
+
+#https://stackoverflow.com/questions/77902559/python-safe-string-compression-without-line-breaks/77928084
+def compress(string0) -> bytes:
+    """Given a bytes instance consisting of a `JSON` string encoded
+    to bytes and then compressed, replace backslash characters
+    with two backslashes and newline characters with the
+    two-character sequence of a backslash followed by 'n'."""
+    s=zlib.compress(string0.encode())
+
+    return s.replace(b'\\', b'\\\\').replace(b'\n', b'\\n')
+
+def decompress(compressed0):
+  """Given a bytes instance that have had newline
+    characters removed with function replace_newline, this function
+    will restore the newline characters."""
+  # A backslash can only be followed by another backslash or 'n':  
+  decoded0=re.sub(br'\\(.)', lambda m: b'\\' if m[1] == b'\\' else b'\n', compressed0)
+  return zlib.decompress(decoded0)
 
 # default_br_repl=b"......"
 # def compress(str0, br_repl=default_br_repl): #compress string using zlib
@@ -1170,32 +1188,32 @@ import os, tempfile, json, zipfile, zlib
 #   decompressed0=zlib.decompress(compressed_str0) 
 #   return decompressed0.decode()
 
-def compress(str0):
-  compressed=zlib.compress(str0.encode()) #encode string to binary
-  compressed=compressed.replace(b"\\",b"\\\\") #doubles all backslashes
-  compressed=compressed.replace(b"\n",b"\\n") #replace line breaks characters (ord: 10) with backslash (ord: 92) and letter n (ord: 110)
-  return compressed
+# def compress(str0):
+#   compressed=zlib.compress(str0.encode()) #encode string to binary
+#   compressed=compressed.replace(b"\\",b"\\\\") #doubles all backslashes
+#   compressed=compressed.replace(b"\n",b"\\n") #replace line breaks characters (ord: 10) with backslash (ord: 92) and letter n (ord: 110)
+#   return compressed
 
-def decompress(compressed_str):
-  i0=0
-  decoded_array=bytearray([]) 
-  while i0<len(compressed_str): #iterate over the compressed and encoded binary string character by character 
-    char0=compressed_str[i0]
-    if i0<len(compressed_str)-1: #to allow checking for next character
-      next_char=compressed_str[i0+1]
-      if char0==92: #if current character is backslasj
-        if next_char==92: #and the next one is also backslash
-          decoded_array.append(char0) #we return only one backslash
-          i0+=1 #and jump to the character after the next
-        elif next_char==110: #if the next character is the letter n
-          decoded_array.append(10) #we return the linebreak character (ord: 10)
-          i0+=1 #and jump to the charcter after the next
-        else: decoded_array.append(char0) #otherwise just return the backslash, no jumping
-      else: decoded_array.append(char0) #otherwise just return the current character, no jumping
-    else: decoded_array.append(char0) #or if it's the last character, just return it
-    i0+=1 #go to next character
-  decoded_str=bytes(decoded_array) #get the binary string from the decoded array
-  return zlib.decompress(decoded_str) #and finally decompress using zlib
+# def decompress(compressed_str):
+#   i0=0
+#   decoded_array=bytearray([]) 
+#   while i0<len(compressed_str): #iterate over the compressed and encoded binary string character by character 
+#     char0=compressed_str[i0]
+#     if i0<len(compressed_str)-1: #to allow checking for next character
+#       next_char=compressed_str[i0+1]
+#       if char0==92: #if current character is backslasj
+#         if next_char==92: #and the next one is also backslash
+#           decoded_array.append(char0) #we return only one backslash
+#           i0+=1 #and jump to the character after the next
+#         elif next_char==110: #if the next character is the letter n
+#           decoded_array.append(10) #we return the linebreak character (ord: 10)
+#           i0+=1 #and jump to the charcter after the next
+#         else: decoded_array.append(char0) #otherwise just return the backslash, no jumping
+#       else: decoded_array.append(char0) #otherwise just return the current character, no jumping
+#     else: decoded_array.append(char0) #or if it's the last character, just return it
+#     i0+=1 #go to next character
+#   decoded_str=bytes(decoded_array) #get the binary string from the decoded array
+#   return zlib.decompress(decoded_str) #and finally decompress using zlib
 
 
 
