@@ -1163,6 +1163,30 @@ def index_bitext_list(list0,params0={}): #each list item = (loc/sent_id,src_toke
   return inverted_src0,  inverted_trg0
 
 
+#6 Feb 2024
+def index_src_trg_toks(src_tokens,trg_tokens,params0={}):
+  max_sent_n_tokens=params0.get("max_sent_n_tokens",1000)
+  #t_bitext0=tok_bitext(list0,params0)
+  src_fwd_index0,trg_fwd_index0=[],[]
+  for cur_loc,cur_item in enumerate(zip(src_tokens,trg_tokens)):
+    src_toks0,trg_toks0=cur_item
+  #for cur_loc,src_toks0,trg_toks0 in t_bitext0:
+    #src_toks0,trg_toks0=t_pair0
+    filtered_src0=filter_toks(src_toks0,params0)
+    filtered_trg0=filter_toks(trg_toks0,params0)
+    indexed_src0=[(v,cur_loc+vi/max_sent_n_tokens) for vi,v in enumerate(filtered_src0) if vi<max_sent_n_tokens and v!=""]
+    indexed_trg0=[(v,cur_loc+vi/max_sent_n_tokens) for vi,v in enumerate(filtered_trg0) if vi<max_sent_n_tokens and v!=""]
+    src_fwd_index0.extend(indexed_src0)
+    trg_fwd_index0.extend(indexed_trg0) 
+  src_fwd_index0.sort()
+  trg_fwd_index0.sort()
+  grouped_src=[(key,[v[1] for v in list(group)]) for key,group in groupby(src_fwd_index0,lambda x:x[0])]
+  grouped_trg=[(key,[v[1] for v in list(group)]) for key,group in groupby(trg_fwd_index0,lambda x:x[0])]
+  inverted_src0=dict(iter(grouped_src))  
+  inverted_trg0=dict(iter(grouped_trg))  
+  return inverted_src0,  inverted_trg0
+
+
 #Working on phrases and chunks
 def extract_phrases(src_tokens,trg_tokens,aligned_elements, max_phrase_size=12, discard_empty_phrases=True):
   used_xs,used_ys=[],[]
