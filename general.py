@@ -1246,6 +1246,17 @@ def read_zip_file_full(zip_fpath0,zipped_file_name0):
   archive0.close()
   return output.decode("utf-8")
 
+#13 Feb 2024
+#get a list of file names/paths that are included in a zip file
+def get_zip_file_list(zip_fpath):
+  file_list=[]
+  archive0 = zipfile.ZipFile(zip_fpath, 'r')
+  for fname0 in archive0.filelist:
+    file_list.append(fname0.filename)
+  archive0.close()
+  return file_list
+
+
 def read_zip_lines(zip_fpath0,zipped_file_name0): #iterate line by line of a target zipped file
   archive0 = zipfile.ZipFile(zip_fpath0, 'r')
   target_file = archive0.open(zipped_file_name0)
