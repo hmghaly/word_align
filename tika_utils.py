@@ -40,12 +40,18 @@ def tika_server(ourfile,port=port_number,host=host_name):
         final_content+=chunk
     return final_content
 
+#wget https://dlcdn.apache.org/tika/2.9.1/tika-app-2.9.1.jar
 #!wget https://dlcdn.apache.org/tika/2.6.0/tika-app-2.6.0.jar
 #!java -jar tika-app-2.6.0.jar -h docs/ecosoc2.docx > tika_out.html
 
 def tika(in_fpath,out_fpath,tika_fpath="tika-app-2.6.0.jar",out_format="html"):
     out_param="-h"
     if out_format=="html": out_param="-h"
+    cur_files=os.listdir(os.getcwd())
+    tika_files=[v for v in cur_files if v.endswith(".jar") and "tika" in v]
+    tika_files.sort(reverse=True)
+    if tika_files and tika_fpath!="": tika_fpath=tika_files[0]
+
     #shell_command='java -jar tika-app-2.6.0.jar -h docs/ecosoc2.docx > tika_out.html'
     shell_command='java -jar %s %s %s > %s'%(tika_fpath,out_param,in_fpath,out_fpath)
     proc=subprocess.Popen(shell_command,shell=True)
