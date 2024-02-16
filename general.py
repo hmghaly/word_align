@@ -142,6 +142,12 @@ def group_list(list_2): #group a list with each element is of size 2 - by the fi
   out_dict=dict(iter(grouped))
   return out_dict
 
+#16 Feb 2024
+#indexing a list of strings, giving a dictionary where the key is the unique word and the values are its locations in the list
+def indexing(str_list):
+  eum_list=[(v,vi) for vi,v in enumerate(str_list)]
+  return group_list(eum_list)
+
 
 ####################### Dictionaries ######################
 def check_dict_multi_keys(dict0,possible_key_list): #if we're not fully sure which key works
