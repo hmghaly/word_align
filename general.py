@@ -311,7 +311,7 @@ def get_key(txt): #normalize text by replacing non alpha items with _
 
 multi_dot_words_lower=["e.g.","i.e.","u.s.a.","u.k.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
 multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
-dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
+dot_words=["Mr","Ms","Mrs","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
 diac=u'\u064e\u064f\u0650\u0651\u0652\u064c\u064b\u064d\ufc62'
 def tok_ar_diac(text):
   diac_list=[]
