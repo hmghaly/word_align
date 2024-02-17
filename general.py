@@ -376,7 +376,10 @@ def tok(txt):
     bare_token=bare_token.replace("("," (_ ")
     bare_token=bare_token.replace(")"," _) ")
     bare_token=bare_token.replace('"',' " ')
-    if bare_token.endswith("'ve"): bare_token=bare_token[:-3]+" _'ve"
+    #if bare_token.endswith("'ve"): bare_token=bare_token[:-3]+" _'ve"
+    after_apostrophe="'"+bare_token.split("'")[-1]
+
+    if after_apostrophe[1:] in ["ve","d","m","ll"]: bare_token=bare_token[:-len(after_apostrophe)]+" _%s"%after_apostrophe
 
 
     if bare_token.endswith("'s"): bare_token=bare_token[:-2]+" _'s"
