@@ -379,10 +379,12 @@ def tok(txt):
     #if bare_token.endswith("'ve"): bare_token=bare_token[:-3]+" _'ve"
     after_apostrophe="'"+bare_token.split("'")[-1]
 
-    if after_apostrophe[1:] in ["ve","d","m","ll"]: bare_token=bare_token[:-len(after_apostrophe)]+" _%s"%after_apostrophe
+    if after_apostrophe[1:] in ["ve","d","m","ll","re"]: bare_token=bare_token[:-len(after_apostrophe)]+" _%s"%after_apostrophe
 
 
     if bare_token.endswith("'s"): bare_token=bare_token[:-2]+" _'s"
+    if bare_token.endswith("n't"): bare_token=bare_token[:-3]+" _n't"
+
     if bare_token.endswith("’s"): bare_token=bare_token[:-2]+" _'s"
     if bare_token.startswith("و") and bare_token[1:].isdigit(): bare_token=bare_token[0]+" "+bare_token[1:]
     #print([item0,begin_punc_chars,end_punc_chars, bare_token])
