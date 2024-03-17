@@ -846,6 +846,26 @@ def remove_dupl(fpath): #remove duplicate lines from a file
   os.remove(temp_fpath)
 
 
+#17 March 2024
+#to read a multiline json file, get a certain value, and add it to a used dict, to exclude it from subsequent processing
+def get_json_used_vals_lines(multiline_json_fpath,key,decompress_line=False):
+  used_vals_dict={}
+  if not os.path.exists(multiline_json_fpath): return used_vals_dict
+  with open(multiline_json_fpath) as json_fopen:
+    for line0 in json_fopen:
+      if decompress_line: json_dict=json.loads(decompress(line0))
+      else: json_dict=json.loads(line0)
+      cur_val=json_dict.get(key)
+      used_vals_dict[cur_val]=True
+  return used_vals_dict
+
+#17 March 2024
+def add_json_line(json_fpath,cur_dict):
+  json_fopen=open(json_fpath,"a")
+  json_line=json.dumps(cur_dict)
+  json_fopen.write(json_line+"\n")
+  json_fopen.close()
+
 ####################### PICKLE AND SHELVE ######################
 # ============= variable Storage (Pickling)
 # CPickle
