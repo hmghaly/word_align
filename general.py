@@ -851,12 +851,14 @@ def remove_dupl(fpath): #remove duplicate lines from a file
 def get_json_used_vals_lines(multiline_json_fpath,key,decompress_line=False):
   used_vals_dict={}
   if not os.path.exists(multiline_json_fpath): return used_vals_dict
-  with open(multiline_json_fpath) as json_fopen:
-    for line0 in json_fopen:
-      if decompress_line: json_dict=json.loads(decompress(line0))
-      else: json_dict=json.loads(line0)
-      cur_val=json_dict.get(key)
-      used_vals_dict[cur_val]=True
+  if decompress_line: json_fopen=open(multiline_json_fpath,"rb")
+  else: json_fopen=open(multiline_json_fpath,"r")
+  for line0 in json_fopen:
+    if decompress_line: json_dict=json.loads(decompress(line0))
+    else: json_dict=json.loads(line0)
+    cur_val=json_dict.get(key)
+    used_vals_dict[cur_val]=True
+  json_fopen.close()
   return used_vals_dict
 
 #17 March 2024
