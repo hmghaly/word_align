@@ -122,6 +122,27 @@ def get_words_vector(words,wv_model,excluded_words=[],top_n=500):
   avg_vec=total_vec0/total_count0
   return avg_vec,wd_vector_dict
 
+#21 March 2024
+# def get_cat_vec_dict(cat_tok_dict,wv_model,excluded_words=[],top_n=500):
+#   cat_vec_dict0={}
+#   for cat0,words0 in cat_tok_dict.items():
+#     cur_vec0=get_words_vector(words0,wv_model,excluded_words,top_n)
+#     cat_vec_dict0[cat0]=cur_vec0
+#   return cat_vec_dict0
+
+#creating a custom category vector from a keyword dictionary keyword_dict["cat_name"]=["word1","word2","word3"...]
+def create_cat_vector(input_keyword_dict,wv_model,excluded_words=[],top_n=500):
+  tmp_category_vector_dict={}
+  for key,words in input_keyword_dict.items():
+    if len(words)==0: continue
+    #words=re.findall("\w+",val)
+    #print(words) 
+    cur_vec,_=get_words_vector(words,wv_model,excluded_words,top_n)
+    tmp_category_vector_dict[key]=cur_vec
+  return tmp_category_vector_dict
+
+
+
 def get_words_vector_OLD(words,wv_model,excluded_words=[]):
   all_vectors=[]
   wd_vector_dict={}
@@ -179,16 +200,6 @@ def cos_sim(vector1,vector2):
   result = 1 - spatial.distance.cosine(vector1, vector2)
   return result
 
-#creating a custom category vector from a keyword dictionary keyword_dict["cat_name"]=["word1","word2","word3"...]
-def create_cat_vector(input_keyword_dict,wv_model):
-  tmp_category_vector_dict={}
-  for key,words in input_keyword_dict.items():
-    if len(words)==0: continue
-    #words=re.findall("\w+",val)
-    #print(words) 
-    cur_vec,_=get_words_vector(words,wv_model)
-    tmp_category_vector_dict[key]=cur_vec
-  return tmp_category_vector_dict
 
 
 class text_classification:
