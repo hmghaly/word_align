@@ -328,15 +328,17 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
     for ch_i,ch in enumerate(self.chunks): #iterate over each chunk
       ch=ch.strip("ـ") #remove tatweel
       #if ch[0]=="ى" and ch_i<len(self.chunks)-1: ch=="ي"+ch[1:]
-      found=self.romanize_dict.get(ch[0]) #check romanization dict for the equiv of the first char in chunk, else use the same char
+      found=self.romanize_dict.get(ch[0],(ch[0],"")) #check romanization dict for the equiv of the first char in chunk, else use the same char
       #found=self.romanize_dict.get(ch[0],ch[0]) #check romanization dict for the equiv of the first char in chunk, else use the same char
 
+  	first=found[0] #romanized dict has two items, default equivalent, and the equivalent that applies only if the character is in the first chunk of the word
+  	if ch_i==0 and len(found)>1 and found[1]!="": first=found[1] #if firt chunk of the word, and there is an actual equivalent for first character, use this equivalent
       
       #if ch[0]=="ى" and ch_i<len(self.chunks)-1: first="ai"
-      if found!=None: 
-      	first=found[0] #romanized dict has two items, default equivalent, and the equivalent that applies only if the character is in the first chunk of the word
-      	if ch_i==0 and len(found)>1 and found[1]!="": first=found[1] #if firt chunk of the word, and there is an actual equivalent for first character, use this equivalent
-      else: first=ch[0] #otherwise, just use the firsch character of the chunk
+      # if found!=None: 
+      # 	first=found[0] #romanized dict has two items, default equivalent, and the equivalent that applies only if the character is in the first chunk of the word
+      # 	if ch_i==0 and len(found)>1 and found[1]!="": first=found[1] #if firt chunk of the word, and there is an actual equivalent for first character, use this equivalent
+      # else: first=ch[0] #otherwise, just use the firsch character of the chunk
 
 
      #  if ch_i==0 and found[1]!="": first=found[1] #if firt chunk of the word, and there is an actual equivalent for first character, use this equivalent
@@ -357,7 +359,7 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       has_shaddah=False
       if "x" in dia0: has_shaddah=True #in the conversion sheet, shadda is converted to x
       dia0=dia0.replace("x","")
-      if dia0 and found[1]!="": first=found[1] 
+      if dia0 and found[1]!="": first=found[1] #if there are diacritics on waaw, yaa2, use the w instead of oo and y instead of ee
       if ch_i>0 and "2" in found[0]: first="2" #imra2ah
 
       if prev_romanized.endswith("a") and ch[0] in "وي" and found[1]!="": first=found[1]
