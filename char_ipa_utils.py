@@ -331,9 +331,10 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
       found=self.romanize_dict.get(ch[0]) #check romanization dict for the equiv of the first char in chunk, else use the same char
       #found=self.romanize_dict.get(ch[0],ch[0]) #check romanization dict for the equiv of the first char in chunk, else use the same char
 
-      first=found[0] #romanized dict has two items, default equivalent, and the equivalent that applies only if the character is in the first chunk of the word
+      
       #if ch[0]=="ى" and ch_i<len(self.chunks)-1: first="ai"
       if found!=None: 
+      	first=found[0] #romanized dict has two items, default equivalent, and the equivalent that applies only if the character is in the first chunk of the word
       	if ch_i==0 and len(found)>1 and found[1]!="": first=found[1] #if firt chunk of the word, and there is an actual equivalent for first character, use this equivalent
       else: first=ch[0] #otherwise, just use the firsch character of the chunk
 
