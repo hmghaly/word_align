@@ -325,21 +325,30 @@ class analyze_ar_word: #analyze a word with diacritics in different ways
     #get the sound
     self.romanized_chunks=[]
     prev_romanized=""
-    for ch_i,ch in enumerate(self.chunks):
-      ch=ch.strip("ـ")
+    for ch_i,ch in enumerate(self.chunks): #iterate over each chunk
+      ch=ch.strip("ـ") #remove tatweel
       #if ch[0]=="ى" and ch_i<len(self.chunks)-1: ch=="ي"+ch[1:]
-      found=self.romanize_dict.get(ch[0],ch[0]) #check romanization dict for the equiv of the first char in chunk, else use the same char
+      found=self.romanize_dict.get(ch[0]) #check romanization dict for the equiv of the first char in chunk, else use the same char
+      #found=self.romanize_dict.get(ch[0],ch[0]) #check romanization dict for the equiv of the first char in chunk, else use the same char
 
-      first=found[0]
+      first=found[0] #romanized dict has two items, default equivalent, and the equivalent that applies only if the character is in the first chunk of the word
       #if ch[0]=="ى" and ch_i<len(self.chunks)-1: first="ai"
+      if found!=None: 
+      	if ch_i==0 and len(found)>1 and found[1]!="": first=found[1] #if firt chunk of the word, and there is an actual equivalent for first character, use this equivalent
+      else: first=ch[0] #otherwise, just use the firsch character of the chunk
 
-      try:
-        if ch_i==0 and found[1]!="": first=found[1]
-      except:
+
+     #  if ch_i==0 and found[1]!="": first=found[1] #if firt chunk of the word, and there is an actual equivalent for first character, use this equivalent
+  	  # else: first=ch[0] #otherwise, just use the firsch character of the chunk
+
+     #  try:
+     #    if ch_i==0 and found[1]!="": first=found[1]
+     #  except:
+     #  	first=ch[0]
         #print("error","found",found,ch_i,ch,word0)
-        continue
+        #continue
 
-      if first=="q" and lang=="ega" and not "q" in self.word_params: first="2"
+      if first=="q" and lang=="ega" and not "q" in self.word_params: first="2" #if for Eg Arabic a word has qaaf, and the parameters do not have q, use 2
       #first=self.romanize_dict[ch[0]][0]
       
       #cur_romanized_chunk=first
