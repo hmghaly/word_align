@@ -25,6 +25,11 @@ en_stop_words=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you
                'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn', 
                "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 
                'won', "won't", 'wouldn', "wouldn't"]
+hs_noise_words=["chapter","spp",'heading','item','therefor','goods','inn','primary','articles',
+             "excluding",'included','like','thereof','man', 'made',"mm",'weight','headings',
+             'cm',"kg",'exceeding','without','one', 'function',"two",'three','article',"good",
+             'whether']
+extended_stop_words=en_stop_words+url_noise_words+hs_noise_words
 
 
 sys.path.append("code_utils")
@@ -35,6 +40,42 @@ from numpy import array
 import numpy as np
 from scipy import spatial
 import re
+
+#5 April 2024
+def get_toks_vec(toks,wv_model,excluded_words=extended_stop_words):
+  vectors=[]
+  for tok0 in toks:
+    if tok0 in excluded_words: continue
+    try: vectors.append(wv_model.wv[tok0])
+    except KeyError: continue
+  if len(vectors)==0: mean0=np.zeros(wv_model.wv.vector_size)
+  else: mean0=np.mean(vectors, axis=0)
+  return mean0
+
+#5 April 2024
+def get_cat_vec_dict(cat_kw_dict,wv_model,excluded_words=extended_stop_words,exclude_empty_vectors=True):
+  cat_vec_dict0={}
+  for cat0,kw_list0 in cat_kw_dict.items():
+    cat_vec0=get_toks_vec(kw_list0,wv_model=wv_model,excluded_words=excluded_words)
+    if exclude_empty_vectors and sum(cat_vec0)==0: continue
+    cat_vec_dict0[cat]=cat_vec0
+  return cat_vec_dict0
+
+#5  April 2024
+def classify_with_cat_vec_dict(input_vec,cat_vec_dict,exclude_empty_vectors=True):
+  pred_list=[]
+  if exclude_empty_vectors and sum(input_vec)==0: return []
+  for cat0,vec0 in cat_vec_dict.items():
+    if exclude_empty_vectors and sum(vec0)==0: continue
+    sim0=cos_sim(input_vec,vec0)
+    pred_list.append((cat0,sim0))
+  pred_list.sort(key=lambda x:-x[-1])
+  return pred_list
+
+    
+
+
+
 
 class doc2vec_text:
   def __init__(self,words):
