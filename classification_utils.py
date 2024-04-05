@@ -58,7 +58,7 @@ def get_cat_vec_dict(cat_kw_dict,wv_model,excluded_words=extended_stop_words,exc
   for cat0,kw_list0 in cat_kw_dict.items():
     cat_vec0=get_toks_vec(kw_list0,wv_model=wv_model,excluded_words=excluded_words)
     if exclude_empty_vectors and sum(cat_vec0)==0: continue
-    cat_vec_dict0[cat]=cat_vec0
+    cat_vec_dict0[cat0]=cat_vec0
   return cat_vec_dict0
 
 #5  April 2024
