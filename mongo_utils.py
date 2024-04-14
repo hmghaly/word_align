@@ -65,7 +65,7 @@ def mongo_aggregate(tag_key,tag_val,match_query={}):
     agg_query=[match_query]
     agg_query.append({ "$unwind": "$%s"%tag_key })
     agg_query.append({ "$group": { "_id": "$%s"%tag_key, "count": { "$sum": 1 } }})
-    agg_query.append({ $sort: { count: -1 } })
+    agg_query.append({ "$sort": { "count": -1 } })
     return agg_query
 
 # [
