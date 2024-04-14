@@ -56,3 +56,23 @@ def mongo_insert_many(cur_list,cur_collection):
         out_dict["n_inserted"]=nInserted
         out_dict["n_inserted"]=len(with_errors)
     return out_dict
+
+def match_elem(tag_key,tag_val):
+    query0={tag_key: { "$elemMatch": { "$eq": tag_val } }}
+    return query0
+
+def mongo_aggregate(tag_key,tag_val,match_query={}):
+    agg_query=match_query
+    agg_query.append({ "$unwind": "$%s"%tag_key })
+    agg_query.append({ "$group": { "_id": "$%s"%tag_key, "count": { "$sum": 1 } }})
+    agg_query.append({ $sort: { count: -1 } })
+    return agg_query
+
+# [
+#    {
+#       $match: {tags: { $elemMatch: { $eq: "20" } }}
+#    },
+#   { "$unwind": "$country" },  
+#   { "$group": { "_id": "$country", "count": { "$sum": 1 } }},
+#   { $sort: { count: -1 } }
+# ]
