@@ -61,7 +61,7 @@ def match_elem(tag_key,tag_val):
     query0={tag_key: { "$elemMatch": { "$eq": tag_val } }}
     return query0
 
-def mongo_aggregate(tag_key,tag_val,match_query={}):
+def mongo_aggregate(tag_key,match_query={}):
     agg_query=[match_query]
     agg_query.append({ "$unwind": "$%s"%tag_key })
     agg_query.append({ "$group": { "_id": "$%s"%tag_key, "count": { "$sum": 1 } }})
