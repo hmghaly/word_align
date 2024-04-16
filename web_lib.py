@@ -2,6 +2,8 @@
 import requests, re, sys, time
 import string
 from urllib.parse import urljoin, urlsplit
+from urllib.parse import unquote
+
 sys.path.append("code_utils")
 import general
 #from bs4 import BeautifulSoup
@@ -812,3 +814,15 @@ def get_page_paras(page_url):
   
   paras=[v.strip() for v in text.split("_br_") if v.strip() and not (v[0]=='<' and v[-1]=='>') ]
   return paras
+
+
+def get_qs_dict(qs_str,lower=False):
+  qs_str = unquote(qs_str)
+  qs_dict0={}
+  for item0 in qs_str.split("&"):
+    eq_split=item0.split("=")
+    if len(eq_split)!=2: continue
+    key,val=eq_split
+    if lower: key=key.lower()
+    qs_dict0[key]=val
+  return qs_dict0
