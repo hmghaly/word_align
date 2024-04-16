@@ -826,3 +826,11 @@ def get_qs_dict(qs_str,lower=False):
     if lower: key=key.lower()
     qs_dict0[key]=val
   return qs_dict0
+
+def encode_qs(qs_dict):
+  qs_items=[]
+  for a,b in qs_dict.items():
+    cur_item=f'{a}={b}'
+    qs_items.append(cur_item)
+  return "&".join(qs_items)
+
