@@ -417,7 +417,18 @@ def de_tok_space(tokens): #outputs list of tokens with the following, whether it
       open_quotes=True
     if next_tok=='"' and open_quotes:
       following=""
-      open_quotes=False
+    if tok0=='"' and open_quotes: open_quotes=False
+    
+    if tok0=="'" and not open_single_quote: #handle open single quotes and apostrophes
+      following=""
+      open_single_quote=True
+    if next_tok=="'" and open_single_quote:
+      following=""
+    if tok0=="'" and open_single_quote: open_single_quote=False
+    if tok0=="'" and next_tok.lower() in ["s","ve","d","re","ll","m"]: following=""
+
+
+      #open_quotes=False
     if next_tok.startswith("_"): following=""
     if cur_tok.endswith("_"): following=""
     if next_tok.startswith("ـ"): following=""
