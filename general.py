@@ -410,25 +410,29 @@ def de_tok_space(tokens): #outputs list of tokens with the following, whether it
     if tok_i>0: prev_tok=tokens[tok_i-1]
     following=" "
     if next_tok=="": following=""
-    if next_tok in ",;:-.!?)}]،؛؟": following="" #!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ - to deal with raw tokenized items
-    if prev_tok in "([{&": following="" #raw tokenized items
-    if tok0=='"' and not open_quotes: #handle open quotes
+    if next_tok and next_tok in ",;:-.!?)}]،؛؟": following="" #!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ - to deal with raw tokenized items
+    if cur_tok in "([{&": following="" #raw tokenized items
+
+    if tok0=='"':
+      if not open_quotes: 
+        open_quotes=True
+        following=""
+      else: open_quotes=False
+    if next_tok=='"' and open_quotes: 
       following=""
-      open_quotes=True
-    if next_tok=='"' and open_quotes:
+
+    if tok0=="'":
+      if next_tok.lower() in ["s","ve","d","re","ll","m","t"]: 
+        following=""
+        if len(tok_space_list)>0: tok_space_list[-1]=(prev_tok,"")
+      elif not open_single_quote: 
+        open_single_quote=True
+        following=""
+      else: open_single_quote=False
+    if next_tok=="'" and open_single_quote: 
       following=""
-    if tok0=='"' and open_quotes: open_quotes=False
-    
-    if tok0=="'" and not open_single_quote: #handle open single quotes and apostrophes
-      following=""
-      open_single_quote=True
-    if next_tok=="'" and open_single_quote:
-      following=""
-    if tok0=="'" and open_single_quote: open_single_quote=False
-    if tok0=="'" and next_tok.lower() in ["s","ve","d","re","ll","m"]: following=""
 
 
-      #open_quotes=False
     if next_tok.startswith("_"): following=""
     if cur_tok.endswith("_"): following=""
     if next_tok.startswith("ـ"): following=""
@@ -439,6 +443,7 @@ def de_tok_space(tokens): #outputs list of tokens with the following, whether it
       else: cur_tok=cur_tok.replace("ال_","ال")
     cur_item= (cur_tok.strip("_"),following)
     tok_space_list.append(cur_item)
+    #print(cur_item)
   return tok_space_list
 
 def de_tok2str(tokens): #detokenize tokens into string
