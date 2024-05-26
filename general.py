@@ -399,8 +399,10 @@ def tok(txt):
     new_str+=" "    
   return [v for v in new_str.split(" ") if v]
 
+#updated 26 May - to accommodate raw tokenized items (not produced by the tokenization scheme included in this file)
 def de_tok_space(tokens): #outputs list of tokens with the following, whether it is followed by space or not identify which tokens are followed by space and which are not, based on latest tok
   tok_space_list=[]
+  open_quotes,open_single_quote=False,False
   for tok_i,tok0 in enumerate(tokens):
     cur_tok=str(tok0)
     prev_tok,next_tok="",""
@@ -408,6 +410,14 @@ def de_tok_space(tokens): #outputs list of tokens with the following, whether it
     if tok_i>0: prev_tok=tokens[tok_i-1]
     following=" "
     if next_tok=="": following=""
+    if next_tok in ",;:-.!?)}]،؛؟": following="" #!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ - to deal with raw tokenized items
+    if prev_tok in "([{&": following="" #raw tokenized items
+    if tok0=='"' and not open_quotes: #handle open quotes
+      following=""
+      open_quotes=True
+    if next_tok=='"' and open_quotes:
+      following=""
+      open_quotes=False
     if next_tok.startswith("_"): following=""
     if cur_tok.endswith("_"): following=""
     if next_tok.startswith("ـ"): following=""
@@ -847,7 +857,7 @@ def remove_dupl(fpath): #remove duplicate lines from a file
 
 
 #17 March 2024
-#to read a multiline json file, get a certain value, and add it to a used dict, to exclude it from subsequent processing
+#to read a multiline json file, get a certain value, and add it to a used dict, to exclude it from subsequent processing #used #json
 def get_json_used_vals_lines(multiline_json_fpath,key,decompress_line=False,max_n_lines=None,use_line_dict=False):
   used_vals_dict={}
   if not os.path.exists(multiline_json_fpath): return used_vals_dict
@@ -863,7 +873,7 @@ def get_json_used_vals_lines(multiline_json_fpath,key,decompress_line=False,max_
   json_fopen.close()
   return used_vals_dict
 
-#17 March 2024
+#17 March 2024 #json
 def add_json_line(json_fpath,cur_dict):
   json_fopen=open(json_fpath,"a")
   json_line=json.dumps(cur_dict)
