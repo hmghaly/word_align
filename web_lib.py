@@ -766,6 +766,25 @@ def get_page_summary(url):
   page_info_dict["lang"]=get_page_lang(page_content)
   return page_info_dict
 
+#1 June 2024
+def remove_html_noise(html_content): #remove script/style/comments
+  text=html_content
+  # (REMOVE <SCRIPT> to </script> and variations)
+  pattern = r'<[ ]*script.*?\/[ ]*script[ ]*>'  # mach any char zero or more times
+  text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
+
+  # (REMOVE HTML <STYLE> to </style> and variations)
+  pattern = r'<[ ]*style.*?\/[ ]*style[ ]*>'  # mach any char zero or more times
+  text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
+  # (REMOVE HTML COMMENTS <!-- to --> and variations)
+  pattern = r'<[ ]*!--.*?--[ ]*>'  # mach any char zero or more times
+  text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
+
+  # (REMOVE HTML DOCTYPE <!DOCTYPE html to > and variations)
+  pattern = r'<[ ]*\![ ]*DOCTYPE.*?>'  # mach any char zero or more times
+  text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
+  #tags=list(re.findall('<[^<>]*?>|\<\!\-\-.+?\-\-\>', text))
+  return text
 
 
 def get_page_paras(page_url):
