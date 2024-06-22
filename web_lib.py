@@ -554,14 +554,39 @@ def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
   return full0
 
 
+#21 June 2024
+#curl-based function for reading urls, with subprocess timeout
+#while capturing response information after the page content
+from subprocess import STDOUT, check_output
+
+def curl(url,timeout=10):
+  cmd='curl -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" -s --max-redirs 10 -w "\n%%{json}" %s -L'%url
+  output = check_output(cmd, shell=True, stderr=STDOUT, timeout=timeout)
+  output=output.decode("utf-8")
+  output_split=output.split("\n")
+  final_json0=output_split[-1]
+  content="\n".join(output_split[:-1])
+  return content, final_json0
+
+
 def get_page_info(url):
   page_info_dict={}
   page_info_dict["url"]=url
 
-  try: page_obj=read_page(url)
-  except: return page_info_dict
-  page_content=general.unescape(page_obj.text)
-  final_url=page_obj.url
+  # try: page_obj=read_page(url)
+  # except: return page_info_dict
+  # page_content=general.unescape(page_obj.text)
+  # final_url=page_obj.url
+
+  page_content,response_json=curl(url,timeout=10)
+  page_content=general.unescape(page_content)
+  try: response_dict=json.loads(response_json)
+  except: response_dict={}
+  final_url=response_dict.get("url_effective",url)
+
+
+
+
   #page_content=get_page_content(url)
   page_content=page_content.replace("\r","\n").replace("\t","\n")
   #page_content=page_content.replace("\r\n","|")#.replace("\r","|")
