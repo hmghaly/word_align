@@ -571,12 +571,13 @@ from subprocess import STDOUT, check_output
 
 def curl(url,timeout=10):
   cmd='curl -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" -s --max-redirs 10 -w "\n%%{json}" %s -L'%url
-  try: output = check_output(cmd, shell=True, stderr=STDOUT, timeout=timeout)
+  try: 
+    output = check_output(cmd, shell=True, stderr=STDOUT, timeout=timeout)
+    output=output.decode("utf-8")
+    output_split=output.split("\n")
+    final_json0=output_split[-1]
+    content="\n".join(output_split[:-1])
   except: return "", "{}"
-  output=output.decode("utf-8")
-  output_split=output.split("\n")
-  final_json0=output_split[-1]
-  content="\n".join(output_split[:-1])
   return content, final_json0
 
 
