@@ -18,14 +18,20 @@ def download_file(file_url):
     decoded_content0 = download.content.decode('utf-8')
   return decoded_content0
 
-#22 June 2024
+#23 June 2024
 def get_attrs(tag0): #get attributes within an html/xml tags
-  found_attrs0=re.findall('(\S+)=(\S+)',tag0) #'''(\S+)=["'](.+?)["']'''
-  final_attrs=[]
-  for at_key0,at_val0 in found_attrs0:
-    at_val0=at_val0.strip("'").strip('"')
-    final_attrs.append((at_key0,at_val0))
-  return dict(iter(final_attrs))
+  tag0=tag0.replace("'",'"')
+  found_attrs0=re.findall('(\S+)="(.+?)"',tag0) #'''(\S+)=["'](.+?)["']'''
+  return dict(iter(found_attrs0))
+
+
+# def get_attrs(tag0): #get attributes within an html/xml tags
+#   found_attrs0=re.findall('(\S+)=(\S+)',tag0) #'''(\S+)=["'](.+?)["']'''
+#   final_attrs=[]
+#   for at_key0,at_val0 in found_attrs0:
+#     at_val0=at_val0.strip("'").strip('"')
+#     final_attrs.append((at_key0,at_val0))
+#   return dict(iter(final_attrs))
 
 
 # def get_attrs(tag0): #get attributes within an html/xml tags
