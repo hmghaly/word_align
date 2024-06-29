@@ -587,7 +587,7 @@ def curl(url,timeout=10):
   return content, final_json0
 
 
-def get_page_info(url):
+def get_page_info(url, timeout=10):
   page_info_dict={}
   page_info_dict["url"]=url
 
@@ -596,7 +596,7 @@ def get_page_info(url):
   # page_content=general.unescape(page_obj.text)
   # final_url=page_obj.url
 
-  page_content,response_json=curl(url,timeout=10)
+  page_content,response_json=curl(url,timeout=timeout)
   page_content=general.unescape(page_content)
   try: response_dict=json.loads(response_json)
   except: response_dict={}
