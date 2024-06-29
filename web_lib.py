@@ -21,8 +21,18 @@ def download_file(file_url):
 #23 June 2024
 def get_attrs(tag0): #get attributes within an html/xml tags
   tag0=tag0.replace("'",'"')
-  found_attrs0=re.findall('(\S+)="(.+?)"',tag0) #'''(\S+)=["'](.+?)["']'''
-  return dict(iter(found_attrs0))
+  found_attrs0=re.findall('(\S+)="(.+?)"[\W\s$]',tag0) #'''(\S+)=["'](.+?)["']'''
+  final_dict={}
+  for a,b in found_attrs0:
+    b=re.sub('"(\S)',r"'\1",b)
+    final_dict[a]=b
+  return final_dict#dict(iter(found_attrs0))
+
+
+# def get_attrs(tag0): #get attributes within an html/xml tags
+#   tag0=tag0.replace("'",'"')
+#   found_attrs0=re.findall('(\S+)="(.+?)"\b',tag0) #'''(\S+)=["'](.+?)["']'''
+#   return dict(iter(found_attrs0))
 
 
 # def get_attrs(tag0): #get attributes within an html/xml tags
