@@ -181,8 +181,8 @@ class DOM:
         cur_class_str=cur_el.attrs.get("class","")
         cur_class_list=[v for v in cur_class_str.split(" ") if v]
 
-        if tag_name=="meta" and cur_el.attrs.get("name","")=="description":self.description=cur_el.attrs.get("content","")
-        if tag_name=="meta" and cur_el.attrs.get("name","")=="keywords":self.keywords=cur_el.attrs.get("content","")
+        if tag_name=="meta" and cur_el.attrs.get("name","").lower()=="description":self.description=cur_el.attrs.get("content","")
+        if tag_name=="meta" and cur_el.attrs.get("name","").lower()=="keywords":self.keywords=cur_el.attrs.get("content","")
         if tag_name=="meta" and cur_el.attrs.get("http-equiv","")=="content-language":self.meta_lang=cur_el.attrs.get("content","")
         if tag_name=="html": self.lang=cur_el.attrs.get("lang","")
         if cur_el.attrs.get("href")!=None: cur_el.href=cur_el.attrs.get("href") #self.all_links.append(cur_el.attrs.get("href"))
