@@ -629,7 +629,9 @@ def get_page_info(url, timeout=10):
   lang0=""
 
   title0=page_dom_obj.title.strip()
-  description0=page_dom_obj.description.strip()
+  #description0=page_dom_obj.description.strip()
+  description0=get_desc(page_content)
+
   keywords0=page_dom_obj.keywords.strip()
   lang0=page_dom_obj.lang
   meta_lang0=page_dom_obj.meta_lang
