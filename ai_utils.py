@@ -1,7 +1,7 @@
 import requests
 
-model="gpt-3.5-turbo"
-def chat_with_chatgpt(prompt,api_key,max_tokens=100):
+cur_model="gpt-3.5-turbo"
+def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
     res = requests.post(f"https://api.openai.com/v1/chat/completions",
           headers = {
               "Content-Type": "application/json",
