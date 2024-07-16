@@ -608,6 +608,7 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
     except: response_dict={}
     final_url=response_dict.get("url_effective",url)
     status_code=response_dict.get("response_code")
+    page_info_dict["response"]=response_dict
   else:
     try: page_obj=read_page(url)
     except: return page_info_dict
