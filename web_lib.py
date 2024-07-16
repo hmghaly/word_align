@@ -597,20 +597,22 @@ def curl(url,timeout=10):
   return content, final_json0
 
 
-def get_page_info(url, timeout=10):
+def get_page_info(url, read_method="curl",timeout=10):
   page_info_dict={}
   page_info_dict["url"]=url
 
-  # try: page_obj=read_page(url)
-  # except: return page_info_dict
-  # page_content=general.unescape(page_obj.text)
-  # final_url=page_obj.url
+  if read_method=="curl":
+    page_content,response_json=curl(url,timeout=timeout)
+    page_content=general.unescape(page_content)
+    try: response_dict=json.loads(response_json)
+    except: response_dict={}
+    final_url=response_dict.get("url_effective",url)
+  else:
+    try: page_obj=read_page(url)
+    except: return page_info_dict
+    page_content=general.unescape(page_obj.text)
+    final_url=page_obj.url
 
-  page_content,response_json=curl(url,timeout=timeout)
-  page_content=general.unescape(page_content)
-  try: response_dict=json.loads(response_json)
-  except: response_dict={}
-  final_url=response_dict.get("url_effective",url)
 
 
 
