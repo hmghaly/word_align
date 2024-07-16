@@ -585,8 +585,8 @@ def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
 #while capturing response information after the page content
 from subprocess import STDOUT, check_output
 
-def curl(url,timeout=10):
-  cmd='curl -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" -s --max-redirs 10 -w "\n%%{json}" %s -L'%url
+def curl(url,curl_path="curl",timeout=10):
+  cmd='%s -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" -s --max-redirs 10 -w "\n%%{json}" %s -L'%(curl_path,url)
   try: 
     output = check_output(cmd, shell=True, stderr=STDOUT, timeout=timeout)
     output=output.decode("utf-8")
@@ -597,12 +597,12 @@ def curl(url,timeout=10):
   return content, final_json0
 
 
-def get_page_info(url, read_method="curl",timeout=10):
+def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
   page_info_dict={}
   page_info_dict["url"]=url
 
   if read_method=="curl":
-    page_content,response_json=curl(url,timeout=timeout)
+    page_content,response_json=curl(url,curl_path=curl_path,timeout=timeout)
     page_content=general.unescape(page_content)
     try: response_dict=json.loads(response_json)
     except: response_dict={}
