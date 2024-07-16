@@ -607,13 +607,15 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
     try: response_dict=json.loads(response_json)
     except: response_dict={}
     final_url=response_dict.get("url_effective",url)
+    status_code=response_dict.get("response_code")
   else:
     try: page_obj=read_page(url)
     except: return page_info_dict
     page_content=general.unescape(page_obj.text)
     final_url=page_obj.url
+    status_code=page_obj.status_code
 
-
+  page_info_dict["status_code"]=status_code
 
 
 
