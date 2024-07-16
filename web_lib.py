@@ -604,8 +604,9 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
   if read_method=="curl":
     page_content,response_json=curl(url,curl_path=curl_path,timeout=timeout)
     page_content=general.unescape(page_content)
-    try: response_dict=json.loads(response_json)
-    except: response_dict={}
+    response_dict=json.loads(response_json)
+    # try: response_dict=json.loads(response_json)
+    # except: response_dict={}
     final_url=response_dict.get("url_effective",url)
     status_code=response_dict.get("response_code")
     page_info_dict["response_json"]=response_json
