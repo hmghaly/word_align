@@ -25,7 +25,7 @@ def business_ai(website_info_dict,api_key):
   description: %s
   keywords: %s
   follow this example:
-  {"company_name":"Company A", "description":"our company provides these products","hs_codes":["05","09","24"]}
+  {"company_name":"Company A", "ai_description":"our company provides these products","hs_codes":["05","09","24"]}
   """%(final_url,title,description,keywords)  
   # out=get_page_info(url,read_method="curl")
   chat_gpt_out=chat_with_chatgpt(prompt,api_key)
