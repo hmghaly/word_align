@@ -14,7 +14,7 @@ def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
           json={"model": model,
           "messages": [{"role": "user", "content": prompt}], 
           "max_tokens": max_tokens,
-          "response_format": { type: "json_object" }
+          "response_format": { "type": "json_object" }
           }).json()
     return res#.choices[0].text
 
