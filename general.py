@@ -975,6 +975,35 @@ def get_first_line(fpath):
   fopen0.close()
   return first_line
 
+
+#25 Aug 2024
+#https://stackoverflow.com/questions/136168/get-last-n-lines-of-a-file-similar-to-tail
+def tail(f, lines=1, _buffer=4098):
+    """Tail a file and get X lines from the end"""
+    # place holder for the lines found
+    lines_found = []
+
+    # block counter will be multiplied by buffer
+    # to get the block size from the end
+    block_counter = -1
+
+    # loop until we find X lines
+    while len(lines_found) < lines:
+        try:
+            f.seek(block_counter * _buffer, os.SEEK_END)
+        except IOError:  # either file is too small, or too many lines requested
+            f.seek(0)
+            lines_found = f.readlines()
+            break
+
+        lines_found = f.readlines()
+        # decrement the block counter to get the
+        # next X bytes
+        block_counter -= 1
+
+    return lines_found[-lines:]
+
+
 #14 Jan 2024
 def get_last_line(fpath,mode="r",chunk_size=4000):
   if not os.path.exists(fpath): return None
