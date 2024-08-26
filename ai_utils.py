@@ -4,6 +4,7 @@ cur_model="gpt-3.5-turbo"
 cur_model="gpt-4o"
 
 cur_model="gpt-4o-2024-08-06"
+cur_model="gpt-4o-mini-2024-07-18"
 
 def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
     res = requests.post(f"https://api.openai.com/v1/chat/completions",
