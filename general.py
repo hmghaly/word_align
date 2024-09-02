@@ -26,8 +26,8 @@ def today():
   return date_str
 
 def now_tuple(utc=True):
-  if utc: now = datetime.datetime.now(datetime.timezone.utc)
-  else: now = datetime.datetime.now()
+  if utc: now = datetime.now(datetime.timezone.utc)
+  else: now = datetime.now()
   return (now.year, now.month, now.day, now.hour, now.minute, now.second)
 
 
