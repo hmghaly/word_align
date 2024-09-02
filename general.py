@@ -5,7 +5,9 @@ from itertools import groupby
 from difflib import SequenceMatcher
 
 
-from datetime import datetime
+#from datetime import datetime
+
+import datetime
 
 
 if sys.version[0]=="3": 
@@ -22,12 +24,12 @@ def now():
   return time.time()
 
 def today():
-  date_str=datetime.today().strftime('%Y-%m-%d')
+  date_str=datetime.datetime.today().strftime('%Y-%m-%d')
   return date_str
 
 def now_tuple(utc=True):
-  if utc: now = datetime.now(datetime.timezone.utc)
-  else: now = datetime.now()
+  if utc: now = datetime.datetime.now(datetime.timezone.utc)
+  else: now = datetime.datetime.now()
   return (now.year, now.month, now.day, now.hour, now.minute, now.second)
 
 
