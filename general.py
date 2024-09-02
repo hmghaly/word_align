@@ -25,6 +25,12 @@ def today():
   date_str=datetime.today().strftime('%Y-%m-%d')
   return date_str
 
+def now_tuple(utc=True):
+  if utc: now = datetime.datetime.now(datetime.timezone.utc)
+  else: now = datetime.datetime.now()
+  return (now.year, now.month, now.day, now.hour, now.minute, now.second)
+
+
 
 def gen_id(size=6): #generate a random id of specific size
   return ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
