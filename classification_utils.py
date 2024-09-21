@@ -46,9 +46,13 @@ def get_toks_vec(toks,wv_model,excluded_words=extended_stop_words):
   vectors=[]
   for tok0 in toks:
     if tok0 in excluded_words: continue
-    try: vectors.append(wv_model.wv[tok0])
+    try: vectors.append(wv_model[tok0])
     except KeyError: continue
-  if len(vectors)==0: mean0=np.zeros(wv_model.wv.vector_size)
+    # try: vectors.append(wv_model.wv[tok0])
+    # except KeyError: continue
+
+  #if len(vectors)==0: mean0=np.zeros(wv_model.wv.vector_size)
+  if len(vectors)==0: mean0=np.zeros(wv_model.vector_size)
   else: mean0=np.mean(vectors, axis=0)
   return mean0
 
