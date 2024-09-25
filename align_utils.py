@@ -1290,7 +1290,7 @@ def get_tsv_bitext(tsv_fpath): #extract bitext src/trg sentences even for messy 
   return bitext0
 
 
-#Visual presentation of alignment
+#Visual presentation of alignment - display aligned phrases
 def present_aligned(src_tokens0,trg_tokens0,align_list0):
     final_list0=[]
     for el0,el_wt0,has_children in align_list0:
@@ -2088,6 +2088,14 @@ def walign(src_sent,trg_sent,params0={}):
 
   return results
 
+
+#!pip install transformers==3.1.0
+# import torch
+# import transformers
+# import itertools
+
+# model = transformers.BertModel.from_pretrained('bert-base-multilingual-cased')
+# tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-multilingual-cased')
 
 def bert_walign(src_tokens,trg_tokens,tokenizer,model,align_layer=8,n_epochs=8,max_dist=2,max_span=6):
   bert_out0=get_bert_align_list(src_tokens,trg_tokens,tokenizer=tokenizer,model=model, align_layer=align_layer)
