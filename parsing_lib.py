@@ -39,6 +39,14 @@ def get_pos_tags(sent_input):
     return tmp_pos_tags
 
 
+def get_lemmas(sent_input):
+    new_sent_input=tok_sent_join(sent_input) #
+    doc = nlp(new_sent_input)
+    tmp_lemmas=[]
+    for token in doc: tmp_lemmas.append(token.lemma_)
+    return tmp_lemmas
+
+
 #https://github.com/hmghaly/word_align/edit/master/parsing_lib.py
 
 def nested_dict(n, type):
