@@ -31,7 +31,7 @@ def convert2binary(file_bs64_data):
   decoded=base64.b64decode(split0[1])
   return decoded
 
-def send_email(email_to0,email_subject0,email_html0,email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
+def send_email(email_to0,email_subject0,email_html0,email_cc0="",email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
     server = SMTP(server_name0)
     server.set_debuglevel(False)
     server.login(email_from0, email_password0)
@@ -41,6 +41,7 @@ def send_email(email_to0,email_subject0,email_html0,email_from0="contact@kmatter
     email_from_full = "%s <%s>"%(from_name0,email_from0)
     msg['From'] = email_from_full
     msg['To'] = email_to0
+    if email_cc0!="": msg['Cc'] = email_cc0
     msg['Message-ID'] = make_msgid()
 
     email_txt0=email_html0.replace("<br>","\n")
