@@ -31,6 +31,38 @@ def convert2binary(file_bs64_data):
   decoded=base64.b64decode(split0[1])
   return decoded
 
+#NEW - 2 October 2024
+import smtplib
+from email.message import EmailMessage
+from email.utils import formataddr
+
+def email_send(email_subject, email_body, email_to, email_cc="",email_bcc="", sender_email="",sender_name="",sender_password="", server_name="",server_port=""):
+    msg = EmailMessage()
+    msg.set_content(email_body)
+    msg['subject'] = email_subject
+    msg['to'] = email_to
+    if email_cc!="": msg['cc'] = email_cc  
+    if email_bcc!="": msg['bcc'] = email_bcc  
+    if sender_name=="": sender_name=sender_email.split("@")[0]
+    email_from_full = formataddr((sender_name,sender_email)) #"%s <%s>"%(from_name0,user)
+
+    msg['from'] = email_from_full
+    msg['Message-ID'] = make_msgid()
+
+    #TODO:
+    #msg.preamble = 'You will not see this in a MIME-aware mail reader.\n'
+    #add option for file attachments: https://docs.python.org/3/library/email.examples.html
+
+    server = SMTP(server_name)
+    server.set_debuglevel(False)
+    server.login(sender_email, sender_password)
+
+    server.send_message(msg) # <- UPDATED
+    server.quit()
+    return True
+
+
+#OLD
 def send_email(email_to0,email_subject0,email_html0,email_cc0="",email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
     server = SMTP(server_name0)
     server.set_debuglevel(False)
@@ -229,6 +261,9 @@ def save_audio():
         result["success"]=False
         result["message"]=str(e)    
     return result
+
+
+
 
 # def save_audio():
 #     result={}
