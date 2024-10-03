@@ -63,7 +63,7 @@ def email_send(email_subject, email_body, email_to, email_cc="",email_bcc="", se
 
 
 #OLD
-def send_email(email_to0,email_subject0,email_html0,email_cc0="",email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
+def send_email_OLD(email_to0,email_subject0,email_html0,email_cc0="",email_from0="contact@kmatters.com",email_password0="V9EF#rzC;h(J", from_name0="B2WEB Team",server_name0="a2plcpnl0342.prod.iad2.secureserver.net",port0=465):
     server = SMTP(server_name0)
     server.set_debuglevel(False)
     server.login(email_from0, email_password0)
