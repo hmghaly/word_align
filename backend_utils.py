@@ -38,6 +38,8 @@ from email.utils import formataddr
 
 def email_send(email_subject, email_body, email_to, email_cc="",email_bcc="", sender_email="",sender_name="",sender_password="", server_name="",server_port=""):
     msg = EmailMessage()
+    msg.add_header('Content-Type','text/html')
+    
     msg.set_content(email_body)
     msg['subject'] = email_subject
     msg['to'] = email_to
@@ -48,6 +50,8 @@ def email_send(email_subject, email_body, email_to, email_cc="",email_bcc="", se
 
     msg['from'] = email_from_full
     msg['Message-ID'] = make_msgid()
+
+
 
     #TODO:
     #msg.preamble = 'You will not see this in a MIME-aware mail reader.\n'
