@@ -40,7 +40,7 @@ def email_send(email_subject, email_body, email_to, email_cc="",email_bcc="", se
     msg = EmailMessage()
     msg.add_header('Content-Type','text/html')
     
-    msg.set_content(email_body)
+    msg.set_content(email_body, subtype='html')
     msg['subject'] = email_subject
     msg['to'] = email_to
     if email_cc!="": msg['cc'] = email_cc  
