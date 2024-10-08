@@ -278,7 +278,11 @@ class DOM:
     else: new_outer_html=""
     # print("cur_outer_html",cur_outer_html)
     # print("new_outer_html",new_outer_html)
-    repl_list.append((cur_outer_html,new_outer_html))
+    
+    #to fix layers of nested elements, if new content is None, we replace only the tag - 8 Oct 2024
+    if el_content0!=None: repl_list.append((cur_outer_html,new_outer_html))
+    else: repl_list.append((cur_el.open_tag,new_open_tag))
+    
     return repl_list
   def apply_content_by_class(self,class0,el_content0,new_attrs_dict0={},except_ids=[]):
     if el_content0!=None: el_content0=el_content0.strip()
