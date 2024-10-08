@@ -269,7 +269,10 @@ class DOM:
       for a0,b0 in new_attrs_dict0.items():
         cur_attrs[a0]=b0
       new_open_tag=create_open_tag(cur_el.tag_name,cur_attrs)
-    cur_outer_html=cur_el.outer_html
+    #cur_outer_html=cur_el.outer_html
+
+    cur_outer_html=cur_el.open_tag+cur_el.inner_html+cur_el.close_tag #to fix img src replacement problem - 8 Oct 2024
+
     if el_content0: new_outer_html=new_open_tag+el_content0+cur_el.close_tag
     elif el_content0==None: new_outer_html=new_open_tag+cur_el.inner_html+cur_el.close_tag
     else: new_outer_html=""
