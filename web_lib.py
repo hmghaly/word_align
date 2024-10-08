@@ -12,6 +12,9 @@ import general
 #This library is for accessing web pages, reading and processing their content
 #and also for templating web pages by DOM manipulation
 
+
+
+
 def download_file(file_url):
   with requests.Session() as sess0:
     download = sess0.get(file_url)
@@ -586,7 +589,7 @@ def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
 from subprocess import STDOUT, check_output
 
 def curl(url,curl_path="curl",timeout=10):
-  cmd='%s -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" -s --max-redirs 10 -w "\n%%{json}" %s -L'%(curl_path,url)
+  cmd='%s -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" %s -L'%(curl_path,url)
   try: 
     output = check_output(cmd, shell=True, stderr=STDOUT, timeout=timeout)
     output=output.decode("utf-8")
