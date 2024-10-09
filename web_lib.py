@@ -306,7 +306,7 @@ class DOM:
   def get_repl_pairs(self,cur_repl_dict0,except_ids=[],id_suffix=None):
     repl_pairs=[]
     for key0,val0 in cur_repl_dict0.items():
-      if val0==None: continue
+      if val0==None: new_content0,new_attrs0=val0,{} # 8 October 2024 - allow None value as an input to repl dict
       if type(val0) is str: new_content0,new_attrs0=val0,{}
       else: new_content0,new_attrs0=val0 #replacement dict has the values as tuples of new content and new attrs
       
