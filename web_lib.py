@@ -3,6 +3,9 @@ import requests, re, sys, time, json
 import string
 from urllib.parse import urljoin, urlsplit
 from urllib.parse import unquote
+import urllib.parse
+
+#import urllib.parse
 
 sys.path.append("code_utils")
 import general
@@ -587,7 +590,11 @@ def reverse_url(full_url): #make site.abc.gov.au > au.gov.abc.site to sort by th
   return r_url.strip("/")
 
 def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
-  full0=root0.strip("/")+"/"+rel0.strip("/")
+  # root0=root0.strip("/")
+  # root_split0=root0.split("/")[:-1]
+  # root0="/".join()
+  # full0=root0.strip("/")+"/"+rel0.strip("/")
+  full0=urllib.parse.urljoin(root0,rel0.strip("/"))
   return full0
 
 
