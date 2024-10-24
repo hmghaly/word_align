@@ -66,16 +66,17 @@ def match_elem(tag_key,tag_val):
     query0={tag_key: { "$elemMatch": { "$eq": tag_val } }}
     return query0
 
-def mongo_aggregate(tag_key,match_query={},unwind=True):
+def mongo_aggregate(tag_key,match_query={},unwind=True,include_first=False):
     agg_query=[]
     if match_query!={}: agg_query=[{ "$match": match_query}]
     if unwind: agg_query.append({ "$unwind": "$%s"%tag_key })
-    agg_query.append({ "$group": { "_id": "$%s"%tag_key, "count": { "$sum": 1 } }})
+    if include_first: agg_query.append({ "$group": { "_id": "$%s"%tag_key, "count": { "$sum": 1 }, "first": { "$first": "$$ROOT" } }})
+    else: agg_query.append({ "$group": { "_id": "$%s"%tag_key, "count": { "$sum": 1 } }})
     agg_query.append({ "$sort": { "count": -1 } })
     return agg_query
 
-def q_aggr(collection,tag_key,match_query={},unwind=True):
-  cur_agg_query0=mongo_aggregate(tag_key=tag_key,match_query=match_query,unwind=unwind)
+def q_aggr(collection,tag_key,match_query={},unwind=True,include_first=False):
+  cur_agg_query0=mongo_aggregate(tag_key=tag_key,match_query=match_query,unwind=unwind,include_first=include_first)
   cursor=collection.aggregate(cur_agg_query0)
   aggr_items=list(cursor)
   return aggr_items
