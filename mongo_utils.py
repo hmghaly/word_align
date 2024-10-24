@@ -66,16 +66,16 @@ def match_elem(tag_key,tag_val):
     query0={tag_key: { "$elemMatch": { "$eq": tag_val } }}
     return query0
 
-def mongo_aggregate(tag_key,match_query={}):
+def mongo_aggregate(tag_key,match_query={},unwind=True):
     agg_query=[]
     if match_query!={}: agg_query=[{ "$match": match_query}]
-    agg_query.append({ "$unwind": "$%s"%tag_key })
+    if unwind: agg_query.append({ "$unwind": "$%s"%tag_key })
     agg_query.append({ "$group": { "_id": "$%s"%tag_key, "count": { "$sum": 1 } }})
     agg_query.append({ "$sort": { "count": -1 } })
     return agg_query
 
-def q_aggr(collection,tag_key,match_query={}):
-  cur_agg_query0=mongo_aggregate(tag_key=tag_key,match_query=match_query)
+def q_aggr(collection,tag_key,match_query={},unwind=True):
+  cur_agg_query0=mongo_aggregate(tag_key=tag_key,match_query=match_query,unwind=unwind)
   cursor=collection.aggregate(cur_agg_query0)
   aggr_items=list(cursor)
   return aggr_items
