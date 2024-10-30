@@ -606,7 +606,8 @@ def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this i
 
 #sentence tokenization
 #multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."," v."," vs."," v.s.", " et al."," etc.", " al."]
-def ssplit(txt):
+#October 2024
+def ssplit(txt,split_at_semicolon=True):
     #dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
     for dw in dot_words:
         txt=txt.replace(dw+".",dw+"._")
@@ -617,14 +618,18 @@ def ssplit(txt):
     txt=re.sub(r"\b([A-Z])\. ([A-Z])",r"\1._ \2",txt) #James P. Sullivan
 
     #txt=re.sub("(?u)([\.\?\!\;\u061b])\s",r"\1\n",txt)
-    txt=re.sub("(?u)([\.\?\!\;])\s",r"\1\n",txt)
+    if split_at_semicolon: 
+      txt=re.sub("(?u)([\.\?\!\;])\s",r"\1\n",txt)
+      txt=txt.replace("؛","؛\n")
+    else: txt=re.sub("(?u)([\.\?\!])\s",r"\1\n",txt)
     txt=txt.replace("\xd8\x9b ","\xd8\x9b\n")
     txt=txt.replace("\xd8\x9f ","\xd8\x9f\n")
     txt=txt.replace("\u200f"," ") #NEW - Oct 2024
-    
+    #Need to handle dots/exclamations/question marks before quotations 
+
     txt=txt.replace("\r","\n")
     txt=txt.replace("\t","\n")
-    txt=txt.replace("؛","؛\n")
+    
     txt=txt.replace("؟","؟\n")
     
     txt=txt.replace("._",".")
@@ -633,7 +638,7 @@ def ssplit(txt):
         txt=txt.replace(mdw_no_dots,mdw)
 
     cur_sents=[v.strip() for v in txt.split("\n")]
-    cur_sents=[v for v in cur_sents if v]
+    cur_sents=[re.sub("\s+"," ",v) for v in cur_sents if v]
     return cur_sents
 
 
