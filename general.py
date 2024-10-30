@@ -620,6 +620,8 @@ def ssplit(txt):
     txt=re.sub("(?u)([\.\?\!\;])\s",r"\1\n",txt)
     txt=txt.replace("\xd8\x9b ","\xd8\x9b\n")
     txt=txt.replace("\xd8\x9f ","\xd8\x9f\n")
+    txt=txt.replace("\u200f "," ") #NEW - Oct 2024
+    
     txt=txt.replace("\r","\n")
     txt=txt.replace("\t","\n")
     txt=txt.replace("؛","؛\n")
