@@ -616,6 +616,7 @@ def ssplit(txt,split_at_semicolon=True):
         mdw_no_dots=mdw.replace(".","_")      
         txt=txt.replace(mdw,mdw_no_dots)
     txt=re.sub(r"\b([A-Z])\. ([A-Z])",r"\1._ \2",txt) #James P. Sullivan
+    txt=txt.replace("\u200f"," ") #NEW - Oct 2024
 
     #txt=re.sub("(?u)([\.\?\!\;\u061b])\s",r"\1\n",txt)
     if split_at_semicolon: 
@@ -624,7 +625,7 @@ def ssplit(txt,split_at_semicolon=True):
     else: txt=re.sub("(?u)([\.\?\!])\s",r"\1\n",txt)
     txt=txt.replace("\xd8\x9b ","\xd8\x9b\n")
     txt=txt.replace("\xd8\x9f ","\xd8\x9f\n")
-    txt=txt.replace("\u200f"," ") #NEW - Oct 2024
+
     #Need to handle dots/exclamations/question marks before quotations 
 
     txt=txt.replace("\r","\n")
