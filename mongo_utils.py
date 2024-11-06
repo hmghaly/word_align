@@ -3,7 +3,7 @@ import pymongo
 import os, json, time
 from itertools import groupby
 
-def mongo_find(query,collection,sort_key=None, page_i=1,n_limit=10,descending=True):
+def mongo_find(query,collection,sort_key=None, page_i=1,n_limit=10,descending=True,sort_criteria=None):
     t0=time.time()
     if page_i<1: page_i=1
 
@@ -18,8 +18,14 @@ def mongo_find(query,collection,sort_key=None, page_i=1,n_limit=10,descending=Tr
     sort_flag=-1
     if not descending: sort_flag=1
     
-    if sort_key==None: cursor = collection.find(query, limit=n_limit).skip(skip_val) #enter the query
+    # if sort_key==None: cursor = collection.find(query, limit=n_limit).skip(skip_val) #enter the query
+    # else: cursor = collection.find(query, sort={sort_key:sort_flag}, limit=n_limit).skip(skip_val) #enter the query
+
+
+    if sort_key==None and sort_criteria==None: cursor = collection.find(query, limit=n_limit).skip(skip_val) #enter the query
+    elif sort_criteria!=None: cursor = collection.find(query, sort=sort_criteria, limit=n_limit).skip(skip_val)
     else: cursor = collection.find(query, sort={sort_key:sort_flag}, limit=n_limit).skip(skip_val) #enter the query
+
         
     res_list=list(cursor)
     t1=time.time()
