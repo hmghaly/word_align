@@ -33,6 +33,19 @@ def now_tuple(utc=True):
   return (now.year, now.month, now.day, now.hour, now.minute, now.second)
 
 
+def date2seconds(day, month, year,end_of_day=False):
+    """Converts a date (day, month, year) to seconds since the epoch."""
+
+    dt = datetime.datetime(year, month, day)
+    timestamp = dt.timestamp()
+    seconds0 = float(timestamp)
+    if end_of_day: seconds0+=24*60*60-1
+    return seconds0
+
+def seconds2date(seconds):
+  return datetime.datetime.fromtimestamp(seconds)
+
+
 
 def gen_id(size=6): #generate a random id of specific size
   return ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
