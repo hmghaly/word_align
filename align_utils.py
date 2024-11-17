@@ -2169,6 +2169,133 @@ def norm_sent_size(sent_size0,step=10,max_size=400):
   norm_val=step*round(sent_size0/step)
   return norm_val
 
+#17 Nov 2024
+class sent_align:
+  def __init__(self,src_sent_list, trg_sent_list,params={}):
+    self.src_sent_list=src_sent_list
+    self.trg_sent_list=trg_sent_list
+    self.params=params
+
+    self.default_len_ratio=params.get("default_len_ratio",1) #default length ratio between different language pairs
+    src_tokenize=params.get("src_tok_function",general.tok)
+    trg_tokenize=params.get("trg_tok_function",general.tok)
+    self.src_tok_seg_map,self.trg_tok_seg_map=[],[]
+    self.src_all_toks,self.trg_all_toks=[],[]
+    self.src_fwd_index,self.trg_fwd_index=[],[]
+    src_tok_counter,trg_tok_counter=0,0
+    for i0,src_seg0 in enumerate(src_sent_list):
+      cur_toks=src_tokenize(src_seg0)
+      cur_tok_ids=[i0]*len(cur_toks)
+      self.src_all_toks.extend(cur_toks)
+      self.src_tok_seg_map.extend(cur_tok_ids)
+      for s_tok0 in cur_toks:
+        s_tok0=s_tok0.lower().strip("_")
+        self.src_fwd_index.append((s_tok0,src_tok_counter))
+        src_tok_counter+=1
+
+    for j0,trg_seg0 in enumerate(trg_sent_list):
+      cur_toks=trg_tokenize(trg_seg0)
+      cur_tok_ids=[j0]*len(cur_toks)
+      self.trg_all_toks.extend(cur_toks)
+      self.trg_tok_seg_map.extend(cur_tok_ids)
+      for t_tok0 in cur_toks:
+        t_tok0=t_tok0.lower().strip("_")
+        self.trg_fwd_index.append((t_tok0,trg_tok_counter))
+        trg_tok_counter+=1
+    
+    self.src_inv_index=dict(iter([(key,[v[1] for v in list(group)]) for key,group in groupby(sorted(self.src_fwd_index,key=lambda x:x[0]),lambda x:x[0])]))
+    self.trg_inv_index=dict(iter([(key,[v[1] for v in list(group)]) for key,group in groupby(sorted(self.trg_fwd_index,key=lambda x:x[0]),lambda x:x[0])]))
+
+    self.seg_tok_matching_dict={}
+
+    for s_tok0,s_tok_indexes0 in self.src_inv_index.items():
+      corr_t_indexes0=self.trg_inv_index.get(s_tok0,[])
+      if not corr_t_indexes0: continue
+      src_seg_ids=[self.src_tok_seg_map[v] for v in s_tok_indexes0]
+      trg_seg_ids=[self.trg_tok_seg_map[v] for v in corr_t_indexes0]
+      print(s_tok0,src_seg_ids,trg_seg_ids)
+      for a0 in src_seg_ids:
+        for b0 in trg_seg_ids:
+          pt0=(a0,b0)
+          self.seg_tok_matching_dict[pt0]=self.seg_tok_matching_dict.get(pt0,0)+len(s_tok0)
+      #print(src_seg_ids,trg_seg_ids)
+
+    self.src_len_list=[len(v) for v in src_sent_list]
+    self.trg_len_list=[len(v) for v in trg_sent_list]
+    self.n,self.m=len(src_sent_list), len(trg_sent_list)
+    self.dp= np.full((self.n, self.m), float(0))
+
+    self.path_dict={}
+    self.span_dict={}
+    self.wt_dict={}
+    for i in range(self.n):
+      for j in range(self.m):
+        cur_val=self.dp[i][j]
+        next_pt_list=[(i+1,j+1),(i+1,j+2),(i+2,j+1),(i+1,j),(i,j+1)]
+        for next_pt in next_pt_list:
+          next_i,next_j=next_pt
+          next_i,next_j=min(next_i,len(self.src_len_list)),min(next_j,len(self.trg_len_list))
+          src_span0,trg_span0=tuple(range(i,next_i)),tuple(range(j,next_j))
+          wt0=self.cost_fn(src_span0,trg_span0)
+          if next_i<self.n and next_j<self.m:
+            next_val=self.dp[next_i][next_j]
+            if cur_val+wt0> next_val:
+              #print("updating value",next_pt,"OLD:",next_val,"NEW:",cur_val+wt0)
+              self.dp[next_i][next_j]=cur_val+wt0
+          next_pt_wt=self.wt_dict.get(next_pt,0)
+          if cur_val+wt0> next_pt_wt:
+            self.wt_dict[next_pt]=cur_val+wt0
+            #next_span_pair=(tuple([next_i]),tuple([next_j]))
+            self.path_dict[next_pt]=(src_span0,trg_span0)
+        #print("-------")
+
+    #for d0 in self.dp: print(d0)
+
+    self.alignments=[]
+    cur_pt=(self.n,self.m)
+    next_span_pair=self.path_dict.get(cur_pt)
+    while next_span_pair!=None:
+      self.alignments.append(next_span_pair)
+      x_offset,y_offset=len(next_span_pair[0]),len(next_span_pair[1])
+      cur_pt=(cur_pt[0]-x_offset,cur_pt[1]-y_offset)
+      next_span_pair=self.path_dict.get(cur_pt)
+
+    self.alignments.reverse()
+    self.aligned_pairs=[]
+    self.text_pairs=[]
+    for src_span0,trg_span0 in self.alignments:
+      src_combined=[self.src_sent_list[v] for v in src_span0]
+      trg_combined=[self.trg_sent_list[v] for v in trg_span0]
+      src_text0=" ".join(src_combined)
+      trg_text0=" ".join(trg_combined)
+      local_align_dict={"src":{"text":src_text0,"ids":src_span0},"trg":{"text": trg_text0,"ids":trg_span0}}
+      self.aligned_pairs.append(local_align_dict)
+      self.text_pairs.append((src_text0,trg_text0))
+
+  def cost_fn(self,src_span,trg_span):
+    min_cost=self.params.get("min_cost",0.01)
+    combined_src_len=sum([self.src_len_list[v] for v in src_span])
+    combined_trg_len=sum([self.trg_len_list[v] for v in trg_span])
+
+    #aligning with matching characters
+    size_matching_chars=0
+    for a0 in src_span:
+      for b0 in trg_span:
+        size_matching_chars+=self.seg_tok_matching_dict.get((a0,b0),0)
+
+    combined_src_len=self.default_len_ratio*combined_src_len #adjust src len based on default length ratio
+
+    avg_src_trg_len=(combined_src_len+combined_trg_len)/2
+    len_add=combined_src_len+combined_trg_len
+    len_diff=abs(combined_src_len-combined_trg_len)
+    len_cost=1-(len_diff/len_add)
+
+    matching_chars_wt=size_matching_chars/avg_src_trg_len
+    len_cost+=matching_chars_wt
+    if len_cost<min_cost: len_cost=min_cost
+    return len_cost#+avg_src_trg_len
+
+
 
 if __name__=="__main__":
   index_dir="indexes/un/exp3"
