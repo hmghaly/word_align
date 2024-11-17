@@ -2209,12 +2209,12 @@ class sent_align:
 
     self.seg_tok_matching_dict={}
 
-    for s_tok0,s_tok_indexes0 in self.src_inv_index.items():
+    for s_tok0,s_tok_indexes0 in self.src_inv_index.items(): #TODO matching dictionary tokens #TODO matching tags
       corr_t_indexes0=self.trg_inv_index.get(s_tok0,[])
       if not corr_t_indexes0: continue
       src_seg_ids=[self.src_tok_seg_map[v] for v in s_tok_indexes0]
       trg_seg_ids=[self.trg_tok_seg_map[v] for v in corr_t_indexes0]
-      print(s_tok0,src_seg_ids,trg_seg_ids)
+      #print(s_tok0,src_seg_ids,trg_seg_ids)
       for a0 in src_seg_ids:
         for b0 in trg_seg_ids:
           pt0=(a0,b0)
@@ -2232,7 +2232,7 @@ class sent_align:
     for i in range(self.n):
       for j in range(self.m):
         cur_val=self.dp[i][j]
-        next_pt_list=[(i+1,j+1),(i+1,j+2),(i+2,j+1),(i+1,j),(i,j+1)]
+        next_pt_list=[(i+1,j+1),(i+1,j+2),(i+2,j+1),(i+1,j),(i,j+1)] #TODO check further 1-many
         for next_pt in next_pt_list:
           next_i,next_j=next_pt
           next_i,next_j=min(next_i,len(self.src_len_list)),min(next_j,len(self.trg_len_list))
