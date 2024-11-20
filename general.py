@@ -1388,6 +1388,33 @@ def read_zip_lines(zip_fpath0,zipped_file_name0): #iterate line by line of a tar
   archive0.close()
   return 
 
+#20 Nov 2024
+def iter_zip(zip_fpath,zipped_fname=None,from_loc=0,to_loc=None, decode=True, yield_loc=True):
+  archive0 = zipfile.ZipFile(zip_fpath, 'r')
+  zfiles=archive0.filelist
+  for zf in zfiles:
+    z_fname=zf.filename
+    if zipped_fname!=None and zipped_fname!=z_fname: continue
+    z_size=zf.file_size
+    if to_loc==None: to_loc=z_size
+    z_fopen0 = archive0.open(z_fname)
+    z_fopen0.seek(from_loc)
+    line0="-"
+    loc0=z_fopen0.tell()
+    while line0 and loc0<=to_loc:
+      temp_loc=loc0
+      line0=z_fopen0.readline()
+      loc0=z_fopen0.tell()
+      if line0: 
+        out=line0
+        if decode: 
+          try: out=out.decode("utf-8")
+          except: pass
+        if yield_loc: yield temp_loc,out
+        else: yield out
+  archive0.close()
+  return 
+
 # def iter_zipfile(zip_file_obj,zipped_file_name0=None):
 #   pass
 
