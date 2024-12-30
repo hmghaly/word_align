@@ -805,7 +805,7 @@ def tsv_bitext2list(tsv_fpath):
 #30 December 2024
 def split_bitext_str(bitext_content,exclude_single=True):
   #eLuna or tabular bitext string
-  split=content.split("\n")
+  split=bitext_content.split("\n")
   all_pairs=[]
   has_para_numbers=False
   for i0,a in enumerate(split):
