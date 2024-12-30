@@ -802,6 +802,28 @@ def tsv_bitext2list(tsv_fpath):
     items.append([src,trg])
   return items
 
+#30 December 2024
+def split_bitext_str(bitext_content,exclude_single=True):
+  #eLuna or tabular bitext string
+  split=content.split("\n")
+  all_pairs=[]
+  has_para_numbers=False
+  for i0,a in enumerate(split):
+    a_split=a.split("\t")
+    valid_split=[v for v in a_split if v]
+    if len(valid_split)<1: continue
+    if exclude_single and len(valid_split)==1: continue
+    if a_split[0].isdigit(): #first cell is number 
+      if len(valid_split)>2: #if we have more than two cells (eLuna)
+        has_para_numbers=True
+        if len(all_pairs)>0: all_pairs.append(["<br>","<br>"])
+        a_split=a_split[1:]
+      elif len(valid_split)==2 and valid_split[0]!=valid_split[1] and has_para_numbers: #first cell is number and 2nd isn't, and 
+        all_pairs.append(["<br>","<br>"])
+    all_pairs.append(a_split[:2])  
+  return all_pairs
+
+
 ###################### ARABIC - CLEANING ####################
 stop_words=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', 'couldn', 'didn', 'doesn', 'hadn', 'hasn', 'haven', 'isn', 'ma', 'mightn', 'mustn', 'needn', 'shan', 'shouldn', 'wasn', 'weren', 'won', 'wouldn',"would"]
 alef_lam=u'\u0627\u0644'
