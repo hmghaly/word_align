@@ -620,8 +620,9 @@ def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this i
 #sentence tokenization
 #multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","O.K."," v."," vs."," v.s.", " et al."," etc.", " al."]
 #October 2024
-def ssplit(txt,split_at_semicolon=True):
+def ssplit(txt,split_at_semicolon=True,add_br=False):
     #dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add","para","Para","Paras","paras"]
+    if add_br: txt=txt.replace("\n","\n<br>\n")
     for dw in dot_words:
         txt=txt.replace(dw+".",dw+"._")
     for mdw in multi_dot_words:
