@@ -654,6 +654,13 @@ def ssplit(txt,split_at_semicolon=True,add_br=False):
 
     cur_sents=[v.strip() for v in txt.split("\n")]
     cur_sents=[re.sub("\s+"," ",v) for v in cur_sents if v]
+    new_sents=[]
+    for sent0 in cur_sents:
+      if sent0=="<br>" and new_sents==[]: continue #avoid line break in the beginning
+      elif sent0=="<br>" and new_sents[-1]=="<br>": continue #avoid multiple successive line breaks
+      new_sents.append(sent0)
+    cur_sents=new_sents
+
     return cur_sents
 
 
