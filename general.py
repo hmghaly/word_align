@@ -132,27 +132,51 @@ def interval_split(list1,n_intervals): #gets the boundaries between segments whe
   boundary_elements=sorted(list(set(boundary_elements)))
   return boundary_elements
 
-def list_in_list(small,large,skip_punc=True): #retieves the spans of indexes where a small list exists in a big list
-    mapping_dict=dict(iter([(i0,i0) for i0 in range(len(large))]))
-    if skip_punc:
-        small=[v for v in small if not is_punct(v)]
-        if small==[]: return []
-        large_toks_indexes=[(i,v) for i,v in enumerate(large) if not is_punct(v)]
-        large=[v[1] for v in large_toks_indexes]
-        large_indexes=[v[0] for v in large_toks_indexes]
-        mapping_dict=dict(iter(enumerate(large_indexes)))
+#26 Jan 2025
+single_pre_forms=["ب", "و","ف","ل","ك","ول","فل","وب","فب"]
+ll_forms=["لل","ولل","فلل"]
 
-    first=small[0]
-    ranges=[]
-    for idx, item in enumerate(large):
-        if large[idx:idx+len(small)]==small:
-            range0,range1=idx,idx+len(small)-1
-            #range0,range1=idx,idx+len(small)
-            range0,range1=mapping_dict[range0],mapping_dict[range1]
-            ranges.append((range0,range1))
+#match an Arabic word with another form of it with different prefixes
+def match_ar_words(ref_word,text_word):
+  for p0 in single_pre_forms: 
+    if p0+ref_word==text_word: return True
+  for ll0 in ll_forms: 
+    if not text_word.startswith(ll0): continue
+    if "ال"+text_word[len(ll0):]==ref_word: return True #print(ll0,"Match")
+  return False
 
-            #ranges.append((idx,idx+len(small)-1))
-    return ranges
+
+
+#26 Jan 2025 - to also include matching Arabic words with different prefixes
+def list_in_list(small,large,skip_punc=True,match_ar=True): #retieves the spans of indexes where a small list exists in a big list
+  mapping_dict=dict(iter([(i0,i0) for i0 in range(len(large))]))
+  if skip_punc:
+    small=[v for v in small if not is_punct(v)]
+    if small==[]: return []
+    large_toks_indexes=[(i,v) for i,v in enumerate(large) if not is_punct(v)]
+    large=[v[1] for v in large_toks_indexes]
+    large_indexes=[v[0] for v in large_toks_indexes]
+    mapping_dict=dict(iter(enumerate(large_indexes))) #map indexes of the sentence with punct to the one without
+
+  first=small[0]
+  ranges=[]
+  fwd_large=[(v,i) for i,v in enumerate(large)]
+  fwd_large.sort()
+  grouped_larged=[(key,[v[1] for v in group]) for key,group in groupby(fwd_large,lambda x:x[0])]
+  for lg_word0, lg_word_indexes in grouped_larged:
+    matched=False
+    if lg_word0==first: matched=True
+    if match_ar and match_ar_words(first,lg_word0): matched=True
+    if not matched: continue
+
+    for idx in lg_word_indexes:
+      if large[idx+1:idx+1+len(small[1:])]==small[1:]:
+        range0,range1=idx,idx+len(small)-1
+        range0,range1=mapping_dict[range0],mapping_dict[range1]
+        ranges.append((range0,range1))
+
+  return ranges
+
 def is_in(small,large,skip_punc=False): 
     return list_in_list(small,large,skip_punc=skip_punc)
 
