@@ -20,9 +20,9 @@ def qa_list_inv(qa_2d_list): #invert a list of src/trg items to match them for Q
   trg_list=[]
   for src_item_raw0,trg_item_raw0 in qa_2d_list:
     for src_item0 in src_item_raw0.strip().split("|"):
-      src_item_toks0=tok(src_item0)
+      src_item_toks0=general.tok(src_item0)
       for trg_item0 in trg_item_raw0.strip().split("|"):
-        trg_item_toks0=tok(trg_item0)
+        trg_item_toks0=general.tok(trg_item0)
         if not trg_item_toks0 in trg_list:trg_list.append(trg_item_toks0)
         first_src0=src_item_toks0[0]
         first_trg0=trg_item_toks0[0]
