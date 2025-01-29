@@ -1,3 +1,41 @@
+import time, json, shelve, os, re, sys, itertools
+from itertools import groupby
+from math import log
+import random
+import numpy as np
+
+try: import torch
+except: pass
+
+
+#from general import * 
+sys.path.append("code_utils")
+import general
+import arabic_lib
+
+
+#29 Jan 24
+def qa_list_inv(qa_2d_list): #invert a list of src/trg items to match them for QA 
+  src_fwd,trg_fwd=[],[]  
+  trg_list=[]
+  for src_item_raw0,trg_item_raw0 in qa_2d_list:
+    for src_item0 in src_item_raw0.strip().split("|"):
+      src_item_toks0=tok(src_item0)
+      for trg_item0 in trg_item_raw0.strip().split("|"):
+        trg_item_toks0=tok(trg_item0)
+        if not trg_item_toks0 in trg_list:trg_list.append(trg_item_toks0)
+        first_src0=src_item_toks0[0]
+        first_trg0=trg_item_toks0[0]
+        src_fwd.append((first_src0,src_item_toks0,trg_item_toks0))
+        trg_fwd.append((first_trg0,trg_item_toks0,src_item_toks0))
+  src_fwd.sort()
+  src_grouped0=[(key,[v[1:] for v in list(group)]) for key,group in groupby(src_fwd,lambda x:x[0])]
+  src_inv_dict=dict(iter(src_grouped0))
+
+  trg_fwd.sort()
+  trg_grouped0=[(key,[v[1:] for v in list(group)]) for key,group in groupby(trg_fwd,lambda x:x[0])]
+  trg_inv_dict=dict(iter(trg_grouped0))
+  return src_inv_dict,trg_inv_dict
 
 #=================== QA functions ==============
 #15 Jan 23
