@@ -133,8 +133,16 @@ def interval_split(list1,n_intervals): #gets the boundaries between segments whe
   return boundary_elements
 
 #26 Jan 2025
-single_pre_forms=["ب", "و","ف","ل","ك","ول","فل","وب","فب"]
+single_pre_forms=["ب", "و","ف","ل","ك","ول","فل","وب","فب","وك","فك"]
 ll_forms=["لل","ولل","فلل"]
+
+def get_multi_pre_candidates(ar_word):
+  candidates=[ar_word]
+  if ar_word[0] in ["ب", "و","ف","ل","ك"]: candidates.append(ar_word[1:])
+  if ar_word[:2] in ["ول","فل","وب","فب","وك","فك"]: candidates.append(ar_word[2:])
+  if ar_word[:2] in ["لل"]: candidates.append("ال"+ar_word[2:])
+  if ar_word[:3] in ["لل","ولل","فلل"]: candidates.append("ال"+ar_word[3:])
+  return candidates
 
 #match an Arabic word with another form of it with different prefixes
 def match_ar_words(ref_word,text_word):
