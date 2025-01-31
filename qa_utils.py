@@ -41,11 +41,11 @@ def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict):
   src_grouped_pairs0=[(key,[v[1] for v in list(group)]) for key,group in groupby(src_found_pairs,lambda x:x[0])]
 
   for src_phrase0,trg_phrase_list0 in src_grouped_pairs0:
-    src_locs0=is_in(src_phrase0,src_toks)
+    src_locs0=general.is_in(src_phrase0,src_toks)
     if not src_locs0: continue
     trg_locs=[]
     for trg_phrase0 in trg_phrase_list0:
-      temp_loc0=is_in(trg_phrase0,trg_toks)
+      temp_loc0=general.is_in(trg_phrase0,trg_toks)
       trg_locs.extend(temp_loc0)
     cur_match_item={"src_locs":src_locs0,"trg_locs":trg_locs,"src_phrase": src_phrase0,"trg_phrase":[], "expected":trg_phrase_list0}
     all_match_items.append(cur_match_item) #when matching src items, we keep trg_phrase []
@@ -54,11 +54,11 @@ def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict):
   trg_grouped_pairs0=[(key,[v[1] for v in list(group)]) for key,group in groupby(trg_found_pairs,lambda x:x[0])]
 
   for trg_phrase0,src_phrase_list0 in trg_grouped_pairs0:
-    trg_locs0=is_in(trg_phrase0,trg_toks)
+    trg_locs0=general.is_in(trg_phrase0,trg_toks)
     if not trg_locs0: continue
     src_locs=[]
     for src_phrase0 in src_phrase_list0:
-      temp_loc0=is_in(src_phrase0,src_toks)
+      temp_loc0=general.is_in(src_phrase0,src_toks)
       src_locs.extend(temp_loc0)
     cur_match_item={"src_locs":src_locs,"trg_locs":trg_locs0,"src_phrase": [],"trg_phrase":trg_phrase0, "expected":src_phrase_list0}
     all_match_items.append(cur_match_item) #when matching trg items, we keep src_phrase []
