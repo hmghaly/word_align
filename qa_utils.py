@@ -14,7 +14,65 @@ import general
 import arabic_lib
 
 
-#29 Jan 24
+#30 Jan 2025
+#match a list of pairs of src/trg items - apply to a pair of tokenized sentences
+#if we need to match only src items, keep trg_inv_dict={}, and vice versa
+def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict):
+  all_match_items=[]
+  src_found_pairs=[]
+  trg_found_pairs=[]
+  for et0 in list(set(src_toks)):
+    if src_inv_dict=={}: break
+    cur_forms0=[et0]
+    if ord(et0[0])>1500: cur_forms0=get_multi_pre_candidates(et0) #to match Arabic words with different prefix forms
+    for form0 in cur_forms0: #print(form0)
+      check0=src_inv_dict.get(form0,[])
+      for ch0 in check0: src_found_pairs.append(ch0)
+
+  for at0 in list(set(trg_toks)):
+    if trg_inv_dict=={}: break
+    cur_forms0=[at0]
+    if ord(at0[0])>1500: cur_forms0=get_multi_pre_candidates(at0)
+    for form0 in cur_forms0: #print(form0)
+      check0=trg_inv_dict.get(form0,[])
+      for ch0 in check0: trg_found_pairs.append(ch0)
+        
+  src_found_pairs.sort()
+  src_grouped_pairs0=[(key,[v[1] for v in list(group)]) for key,group in groupby(src_found_pairs,lambda x:x[0])]
+
+  for src_phrase0,trg_phrase_list0 in src_grouped_pairs0:
+    src_locs0=is_in(src_phrase0,src_toks)
+    if not src_locs0: continue
+    trg_locs=[]
+    for trg_phrase0 in trg_phrase_list0:
+      temp_loc0=is_in(trg_phrase0,trg_toks)
+      trg_locs.extend(temp_loc0)
+    cur_match_item={"src_locs":src_locs0,"trg_locs":trg_locs,"src_phrase": src_phrase0,"trg_phrase":[], "expected":trg_phrase_list0}
+    all_match_items.append(cur_match_item) #when matching src items, we keep trg_phrase []
+
+  trg_found_pairs.sort()
+  trg_grouped_pairs0=[(key,[v[1] for v in list(group)]) for key,group in groupby(trg_found_pairs,lambda x:x[0])]
+
+  for trg_phrase0,src_phrase_list0 in trg_grouped_pairs0:
+    trg_locs0=is_in(trg_phrase0,trg_toks)
+    if not trg_locs0: continue
+    src_locs=[]
+    for src_phrase0 in src_phrase_list0:
+      temp_loc0=is_in(src_phrase0,src_toks)
+      src_locs.extend(temp_loc0)
+    cur_match_item={"src_locs":src_locs,"trg_locs":trg_locs0,"src_phrase": [],"trg_phrase":trg_phrase0, "expected":src_phrase_list0}
+    all_match_items.append(cur_match_item) #when matching trg items, we keep src_phrase []
+  used_loc_pairs=[]
+  new_match_items=[]
+  for am in all_match_items:
+    locs_pair=(am["src_locs"],am["trg_locs"])
+    if locs_pair in used_loc_pairs: continue
+    used_loc_pairs.append(locs_pair)
+    new_match_items.append(am)
+  return new_match_items
+
+
+#29 Jan 2025
 def qa_list_inv(qa_2d_list): #invert a list of src/trg items to match them for QA 
   src_fwd,trg_fwd=[],[]  
   trg_list=[]
