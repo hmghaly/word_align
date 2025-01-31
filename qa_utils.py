@@ -24,7 +24,7 @@ def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict):
   for et0 in list(set(src_toks)):
     if src_inv_dict=={}: break
     cur_forms0=[et0]
-    if ord(et0[0])>1500: cur_forms0=get_multi_pre_candidates(et0) #to match Arabic words with different prefix forms
+    if ord(et0[0])>1500: cur_forms0=general.get_multi_pre_candidates(et0) #to match Arabic words with different prefix forms
     for form0 in cur_forms0: #print(form0)
       check0=src_inv_dict.get(form0,[])
       for ch0 in check0: src_found_pairs.append(ch0)
@@ -32,7 +32,7 @@ def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict):
   for at0 in list(set(trg_toks)):
     if trg_inv_dict=={}: break
     cur_forms0=[at0]
-    if ord(at0[0])>1500: cur_forms0=get_multi_pre_candidates(at0)
+    if ord(at0[0])>1500: cur_forms0=general.get_multi_pre_candidates(at0)
     for form0 in cur_forms0: #print(form0)
       check0=trg_inv_dict.get(form0,[])
       for ch0 in check0: trg_found_pairs.append(ch0)
