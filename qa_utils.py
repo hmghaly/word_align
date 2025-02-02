@@ -108,7 +108,7 @@ def qa_matches2tags(all_matches,src_tokens,trg_tokens,prefix="sent0"):
   #match_item_counter=0
   for match_item_counter,a0 in enumerate(all_matches):
     match_item_name=f"{prefix}_item{match_item_counter}"
-    expected_str=" | ".join([de_tok2str(v) for v in a0["expected"]]) 
+    expected_str=" | ".join([general.de_tok2str(v) for v in a0["expected"]]) 
     qa_type0=a0.get("qa_type","matching")
     src_locs0,trg_locs0=a0["src_locs"],a0["trg_locs"]
     match_type_class="qa_"+qa_type0
@@ -134,7 +134,7 @@ def qa_matches2tags(all_matches,src_tokens,trg_tokens,prefix="sent0"):
 
 
 def qa_detok_apply_tags(cur_tokens,cur_open_tag_dict,cur_close_tag_dict):
-  out_detok_with_space=de_tok_space(cur_tokens)
+  out_detok_with_space=general.de_tok_space(cur_tokens)
 
   full_qa_str=""
   for i0,a in enumerate(out_detok_with_space): 
