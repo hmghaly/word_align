@@ -73,13 +73,15 @@ def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict,qa_type="matching"
 
 
 #29 Jan 2025
-def qa_list_inv(qa_2d_list): #invert a list of src/trg items to match them for QA 
+def qa_list_inv(qa_2d_list,include_self=False): #invert a list of src/trg items to match them for QA 
   src_fwd,trg_fwd=[],[]  
   trg_list=[]
   for src_item_raw0,trg_item_raw0 in qa_2d_list:
     for src_item0 in src_item_raw0.strip().split("|"):
       src_item_toks0=general.tok(src_item0)
-      for trg_item0 in trg_item_raw0.strip().split("|"):
+      trg_split0=trg_item_raw0.strip().split("|")
+      if include_self: trg_split0.append(src_item0)
+      for trg_item0 in trg_split0:
         trg_item_toks0=general.tok(trg_item0)
         if not trg_item_toks0 in trg_list:trg_list.append(trg_item_toks0)
         first_src0=src_item_toks0[0]
