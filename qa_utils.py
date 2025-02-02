@@ -97,6 +97,54 @@ def qa_list_inv(qa_2d_list,include_self=False): #invert a list of src/trg items 
   trg_inv_dict=dict(iter(trg_grouped0))
   return src_inv_dict,trg_inv_dict
 
+
+#2 Feb 2025
+def qa_matches2tags(all_matches,src_tokens,trg_tokens,prefix="sent0"):
+  src_span_tag_open_dict,src_span_tag_close_dict={},{}
+  trg_span_tag_open_dict,trg_span_tag_close_dict={},{}
+  close_tag="</span>"
+  
+  all_matches.sort(key=lambda x:-len(x["src_phrase"])-len(x["trg_phrase"]))
+  #match_item_counter=0
+  for match_item_counter,a0 in enumerate(all_matches):
+    match_item_name=f"{prefix}_item{match_item_counter}"
+    expected_str=" | ".join([de_tok2str(v) for v in a0["expected"]]) 
+    qa_type0=a0.get("qa_type","matching")
+    src_locs0,trg_locs0=a0["src_locs"],a0["trg_locs"]
+    match_type_class="qa_"+qa_type0
+    cur_tag_classes=[match_type_class,match_item_name]
+
+    if qa_type0=="matching":
+      if len(trg_locs0)==len(src_locs0): cur_tag_classes.append("matched")
+      else: cur_tag_classes.append("mismatch")
+    cur_tag_classes_str=" ".join(cur_tag_classes)
+    #match_item_counter+=1
+
+    open_tag=f'<span title="{expected_str}" class="{cur_tag_classes_str}">'
+
+    for sl_i0,sl_i1 in src_locs0: 
+      src_span_tag_open_dict[sl_i0]=src_span_tag_open_dict.get(sl_i0,[])+[open_tag]
+      src_span_tag_close_dict[sl_i1]=src_span_tag_close_dict.get(sl_i1,[])+[close_tag]
+    for tl_i0,tl_i1 in trg_locs0: 
+      trg_span_tag_open_dict[tl_i0]=trg_span_tag_open_dict.get(tl_i0,[])+[open_tag]
+      trg_span_tag_close_dict[tl_i1]=trg_span_tag_close_dict.get(tl_i1,[])+[close_tag]
+  qa_src_str=qa_detok_apply_tags(src_tokens,src_span_tag_open_dict,src_span_tag_close_dict)
+  qa_trg_str=qa_detok_apply_tags(trg_tokens,trg_span_tag_open_dict,trg_span_tag_close_dict)
+  return qa_src_str,qa_trg_str
+
+
+def qa_detok_apply_tags(cur_tokens,cur_open_tag_dict,cur_close_tag_dict):
+  out_detok_with_space=de_tok_space(cur_tokens)
+
+  full_qa_str=""
+  for i0,a in enumerate(out_detok_with_space): 
+    word0,space0=a
+    cur_open_tags=cur_open_tag_dict.get(i0,[])
+    cur_close_tags=cur_close_tag_dict.get(i0,[])
+    cur_chunk="".join(cur_open_tags)+word0+"".join(cur_close_tags)+space0
+    full_qa_str+=cur_chunk
+  return full_qa_str
+
 #=================== QA functions ==============
 #15 Jan 23
 def gen_ul_style(color0="black"):
