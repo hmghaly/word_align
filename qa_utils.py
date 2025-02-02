@@ -17,7 +17,7 @@ import arabic_lib
 #30 Jan 2025
 #match a list of pairs of src/trg items - apply to a pair of tokenized sentences
 #if we need to match only src items, keep trg_inv_dict={}, and vice versa
-def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict):
+def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict,qa_type="matching"):
   all_match_items=[]
   src_found_pairs=[]
   trg_found_pairs=[]
@@ -47,7 +47,7 @@ def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict):
     for trg_phrase0 in trg_phrase_list0:
       temp_loc0=general.is_in(trg_phrase0,trg_toks)
       trg_locs.extend(temp_loc0)
-    cur_match_item={"src_locs":src_locs0,"trg_locs":trg_locs,"src_phrase": src_phrase0,"trg_phrase":[], "expected":trg_phrase_list0}
+    cur_match_item={"src_locs":src_locs0,"trg_locs":trg_locs,"src_phrase": src_phrase0,"trg_phrase":[], "expected":trg_phrase_list0, "qa_type":qa_type}
     all_match_items.append(cur_match_item) #when matching src items, we keep trg_phrase []
 
   trg_found_pairs.sort()
@@ -60,7 +60,7 @@ def qa_match_2way(src_toks,trg_toks,src_inv_dict,trg_inv_dict):
     for src_phrase0 in src_phrase_list0:
       temp_loc0=general.is_in(src_phrase0,src_toks)
       src_locs.extend(temp_loc0)
-    cur_match_item={"src_locs":src_locs,"trg_locs":trg_locs0,"src_phrase": [],"trg_phrase":trg_phrase0, "expected":src_phrase_list0}
+    cur_match_item={"src_locs":src_locs,"trg_locs":trg_locs0,"src_phrase": [],"trg_phrase":trg_phrase0, "expected":src_phrase_list0, "qa_type":qa_type}
     all_match_items.append(cur_match_item) #when matching trg items, we keep src_phrase []
   used_loc_pairs=[]
   new_match_items=[]
