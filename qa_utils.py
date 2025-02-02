@@ -99,12 +99,25 @@ def qa_list_inv(qa_2d_list,include_self=False): #invert a list of src/trg items 
 
 
 #2 Feb 2025
+#takes a list of paramaeter dicts, and applies each set of params to get matching items on src/trg pairs
+def qa_get_matching_list_from_params(matching_params_list,src_toks,trg_toks):
+  all_matches0=[]
+  for param0 in matching_params_list:
+    src_inv_dict0=param0.get("src_inv_dict",{})
+    trg_inv_dict0=param0.get("trg_inv_dict",{})
+    qa_type0=param0.get("qa_type","matching")
+    qa_out0=qa_match_2way(src_toks,trg_toks,src_inv_dict0,trg_inv_dict0,qa_type=qa_type0)
+    all_matches0.extend(qa_out0)
+  return all_matches0
+
+
+#generate qa string for src/trg with spans & classes based on matching items
 def qa_matches2tags(all_matches,src_tokens,trg_tokens,prefix="sent0"):
   src_span_tag_open_dict,src_span_tag_close_dict={},{}
   trg_span_tag_open_dict,trg_span_tag_close_dict={},{}
   close_tag="</span>"
   
-  all_matches.sort(key=lambda x:-len(x["src_phrase"])-len(x["trg_phrase"]))
+  all_matches.sort(key=lambda x:-len(x["src_phrase"])-len(x["trg_phrase"])) #need better sorting
   #match_item_counter=0
   for match_item_counter,a0 in enumerate(all_matches):
     match_item_name=f"{prefix}_item{match_item_counter}"
@@ -133,6 +146,7 @@ def qa_matches2tags(all_matches,src_tokens,trg_tokens,prefix="sent0"):
   return qa_src_str,qa_trg_str
 
 
+#apply spans at open/close dict to tokenized items, generate detokenized text based on tokens, spaces and tags
 def qa_detok_apply_tags(cur_tokens,cur_open_tag_dict,cur_close_tag_dict):
   out_detok_with_space=general.de_tok_space(cur_tokens)
 
