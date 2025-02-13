@@ -541,6 +541,18 @@ def get_char_chunks(word0,max_chunk_size=7,exclude_inside_chunks=False):
   return all_chunks
 
 
+#13 Feb 2025
+def get_char_ngrams(word,min_size=2,max_size=5,padding="#"):
+  all_char_ngrams=[]
+  word=padding+word+padding
+  len_word=len(word)
+  for size0 in range(min_size,max_size+1):
+    for i0 in range(len_word-size0+1):
+      cur_chunk=word[i0:i0+size0]
+      all_char_ngrams.append(cur_chunk)
+  return all_char_ngrams
+
+
 
 #==== for applications such as spell checking or creating word vectors
 def get_neighbor_offsets(word_i,sent_words,max_offset=3):
