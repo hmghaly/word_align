@@ -821,6 +821,45 @@ def process_tsv_content(tsv_content):
   return output0
 
 
+#27 Feb 2025
+#iter over a tsv, with or without headers, with or without grouping
+def iter_tsv(tsv_path,use_headers=True,group_key=None):
+  fopen=open(tsv_path)
+  headers=[]
+  cur_group=[]
+  prev_group_val=None
+  for i0,line0 in enumerate(fopen):
+    line_split0=line0.strip().split("\t")
+    row_dict={}
+    if use_headers:
+      if i0==0: headers=line_split0
+      else: row_dict=dict(iter(zip(headers,line_split0)))
+    else:
+      row_dict=dict(iter(enumerate(line_split0)))
+    if row_dict=={}: continue
+    if group_key!=None:
+
+      cur_group_val=row_dict.get(group_key)
+      if cur_group_val==None:
+        cur_group.append(row_dict)
+        yield cur_group
+        cur_group=[]
+      else:
+        if len(cur_group)==0:
+           cur_group.append(row_dict)
+           prev_group_val=cur_group_val
+        elif cur_group_val==prev_group_val:
+          cur_group.append(row_dict)
+          prev_group_val=cur_group_val
+        else:
+          prev_group_val=cur_group_val
+          yield cur_group
+          cur_group=[row_dict]
+    if group_key==None: yield row_dict
+  fopen.close()
+  return
+
+
 
 def html_bitext2list(bitext_path):
   fopen=open(bitext_path)
