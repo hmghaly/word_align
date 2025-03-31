@@ -44,6 +44,9 @@ def extract_xlsx_items(fpath,selected_sheet_name=None):
     
     wb_info=f.read(wb_info_path) #first get sheet information
     wb_info=wb_info.decode("utf-8")
+    wb_info=general.unescape(wb_info)
+
+
     wb_info=wb_info.replace("<sheet","\n<sheet")
     wb_info=wb_info.replace("</sheets>","\n</sheets>")
     
@@ -63,6 +66,7 @@ def extract_xlsx_items(fpath,selected_sheet_name=None):
 
     shared_str_info=f.read(shared_str_path) #now getting info about shared strings for easy retrieval while parsing rows/cells referencing them
     shared_str_info=shared_str_info.decode("utf-8")
+    shared_str_info=general.unescape(shared_str_info)
 
     shared_str_dict={}
     shared_str_info_split=re.findall('<si.*?>(.+?)</si>',shared_str_info)
@@ -84,6 +88,9 @@ def extract_xlsx_items(fpath,selected_sheet_name=None):
 
       xml_data = f.read(xml_fname)
       xml_data=xml_data.decode("utf-8")
+      xml_data=general.unescape(xml_data)
+
+
       sheet_row_items=re.findall('<row.*?>(.+?)</row>',xml_data)
 
       for it0 in sheet_row_items:
