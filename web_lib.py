@@ -1,6 +1,7 @@
 #a librry for all the utilities we need for scraping data from the web
 import requests, re, sys, time, json
 import string
+import shutil
 from urllib.parse import urljoin, urlsplit
 from urllib.parse import unquote
 import urllib.parse
@@ -16,9 +17,19 @@ import general
 #and also for templating web pages by DOM manipulation
 
 
+#17 April 2025
+def download_file(url, file_path):
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        with open(file_path, 'wb') as file:
+            shutil.copyfileobj(response.raw, file)
+        print(f"Image downloaded successfully and saved as {file_path}")
+    else:
+        print(f"Failed to download image. Status code: {response.status_code}")
 
 
-def download_file(file_url):
+
+def download_file_OLD(file_url):
   with requests.Session() as sess0:
     download = sess0.get(file_url)
     decoded_content0 = download.content.decode('utf-8')
