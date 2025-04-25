@@ -563,7 +563,7 @@ class subword: #create a subword tokenization model based on the token counter d
     self.max_size=params.get("max_size",4)
     self.padding="#"
     self.n_gram_counter={}
-    for a,b in counter_dict:
+    for a,b in counter_dict.items():
       char_ngrams=get_char_ngrams(a,max_size=self.max_size,min_size=self.min_size,padding=self.padding)
       for ng0 in char_ngrams: self.n_gram_counter[ng0]=self.n_gram_counter.get(ng0,0)+b
   def tok(self,word):
