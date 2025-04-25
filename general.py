@@ -568,7 +568,7 @@ class subword: #create a subword tokenization model based on the token counter d
       for ng0 in char_ngrams: self.n_gram_counter[ng0]=self.n_gram_counter.get(ng0,0)+b
   def tok(self,word):
     padded=self.padding+word+self.padding
-    ng_list0=get_char_ngrams(word0,max_size=self.max_size,min_size=self.min_size,padding=self.padding,include_span=True)
+    ng_list0=get_char_ngrams(word,max_size=self.max_size,min_size=self.min_size,padding=self.padding,include_span=True)
     list0=[]
     for ng0,span0 in ng_list0:
       count0=self.n_gram_counter.get(ng0,0)+1
