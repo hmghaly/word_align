@@ -555,6 +555,51 @@ def get_char_ngrams(word,min_size=2,max_size=5,padding="#",include_span=False):
   return all_char_ngrams
 
 
+#==== Subword tokenization
+#25 April 2025
+class subword: #create a subword tokenization model based on the token counter dict and certain parameters
+  def __init__(self,counter_dict,params={}) -> None:
+    self.min_size=params.get("min_size",2)
+    self.max_size=params.get("max_size",4)
+    self.padding="#"
+    self.n_gram_counter={}
+    for a,b in counter_dict:
+      char_ngrams=get_char_ngrams(a,max_size=self.max_size,min_size=self.min_size,padding=self.padding)
+      for ng0 in char_ngrams: self.n_gram_counter[ng0]=self.n_gram_counter.get(ng0,0)+b
+  def tok(self,word):
+    padded=self.padding+word+self.padding
+    ng_list0=get_char_ngrams(word0,max_size=self.max_size,min_size=self.min_size,padding=self.padding,include_span=True)
+    list0=[]
+    for ng0,span0 in ng_list0:
+      count0=self.n_gram_counter.get(ng0,0)+1
+      log_count0=math.log10(count0)
+      log_len0=len(ng0)#*10
+      wt0=log_count0*log_len0 #TODO - maybe experiment with different ways to determine weight
+
+      list0.append((ng0, span0,wt0))    
+    list0.sort(key=lambda x:-x[-1])
+    used_indexes=[]
+    final_list=[]
+    for li0 in list0:
+      ng0, span0,wt0=li0
+      x0,x1=span0
+      cur_indexes=list(range(x0,x1))
+      intersection=list(set(cur_indexes).intersection(set(used_indexes)))
+      if intersection: continue
+      used_indexes.extend(cur_indexes)
+      final_list.append(li0)
+
+    #TODO - improve filling of remaining indexes
+    remaining_indexes=list(set(range(len(padded))).difference(set(used_indexes)))
+    for ri0 in remaining_indexes:
+      span0=(ri0,ri0+1)
+      chunk0=padded[ri0]
+      final_list.append((chunk0,span0,0))
+    final_list.sort(key=lambda x:x[1])
+
+    return [v[0] for v in final_list]
+
+
 
 #==== for applications such as spell checking or creating word vectors
 def get_neighbor_offsets(word_i,sent_words,max_offset=3):
