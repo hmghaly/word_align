@@ -1,4 +1,5 @@
 
+import math, re
 import numpy as np
 
 #this file is for helping with working with subwords, n-grams, character clusters, and so forth
