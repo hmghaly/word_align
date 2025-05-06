@@ -28,6 +28,8 @@ def get_corr_top(src_items,trg_items, pair_corr_dict,fill_all=True):
   final_items=[]
   for pair0,wt0 in corr_items:
     s_0,t_0=pair0
+    if not s_0 in src_items or not t_0 in trg_items: continue
+    
     if s_0 in used_src_items or t_0 in used_trg_items: continue
     used_src_items.append(s_0)
     used_trg_items.append(t_0)
@@ -39,6 +41,8 @@ def get_corr_top(src_items,trg_items, pair_corr_dict,fill_all=True):
   if not fill_all: return final_items
   for pair0,wt0 in corr_items:
     s_0,t_0=pair0
+    if not s_0 in src_items or not t_0 in trg_items: continue
+
     if s_0 in used_src_items and t_0 in used_trg_items: continue
     final_items.append((pair0,wt0))
     if len(final_items)==max_size0: break
