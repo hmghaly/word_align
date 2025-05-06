@@ -13,6 +13,38 @@ sys.path.append("code_utils")
 import general
 import arabic_lib
 
+
+#5 May 2025
+#for pairs of items with their weights, and we want to get the top items without duplication
+#of any src/trg part of each item, or we want to make sure each src/trg element gets the
+#top corresponding one - mainly used for word alignment
+def get_corr_top(src_items,trg_items, pair_corr_dict,fill_all=True):
+  corr_items=sorted(list(pair_corr_dict.items()),key=lambda x:-x[-1])
+  used_src_items,used_trg_items=[],[]
+  min_size0=min(len(src_items),len(trg_items)) #possibly this will not be needed
+  max_size0=max(len(src_items),len(trg_items))
+
+  #first run
+  final_items=[]
+  for pair0,wt0 in corr_items:
+    s_0,t_0=pair0
+    if s_0 in used_src_items or t_0 in used_trg_items: continue
+    used_src_items.append(s_0)
+    used_trg_items.append(t_0)
+    final_items.append((pair0,wt0))
+    if len(final_items)==min_size0: break
+  if len(final_items)==max_size0: return final_items 
+
+  #second run - to make sure all rows/cols (src/trg) items are covered
+  if not fill_all: return final_items
+  for pair0,wt0 in corr_items:
+    s_0,t_0=pair0
+    if s_0 in used_src_items and t_0 in used_trg_items: continue
+    final_items.append((pair0,wt0))
+    if len(final_items)==max_size0: break
+  return final_items
+
+
 def filter_toks(tok_list0,params={}):
   cur_excluded_words=params.get("excluded_words",[])
   keep_all_tokens=params.get("keep_all_tokens",False)
