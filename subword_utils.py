@@ -10,10 +10,16 @@ class subword: #create a subword tokenization model based on the token counter d
   def __init__(self,counter_dict,params={}) -> None:
     self.min_size=params.get("min_size",2)
     self.max_size=params.get("max_size",4)
-    self.min_token_size=params.get("min_token_size",2) #do not split into subwords if a token is equal to or less then this size
+    self.min_count=params.get("min_count",5) #minimum frequency of a char cluster to be included
+    self.max_matrix_dim=params.get("max_matrix_dim",10000)
+    #self.min_token_size=params.get("min_token_size",2) #do not split into subwords if a token is equal to or less then this size
     self.padding="#"
     self.n_gram_counter={}
-    for a,b in counter_dict.items():
+    counter_dict_items=list(counter_dict.items())
+    if self.max_matrix_dim!=None: counter_dict_items=counter_dict_items[:self.max_matrix_dim]
+    counter_dict_items.sort(key=lambda x:-x[-1])
+    for a,b in counter_dict_items:
+      if self.min_count!=None and b<self.min_count: break
       char_ngrams=get_char_ngrams(a,max_size=self.max_size,min_size=self.min_size,padding=self.padding)
       for ng0 in char_ngrams: self.n_gram_counter[ng0]=self.n_gram_counter.get(ng0,0)+b
   def tok(self,word):
