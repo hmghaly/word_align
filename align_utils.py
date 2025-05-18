@@ -197,7 +197,7 @@ def get_sent_matching_matrix(src_tokens,trg_tokens,matching_dict,max_val=1.0):
     cur_matrix_rows=[]
     for s_0 in src_tokens:
       if t_0==s_0: val0=max_val
-      else: val0=matched.get((s_0,t_0),0)
+      else: val0=matching_dict.get((s_0,t_0),0)
       cur_matrix_rows.append(val0)
     corr_matrix_vals.append(cur_matrix_rows)
   return corr_matrix_vals
