@@ -193,9 +193,9 @@ def update_corr_matrix(matrix,row_indexes,col_indexes, inc=0.01):
 #populate corresppondence matrix between src/trg tokens
 def get_sent_matching_matrix(src_tokens,trg_tokens,matching_dict,max_val=1.0):
   corr_matrix_vals=[]
-  for t_0 in trg_toks0:
+  for t_0 in trg_tokens:
     cur_matrix_rows=[]
-    for s_0 in src_toks0:
+    for s_0 in src_tokens:
       if t_0==s_0: val0=max_val
       else: val0=matched.get((s_0,t_0),0)
       cur_matrix_rows.append(val0)
