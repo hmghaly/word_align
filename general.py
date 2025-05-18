@@ -360,7 +360,7 @@ def get_key(txt): #normalize text by replacing non alpha items with _
 
 
 ####################### TOKENIZATION ####################
-#Word tokenization and sentence tokenization
+#Word tokenization and sentence tokenization - also subword tokenization
 
 multi_dot_words_lower=["e.g.","i.e.","u.s.a.","u.k.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
 multi_dot_words=["e.g.","i.e.","U.S.A.","U.K.","o.k."," v."," vs."," v.s.", " et al."," etc.", " al."]
@@ -518,6 +518,29 @@ def remove_padding(token_list): #remove sentence start/end marker to a list of t
   return token_list
 
 
+
+#13 Feb 2025
+#split a string into lists of n-grams, optionally with spans
+def get_char_ngrams(word,min_size=2,max_size=5,padding="#",include_span=False):
+  all_char_ngrams=[]
+  word=padding+word+padding
+  len_word=len(word)
+  for size0 in range(min_size,max_size+1):
+    for i0 in range(len_word-size0+1):
+      cur_chunk=word[i0:i0+size0]
+      
+      if include_span: all_char_ngrams.append((cur_chunk,(i0,i0+size0)))
+      else: all_char_ngrams.append(cur_chunk)
+  return all_char_ngrams
+
+
+
+
+
+
+
+
+#================== MISC ==============
 
 def create_one_hot_vec(hot_i,vec_size):
   zeros=[0.]*vec_size

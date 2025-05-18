@@ -115,7 +115,7 @@ class sw_matrix:
   def normalize(self):
     self.correspondence_array=normalize_array(self.correspondence_array)
 
-#3 May 2025
+#3 May 2025 - OLD - move to word align
 #apply increments to rows and columns of a matrix according to row/cols indexes - increment for correspondence coordinates
 #and decrement otherwise for rows/cols indexes
 def update_corr_matrix(matrix,row_indexes,col_indexes, inc=0.01):
@@ -145,7 +145,7 @@ def update_corr_matrix(matrix,row_indexes,col_indexes, inc=0.01):
 
 
 #13 Feb 2025
-#split a string into lists of n-grams, optionally with spans
+#split a string into lists of n-grams, optionally with spans - OLD - moving to general
 def get_char_ngrams(word,min_size=2,max_size=5,padding="#",include_span=False):
   all_char_ngrams=[]
   word=padding+word+padding

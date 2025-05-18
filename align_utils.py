@@ -14,6 +14,236 @@ import general
 import arabic_lib
 
 
+#============================== Word/chunk/subword align paradigm ===================
+
+#2025 - Word Alignment through matching chunks/n-grams/subwords
+#create and update correspondence/matching matrix between chunks
+class chunk_align_matrix:
+  def __init__(self,src_counter,trg_counter,params={}) -> None:
+    self.src_counter=src_counter
+    self.trg_counter=trg_counter
+    self.max_dim_size=params.get("max_dim_size",10000)
+    self.min_chunk_count=params.get("min_chunk_count",5)
+    self.min_chunk_size=params.get("min_size",2)
+    self.max_chunk_size=params.get("max_size",4)
+    self.padding=params.get("padding","#")
+    self.src_chunk_counter,self.trg_chunk_counter={},{}
+    for s_tk0,s_tk_count0 in self.src_counter.items():
+      char_ngrams=general.get_char_ngrams(s_tk0,max_size=self.max_chunk_size,min_size=self.min_chunk_size,padding=self.padding)
+      for ng0 in char_ngrams: self.src_chunk_counter[ng0]=self.src_chunk_counter.get(ng0,0)+s_tk_count0
+    for t_tk0,t_tk_count0 in self.trg_counter.items():
+      char_ngrams=general.get_char_ngrams(t_tk0,max_size=self.max_chunk_size,min_size=self.min_chunk_size,padding=self.padding)
+      for ng0 in char_ngrams: self.trg_chunk_counter[ng0]=self.trg_chunk_counter.get(ng0,0)+t_tk_count0
+
+    src_n_gram_counter_items=list(self.src_chunk_counter.items())
+    src_n_gram_counter_items.sort(key=lambda x:-x[-1])
+    src_n_gram_counter_items=[v for v in src_n_gram_counter_items if v[1]>=self.min_chunk_count]
+    if self.max_dim_size!=None: src_n_gram_counter_items=src_n_gram_counter_items[:self.max_dim_size]
+    self.src_map=dict(iter([(v,i) for i,v in enumerate([v[0] for v in src_n_gram_counter_items])]))
+
+    trg_n_gram_counter_items=list(self.trg_chunk_counter.items())
+    trg_n_gram_counter_items.sort(key=lambda x:-x[-1])
+    trg_n_gram_counter_items=[v for v in trg_n_gram_counter_items if v[1]>=self.min_chunk_count]
+    if self.max_dim_size!=None: trg_n_gram_counter_items=trg_n_gram_counter_items[:self.max_dim_size]
+    self.trg_map=dict(iter([(v,i) for i,v in enumerate([v[0] for v in trg_n_gram_counter_items])]))
+
+
+    # self.src_sw_list=sorted(list(src_sw_counter.keys()))
+    # self.trg_sw_list=sorted(list(trg_sw_counter.keys()))
+    # self.src_map=dict(iter([(v,i) for i,v in enumerate(self.src_sw_list)]))
+    # self.trg_map=dict(iter([(v,i) for i,v in enumerate(self.trg_sw_list)]))
+    self.n_src=len(src_n_gram_counter_items)
+    self.n_trg=len(trg_n_gram_counter_items)
+    #self.correspondence_array=np.zeros((self.n_src,self.n_trg))
+    self.correspondence_array = np.full((self.n_src,self.n_trg), 0.5)
+  def get_ids(self,input_src_chunks,input_trg_chunks,only_id=True):
+    src_ids,trg_ids=[],[]
+    for src_sw0 in list(set(input_src_chunks)):
+      s_id0=self.src_map.get(src_sw0)
+      if s_id0!=None:
+        if only_id: src_ids.append(s_id0)
+        else: src_ids.append((src_sw0,s_id0))
+    for trg_sw0 in list(set(input_trg_chunks)):
+      t_id0=self.trg_map.get(trg_sw0)
+      if t_id0!=None:
+        if only_id: trg_ids.append(t_id0)
+        else: trg_ids.append((trg_sw0,t_id0))
+    return src_ids,trg_ids
+
+
+  def update(self,input_src_tokens,input_trg_tokens,inc=0.01):
+
+    src_chunks,trg_chunks=[],[]
+    for s_tk0 in input_src_tokens:
+      char_ngrams=general.get_char_ngrams(s_tk0,max_size=self.max_chunk_size,min_size=self.min_chunk_size,padding=self.padding)
+      src_chunks.extend(char_ngrams)
+    for t_tk0 in input_trg_tokens:
+      char_ngrams=general.get_char_ngrams(t_tk0,max_size=self.max_chunk_size,min_size=self.min_chunk_size,padding=self.padding)
+      trg_chunks.extend(char_ngrams)
+    src_ids,trg_ids=self.get_ids(src_chunks,trg_chunks)
+    self.correspondence_array=update_corr_matrix(self.correspondence_array,src_ids,trg_ids, inc=inc)
+
+  def retr(self,input_src_chunks,input_trg_chunks): #retrieve corr values given pairs of subwords lists
+    src_sw_ids,trg_sw_ids=self.get_ids(input_src_chunks,input_trg_chunks,only_id=False)
+    #print("src_sw_ids",src_sw_ids)
+    #print("trg_sw_ids",trg_sw_ids)
+    cur_sw_corr_dict={}
+    for s_tk0,s_id0 in src_sw_ids:
+      for t_tk0,t_id0 in trg_sw_ids:
+
+        val0=float(self.correspondence_array[s_id0][t_id0])
+        #print(s_tk0, t_tk0,val0)
+        cur_sw_corr_dict[(s_tk0,t_tk0)]=val0
+    return cur_sw_corr_dict
+
+  # def normalize(self):
+  #   self.correspondence_array=normalize_array(self.correspondence_array)
+  def match(self,input_src_toks,input_trg_toks):
+    cur_src_chars,cur_trg_chars=[],[]
+    src_tok_chars_dict,trg_tok_chars_dict={},{}
+    for s_tk0 in list(set(input_src_toks)):
+      src_char_ngrams=general.get_char_ngrams(s_tk0,max_size=params0.get("max_size",3),min_size=params0.get("min_size",3),include_span=True)
+      src_tok_chars_dict[s_tk0]=src_char_ngrams
+      cur_src_chars.extend([v[0] for v in src_char_ngrams])
+    for t_tk0 in list(set(input_trg_toks)):
+      trg_char_ngrams=general.get_char_ngrams(t_tk0,max_size=params0.get("max_size",3),min_size=params0.get("min_size",3),include_span=True)
+      trg_tok_chars_dict[t_tk0]=trg_char_ngrams
+      cur_trg_chars.extend([v[0] for v in trg_char_ngrams])
+
+    corr_dict0=self.retr(cur_src_chars,cur_trg_chars)
+
+    corr_dict_items0=list(corr_dict0.items())
+    corr_dict_items0.sort(key=lambda x:-x[-1])
+
+    final_match_dict={}
+    for s_tk0,s_chars_spans0 in src_tok_chars_dict.items():
+      for t_tk0,t_chars_spans0 in trg_tok_chars_dict.items():
+        #print(s_tk0,t_tk0)
+        #char_corr_val_dict={}
+        cur_corr_list=[]
+        for s_char0,s_span0 in s_chars_spans0:
+          for t_char0,t_span0 in t_chars_spans0:
+
+            corr_val0=corr_dict0.get((s_char0,t_char0),0)
+            #print(s_char0,t_char0,corr_val0)
+            char_pair0=s_char0,t_char0
+            span_pair=s_span0,t_span0
+            cur_corr_list.append((char_pair0,span_pair,corr_val0))
+        cur_corr_list.sort(key=lambda x:-x[-1])
+        used_src_i_list,used_trg_i_list=[],[]
+        #for a in cur_corr_list[:5]: print(a)
+        valid_vals=[]
+        for char_pair0,span_pair,corr_val0 in cur_corr_list:
+          src_span0,trg_span0=span_pair
+          cur_src_i_list=list(range(src_span0[0],src_span0[1]))
+          cur_trg_i_list=list(range(trg_span0[0],trg_span0[1]))
+          if set(used_src_i_list).intersection(set(cur_src_i_list)): continue
+          if set(used_trg_i_list).intersection(set(cur_trg_i_list)): continue
+          used_src_i_list.extend(cur_src_i_list)
+          used_trg_i_list.extend(cur_trg_i_list)
+          #print(char_pair0,span_pair,corr_val0)
+          valid_vals.append(corr_val0)
+
+        max_corr_val=max(valid_vals)
+        avg_corr_val=sum(valid_vals)/len(valid_vals)
+        avg_max_wt0=(max_corr_val+avg_corr_val)/2
+        #print(s_tk0,t_tk0,valid_vals,max_corr_val,avg_corr_val)
+        #print(s_tk0,t_tk0,round(avg_max_wt0,4))
+        final_match_dict[(s_tk0,t_tk0)]=avg_max_wt0
+
+        #print("--------")
+    return final_match_dict
+  def expand_update(self,src_tok_list,trg_tok_list,ex_params={}):
+    #iterate over a list of pairs of tokenized src/trg sentences
+    #calculate chunk freq src/trg to update the src/trg counter dicts
+    #update matrix size and dimensions accordingly
+    #and then update correspondences with each pair of tokenized sentences
+    pass
+
+
+
+#3 May 2025 
+#apply increments to rows and columns of a matrix according to row/cols indexes - increment for correspondence coordinates
+#and decrement otherwise for rows/cols indexes
+def update_corr_matrix(matrix,row_indexes,col_indexes, inc=0.01):
+  up_ratio,down_ratio=1+inc,1-inc
+  for r_i in row_indexes:
+    row_copy=matrix[r_i]
+    #col_vals=row_copy[col_indexes]*up_ratio
+    col_vals=row_copy[col_indexes]#*up_ratio
+    col_vals_inc=(1-col_vals)*inc #increment col vals up according to how far from 1
+    col_vals=col_vals+col_vals_inc
+
+
+    row_copy=row_copy*down_ratio
+    row_copy[col_indexes]=col_vals
+    matrix[r_i]=row_copy
+
+  for c_i in col_indexes:
+    col_copy=matrix[:,c_i]
+    row_vals=col_copy[row_indexes]
+    col_copy=col_copy*down_ratio
+    col_copy[row_indexes]=row_vals
+    matrix[:,c_i]=col_copy
+  return matrix
+
+#18 May 2025
+#populate corresppondence matrix between src/trg tokens
+def get_sent_matching_matrix(src_tokens,trg_tokens,matching_dict,max_val=1.0):
+  corr_matrix_vals=[]
+  for t_0 in trg_toks0:
+    cur_matrix_rows=[]
+    for s_0 in src_toks0:
+      if t_0==s_0: val0=max_val
+      else: val0=matched.get((s_0,t_0),0)
+      cur_matrix_rows.append(val0)
+    corr_matrix_vals.append(cur_matrix_rows)
+  return corr_matrix_vals
+
+#18 May 2025
+#create data for an excel table to visualize alignment (rows +headers)
+def get_corr_table(src_tokens,trg_tokens,matching_dict):
+  corr_matrix_vals0=get_sent_matching_matrix(src_tokens,trg_tokens,matching_dict)
+  header_items=[""]+src_tokens
+  all_rows=[]
+  for row_i0,row0 in enumerate(corr_matrix_vals0):
+    t_0=trg_tokens[row_i0]
+    #row_items=[t_0]+[str(round(v,4)) for v in row0]
+    row_items=[t_0]+[round(v,4) for v in row0]
+    all_rows.append(row_items)
+  return all_rows, header_items
+
+#18 May 2025
+#identify adjeacent points - horizontal - vertical diagonal (up & down)
+#to create spans out of pairs of adjacent points 
+def get_adj_pts(x,y,x_dim,y_dim,max_offset=2):
+  next_x_list=[]
+  next_y_list=[]
+  prev_y_list=[]
+  for of0 in range(1,max_offset+1): #get possible horizontal offsets
+    next_x0=x+of0
+    if next_x0>=x_dim: break
+    next_x_list.append(next_x0)
+  for of0 in range(1,max_offset+1): #get possible vertical offsets (next)
+    next_y0=y+of0
+    if next_y0>=y_dim: break
+    next_y_list.append(next_y0)
+  for of0 in range(1,max_offset+1): #get possible vertical offsets (prev)
+    prev_y0=y-of0
+    if prev_y0<0: break
+    prev_y_list.append(prev_y0)
+
+  all_next_pts=[]
+  all_next_pts.extend([(x,y1) for y1 in next_y_list]) #vertical next points
+  all_next_pts.extend([(x1,y) for x1 in next_x_list]) #horizontal next points
+  all_next_pts.extend([(x1,y1) for x1 in next_x_list for y1 in next_y_list+prev_y_list]) #diagonal adjacent points
+  return sorted(all_next_pts)
+
+
+
+
+
+
 #5 May 2025
 #for pairs of items with their weights, and we want to get the top items without duplication
 #of any src/trg part of each item, or we want to make sure each src/trg element gets the
