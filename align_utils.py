@@ -20,6 +20,7 @@ import arabic_lib
 #create and update correspondence/matching matrix between chunks
 class chunk_align_matrix:
   def __init__(self,src_counter,trg_counter,params={}) -> None:
+    self.params=params
     self.src_counter=src_counter
     self.trg_counter=trg_counter
     self.max_dim_size=params.get("max_dim_size",10000)
@@ -99,6 +100,7 @@ class chunk_align_matrix:
   # def normalize(self):
   #   self.correspondence_array=normalize_array(self.correspondence_array)
   def match(self,input_src_toks,input_trg_toks):
+    params0=self.params
     cur_src_chars,cur_trg_chars=[],[]
     src_tok_chars_dict,trg_tok_chars_dict={},{}
     for s_tk0 in list(set(input_src_toks)):
