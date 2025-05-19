@@ -215,6 +215,7 @@ def get_corr_table(src_tokens,trg_tokens,matching_dict):
     all_rows.append(row_items)
   return all_rows, header_items
 
+#Now for the functions to help with dymanic programming alignment of points/spans/elements within the corr table
 #18 May 2025
 #identify adjeacent points - horizontal - vertical diagonal (up & down)
 #to create spans out of pairs of adjacent points 
@@ -241,7 +242,16 @@ def get_adj_pts(x,y,x_dim,y_dim,max_offset=2):
   all_next_pts.extend([(x1,y1) for x1 in next_x_list for y1 in next_y_list+prev_y_list]) #diagonal adjacent points
   return sorted(all_next_pts)
 
-
+#19 May 2025
+#Given a number of points, identify the corresponding element/span pair
+def get_span_pair(pts):
+  x_pts=[v[0] for v in pts]
+  y_pts=[v[1] for v in pts]
+  max_x0,max_y0=max(x_pts),max(y_pts)
+  min_x0,min_y0=min(x_pts),min(y_pts)
+  x_span0=(min_x0,max_x0)
+  y_span0=(min_y0,max_y0)
+  return (x_span0,y_span0)
 
 
 
