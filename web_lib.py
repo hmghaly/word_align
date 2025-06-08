@@ -238,6 +238,8 @@ class DOM:
     self.text_items=[v for v in self.text_items if v]
     self.text="\n".join(self.text_items)
 
+    #self.page_info_dict
+
   def get_html(self,assigned_tag_id0,html_content0=''):
     cur_el=self.tag_dict.get(assigned_tag_id0)
     if cur_el==None: return html_content0
@@ -678,6 +680,7 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
   emails=[]
   addresses=[]
   social_links=[]
+  external_links=[]
 
   #processing links
   raw_links=page_dom_obj.all_links
@@ -698,9 +701,18 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
     if href0.split(".")[-1].isdigit(): continue
     if not href0.lower().startswith("http"): href0=join_url(final_url,href0) #url0.strip("/")+"/"+href0.strip("/")
     anchor0=re.sub("\s+"," ",anchor0).strip()
-    if "facebook" in href0 or "twitter" in href0 or "linkedin" in href0: social_links.append(href0.lower())
+    is_social_link=False
+    if "facebook" in href0 or "twitter" in href0 or "linkedin" in href0 or "youtube" in href0 or "x.com" in href0: 
+      social_links.append(href0.lower())
+      is_social_link=True
     #print(href0,anchor0)
     links.append((href0,anchor0))
+    if not href0.startswith(final_url) and not is_social_link: external_links.append(href0)
+
+
+    #full_link_url=final_url
+
+
   links=list(set(links)) 
   social_links=list(set(social_links))
 
@@ -761,6 +773,9 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
   page_info_dict["logos"]=logos
   #page_info_dict["text_items"]=text_items
   page_info_dict["text"]=page_dom_obj.text
+  page_info_dict["external_links"]=external_links
+  page_info_dict["page_content"]=page_content
+  
   
   
   return page_info_dict  
