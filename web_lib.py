@@ -649,6 +649,7 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
     status_code=page_obj.status_code
 
   page_info_dict["status_code"]=status_code
+  final_url=final_url.strip("/")
 
 
 
