@@ -651,6 +651,8 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
   page_info_dict["status_code"]=status_code
   final_url=final_url.strip("/")
 
+  page_content=remove_html_noise(page_content)
+
 
 
   #page_content=get_page_content(url)
