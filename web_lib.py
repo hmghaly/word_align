@@ -630,7 +630,7 @@ def curl(url,curl_path="curl",timeout=10):
     return "", "{}"
   return content, final_json0
 
-def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
+def get_page_info(url, read_method="curl",curl_path="curl",timeout=30):
   page_info_dict={}
   page_info_dict["url"]=url
 
