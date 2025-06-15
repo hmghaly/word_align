@@ -1,4 +1,4 @@
-import requests, json
+import requests, json, openai
 
 cur_model="gpt-3.5-turbo"
 cur_model="gpt-4o"
@@ -8,6 +8,8 @@ cur_model="gpt-4o-mini-2024-07-18"
 #gpt-4.1-nano-2025-04-14
 
 chatgpt_api_key="XXX"
+
+client = openai.OpenAI()
 
 
 def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
