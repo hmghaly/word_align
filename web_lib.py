@@ -625,6 +625,19 @@ def curl(url,curl_path="curl",timeout=10):
     output_split=output.split("\n")
     final_json0=output_split[-1]
     content="\n".join(output_split[:-1])
+    meta_redirects=re.findall('<meta[^>]*?url=(.*?)["\']',content , re.IGNORECASE)
+    final_url=url
+    #handle meta refresh redirects
+    try:
+      json_dict=json.loads(final_json0)
+      final_url_check=json_dict.get("url_effective","")
+      if final_url_check!="": final_url=final_url_check
+    except: pass
+    if len(meta_redirects)>0: 
+      meta_new_url=urljoin(final_url,meta_redirects[0])
+      return curl(meta_new_url,curl_path=curl_path,timeout=timeout)
+
+
   except Exception as ex:
     print(ex) 
     return "", "{}"
