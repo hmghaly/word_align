@@ -9,7 +9,7 @@ cur_model="gpt-4o-mini-2024-07-18"
 
 chatgpt_api_key="XXX"
 
-#client = openai.OpenAI()
+
 
 
 def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
@@ -38,7 +38,7 @@ def ai_query(prompt,api_key=chatgpt_api_key,max_tokens=1000,model=cur_model):
     return output
 
 
-
+#client = openai.OpenAI()
 #web_page_extractor - "asst_wCTV2R9HAVpOmZtPU3JmahGZ"
 #page_link_identifier - "asst_oFVuaaq7Dmd1L35vCdz02bmP"
 #get_hs_codes - "asst_oKfhpIBNKsgMTdrNN96hA962"
@@ -71,3 +71,37 @@ def chat_with_assistant(message_input,assistant_id, client):
   assistant_response = messages.data[0].content[0].text.value
   #print(assistant_response)
   return assistant_response
+
+
+
+def chat_with_assistant_multi(message_input_list,assistant_id, client):
+  all_responses=[]
+  for message_input in message_input_list:
+    thread = client.beta.threads.create()
+    thread_id = thread.id
+
+    message = client.beta.threads.messages.create(
+      thread_id=thread.id,
+      role="user",
+      content=message_input 
+    )    
+
+    run = client.beta.threads.runs.create(
+        thread_id=thread_id,
+        assistant_id=assistant_id
+    )
+
+    while True:
+        run_status = client.beta.threads.runs.retrieve(
+            thread_id=thread_id,
+            run_id=run.id
+        )
+        if run_status.status == "completed":
+            break
+    messages = client.beta.threads.messages.list(thread_id=thread_id)
+    #print(messages)
+    assistant_response = messages.data[0].content[0].text.value
+    all_responses.append(assistant_response)
+    time.sleep(0.25)
+  #print(assistant_response)
+  return all_responses  
