@@ -9,7 +9,7 @@ cur_model="gpt-4o-mini-2024-07-18"
 
 chatgpt_api_key="XXX"
 
-client = openai.OpenAI()
+#client = openai.OpenAI()
 
 
 def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
