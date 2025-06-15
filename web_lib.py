@@ -621,13 +621,14 @@ def curl(url,curl_path="curl",timeout=10):
   cmd='%s -k -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" %s -L'%(curl_path,url)
   try: 
     output = check_output(cmd, shell=True, stderr=STDOUT, timeout=timeout)
-    output=output.decode("utf-8")
+    output=output.decode("utf-8", errors='ignore')
     output_split=output.split("\n")
     final_json0=output_split[-1]
     content="\n".join(output_split[:-1])
-  except: return "", "{}"
+  except Exception as ex:
+    print(ex) 
+    return "", "{}"
   return content, final_json0
-
 
 def get_page_info(url, read_method="curl",curl_path="curl",timeout=10):
   page_info_dict={}
