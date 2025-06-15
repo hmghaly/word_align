@@ -45,7 +45,7 @@ def ai_query(prompt,api_key=chatgpt_api_key,max_tokens=1000,model=cur_model):
 #country_iso_code_converter - "asst_TFizZrNrChd6LUxxk9lC5HOl"
 
 # 14 June 2025
-def chat_with_assistant(message_input,assistant_id):
+def chat_with_assistant(message_input,assistant_id, client):
   thread = client.beta.threads.create()
   thread_id = thread.id
 
