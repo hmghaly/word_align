@@ -733,7 +733,14 @@ def tok_simple(txt,full=False): #this tokenization scheme splits around punctuat
     return [v for v in out if v]
 
 
-
+#27 July 2025
+#simple tokenization to preserve punctuation tokens, and optionally add sentence beginning and end tags <s>, </s>
+def tok_basic(txt,add_sent_tags=False): 
+  txt=re.sub("(?u)(\W)",r" \1 ", txt)
+  out=re.split("\s+",txt)
+  tokens=[v for v in out if v]
+  if add_sent_tags: tokens=["<s>"]+tokens+["</s>"]
+  return tokens
 
 
 
