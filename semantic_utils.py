@@ -4,6 +4,15 @@ from itertools import groupby
 import random
 import math, re, string
 # from torch import nn
+#from code_utils.general import *
+#from code_utils.pandas_utils import *
+from code_utils import general
+import re,json
+from itertools import groupby
+from collections import Counter
+from random import shuffle, seed
+
+
 
 # loss_fn = nn.CrossEntropyLoss()
 # loss_fn = nn.BCELoss()
@@ -27,10 +36,32 @@ def tok_basic(txt,add_sent_tags=False):
   if add_sent_tags: tokens=["<s>"]+tokens+["</s>"]
   return tokens
 
+def get_pair_offsets(tokens, max_offset=4): #get pairs of tokens from a sentence, with their +ve & -ve offsets
+  all_pair_offset_list=[]
+  for tk_i0,tk0 in enumerate(tokens):
+    next_toks=tokens[tk_i0+1:tk_i0+max_offset]
+    for inc0,next0 in enumerate(next_toks):
+      offet0=inc0+1
+      all_pair_offset_list.append((tk0,next0,offet0))
+      all_pair_offset_list.append((next0,tk0,-offet0))  
+  return all_pair_offset_list  
+
 def create_one_hot_vec(hot_i,vec_size):
   zeros=[0.]*vec_size
   zeros[hot_i]=1.
   return np.array(zeros)
+
+
+# Sigmoid and softmax
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def softmax(x):
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum()
+
+
+
 
 
 random.seed(0)
