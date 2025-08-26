@@ -31,7 +31,7 @@ def get_mse_loss(y_true, y_pred):
 
 def tok_basic(txt,add_sent_tags=False): 
   txt=re.sub(r"(?u)(\W)",r" \1 ", txt)
-  out=re.split("\s+",txt)
+  out=re.split(r"\s+",txt)
   tokens=[v for v in out if v]
   if add_sent_tags: tokens=["<s>"]+tokens+["</s>"]
   return tokens
