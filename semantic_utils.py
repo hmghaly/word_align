@@ -30,7 +30,7 @@ def get_mse_loss(y_true, y_pred):
 
 
 def tok_basic(txt,add_sent_tags=False): 
-  txt=re.sub("(?u)(\W)",r" \1 ", txt)
+  txt=re.sub(r"(?u)(\W)",r" \1 ", txt)
   out=re.split("\s+",txt)
   tokens=[v for v in out if v]
   if add_sent_tags: tokens=["<s>"]+tokens+["</s>"]
@@ -73,6 +73,8 @@ class shadow:
         self.tag_list=tag_list
         self.params={}
         self.add_sent_tags=self.params.get("add_sent_tags",True)
+        self.max_offset=self.params.get("max_offset",4)
+
         self.extended_tags=["<s>","</s>"] #maybe will also include numbers and punctuation - special characters, hashtags, whatever
         if self.add_sent_tags: 
             self.tag_list+=self.extended_tags
