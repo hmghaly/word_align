@@ -60,6 +60,31 @@ def softmax(x):
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum()
 
+#multiply 4 matrices P(w1) x P(t1|w1) x P(t2|t1) x P(w2|t2)
+#get gradients to apply to each input matrix by comparing to target output
+#get also the loss, and put all these outputs in an output_dict 
+
+def multiply4_get_grad(A,B,C,D,target_output):
+  # Using the @ operator (preferred for readability)
+  result_at = A @ B @ C @ D
+  loss = np.mean((result_at - target_output)**2)
+
+  # Calculate gradient of loss with respect to the final output
+  d_output = 2 * (result_at - target_output) / (result_at.size)
+
+  # Backpropagate through D
+  dD = (A @ B @ C).T @ d_output
+
+  # Backpropagate through C
+  dC = (A @ B).T @ (d_output @ D.T)
+
+  # Backpropagate through B
+  dB = A.T @ (d_output @ D.T @ C.T)
+
+  # Backpropagate through A
+  dA = d_output @ D.T @ C.T @ B.T
+  output_dict={"result":result_at,"grads":[dA,dB,dC,dD],"loss":loss}
+  return output_dict
 
 
 
