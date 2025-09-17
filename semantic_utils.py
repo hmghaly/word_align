@@ -46,10 +46,12 @@ def get_pair_offsets(tokens, max_offset=4): #get pairs of tokens from a sentence
       all_pair_offset_list.append((next0,tk0,-offet0))  
   return all_pair_offset_list  
 
-def create_one_hot_vec(hot_i,vec_size):
+def create_one_hot_vec(hot_i,vec_size,expand_dims=False):
   zeros=[0.]*vec_size
   zeros[hot_i]=1.
-  return np.array(zeros)
+  array0=np.array(zeros)
+  if expand_dims: array0=np.expand_dims(array0,0)
+  return array0
 
 
 # Sigmoid and softmax
