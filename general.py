@@ -1631,6 +1631,17 @@ def walk_trie(cur_trie,items,terminal_item=""):
     val=new_trie.get(terminal_item)
     return val
 
+
+def print_trie(d,depth=0):
+  for k,v in sorted(d.items(),key=lambda x: x[0]):
+    if isinstance(v, dict):
+      line= "--"* depth +  ("%s" % k)   
+      print(line)
+      walk_dict(v,depth+1)
+    else:
+      line= "--"* depth + "%s %s" % (k, v)         
+      print(line)
+
 if __name__=="__main__":
     print("Hello!")
     our_trie={}
