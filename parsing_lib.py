@@ -9,6 +9,203 @@ sys.path.append("code_utils")
 import general
 
 
+# 10 December 2025 - New Parsing approach CFG/GPSG
+
+import re, copy
+import itertools
+from itertools import product
+
+class Parser:
+  def __init__(self,rules_list=[],word_features_list=[],params={}) -> None:
+    self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
+    self.sent_padding=params.get("sent_padding",False)
+    self.default_wt=params.get("default_wt",0.5)
+    self.unknown_token_tags=[("N","noun"),("V","verb"),("JJ","adj"),("RB","adv")]
+    self.unknown_token_tags_wt_dict={}
+    #process all word features
+
+    #process all rules
+    self.all_processed_rules=[]
+    self.cat_fwd_index=[]
+    self.feat_fwd_index=[]
+    for i0,r0 in enumerate(rules_list):
+      processed_rule=process_rule(r0)
+      #print(processed_rule)
+      self.all_processed_rules.append(processed_rule)
+      last_child=processed_rule["children"][-1]
+      last_child_cat=last_child["cat"]
+      last_child_features=last_child["feat"]
+      self.cat_fwd_index.append((last_child_cat,i0))
+      for ft0 in last_child_features: self.feat_fwd_index.append((ft0,i0))
+    self.cat_fwd_index.sort()
+    self.feat_fwd_index.sort()
+    self.cat_inv_index=dict(iter([(key,[v[1] for v in list(group)]) for key,group in groupby(self.cat_fwd_index,lambda x:x[0])]))
+    self.feat_inv_index=dict(iter([(key,[v[1] for v in list(group)]) for key,group in groupby(self.feat_fwd_index,lambda x:x[0])]))
+
+  def parse(self,tokens):
+    self.phrase_list=[] #list of all phrase objects, with spans, weights, children
+    self.cat_phrase_index={}
+    self.feat_phrase_index={}
+    for i,a in enumerate(tokens): #process each token
+      start,end=i,i
+      wt=self.default_wt
+      outcome=final_word_features_dict.get(a,self.unknown_token_tags) #outcome is multiple tag/cat options, with their features
+      for cat0,feat0 in outcome:
+        feat_split=feat0.split()
+        #only one phrase object per cat/features pair
+        cur_token_rules=[] #retrieved rules that apply to current token
+        phrase_i=len(self.phrase_list)
+        cur_phrase_obj={"start":start,"end":end,"wt":wt,"cat":cat0,"feat":feat_split,"head":start,"children":[],"i":phrase_i}
+        self.add_phrase(cur_phrase_obj)
+        #print(cur_phrase_obj)
+        new_phrases=self.project_phrase(cur_phrase_obj)
+        for a in new_phrases: self.add_phrase(a)
+        while new_phrases:
+          new_phrases_copy=copy.deepcopy(new_phrases)
+          new_phrases=[]
+          for ph0 in new_phrases_copy:
+            #print("copy",ph0)
+            projected_phrases=self.project_phrase(ph0)
+            new_phrases.extend(projected_phrases)
+          for a in new_phrases: self.add_phrase(a)
+          
+
+        #print("---")
+    for i0,a0 in enumerate(self.phrase_list):
+      print(i0,a0)
+  
+  def project_phrase(self,cur_phrase_obj):
+    cur_phrase_counter=cur_phrase_obj["i"]
+    new_phrases=[]
+    rules=self.get_rules(cur_phrase_obj)
+    for r_i in rules:
+      rule_obj=self.all_processed_rules[r_i]
+      rule_children=rule_obj["children"]
+      #print(r_i,self.all_processed_rules[r_i])
+      rule_children_reversed=list(reversed(rule_children)) 
+      last_child=rule_children_reversed[0]
+      match_last=match_rule(cur_phrase_obj,last_child)
+     
+      if not match_last: continue
+      rule_children_corr_phrases=[]
+      rule_children_corr_phrases.append([cur_phrase_counter])
+      for child0 in rule_children_reversed[1:]:
+        corr_phrases=self.scan_phrases(child0,cur_phrase_start=cur_phrase_obj["start"])
+        if corr_phrases==[]: break
+        rule_children_corr_phrases.append(corr_phrases)
+      #print("rule_children_corr_phrases",rule_children_corr_phrases)
+      if len(rule_children_corr_phrases)!=len(rule_children): continue
+
+      rule_children_corr_phrases=list(reversed(rule_children_corr_phrases))
+      #print(list(itertools.product(*zip(*rule_children_corr_phrases))))
+      phrase_combinations = list(product(*rule_children_corr_phrases))
+      #print(phrase_combinations)
+      for pc in phrase_combinations:
+        parent_phrase_obj={}
+        phrase_obj_list=[self.phrase_list[vi] for vi in pc]
+        parent_phrase_obj["wt"]=sum([vw["wt"] for vw in phrase_obj_list])
+        parent_phrase_obj["start"]=min([vw["start"] for vw in phrase_obj_list])
+        parent_phrase_obj["end"]=max([vw["end"] for vw in phrase_obj_list])
+        parent_phrase_obj["cat"]=rule_obj["parent"]["cat"]
+        parent_phrase_obj["feat"]=rule_obj["parent"]["feat"]
+        rule_head_i=rule_obj["head_i"]
+        parent_phrase_obj["children"]=pc
+        parent_phrase_obj["head"]=pc[rule_head_i]
+        new_phrases.append(parent_phrase_obj)
+    return new_phrases
+
+  def add_phrase(self,cur_phrase_obj):
+    phrase_obj_cat,phrase_obj_feat=cur_phrase_obj["cat"],cur_phrase_obj["feat"]
+    cur_phrase_counter=len(self.phrase_list)
+    self.cat_phrase_index[phrase_obj_cat]=self.cat_phrase_index.get(phrase_obj_cat,[])+[cur_phrase_counter] #add this phrase to the inverted index of categories and their corresponding phrase counter
+    for s_feat0 in phrase_obj_feat:
+      self.feat_phrase_index[s_feat0]=self.feat_phrase_index.get(s_feat0,[])+[cur_phrase_counter]
+    cur_phrase_obj["i"]=len(self.phrase_list)
+    self.phrase_list.append(cur_phrase_obj)
+
+  def get_rules(self,cur_phrase_obj):
+    #given a token or phrase with cat/feat pair, identify the rules that apply
+    all_rules=[]
+    phrase_obj_cat,phrase_obj_feat=cur_phrase_obj["cat"],cur_phrase_obj["feat"]
+    cur_cat_rules=self.cat_inv_index.get(phrase_obj_cat,[])
+    all_rules.extend(cur_cat_rules)
+    for s_feat0 in phrase_obj_feat:
+      corr_rules=self.feat_inv_index.get(s_feat0,[])
+      all_rules.extend(corr_rules)
+    return all_rules
+
+  def scan_phrases(self,rule_child,cur_phrase_start=None):
+    #for any child of a given rule, scan all the phrases that match this child (both cat/feat)
+    phrases_i_list=[]
+    rule_child_info_cat,rule_child_info_feat=rule_child["cat"],rule_child["feat"]
+    corr_cat_phraes=self.cat_phrase_index.get(rule_child_info_cat,[])
+    phrases_i_list.extend(corr_cat_phraes)
+    for feat0 in rule_child_info_feat:
+      corr_feat_phrases=self.feat_phrase_index.get(feat0,[])
+      phrases_i_list.extend(corr_feat_phrases)
+    phrases_i_list=list(set(phrases_i_list))
+    final_phrase_list=[] #with phrase indexes
+    for ph_i in phrases_i_list:
+      found_phrase_obj=self.phrase_list[ph_i]
+      found_phrase_obj_end=found_phrase_obj["end"]
+      matched=match_rule(found_phrase_obj,rule_child)
+      if found_phrase_obj_end>=cur_phrase_start: continue
+      if not match_rule(found_phrase_obj,rule_child): continue
+      final_phrase_list.append(ph_i)
+    return final_phrase_list
+
+
+def match_rule(token_info,rule_child_info):
+  #given cat/feat for a phrase/token, match it with the cat/feat for a child in a rule
+  token_info_cat,token_info_feat=token_info["cat"],token_info["feat"]
+  rule_child_info_cat,rule_child_info_feat=rule_child_info["cat"],rule_child_info["feat"]
+  if rule_child_info_cat!="X" and rule_child_info_cat!=token_info_cat: return False
+  feat_intersection=list(set(token_info_feat).intersection(set(rule_child_info_feat)))
+  #print(feat_intersection)
+  if len(feat_intersection)!=len(rule_child_info_feat): return False
+  return True
+
+
+def process_rule(rule_str):
+  #process the string of the rule to turn it into parent and children, with objects/dict of each
+  final_rule_dict={}
+  rule_str=rule_str.replace("→","-->")
+  rule_split=rule_str.split("-->")
+  lhs,rhs=rule_split
+  lhs,rhs=lhs.strip(),rhs.strip()
+  lhs_cat0=lhs.split("[")[0]
+  lhs_features=re.findall(r'\[(.+?)\]',lhs)
+  cur_rhs_features=[]
+  for ft0 in lhs_features:
+    cur_rhs_features.extend(ft0.split())
+  lhs_dict={"cat":lhs_cat0,"feat":cur_rhs_features}
+  final_rule_dict["parent"]=lhs_dict
+  rule_children=[]
+  rhs_items=rhs.split()
+  head_i=0 #the location of the head among the children
+  for i_0, it0 in enumerate(rhs_items):
+    item_dict={}
+    is_head=False
+    features=re.findall(r'\[(.+?)\]',it0)
+    if "^" in it0: is_head=True
+
+    if is_head: head_i=i_0
+    it0=it0.replace("^","")
+    item_cat0=it0.split("[")[0]
+    cur_features=[]
+    for ft0 in features:
+      cur_features.extend(ft0.split())
+
+    item_dict={"cat":item_cat0,"is_head":is_head,"feat":cur_features}
+    rule_children.append(item_dict)
+  final_rule_dict["children"]=rule_children
+  final_rule_dict["head_i"]=head_i
+  return final_rule_dict
+
+
+
+#============== spaCy Utils ===============
+
 nlp = spacy.load("en_core_web_sm")
 #http://spyysalo.github.io/conllu.js/
 #https://github.com/explosion/spaCy/issues/533 #spacy to output conll format
@@ -30,7 +227,6 @@ def get_conll(sent_input): #Use spaCy to get CoNLL format outpus of an input sen
         conll_2d.append(items)
     return conll_2d
 
-
 def get_pos_tags(sent_input):
     new_sent_input=tok_sent_join(sent_input) #
     doc = nlp(new_sent_input)
@@ -45,6 +241,175 @@ def get_lemmas(sent_input):
     tmp_lemmas=[]
     for token in doc: tmp_lemmas.append(token.lemma_)
     return tmp_lemmas
+
+
+
+
+#================= PTB utils ===================
+
+
+
+#Penn TreeBank PTB code from dissertation work
+def strip_num(txt): #to strip trailing numbers and underscores
+    return txt.strip("0123456789_")
+
+
+class ptb:
+    def __init__(self,ptb_tree_str):
+        all_labels=[]
+        ptb_tree_str=ptb_tree_str.replace("\n"," ") #we remove line breaks 
+        open_labels=re.finditer("(\(\S+)",ptb_tree_str) #get the open tags with non-space items
+        open_labels2=re.finditer("(\(\s+)",ptb_tree_str) #get open brackets followed by space
+        for op in open_labels: #for each of the open and closed labels found, we use finditer to get its exact start and end points within the tring
+            all_labels.append((op.group(), op.start(),op.end())) 
+        for op in open_labels2:
+            all_labels.append((op.group(), op.start(),op.end())) 
+
+        closed_labels=re.finditer("\)",ptb_tree_str) #get closing brackets
+        for cl in closed_labels:
+            all_labels.append((cl.group(), cl.start(),cl.end()))
+
+        all_labels.sort(key=lambda x:x[1]) #we sort both the opening and closing tags/brackets by their start index in the tree string (which tags come first)
+
+        open_tags=[] #this is to control the opening and closing of tags, signaled by brackets
+        self.all_tag_ids=[]
+        self.children_dict={} #showing which nodes dominates which
+        tag_count_dict={} #to count the occurance of each tag type, and use it to give each node a unique ID
+        self.tag_info_dict={} #to keep track of the start and end indexes within the tree string
+        full_span_dict={} #to show the entire string covered by a certain node
+        self.terminal_dict={} #to show if this is a terminal node or not
+        #phrase_dict={} #NOT needed - to show the phrase tring covered by this node
+        self.flat_dict={} #to show the terminal tokens with their token indexes
+        self.vertical_dict={} #to show the open tags corresponding to each node, up to the root of the tree
+        self.all_terminals=[] #to collect all the terminal tokens
+        terminal_counter=0
+        for al in all_labels:
+            tag_str,tag_start,tag_end=al
+            #print al
+            prev_tag="" #initialize the previous tag
+            if open_tags: prev_tag=open_tags[-1] #if we already have open tags, then our previous tag is the last of these
+            if al[0][0]=="(": #if it is an open tag
+                tag_name=tag_str[1:] 
+                tag_count=tag_count_dict.get(tag_name,0)
+                tag_id="%s_%s"%(tag_name,tag_count) #creating a unique node ID from the tag name and tag count
+                self.all_tag_ids.append(tag_id)
+                tag_count_dict[tag_name]=tag_count+1
+                open_tags.append(tag_id) #add the current open tag to the list of open tags
+                self.children_dict[prev_tag]=self.children_dict.get(prev_tag,[])+[tag_id] #add the current node to the children dict
+                self.tag_info_dict[tag_id]=(tag_start,tag_end) #keep track of the start and end indexes of the current tag/node
+            else: #if it is a closing tag/bracket
+                prev_start,prev_end=prev_tag_info=self.tag_info_dict[prev_tag] #we identify the start and end indexes of the last open tag
+                cur_span=ptb_tree_str[prev_end:tag_start] #then we identify the current span
+                full_span_dict[prev_tag]=(prev_start,tag_end) #maybe not needed, just showing the full string span under the currently open node (prev_tag)
+                open_tags=open_tags[:-1] #IMPORTANT - this is how we remove the last open tag from the list of open tags once we encounter a closing tag
+                #test_span=re.sub("\)+",")",cur_span) #maybe not needed
+                #span_items=re.findall("(\S+)\)",test_span) #maybe not needed
+                #phrase_dict[prev_tag]=" ".join(span_items) #maybe not needed
+                if "(" in cur_span or ")" in cur_span: continue #the following code will be excuted only if it is a terminal node
+                cur_terminal=(cur_span.strip(),terminal_counter) #we need to keep both the terminal token and its index
+                self.all_terminals.append(cur_terminal) #and add it to the list of terminal tokens
+                for opt in open_tags: self.flat_dict[opt]=self.flat_dict.get(opt,[])+[cur_terminal] #and add it to all of the open tags (nodes dominating it)
+                self.flat_dict[prev_tag]=self.flat_dict.get(prev_tag,[])+[cur_terminal] #not to forget the previous open tag which we just removed from the list of open tags
+                self.vertical_dict[cur_terminal]=open_tags+[prev_tag] #and here for each terminal token with its index, we show all the nodes all the way up to the root of the tree
+                self.terminal_dict[prev_tag]=cur_terminal #and here it tells us if the current open tag is a terminal node or not
+                #phrase_dict[prev_tag]=cur_span.strip() #maybe not needed
+                terminal_counter+=1 #to keep track of the token indexes
+                self.children_dict[prev_tag]=self.children_dict.get(prev_tag,[])+[cur_terminal] #to include the terminal token in the children of terminal nodes
+    def get_phrases(self):
+        self.phrase_list=[]
+        for fd in self.flat_dict:
+            tag_name=fd.split("_")[0]
+            cur_words_indexes=self.flat_dict[fd]
+            cur_words=[v[0] for v in cur_words_indexes]
+            cur_words_str=" ".join(cur_words)
+            first,last=cur_words_indexes[0][1],cur_words_indexes[-1][1]
+            self.phrase_list.append((tag_name,cur_words_str,first,last,len(self.all_terminals)))
+        self.phrase_list=list(set(self.phrase_list))
+        return self.phrase_list  
+    def get_non_terminals(self,ignore_tags=["s1","top","root",""]):
+        self.non_terminal_phrase_list=[]
+        for fd in self.flat_dict:
+            if self.terminal_dict.get(fd)!=None: continue
+            tag_name=fd.split("_")[0]
+            if tag_name.lower() in ignore_tags: continue
+            cur_words_indexes=self.flat_dict[fd]
+            cur_words=[v[0] for v in cur_words_indexes]
+            cur_words_str=" ".join(cur_words)
+            first,last=cur_words_indexes[0][1],cur_words_indexes[-1][1]
+            self.non_terminal_phrase_list.append((tag_name,cur_words_str,first,last,len(self.all_terminals)))
+        self.non_terminal_phrase_list=list(set(self.non_terminal_phrase_list))
+        return self.non_terminal_phrase_list
+
+
+class tree_diff:
+    def __init__(self,ptb_gold_tree_str,ptb_guessed_tree_str,ignore_tags=["s1","top","root",""]): #indicate which spurious tags to ignore in our tree difference analysis
+        gold_tree_obj=ptb(ptb_gold_tree_str)
+        guessed_tree_obj=ptb(ptb_guessed_tree_str)
+        self.gold_tree_nt_phrases=[v for v in gold_tree_obj.get_non_terminals() if not v[0].lower() in ignore_tags]
+        self.guessed_tree_nt_phrases=[v for v in guessed_tree_obj.get_non_terminals() if not v[0].lower() in ignore_tags]
+        self.common_phrases=[v for v in self.guessed_tree_nt_phrases if v in self.gold_tree_nt_phrases]
+        self.missed_phrases=[v for v in self.gold_tree_nt_phrases if not v in self.guessed_tree_nt_phrases]
+        self.wrong_phrases=[v for v in self.guessed_tree_nt_phrases if not v in self.gold_tree_nt_phrases]
+        self.precision=0
+        if len(self.guessed_tree_nt_phrases)!=0: self.precision=float(len(self.common_phrases))/len(self.guessed_tree_nt_phrases)
+        self.recall=0
+        if len(self.gold_tree_nt_phrases)!=0: self.recall=float(len(self.common_phrases))/len(self.gold_tree_nt_phrases)
+        self.f1=0
+        if self.precision+self.recall!=0: self.f1=float(2)*(self.precision*self.recall)/(self.precision+self.recall)
+        #if len(self.common_phrases)==0 or len(self.guessed_tree_nt_phrases)==0 or len(self.gold_tree_nt_phrases)==0: return
+
+
+        #self.precision=float(len(self.common_phrases))/len(self.guessed_tree_nt_phrases)
+        #self.recall=float(len(self.common_phrases))/len(self.gold_tree_nt_phrases)
+        #self.f1=2*(self.precision*self.recall)/(self.precision+self.recall)
+
+        
+
+class tree_diff_phrase_list: #a faster way to compare two trees if you already have the non-terminal phrase list of each
+    def __init__(self,gold_tree_nt_phrases,guessed_tree_nt_phrases,ignore_tags=["s1","top","root",""]): #indicate which spurious tags to ignore in our tree difference analysis
+        #gold_tree_obj=ptb(ptb_gold_tree_str)
+        #guessed_tree_obj=ptb(ptb_guessed_tree_str)
+        #self.gold_tree_nt_phrases=[v for v in gold_tree_obj.get_non_terminals() if not v[0].lower() in ignore_tags]
+        #self.guessed_tree_nt_phrases=[v for v in guessed_tree_obj.get_non_terminals() if not v[0].lower() in ignore_tags]
+        self.common_phrases=[v for v in guessed_tree_nt_phrases if v in gold_tree_nt_phrases]
+        self.missed_phrases=[v for v in gold_tree_nt_phrases if not v in guessed_tree_nt_phrases]
+        self.wrong_phrases=[v for v in guessed_tree_nt_phrases if not v in gold_tree_nt_phrases]
+        self.precision=0
+        if len(guessed_tree_nt_phrases)!=0: self.precision=float(len(self.common_phrases))/len(guessed_tree_nt_phrases)
+        self.recall=0
+        if len(gold_tree_nt_phrases)!=0: self.recall=float(len(self.common_phrases))/len(gold_tree_nt_phrases)
+        self.f1=0
+        if self.precision+self.recall!=0: self.f1=float(2)*(self.precision*self.recall)/(self.precision+self.recall)
+        #if len(self.common_phrases)==0 or len(self.guessed_tree_nt_phrases)==0 or len(self.gold_tree_nt_phrases)==0: return
+
+def extract_rules_tree_str(tree_str,start_end=False,ignore_tags=["s1","top","root",""]):
+    ptb_obj=ptb(tree_str)
+    return extract_rules(ptb_obj,start_end,ignore_tags)
+
+def extract_rules(ptb_obj,start_end=False,ignore_tags=["s1","top","root",""]):
+    #ptb_obj=ptb(tree_str)
+    ch_dict,terminal_dict=ptb_obj.children_dict, ptb_obj.terminal_dict
+    flat_dict=ptb_obj.flat_dict
+    terminals=[v[0] for v in ptb_obj.all_terminals]
+    #print (terminals)
+    terminal_rules,non_terminal_rules=[],[]
+    for ch in ch_dict:
+        terminal_check=terminal_dict.get(ch)
+        ch_stripped=strip_num(ch)
+        if ch_stripped.lower() in ignore_tags: continue
+        if terminal_check:
+            cur_word=ch_dict[ch][0][0]
+            terminal_rules.append((ch_stripped, cur_word))
+        else: 
+            if start_end: cur_nt_children=[(strip_num(v),ptb_obj.flat_dict[v]) for v in ch_dict[ch]]
+            else: cur_nt_children=[strip_num(v) for v in ch_dict[ch]]
+            non_terminal_rules.append((ch_stripped, cur_nt_children))
+    return terminal_rules, non_terminal_rules
+
+
+
+##====================== OLD Parsing framework =====================
+
 
 
 #https://github.com/hmghaly/word_align/edit/master/parsing_lib.py
@@ -72,34 +437,34 @@ def add2trie(cur_trie,items,val,terminal_item=""):
     return cur_trie
 
 #TO BE UPDATED WITH MORE RULES
-rules=[
-       "IN NP > PP",
-       "NP PP > NP",
-       "NP CONJ NP > NP",
-       "VP CONJ VP > VP",
-       "PP CONJ PP > PP",
-       "DT NN > NP",
-       "PRP$ NN > NP",
-       "JJ NN > NN",
-       "JJ JJ > JJ",
-       "NN NN > NN",
-       "AUX V > V",
-       "NP S/NP > NP",
-       "RB JJ > JJ"
-]
-uni_rules=[("PRON","NP"),
-           ("NN","NP"),
-           ("JJ","ADJ"),
-           ("be","V")
-           ]
-cur_trie=defaultdict(lambda: defaultdict(dict))
-for rl in rules:
-  items_str,val=rl.split(">")
-  items_str,val=items_str.strip(),val.strip()
-  items=[v for v in items_str.split(" ") if v]
-  items_reveresed=reversed(items)
-  #print(items,val)
-  cur_trie=add2trie(cur_trie,items_reveresed,val)
+# rules=[
+#        "IN NP > PP",
+#        "NP PP > NP",
+#        "NP CONJ NP > NP",
+#        "VP CONJ VP > VP",
+#        "PP CONJ PP > PP",
+#        "DT NN > NP",
+#        "PRP$ NN > NP",
+#        "JJ NN > NN",
+#        "JJ JJ > JJ",
+#        "NN NN > NN",
+#        "AUX V > V",
+#        "NP S/NP > NP",
+#        "RB JJ > JJ"
+# ]
+# uni_rules=[("PRON","NP"),
+#            ("NN","NP"),
+#            ("JJ","ADJ"),
+#            ("be","V")
+#            ]
+# cur_trie=defaultdict(lambda: defaultdict(dict))
+# for rl in rules:
+#   items_str,val=rl.split(">")
+#   items_str,val=items_str.strip(),val.strip()
+#   items=[v for v in items_str.split(" ") if v]
+#   items_reveresed=reversed(items)
+#   #print(items,val)
+#   cur_trie=add2trie(cur_trie,items_reveresed,val)
 
 def look_back(phrase_span0,all_phrase_spans0,rule_trie0,child_dict0,sequence0=[],depth=0):
   label,i0,i1=phrase_span0
@@ -150,7 +515,7 @@ def get_children_recursive(node0,child_dict0,parent_node=(),all_nodes=[],depth=0
   return tmp_nodes
 
 
-class parse:
+class parse_OLD:
   def __init__(self,sent0,cur_trie0,verb_frame_shelve_path):
     self.cur_trie=cur_trie0
     self.child_dict={}
@@ -214,8 +579,6 @@ class parse:
         self.parse_phrase_list.append((word_node_str,node_i0,node_i1,node_str,new_depth))
     self.out_dict["phrases"]=self.parse_phrase_list
     self.json_out=json.dumps(self.out_dict)
-
-
 
 
 # def get_id(input_tag,counter_dict): #this is a bad function, it takes the global variable tag_count_dict
