@@ -4,23 +4,30 @@ from collections import OrderedDict
 import numpy as np
 import os,json, copy, sys, time, random
 
-import gensim
-from gensim.models import Word2Vec
+# import gensim
+# from gensim.models import Word2Vec
 
-sys.path.append("code_utils")
-import cat_utils
+# sys.path.append("code_utils")
+# import cat_utils
 import general
 from scipy import stats
+
+
+import torch
+from torch import nn
+import torch.optim as optim
+torch.manual_seed(1)
+device = torch.device('cpu')
 
 
 
 try:
   import dill as pickle
-  import torch
-  from torch import nn
-  import torch.optim as optim
-  torch.manual_seed(1)
-  device = torch.device('cpu')
+  # import torch
+  # from torch import nn
+  # import torch.optim as optim
+  # torch.manual_seed(1)
+  # device = torch.device('cpu')
 except:
   pass
   # class nn_cls:

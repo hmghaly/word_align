@@ -14,6 +14,8 @@ import general
 import re, copy
 import itertools
 from itertools import product
+import torch
+import numpy as np
 
 class Parser:
   def __init__(self,rules_list=[],word_features_list=[],params={}) -> None:
@@ -201,6 +203,94 @@ def process_rule(rule_str):
   final_rule_dict["children"]=rule_children
   final_rule_dict["head_i"]=head_i
   return final_rule_dict
+
+
+#=================== Extracting features ============
+#14 Dec 2025
+params0={"len":True,"caps":True,"n_chars":4,"norm_digit":True,"check_hyphen":True,"check_dot":True, "max_len":15}
+#params0={"len":True,"caps":True,"n_chars":4,"norm_digit":False,"check_hyphen":True,"max_len":15}
+
+class wd_ft:
+  def __init__(self,params={}) -> None:
+    self.params=params
+    self.all_feature_slots=[]
+    if self.params.get("len",True): 
+      max_len0=self.params.get("max_len",20)
+      for len0 in range(1,max_len0+1): self.all_feature_slots.append(f"len:{len0}")
+    if self.params.get("caps",True):
+      self.all_feature_slots.append(f"caps_0")
+      self.all_feature_slots.append(f"caps_all")
+    if self.params.get("check_hyphen",True): self.all_feature_slots.append("hyphen")
+    if self.params.get("dot",True): self.all_feature_slots.append("dot")
+    all_alpha_chars=string.ascii_lowercase
+    if params.get("norm_digit",True): all_alpha_chars+="5"
+    else: all_alpha_chars+=string.digits
+
+    n_pre_suf_chars=self.params.get("n_chars",4)
+    for char_i in range(n_pre_suf_chars):
+      rev_i=-char_i-1
+      if char_i==0: #apply to only first/last char
+        for punc0 in string.punctuation:
+          self.all_feature_slots.append(f"{punc0}|{char_i}")
+          self.all_feature_slots.append(f"{punc0}|{rev_i}")
+      else: #empty chars - shorter words
+        self.all_feature_slots.append(f"|{char_i}")
+        self.all_feature_slots.append(f"|{rev_i}")
+      for char0 in all_alpha_chars: 
+        self.all_feature_slots.append(f"{char0}|{char_i}")
+        self.all_feature_slots.append(f"{char0}|{rev_i}")
+      
+
+    self.feature_idx_dict=dict(iter([(v,i) for i,v in enumerate(self.all_feature_slots)]))
+    
+    self.n_features=len(self.all_feature_slots)
+
+  def extract(self,word):
+    all_features=[]
+    if self.params.get("len",True): 
+      len_word=min(len(word),self.params.get("max_len",20))
+      all_features.append(f"len:{len_word}")
+    if self.params.get("caps",True):
+      if word[0].isupper(): all_features.append(f"caps_0")
+      if word.isupper(): all_features.append(f"caps_all")
+    word=word.lower()
+    if len(word)>3:
+      if self.params.get("check_hyphen",True) and len(word.split("-"))>1: all_features.append("hyphen")
+      if self.params.get("check_dot",True) and len(word.split("."))>1: all_features.append("dot")
+    if self.params.get("norm_digit",True): word=re.sub(r"\d",r"5",word) 
+    n_pre_suf_chars=self.params.get("n_chars",4)
+    for char_i in range(n_pre_suf_chars):
+      rev_i=-char_i-1
+      if char_i>len(word)-1: cur_char,cur_rev_char="",""
+      else:
+        cur_char=word[char_i]
+        cur_rev_char=word[rev_i]
+      all_features.append(f"{cur_char}|{char_i}")
+      all_features.append(f"{cur_rev_char}|{rev_i}")
+    return all_features
+
+
+  def to_tensor(self,word):
+    features=self.extract(word)
+    #ft_vector_list=[0.]*self.n_features #len(self.all_feature_slots)
+    
+    ft_vector = np.zeros(self.n_features)
+
+    #ft_tensor0 = torch.zeros(self.n_features)
+    #ft_vector_list=[0.]*len()
+    #indexes=[]
+    for ft0 in features:
+      idx0=self.feature_idx_dict.get(ft0)
+      if idx0!=None: 
+        #indexes.append((ft0,idx0))
+        #ft_vector_list[idx0]=1.
+        #ft_tensor0[idx0]=1.
+        ft_vector[idx0]=1.
+    #return indexes
+    #return ft_vector #ft_tensor0 #torch.tensor(ft_vector_list) #ft_vector_list
+    #return torch.tensor(ft_vector,dtype=torch.float32) 
+    return torch.tensor(ft_vector,dtype=torch.float64) 
+
 
 
 
