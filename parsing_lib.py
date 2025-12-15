@@ -348,14 +348,14 @@ class ptb:
     def __init__(self,ptb_tree_str):
         all_labels=[]
         ptb_tree_str=ptb_tree_str.replace("\n"," ") #we remove line breaks 
-        open_labels=re.finditer("(\(\S+)",ptb_tree_str) #get the open tags with non-space items
-        open_labels2=re.finditer("(\(\s+)",ptb_tree_str) #get open brackets followed by space
+        open_labels=re.finditer(r"(\(\S+)",ptb_tree_str) #get the open tags with non-space items
+        open_labels2=re.finditer(r"(\(\s+)",ptb_tree_str) #get open brackets followed by space
         for op in open_labels: #for each of the open and closed labels found, we use finditer to get its exact start and end points within the tring
             all_labels.append((op.group(), op.start(),op.end())) 
         for op in open_labels2:
             all_labels.append((op.group(), op.start(),op.end())) 
 
-        closed_labels=re.finditer("\)",ptb_tree_str) #get closing brackets
+        closed_labels=re.finditer(r"\)",ptb_tree_str) #get closing brackets
         for cl in closed_labels:
             all_labels.append((cl.group(), cl.start(),cl.end()))
 
