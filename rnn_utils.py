@@ -61,7 +61,8 @@ try: #to avoid environments without torch installation
       self.hidden = self.init_hidden()
     def forward(self, feature_list):
       self.hidden = self.init_hidden() ### check
-      feature_list=torch.tensor(feature_list)
+      if not isinstance(feature_list, torch.Tensor): feature_list=torch.tensor(feature_list)
+      
       feature_list=feature_list.to(device) #### <<<<<<<<<<<<<<<<< 
       if self.matching_in_out:
         lstm_out, _ = self.lstm( feature_list.view(len( feature_list), 1, -1))
