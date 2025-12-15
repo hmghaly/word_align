@@ -7,7 +7,7 @@ import os,json, copy, sys, time, random
 # import gensim
 # from gensim.models import Word2Vec
 
-# sys.path.append("code_utils")
+sys.path.append("code_utils")
 # import cat_utils
 import general
 from scipy import stats
