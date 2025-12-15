@@ -258,17 +258,17 @@ def is_number(str0):
 def str2key(str0): #create_id, create_key, create_text_id
   str0=unescape(str0)
   str0=str0.lower().strip()
-  str0=re.sub("\W+","_",str0).strip("_")
+  str0=re.sub(r"\W+","_",str0).strip("_")
   return str0
 from difflib import SequenceMatcher
 
 TAG_RE = re.compile(r'<[^>]+>')
 def remove_tags(text,repl_with=""): #can also replace with spaces
   removed=TAG_RE.sub(repl_with, text)
-  return re.sub("\s+"," ",removed) #remove extra spaces #TAG_RE.sub(repl_with, text)
+  return re.sub(r"\s+"," ",removed) #remove extra spaces #TAG_RE.sub(repl_with, text)
 
 def is_alpha(text):
-  removed=re.sub("[\W\d]","",text)
+  removed=re.sub(r"[\W\d]","",text)
   return removed!=""
 
 #string/text/unicode functions
@@ -354,7 +354,7 @@ ascii_chars=get_chars(start_i=0,end_i=500,include_diacritics=False)
 
 
 def get_key(txt): #normalize text by replacing non alpha items with _
-  txt=re.sub("\W+","_",txt)
+  txt=re.sub(r"\W+","_",txt)
   txt=txt.strip("_")
   return txt.lower()
 
@@ -374,18 +374,18 @@ def tok_ar_diac(text):
     text=text.replace(dia0,place_holder0)
     diac_list.append((place_holder0,dia0))
 
-  text=re.sub("(\W)",r" \1 ",text)
+  text=re.sub(r"(\W)",r" \1 ",text)
   for a,b in diac_list:
     text=text.replace(a,b)
-  tokens=[v for v in re.split("\s+",text) if v]
+  tokens=[v for v in re.split(r"\s+",text) if v]
   return tokens
 
 
 def tok_multiling(text): 
   tokens=[]
   text=re.sub(u'[\u064e\u064f\u0650\u0651\u0652\u064c\u064b\u064d\u0640\ufc62]','',text) #remove arabic diacritics
-  text=re.sub('(\d+)(\w)',r'\1 \2',text) #handle numbers in chinese and japanese
-  chunks=re.findall("\w+",text)
+  text=re.sub(r'(\d+)(\w)',r'\1 \2',text) #handle numbers in chinese and japanese
+  chunks=re.findall(r"\w+",text)
   for c in chunks:
     if ord(c[0])>10000 or ord(c[-1])>10000: 
       check_end_digits=re.findall('([0-9]+)$',c)
@@ -610,7 +610,7 @@ def tok_keep_punc(text0): #sep 2022
 
 def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this is a tokenization scheme to preserve the punctuation also, but it is sensetive to English clitics, instead of splitting isn't as ['isn',"'","t"], it splits ["is","n't"]
     replaced=[]
-    if keep_urls: replaced.extend(re.findall("https?\:\/\/\S+",txt))
+    if keep_urls: replaced.extend(re.findall(r"https?\:\/\/\S+",txt))
     if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",txt))
     #if keep_numbers: replaced.extend(re.findall(r"[\d,\.]+",txt))
     repl_dict={}
@@ -627,14 +627,14 @@ def tok_old(txt,keep_urls=True,keep_un_symbols=True,keep_numbers=False): #this i
     txt=txt.replace("can't ","cann_t ")
     txt=txt.replace("cannot ","can not ")
     txt=txt.replace("n't ","n_t ")
-    txt=re.sub("(?u)(\W)",r" \1 ", txt)
+    txt=re.sub(r"(?u)(\W)",r" \1 ", txt)
     txt=txt.replace("_s ", " 's ")
     txt=txt.replace("_re "," 're ")
     txt=txt.replace("n_t "," n't ")
     for a,b in repl_dict.items():
         txt=txt.replace(a,b)
     
-    out=re.split("\s+",txt)
+    out=re.split(r"\s+",txt)
     return [v for v in out if v]
 
 #sentence tokenization
@@ -654,9 +654,9 @@ def ssplit(txt,split_at_semicolon=True,add_br=False):
 
     #txt=re.sub("(?u)([\.\?\!\;\u061b])\s",r"\1\n",txt)
     if split_at_semicolon: 
-      txt=re.sub("(?u)([\.\?\!\;])\s",r"\1\n",txt)
+      txt=re.sub(r"(?u)([\.\?\!\;])\s",r"\1\n",txt)
       txt=txt.replace("؛","؛\n")
-    else: txt=re.sub("(?u)([\.\?\!])\s",r"\1\n",txt)
+    else: txt=re.sub(r"(?u)([\.\?\!])\s",r"\1\n",txt)
     txt=txt.replace("\xd8\x9b ","\xd8\x9b\n")
     txt=txt.replace("\xd8\x9f ","\xd8\x9f\n")
 
@@ -673,7 +673,7 @@ def ssplit(txt,split_at_semicolon=True,add_br=False):
         txt=txt.replace(mdw_no_dots,mdw)
 
     cur_sents=[v.strip() for v in txt.split("\n")]
-    cur_sents=[re.sub("\s+"," ",v) for v in cur_sents if v]
+    cur_sents=[re.sub(r"\s+"," ",v) for v in cur_sents if v]
     new_sents=[]
     for sent0 in cur_sents:
       if sent0=="<br>" and new_sents==[]: continue #avoid line break in the beginning
@@ -687,7 +687,7 @@ def ssplit(txt,split_at_semicolon=True,add_br=False):
 def ssplit_old(txt): #split a text into sentences
     dot_words=["Mr","Ms","Dr","Art","art","Chap","chap","No","no","rev","Rev","Add"]
     #txt=re.sub("(?u)([\.\?\!\;\u061b])\s",r"\1\n",txt)
-    txt=re.sub("(?u)([\.\?\!\;])\s",r"\1\n",txt)
+    txt=re.sub(r"(?u)([\.\?\!\;])\s",r"\1\n",txt)
     txt=txt.replace("\xd8\x9b ","\xd8\x9b\n")
     txt=txt.replace("\xd8\x9f ","\xd8\x9f\n")
     cur_sents=[v.strip() for v in txt.split("\n")]
@@ -708,7 +708,7 @@ def split_sents(segs): #if we have already a list of segments, split each into s
 #different tokenization schemes
 def tok_uc(txt): #basic tokenization of unicode text - removes all punctuation
     txt=re.sub(r"(?u)(\W)",r" \1 ",txt)
-    return [v for v in re.split("\s+",txt) if v]
+    return [v for v in re.split(r"\s+",txt) if v]
 
 def tok_zh(zh_txt0):
     tmp_toks=[]
@@ -720,24 +720,24 @@ def tok_zh(zh_txt0):
 def tok_simple(txt,full=False): #this tokenization scheme splits around punctuation - preserving punctuation as tokens
     #txt=txt.replace(u'\x01'," ")
     
-    if full: txt=re.sub("(?u)(\W)",r" \1 ", txt)
+    if full: txt=re.sub(r"(?u)(\W)",r" \1 ", txt)
     else: 
         txt=txt.replace("://","__url__")
-        txt=re.sub("^(\W)",r" \1 ", txt)
-        txt=re.sub("(\W)$",r" \1 ", txt)    
-        txt=re.sub("\s(\W)",r" \1 ", txt)
-        txt=re.sub("(\W)\s",r" \1 ", txt)
-        txt=re.sub("(\W)(\W)",r" \1 \2", txt)   
+        txt=re.sub(r"^(\W)",r" \1 ", txt)
+        txt=re.sub(r"(\W)$",r" \1 ", txt)    
+        txt=re.sub(r"\s(\W)",r" \1 ", txt)
+        txt=re.sub(r"(\W)\s",r" \1 ", txt)
+        txt=re.sub(r"(\W)(\W)",r" \1 \2", txt)   
         txt=txt.replace("__url__","://")    
-    out=re.split("\s+",txt)
+    out=re.split(r"\s+",txt)
     return [v for v in out if v]
 
 
 #27 July 2025
 #simple tokenization to preserve punctuation tokens, and optionally add sentence beginning and end tags <s>, </s>
 def tok_basic(txt,add_sent_tags=False): 
-  txt=re.sub("(?u)(\W)",r" \1 ", txt)
-  out=re.split("\s+",txt)
+  txt=re.sub(r"(?u)(\W)",r" \1 ", txt)
+  out=re.split(r"\s+",txt)
   tokens=[v for v in out if v]
   if add_sent_tags: tokens=["<s>"]+tokens+["</s>"]
   return tokens
