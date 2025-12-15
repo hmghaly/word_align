@@ -208,8 +208,8 @@ def process_rule(rule_str):
 #=================== Extracting features ============
 #14 Dec 2025
 params0={"len":True,"caps":True,"n_chars":4,"norm_digit":True,"check_hyphen":True,"check_dot":True, "max_len":15}
-#params0={"len":True,"caps":True,"n_chars":4,"norm_digit":False,"check_hyphen":True,"max_len":15}
 
+#word feature extraction class
 class wd_ft:
   def __init__(self,params={}) -> None:
     self.params=params
@@ -288,8 +288,8 @@ class wd_ft:
         ft_vector[idx0]=1.
     #return indexes
     #return ft_vector #ft_tensor0 #torch.tensor(ft_vector_list) #ft_vector_list
-    #return torch.tensor(ft_vector,dtype=torch.float32) 
-    return torch.tensor(ft_vector,dtype=torch.float64) 
+    return torch.tensor(ft_vector,dtype=torch.float32) 
+    #return torch.tensor(ft_vector,dtype=torch.float64) 
 
 
 

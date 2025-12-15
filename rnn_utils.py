@@ -104,6 +104,50 @@ def pad_list(list1,N,pad_with=0):
   return list1
 
 
+#========== Encode labels =============
+#using a standard multi-layer labels {"xpos":["VB","VBG","NN","NNS"],"upos":["NOUN","VERB"]}
+#a class for processing multi-label inputs for classification tasks (e.g. both xpos & upos labels for each word) 
+
+#15 Dec 2025
+class label_proc:
+  def __init__(self,label_dict) -> None:
+    self.label_dict=label_dict
+    self.key_label_span_dict={}
+    self.flattened_labels=[]
+    self.label_loc_dict={}
+    i0=0
+    for key,cur_labels in label_dict.items():
+      cur_loc_dict={}
+      for inc0,label0 in enumerate(cur_labels):
+        cur_loc_dict[label0]=i0+inc0
+      self.label_loc_dict[key]=cur_loc_dict
+      self.key_label_span_dict[key]=(i0,i0+len(cur_labels))
+      i0+=len(cur_labels)
+      self.flattened_labels.extend(cur_labels)
+    self.n_labels=len(self.flattened_labels)
+  def encode(self,input_labels): #input labels as dictionary {"xpos":"NN","upos":"NOUN"}
+    cur_vec=np.zeros(self.n_labels)
+    for key0,val0 in input_labels.items():
+      found=self.label_loc_dict.get(key0,{})
+      found_i=found.get(val0)
+      if found_i!=None: cur_vec[found_i]=1.
+    return torch.tensor(cur_vec,dtype=torch.float32) 
+  def decode(self,vec,sort_wt=True): #from a flad vector/tensor to the actual weights of the labels according to the label structure
+    try: vec=vec.tolist() #change numpy array/torch tensor to list - if not already a list
+    except: pass
+    out_dict={}
+    for key,span in self.key_label_span_dict.items():
+      start_i,end_i=span
+      cur_labels= self.label_dict[key]
+      cur_weights= vec[start_i:end_i]
+      cur_label_wt_list=list(zip(cur_labels,cur_weights))
+      if sort_wt: cur_label_wt_list.sort(key=lambda x:-x[-1])
+      out_dict[key]=cur_label_wt_list
+    return out_dict
+
+
+
+
 
 import dill as pickle
 import types
@@ -1495,15 +1539,17 @@ class load_nn:
     self.model.eval()
 
     self.wv_model=None
-    if wv_model!=None:
-      self.wv_model=wv_model #Word2Vec.load(cur_wv_path)
-    elif wv_fpath!=None and wv_fpath!="":
-      self.wv_model=Word2Vec.load(wv_fpath)
-    else:   
-      cur_wv_path=self.extraction_params.get("wv_fpath","")
-      if cur_wv_path=="": self.wv_model=None
-      else: self.wv_model=Word2Vec.load(cur_wv_path)
+    # if wv_model!=None:
+    #   self.wv_model=wv_model #Word2Vec.load(cur_wv_path)
+    # elif wv_fpath!=None and wv_fpath!="":
+    #   self.wv_model=Word2Vec.load(wv_fpath)
+    # else:   
+    #   cur_wv_path=self.extraction_params.get("wv_fpath","")
+    #   if cur_wv_path=="": self.wv_model=None
+    #   else: self.wv_model=Word2Vec.load(cur_wv_path)
     self.extraction_params["wv_model"]=self.wv_model
+
+
   def update_state_dict(self,new_state_dict):
     self.model.load_state_dict(new_state_dict)
     self.model.eval()
