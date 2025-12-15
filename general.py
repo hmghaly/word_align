@@ -251,7 +251,7 @@ def is_money(str0):
 
 def is_number(str0):
   out=False
-  if re.sub("[\d\.\,]","",str0)=="": out=True
+  if re.sub(r"[\d\.\,]","",str0)=="": out=True
   return out
 
 
