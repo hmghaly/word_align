@@ -1,7 +1,7 @@
-import re, json
+#import re, json
 from collections import defaultdict
 #spaCy part
-import os, re, shelve, sys
+import os, re, shelve, sys, string, json
 import spacy
 from spacy.tokenizer import Tokenizer
 from itertools import groupby
