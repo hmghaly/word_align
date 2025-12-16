@@ -8,7 +8,7 @@ random.seed(0)
 
 #16 Dec 2025
 def iter_conll_treebank(treebank_fpath):
-  fopen=open(cur_train_file)
+  fopen=open(treebank_fpath)
   cur_conll_str=""
   for i0,line0 in enumerate(fopen):
     if line0.startswith("#"): continue
