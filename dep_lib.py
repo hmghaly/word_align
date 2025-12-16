@@ -5,6 +5,24 @@ import itertools
 random.seed(0)
 
 
+
+#16 Dec 2025
+def iter_conll_treebank(treebank_fpath):
+  fopen=open(cur_train_file)
+  cur_conll_str=""
+  for i0,line0 in enumerate(fopen):
+    if line0.startswith("#"): continue
+    if line0.strip()=="":
+      yield cur_conll_str
+      cur_conll_str=""
+    else:
+      line_split0=line0.strip().split("\t")
+      id0,form0,lemma0,upos0,xpos0,feats0,head0,deprel0,deps0,misc0=line_split0[:10]
+      if not id0.isdigit(): continue
+      cur_conll_str+=line0
+  fopen.close()
+
+
 # def get_conll(sent_input):
 #   #nlp = spacy.load("en_core_web_sm")
 #   #if type(sent_input) is list: nlp.tokenizer=nlp.tokenizer.tokens_from_list
