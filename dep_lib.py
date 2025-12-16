@@ -17,10 +17,26 @@ def iter_conll_treebank(treebank_fpath):
       cur_conll_str=""
     else:
       line_split0=line0.strip().split("\t")
-      id0,form0,lemma0,upos0,xpos0,feats0,head0,deprel0,deps0,misc0=line_split0[:10]
+      #id0,form0,lemma0,upos0,xpos0,feats0,head0,deprel0,deps0,misc0=line_split0[:10]
+      id0=line_split0[0]
       if not id0.isdigit(): continue
       cur_conll_str+=line0
   fopen.close()
+
+#16 Dec 2025
+def conll2obj(conll_str):
+    line_obj_list=[]
+    col_headers=["id","form","lemma","upos","xpos","feats","head","deprel","deps","misc"]
+    for line0 in conll_str.split("\n"):
+        line_split0=line0.strip().split("\t")
+        line_obj0={}
+        for cell_i,cell in enumerate(line_split0): 
+            if cell_i>len(col_headers)-1: break
+            cur_col_header=col_headers[cell_i]
+            line_obj0[cur_col_header]=cell
+        line_obj_list.append(line_obj0)
+    return line_obj_list
+
 
 
 # def get_conll(sent_input):
