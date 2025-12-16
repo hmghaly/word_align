@@ -29,6 +29,7 @@ def conll2obj(conll_str):
     col_headers=["id","form","lemma","upos","xpos","feats","head","deprel","deps","misc"]
     for line0 in conll_str.split("\n"):
         line_split0=line0.strip().split("\t")
+        if len(line_split0)<len(col_headers): continue
         line_obj0={}
         for cell_i,cell in enumerate(line_split0): 
             if cell_i>len(col_headers)-1: break
