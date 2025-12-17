@@ -126,13 +126,14 @@ class label_proc:
       i0+=len(cur_labels)
       self.flattened_labels.extend(cur_labels)
     self.n_labels=len(self.flattened_labels)
-  def encode(self,input_labels): #input labels as dictionary {"xpos":"NN","upos":"NOUN"}
+  def encode(self,input_labels,to_tensor=False): #input labels as dictionary {"xpos":"NN","upos":"NOUN"}
     cur_vec=np.zeros(self.n_labels)
     for key0,val0 in input_labels.items():
       found=self.label_loc_dict.get(key0,{})
       found_i=found.get(val0)
       if found_i!=None: cur_vec[found_i]=1.
-    return torch.tensor(cur_vec,dtype=torch.float32) 
+    if to_tensor: cur_vec=torch.tensor(cur_vec,dtype=torch.float32) 
+    return cur_vec
   def decode(self,vec,sort_wt=True): #from a flad vector/tensor to the actual weights of the labels according to the label structure
     try: vec=vec.tolist() #change numpy array/torch tensor to list - if not already a list
     except: pass

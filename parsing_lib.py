@@ -270,7 +270,7 @@ class wd_ft:
     return all_features
 
 
-  def to_tensor(self,word):
+  def to_vec(self,word,to_tensor=False):
     features=self.extract(word)
     #ft_vector_list=[0.]*self.n_features #len(self.all_feature_slots)
     
@@ -288,7 +288,8 @@ class wd_ft:
         ft_vector[idx0]=1.
     #return indexes
     #return ft_vector #ft_tensor0 #torch.tensor(ft_vector_list) #ft_vector_list
-    return torch.tensor(ft_vector,dtype=torch.float32) 
+    if to_tensor: ft_vector=torch.tensor(ft_vector,dtype=torch.float32) 
+    return ft_vector #torch.tensor(ft_vector,dtype=torch.float32) 
     #return torch.tensor(ft_vector,dtype=torch.float64) 
 
 
