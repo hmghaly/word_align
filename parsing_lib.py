@@ -274,10 +274,10 @@ class wd_ft:
     features=self.extract(word)
     #ft_vector_list=[0.]*self.n_features #len(self.all_feature_slots)
     
-    ft_vector = np.zeros(self.n_features)
+    #ft_vector = np.zeros(self.n_features)
 
     #ft_tensor0 = torch.zeros(self.n_features)
-    #ft_vector_list=[0.]*len()
+    ft_vector=[0.]*self.n_features
     #indexes=[]
     for ft0 in features:
       idx0=self.feature_idx_dict.get(ft0)
