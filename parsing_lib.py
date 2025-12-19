@@ -296,7 +296,7 @@ class wd_ft:
 def words2ft_tensor(words,ft_obj):
   input_ft_tensor=[]
   for word0 in words:
-    ft_vec0=wd_ft_obj.to_vec(word0)
+    ft_vec0=ft_obj.to_vec(word0)
     input_ft_tensor.append(ft_vec0)
   final_ft_tensor=torch.tensor(input_ft_tensor)
   return final_ft_tensor
