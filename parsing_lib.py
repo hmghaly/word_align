@@ -7,6 +7,7 @@ from spacy.tokenizer import Tokenizer
 from itertools import groupby
 sys.path.append("code_utils")
 import general
+import rnn_utils
 
 
 # 10 December 2025 - New Parsing approach CFG/GPSG
@@ -301,6 +302,41 @@ def words2ft_tensor(words,ft_obj):
   final_ft_tensor=torch.tensor(input_ft_tensor)
   return final_ft_tensor
 
+
+#============== POS Tagger ================
+#20 December 2025
+
+#given the RNN model for POS tagger, initiate and run the tagging for any given sequence of words
+class POS:
+  def __init__(self,rnn_model_path,params={}) -> None:
+    self.params=params
+    self.loaded_model_dict=torch.load(rnn_model_path) #first we load the RNN POS model
+    self.featex_params=self.loaded_model_dict["featex_params"]
+    self.training_params=self.loaded_model_dict["training_params"]
+    self.label_params=self.loaded_model_dict["label_params"]
+    self.state_dict=self.loaded_model_dict.get("state_dict")
+    if self.state_dict==None: self.state_dict=self.loaded_model_dict.get("state_dict_best_loss")
+
+    self.wd_ft_obj=wd_ft(self.featex_params) #loaded from word features class from parsing lib
+    self.label_proc_obj=rnn_utils.label_proc(self.label_params) #loaded from label processing class from RNN lib
+    #last two true params are sigmoid & matching input output size
+    self.rnn=rnn_utils.RNN(self.training_params["n_input"],self.training_params["n_hidden"],self.training_params["n_output"],self.training_params["n_layers"],True,True)
+    self.rnn.load_state_dict(self.state_dict)
+    self.rnn.eval()
+
+  def tag_words(self,words,min_wt=None):
+    input_tensor=words2ft_tensor(words,self.wd_ft_obj)
+    out1=self.rnn(input_tensor)
+    final_pos_obj_list=[]
+    for o1,w1 in zip(out1,words):
+      label_out=self.label_proc_obj.decode(o1)
+      cur_obj_list={"word":w1}
+      for a,b in label_out.items(): 
+        tag_wt_list=b
+        if min_wt!=None: tag_wt_list=[(tg0,wt0) for tg0,wt0 in tag_wt_list if wt0>min_wt]
+        cur_obj_list[a]=tag_wt_list
+      final_pos_obj_list.append(cur_obj_list)
+    return final_pos_obj_list  
 
 #============== spaCy Utils ===============
 
