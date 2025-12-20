@@ -310,6 +310,10 @@ def words2ft_tensor(words,ft_obj):
 class POS:
   def __init__(self,rnn_model_path,params={}) -> None:
     self.params=params
+    self.no_model=False
+    if rnn_model_path==None or not os.path.exists(rnn_model_path): 
+      self.no_model=True
+      return
     self.loaded_model_dict=torch.load(rnn_model_path) #first we load the RNN POS model
     self.featex_params=self.loaded_model_dict["featex_params"]
     self.training_params=self.loaded_model_dict["training_params"]
@@ -325,6 +329,7 @@ class POS:
     self.rnn.eval()
 
   def tag_words(self,words,min_wt=None):
+    if self.no_model: return [{"word":w0} for w0 in words]
     input_tensor=words2ft_tensor(words,self.wd_ft_obj)
     out1=self.rnn(input_tensor)
     final_pos_obj_list=[]
