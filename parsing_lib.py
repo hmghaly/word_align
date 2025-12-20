@@ -26,6 +26,7 @@ class Parser:
     self.default_wt=params.get("default_wt",0.99)
     self.min_pos_wt=params.get("min_pos_wt",0.1)
     self.pos_model_path=params.get("pos_model_path")
+    self.final_word_features_dict=params.get("final_word_features_dict",{})
     self.pos_tagger=POS(self.pos_model_path)
 
     self.unknown_token_tags=[("N","noun"),("V","verb"),("JJ","adj"),("RB","adv")]
@@ -59,7 +60,7 @@ class Parser:
       token0=a["word"]
       start,end=i,i
       wt=self.default_wt
-      outcome=final_word_features_dict.get(token0,self.unknown_token_tags) #outcome is multiple tag/cat options, with their features
+      outcome=self.final_word_features_dict.get(token0,self.unknown_token_tags) #outcome is multiple tag/cat options, with their features
       for cat0,feat0 in outcome:
         feat_split=feat0.split()
         #only one phrase object per cat/features pair
