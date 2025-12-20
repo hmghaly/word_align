@@ -18,11 +18,16 @@ from itertools import product
 import torch
 import numpy as np
 
+#20 December 2025
 class Parser:
   def __init__(self,rules_list=[],word_features_list=[],params={}) -> None:
     self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
     self.sent_padding=params.get("sent_padding",False)
-    self.default_wt=params.get("default_wt",0.5)
+    self.default_wt=params.get("default_wt",0.99)
+    self.min_pos_wt=params.get("min_pos_wt",0.1)
+    self.pos_model_path=params.get("pos_model_path")
+    self.pos_tagger=POS(self.pos_model_path)
+
     self.unknown_token_tags=[("N","noun"),("V","verb"),("JJ","adj"),("RB","adv")]
     self.unknown_token_tags_wt_dict={}
     #process all word features
@@ -49,16 +54,18 @@ class Parser:
     self.phrase_list=[] #list of all phrase objects, with spans, weights, children
     self.cat_phrase_index={}
     self.feat_phrase_index={}
-    for i,a in enumerate(tokens): #process each token
+    tokens_pos_list=self.pos_tagger.tag_words(tokens,min_wt=self.min_pos_wt)
+    for i,a in enumerate(tokens_pos_list): #process each token
+      token0=a["word"]
       start,end=i,i
       wt=self.default_wt
-      outcome=final_word_features_dict.get(a,self.unknown_token_tags) #outcome is multiple tag/cat options, with their features
+      outcome=final_word_features_dict.get(token0,self.unknown_token_tags) #outcome is multiple tag/cat options, with their features
       for cat0,feat0 in outcome:
         feat_split=feat0.split()
         #only one phrase object per cat/features pair
         cur_token_rules=[] #retrieved rules that apply to current token
         phrase_i=len(self.phrase_list)
-        cur_phrase_obj={"start":start,"end":end,"wt":wt,"cat":cat0,"feat":feat_split,"head":start,"children":[],"i":phrase_i}
+        cur_phrase_obj={"start":start,"end":end,"wt":wt,"cat":cat0,"feat":feat_split,"head":start,"children":[],"i":phrase_i,"span":1}
         self.add_phrase(cur_phrase_obj)
         #print(cur_phrase_obj)
         new_phrases=self.project_phrase(cur_phrase_obj)
@@ -71,12 +78,14 @@ class Parser:
             projected_phrases=self.project_phrase(ph0)
             new_phrases.extend(projected_phrases)
           for a in new_phrases: self.add_phrase(a)
-          
+
 
         #print("---")
-    for i0,a0 in enumerate(self.phrase_list):
-      print(i0,a0)
-  
+    self.phrase_list.sort(key=lambda x:(-x["span"],-x["wt"]))
+    return self.phrase_list
+    # for i0,a0 in enumerate(self.phrase_list):
+    #   print(i0,a0)
+
   def project_phrase(self,cur_phrase_obj):
     cur_phrase_counter=cur_phrase_obj["i"]
     new_phrases=[]
@@ -85,10 +94,10 @@ class Parser:
       rule_obj=self.all_processed_rules[r_i]
       rule_children=rule_obj["children"]
       #print(r_i,self.all_processed_rules[r_i])
-      rule_children_reversed=list(reversed(rule_children)) 
+      rule_children_reversed=list(reversed(rule_children))
       last_child=rule_children_reversed[0]
       match_last=match_rule(cur_phrase_obj,last_child)
-     
+
       if not match_last: continue
       rule_children_corr_phrases=[]
       rule_children_corr_phrases.append([cur_phrase_counter])
@@ -107,8 +116,11 @@ class Parser:
         parent_phrase_obj={}
         phrase_obj_list=[self.phrase_list[vi] for vi in pc]
         parent_phrase_obj["wt"]=sum([vw["wt"] for vw in phrase_obj_list])
-        parent_phrase_obj["start"]=min([vw["start"] for vw in phrase_obj_list])
-        parent_phrase_obj["end"]=max([vw["end"] for vw in phrase_obj_list])
+        phrase_start0=min([vw["start"] for vw in phrase_obj_list])
+        parent_phrase_obj["start"]=phrase_start0
+        phrase_end0=max([vw["end"] for vw in phrase_obj_list])
+        parent_phrase_obj["end"]=phrase_end0
+        parent_phrase_obj["span"]=phrase_end0-phrase_start0+1
         parent_phrase_obj["cat"]=rule_obj["parent"]["cat"]
         parent_phrase_obj["feat"]=rule_obj["parent"]["feat"]
         rule_head_i=rule_obj["head_i"]
@@ -157,6 +169,10 @@ class Parser:
       final_phrase_list.append(ph_i)
     return final_phrase_list
 
+
+
+
+#end of parser def
 
 def match_rule(token_info,rule_child_info):
   #given cat/feat for a phrase/token, match it with the cat/feat for a child in a rule
