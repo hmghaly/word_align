@@ -23,10 +23,13 @@ class Parser:
   def __init__(self,rules_list=[],word_features_list=[],params={}) -> None:
     self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
     self.sent_padding=params.get("sent_padding",False)
-    self.default_wt=params.get("default_wt",0.99)
+    self.default_wt=params.get("default_wt",1)
     self.min_pos_wt=params.get("min_pos_wt",0.1)
     self.pos_model_path=params.get("pos_model_path")
     self.final_word_features_dict=params.get("final_word_features_dict",{})
+    self.xpos_ft_dict=params.get("xpos_ft_dict",{})
+
+
     self.pos_tagger=POS(self.pos_model_path)
 
     self.unknown_token_tags=[("N","noun"),("V","verb"),("JJ","adj"),("RB","adv")]
@@ -58,15 +61,28 @@ class Parser:
     tokens_pos_list=self.pos_tagger.tag_words(tokens,min_wt=self.min_pos_wt)
     for i,a in enumerate(tokens_pos_list): #process each token
       token0=a["word"]
+      xpos0=a.get("xpos",[])
       start,end=i,i
       wt=self.default_wt
       outcome=self.final_word_features_dict.get(token0,self.unknown_token_tags) #outcome is multiple tag/cat options, with their features
-      for cat0,feat0 in outcome:
-        feat_split=feat0.split()
+      outcome_wt=[(cat0,feat0,self.default_wt) for cat0,feat0 in outcome]
+      for xpos_tag0,xpos_wt0 in xpos0:
+        xpos_ft0=self.xpos_ft_dict.get(xpos_tag0,[])
+        outcome_wt.append((xpos_tag0,xpos_ft0,xpos_wt0))
+
+        
+      # print(outcome_wt)
+      # print(xpos0)
+
+      for cat0,feat0,wt0 in outcome_wt:
+
+      # for cat0,feat0 in outcome:
+      #   feat_split=feat0.split()
+        feat_split=feat0#.split()
         #only one phrase object per cat/features pair
         cur_token_rules=[] #retrieved rules that apply to current token
         phrase_i=len(self.phrase_list)
-        cur_phrase_obj={"start":start,"end":end,"wt":wt,"cat":cat0,"feat":feat_split,"head":start,"children":[],"i":phrase_i,"span":1}
+        cur_phrase_obj={"wt":wt0,"span":1,"start":start,"end":end,"cat":cat0,"feat":feat_split,"head":start,"children":[],"i":phrase_i}
         self.add_phrase(cur_phrase_obj)
         #print(cur_phrase_obj)
         new_phrases=self.project_phrase(cur_phrase_obj)
@@ -118,10 +134,12 @@ class Parser:
         phrase_obj_list=[self.phrase_list[vi] for vi in pc]
         parent_phrase_obj["wt"]=sum([vw["wt"] for vw in phrase_obj_list])
         phrase_start0=min([vw["start"] for vw in phrase_obj_list])
-        parent_phrase_obj["start"]=phrase_start0
         phrase_end0=max([vw["end"] for vw in phrase_obj_list])
-        parent_phrase_obj["end"]=phrase_end0
+
         parent_phrase_obj["span"]=phrase_end0-phrase_start0+1
+        parent_phrase_obj["start"]=phrase_start0
+        parent_phrase_obj["end"]=phrase_end0
+
         parent_phrase_obj["cat"]=rule_obj["parent"]["cat"]
         parent_phrase_obj["feat"]=rule_obj["parent"]["feat"]
         rule_head_i=rule_obj["head_i"]
