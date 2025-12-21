@@ -23,7 +23,7 @@ class Parser:
   def __init__(self,rules_list=[],word_features_list=[],params={}) -> None:
     self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
     self.sent_padding=params.get("sent_padding",False)
-    self.default_wt=params.get("default_wt",1)
+    self.default_wt=params.get("default_wt",0.5) #to apply on unknown tags
     self.min_pos_wt=params.get("min_pos_wt",0.1)
     self.pos_model_path=params.get("pos_model_path")
     self.final_word_features_dict=params.get("final_word_features_dict",{})
@@ -64,20 +64,20 @@ class Parser:
       xpos0=a.get("xpos",[])
       start,end=i,i
       wt=self.default_wt
-      outcome=self.final_word_features_dict.get(token0,self.unknown_token_tags) #outcome is multiple tag/cat options, with their features
-      outcome_wt=[(cat0,feat0,self.default_wt) for cat0,feat0 in outcome]
+      outcome=self.final_word_features_dict.get(token0,[]) #outcome is multiple tag/cat options, with their features
+      outcome_wt=[(cat0,feat0,1) for cat0,feat0 in outcome] #use a weight of 1 for the specific closed class words 
       for xpos_tag0,xpos_wt0 in xpos0:
         xpos_ft0=self.xpos_ft_dict.get(xpos_tag0,[])
         outcome_wt.append((xpos_tag0,xpos_ft0,xpos_wt0))
+      #if nothing found
+      if outcome_wt==[]:
+        for cat0,feat0 in self.unknown_token_tags: outcome_wt.append((cat0,feat0,self.default_wt))
 
         
       # print(outcome_wt)
       # print(xpos0)
 
       for cat0,feat0,wt0 in outcome_wt:
-
-      # for cat0,feat0 in outcome:
-      #   feat_split=feat0.split()
         feat_split=feat0#.split()
         #only one phrase object per cat/features pair
         cur_token_rules=[] #retrieved rules that apply to current token
