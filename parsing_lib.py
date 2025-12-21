@@ -198,6 +198,73 @@ class Parser:
 
 #end of parser def
 
+#21 December 2025
+#convert the output of the parser (list of phrase objects) into dependency and constituency information
+def export_parse(words,main_phrase,final_phrases):
+
+  cur_phrase=main_phrase
+  start0,end0=cur_phrase["start"],cur_phrase["end"]
+  phrase_head_loc_dict={cur_phrase["i"]: cur_phrase["head_loc"]} #identify the head location for each phrase obj/key is phrase number/phrase index in the phrase list
+
+  dep_dict={} #identify which phrase head loc depends on which phrase head loc
+  root_index=cur_phrase["head_loc"] #the root of the current phrase
+
+  cur_tokens_xpos_dict={}
+  unsorted_phrases=sorted(final_phrases,key=lambda x:x["i"]) #they should be sorted anyway by their original order of being added to the list
+  parse_phrases=[cur_phrase] #these are the phrases to be used for constituency parsing
+  children=cur_phrase.get("children",[])
+  new_children=[]
+
+  while children: #go on a semi-recursive way to identify children and subchildren of current main phrase
+    for ch0 in children:
+      child_phrase=unsorted_phrases[ch0]
+      phrase_head_loc_dict[ch0]=child_phrase["head_loc"]
+      if child_phrase["span"]==1 and child_phrase["children"]==[]: #identify the matching XPOS for terminal phrases
+        cur_tokens_xpos_dict[child_phrase["start"]]=child_phrase["cat"] 
+      parse_phrases.append(child_phrase) 
+      sub_children=child_phrase.get("children",())
+      sub_children=list(sub_children)
+      for sc in sub_children:
+        if sc==ch0: continue
+        new_children.append(sc) #print("sc",sc)
+    children=new_children
+    new_children=[]
+
+  for a in parse_phrases:
+    cur_children=a["children"]
+    cur_phrase_head_loc=a["head_loc"]
+    for ch0 in cur_children: #for each child of the current phrase, identify its head_loc
+      ch_head_loc=phrase_head_loc_dict[ch0]
+      if ch_head_loc==cur_phrase_head_loc: continue #skip if the head_loc for current child is the same as of the main phrase
+      dep_dict[ch_head_loc]=cur_phrase_head_loc #update dependency dict between heads of two phrases
+
+  final_dep_list=[]
+  for i0,w0 in enumerate(words): #create dependency info for each word
+    cur_id0=i0+1
+
+    #identify head index
+    if i0==root_index: #root word
+      cur_dep="0"
+      head_word="^"
+      offset=0
+    else: 
+      cur_dep=dep_dict.get(i0)
+      if cur_dep==None:  #word without attachment
+        cur_dep="-"
+        head_word=""
+        offset=100 #any random number for no offset
+      else: #any other word
+        head_word=words[cur_dep]
+        offset=i0-cur_dep
+        cur_dep=str(cur_dep+1)
+        
+    cur_xpos0=cur_tokens_xpos_dict.get(i0,"-")
+    final_dep_list.append({"id":str(cur_id0),"word": w0,"head":cur_dep,"xpos":cur_xpos0,"head_word":head_word,"offset":offset})
+  return final_dep_list, parse_phrases  
+
+
+
+
 def match_rule(token_info,rule_child_info):
   #given cat/feat for a phrase/token, match it with the cat/feat for a child in a rule
   token_info_cat,token_info_feat=token_info["cat"],token_info["feat"]
