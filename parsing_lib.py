@@ -461,7 +461,7 @@ nlp.tokenizer = Tokenizer(nlp.vocab, token_match=re.compile(r'\S+').match)
 def spacy_parse(tokens):
   tokens=[v.strip("_") for v in tokens]
   joined_sent=" ".join(tokens)
-  #conll_2d=[]
+  doc = nlp(joined_sent)
   conll_lines=[]
   for token in doc:   
       token_i = token.i+1
