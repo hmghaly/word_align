@@ -65,7 +65,7 @@ class Parser:
       start,end=i,i
       wt=self.default_wt
       outcome=self.final_word_features_dict.get(token0,[]) #outcome is multiple tag/cat options, with their features
-      outcome_wt=[(cat0,feat0,1) for cat0,feat0 in outcome] #use a weight of 1 for the specific closed class words 
+      outcome_wt=[(cat0,feat0,1) for cat0,feat0 in outcome] #use a weight of 1 for the specific closed class words
       for xpos_tag0,xpos_wt0 in xpos0:
         xpos_ft0=self.xpos_ft_dict.get(xpos_tag0,[])
         outcome_wt.append((xpos_tag0,xpos_ft0,xpos_wt0))
@@ -73,7 +73,7 @@ class Parser:
       if outcome_wt==[]:
         for cat0,feat0 in self.unknown_token_tags: outcome_wt.append((cat0,feat0,self.default_wt))
 
-        
+
       # print(outcome_wt)
       # print(xpos0)
 
@@ -82,7 +82,7 @@ class Parser:
         #only one phrase object per cat/features pair
         cur_token_rules=[] #retrieved rules that apply to current token
         phrase_i=len(self.phrase_list)
-        cur_phrase_obj={"wt":wt0,"span":1,"start":start,"end":end,"cat":cat0,"feat":feat_split,"head":start,"children":[],"i":phrase_i}
+        cur_phrase_obj={"wt":wt0,"span":1,"start":start,"end":end,"cat":cat0,"feat":feat_split,"head_loc":start,"head_phrase":phrase_i,"children":[],"i":phrase_i}
         self.add_phrase(cur_phrase_obj)
         #print(cur_phrase_obj)
         new_phrases=self.project_phrase(cur_phrase_obj)
@@ -98,8 +98,9 @@ class Parser:
 
 
         #print("---")
-    self.phrase_list.sort(key=lambda x:(-x["span"],-x["wt"]))
-    return self.phrase_list
+    #self.phrase_list.sort(key=lambda x:(-x["span"],-x["wt"]))
+    sorted_phrase_list=sorted(self.phrase_list,key=lambda x:(-x["span"],-x["wt"]))
+    return sorted_phrase_list
     # for i0,a0 in enumerate(self.phrase_list):
     #   print(i0,a0)
 
@@ -129,7 +130,7 @@ class Parser:
       #print(list(itertools.product(*zip(*rule_children_corr_phrases))))
       phrase_combinations = list(product(*rule_children_corr_phrases))
       #print(phrase_combinations)
-      for pc in phrase_combinations:
+      for pc in phrase_combinations: #combinations of phrase ids
         parent_phrase_obj={}
         phrase_obj_list=[self.phrase_list[vi] for vi in pc]
         parent_phrase_obj["wt"]=sum([vw["wt"] for vw in phrase_obj_list])
@@ -144,7 +145,11 @@ class Parser:
         parent_phrase_obj["feat"]=rule_obj["parent"]["feat"]
         rule_head_i=rule_obj["head_i"]
         parent_phrase_obj["children"]=pc
-        parent_phrase_obj["head"]=pc[rule_head_i]
+        heade_phrase_index=pc[rule_head_i]
+        parent_phrase_obj["head_phrase"]=heade_phrase_index
+        heade_phrase_obj=self.phrase_list[heade_phrase_index]
+        parent_phrase_obj["head_loc"]=heade_phrase_obj["head_loc"]
+        
         new_phrases.append(parent_phrase_obj)
     return new_phrases
 
