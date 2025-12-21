@@ -456,6 +456,23 @@ nlp = spacy.load("en_core_web_sm")
 #http://spyysalo.github.io/conllu.js/
 #https://github.com/explosion/spaCy/issues/533 #spacy to output conll format
 nlp.tokenizer = Tokenizer(nlp.vocab, token_match=re.compile(r'\S+').match)
+
+#21 December 2025
+def spacy_parse(tokens):
+  tokens=[v.strip("_") for v in tokens]
+  joined_sent=" ".join(tokens)
+  #conll_2d=[]
+  conll_lines=[]
+  for token in doc:   
+      token_i = token.i+1
+      if token.i==token.head.i: head_i=0
+      else: head_i = token.head.i+1
+      items=[token_i,token.text, token.lemma_, token.tag_, token.pos_, "_", head_i, token.dep_,"_","_"]
+      line0="\t".join([str(v) for v in items])
+      conll_lines.append(line0)
+  return "\n".join(conll_lines)
+
+
 def tok_sent_join(sent_text): #tokenize with our function, and then join with whitespace for spacy tokenization
     tokenized_sent=general.tok(sent_text)
     tokenized_sent=[v.strip("_") for v in tokenized_sent]
