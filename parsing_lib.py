@@ -177,7 +177,7 @@ class Parser:
     for s_feat0 in phrase_obj_feat:
       corr_rules=self.feat_inv_index.get(s_feat0,[])
       all_rules.extend(corr_rules)
-    return all_rules
+    return list(set(all_rules))
 
   def scan_phrases(self,rule_child,cur_phrase_start=None):
     #for any child of a given rule, scan all the phrases that match this child (both cat/feat)
