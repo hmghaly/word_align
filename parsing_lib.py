@@ -70,7 +70,7 @@ class Parser:
       outcome_wt=[(cat0,feat0,1) for cat0,feat0 in outcome] #use a weight of 1 for the specific closed class words
       temp_used_cat_list=[v[0] for v in outcome_wt]
       for xpos_tag0,xpos_wt0 in xpos0:
-        if xpos_tag0 in outcome_wt: continue
+        if xpos_tag0 in temp_used_cat_list: continue
         xpos_ft0=self.xpos_ft_dict.get(xpos_tag0,[])
         outcome_wt.append((xpos_tag0,xpos_ft0,xpos_wt0))
       #if nothing found
