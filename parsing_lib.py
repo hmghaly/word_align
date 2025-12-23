@@ -154,6 +154,7 @@ class Parser:
         parent_phrase_obj["head_phrase"]=heade_phrase_index
         heade_phrase_obj=self.phrase_list[heade_phrase_index]
         parent_phrase_obj["head_loc"]=heade_phrase_obj["head_loc"]
+        parent_phrase_obj["rule_i"]=r_i
         
         new_phrases.append(parent_phrase_obj)
     return new_phrases
