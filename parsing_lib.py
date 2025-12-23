@@ -42,6 +42,7 @@ class Parser:
     self.feat_fwd_index=[]
     for i0,r0 in enumerate(rules_list):
       processed_rule=process_rule(r0)
+      if processed_rule==None: continue
       #print(processed_rule)
       self.all_processed_rules.append(processed_rule)
       last_child=processed_rule["children"][-1]
@@ -281,6 +282,7 @@ def process_rule(rule_str):
   final_rule_dict={}
   rule_str=rule_str.replace("→","-->")
   rule_split=rule_str.split("-->")
+  if len(rule_split)!=2: return None
   lhs,rhs=rule_split
   lhs,rhs=lhs.strip(),rhs.strip()
   lhs_cat0=lhs.split("[")[0]
