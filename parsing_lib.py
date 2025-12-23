@@ -43,8 +43,9 @@ class Parser:
     for i0,r0 in enumerate(rules_list):
       processed_rule=process_rule(r0)
       if processed_rule==None: continue
-      #print(processed_rule)
       self.all_processed_rules.append(processed_rule)
+
+    for i0, processed_rule in enumerate(self.all_processed_rules):
       last_child=processed_rule["children"][-1]
       last_child_cat=last_child["cat"]
       last_child_features=last_child["feat"]
@@ -109,6 +110,7 @@ class Parser:
     cur_phrase_counter=cur_phrase_obj["i"]
     new_phrases=[]
     rules=self.get_rules(cur_phrase_obj)
+    #for r_i in rules:
     for r_i in rules:
       rule_obj=self.all_processed_rules[r_i]
       rule_children=rule_obj["children"]
