@@ -195,7 +195,7 @@ class Parser:
       found_phrase_obj=self.phrase_list[ph_i]
       found_phrase_obj_end=found_phrase_obj["end"]
       matched=match_rule(found_phrase_obj,rule_child)
-      if found_phrase_obj_end>=cur_phrase_start: continue
+      if cur_phrase_start!=None and found_phrase_obj_end>=cur_phrase_start: continue
       if not match_rule(found_phrase_obj,rule_child): continue
       final_phrase_list.append(ph_i)
     return final_phrase_list
