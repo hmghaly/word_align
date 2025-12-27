@@ -29,6 +29,8 @@ class Parser:
     self.final_word_features_dict=params.get("final_word_features_dict",{})
     self.xpos_ft_dict=params.get("xpos_ft_dict",{})
     self.max_n_phrases=params.get("max_n_phrases",10) #max n phrases per key
+    self.max_skip_distance=params.get("max_skip_distance",3) #max number of tokens to skip between phrases
+
 
 
     self.pos_tagger=POS(self.pos_model_path)
@@ -131,7 +133,7 @@ class Parser:
       
       #print(phrase_obj0)
       dep0,const0=self.export_parse(tokens,phrase_obj0)
-      final_raw_parses.append((dep0,const0))
+      final_raw_parses.append((phrase_obj0,dep0,const0))
     #   for d0 in dep0: print(d0)
     #   print("---")
     # print("--------")
@@ -203,7 +205,18 @@ class Parser:
         cur_child_keys=[self.phrase_key_list[vi] for vi in pc]
         #print("cur_child_keys",cur_child_keys)
         phrase_obj_list=[self.main_phrase_dict[key0][0] for key0 in cur_child_keys] #get the top phrase object corresponding to each key
+        phrase_obj_pairs=list(zip(phrase_obj_list,phrase_obj_list[1:]))
+        skip_combination=False
+        for p0,p1 in phrase_obj_pairs: 
+          distance=p1["start"]-p0["end"]-1
+          if distance<0 or distance>self.max_skip_distance: skip_combination=True
+          if skip_combination: break
+          # print("phrase pair",distance,"skip_combination",skip_combination)
+          # print(p0)
+          # print(p1)
+          # print("----")
         #print("phrase_obj_list",phrase_obj_list)
+        if skip_combination: continue
 
         #phrase_obj_list=[self.phrase_key_list[vi] for vi in pc]
         parent_phrase_obj["wt"]=sum([vw["wt"] for vw in phrase_obj_list])
