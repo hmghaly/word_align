@@ -239,7 +239,7 @@ class Parser:
         head_phrase_index=pc[rule_head_i]
         parent_phrase_obj["head_phrase"]=head_phrase_index
         #heade_phrase_obj=self.phrase_list[heade_phrase_index]
-        head_phrase_key=self.phrase_key_list[heade_phrase_index]
+        head_phrase_key=self.phrase_key_list[head_phrase_index]
 
         head_phrase_obj=self.main_phrase_dict[head_phrase_key][0]
         #self.phrase_key_list
