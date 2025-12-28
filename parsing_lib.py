@@ -30,6 +30,7 @@ class Parser:
     self.xpos_ft_dict=params.get("xpos_ft_dict",{})
     self.max_n_phrases=params.get("max_n_phrases",10) #max n phrases per key
     self.max_skip_distance=params.get("max_skip_distance",3) #max number of tokens to skip between phrases
+    self.debug=params.get("debug",False)
 
 
 
@@ -75,8 +76,12 @@ class Parser:
 
 
     tokens_pos_list=self.pos_tagger.tag_words(tokens,min_wt=self.min_pos_wt)
+
+    if self.debug: print(tokens_pos_list)
     for i,a in enumerate(tokens_pos_list): #process each token
       token0=a["word"]
+      if self.debug: print(i,token0,len(self.phrase_list))
+
       xpos0=a.get("xpos",[])
       start,end=i,i
       wt=self.default_wt
