@@ -113,6 +113,7 @@ class Parser:
           for ph0 in new_phrases_copy:
             #print("copy",ph0)
             projected_phrases=self.project_phrase(ph0)
+            if self.debug: print("projected", len(projected_phrases),ph0)
             new_phrases.extend(projected_phrases)
           for a in new_phrases: self.add_phrase(a)
 
@@ -148,7 +149,7 @@ class Parser:
     #   print(i0,a0)
 
   def project_phrase(self,cur_phrase_obj):
-    if self.debug: print("projecting:",cur_phrase_obj)
+    #if self.debug: print("projecting:",cur_phrase_obj)
     #cur_phrase_counter=cur_phrase_obj["i"]
     new_phrases=[]
     new_phrases2=[]
@@ -165,7 +166,7 @@ class Parser:
       if not match_last: continue
 
       #self.phrase_key_index_dict
-      if self.debug: print("rule_obj",rule_obj)
+      #if self.debug: print("rule_obj",rule_obj)
 
       rule_children_corr_phrases=[]
       
