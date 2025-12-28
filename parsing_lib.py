@@ -76,6 +76,7 @@ class Parser:
 
 
     tokens_pos_list=self.pos_tagger.tag_words(tokens,min_wt=self.min_pos_wt)
+    self.cur_tokens_pos_list=tokens_pos_list
 
     if self.debug: print(tokens_pos_list)
     for i,a in enumerate(tokens_pos_list): #process each token
