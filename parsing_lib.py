@@ -238,8 +238,15 @@ class Parser:
         parent_phrase_obj["children"]=pc
         heade_phrase_index=pc[rule_head_i]
         parent_phrase_obj["head_phrase"]=heade_phrase_index
-        heade_phrase_obj=self.phrase_list[heade_phrase_index]
-        parent_phrase_obj["head_loc"]=heade_phrase_obj["head_loc"]
+        #heade_phrase_obj=self.phrase_list[heade_phrase_index]
+
+        head_phrase_obj=self.phrase_key_list[heade_phrase_index][0]
+        #self.phrase_key_list
+        parent_phrase_obj["head_loc"]=head_phrase_obj["head_loc"]
+
+
+        #parent_phrase_obj["head_loc"]=heade_phrase_obj["head_loc"]
+
         parent_phrase_obj["rule_i"]=r_i
         
         new_phrases2.append(parent_phrase_obj)
