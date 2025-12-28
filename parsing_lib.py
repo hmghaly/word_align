@@ -272,8 +272,9 @@ class Parser:
 
     phrase_key=(phrase_obj_start,phrase_obj_end,phrase_obj_cat," ".join(phrase_obj_feat))
     phrase_key_i=self.phrase_key_index_dict.get(phrase_key)
+    cur_phrase_obj["i"]=phrase_key_i
     if phrase_key_i==None: #if no key exists, we create a key, and index the 
-      cur_phrase_obj["i"]=phrase_key_i
+
       phrase_key_i=len(self.phrase_key_list)
       self.phrase_key_index_dict[phrase_key]=phrase_key_i #map the phrase key to its number in the phrase key list
       self.phrase_key_list.append(phrase_key)
