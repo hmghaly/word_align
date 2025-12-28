@@ -80,7 +80,7 @@ class Parser:
     if self.debug: print(tokens_pos_list)
     for i,a in enumerate(tokens_pos_list): #process each token
       token0=a["word"]
-      if self.debug: print(i,token0,len(self.phrase_list))
+      if self.debug: print(i,token0,len(self.phrase_list),len(self.phrase_key_list))
 
       xpos0=a.get("xpos",[])
       start,end=i,i
@@ -253,12 +253,12 @@ class Parser:
     phrase_obj_wt=cur_phrase_obj["wt"]
     cur_phrase_span=(phrase_obj_start,phrase_obj_end)
 
-    cur_phrase_counter=len(self.phrase_list)
-    self.cat_phrase_index[phrase_obj_cat]=self.cat_phrase_index.get(phrase_obj_cat,[])+[cur_phrase_counter] #add this phrase to the inverted index of categories and their corresponding phrase counter
-    for s_feat0 in phrase_obj_feat:
-      self.feat_phrase_index[s_feat0]=self.feat_phrase_index.get(s_feat0,[])+[cur_phrase_counter]
-    cur_phrase_obj["i"]=len(self.phrase_list)
-    self.phrase_list.append(cur_phrase_obj)
+    # cur_phrase_counter=len(self.phrase_list)
+    # self.cat_phrase_index[phrase_obj_cat]=self.cat_phrase_index.get(phrase_obj_cat,[])+[cur_phrase_counter] #add this phrase to the inverted index of categories and their corresponding phrase counter
+    # for s_feat0 in phrase_obj_feat:
+    #   self.feat_phrase_index[s_feat0]=self.feat_phrase_index.get(s_feat0,[])+[cur_phrase_counter]
+    # cur_phrase_obj["i"]=len(self.phrase_list)
+    # self.phrase_list.append(cur_phrase_obj)
 
     phrase_key=(phrase_obj_start,phrase_obj_end,phrase_obj_cat," ".join(phrase_obj_feat))
     phrase_key_i=self.phrase_key_index_dict.get(phrase_key)
