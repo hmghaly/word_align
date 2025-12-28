@@ -148,8 +148,8 @@ class Parser:
     #   print(i0,a0)
 
   def project_phrase(self,cur_phrase_obj):
-    #print("projecting:",cur_phrase_obj)
-    cur_phrase_counter=cur_phrase_obj["i"]
+    if self.debug: print("projecting:",cur_phrase_obj)
+    #cur_phrase_counter=cur_phrase_obj["i"]
     new_phrases=[]
     new_phrases2=[]
     rules=self.get_rules(cur_phrase_obj)
@@ -165,13 +165,15 @@ class Parser:
       if not match_last: continue
 
       #self.phrase_key_index_dict
-      #print("rule_obj",rule_obj)
+      if self.debug: print("rule_obj",rule_obj)
 
       rule_children_corr_phrases=[]
-      rule_children_corr_phrases.append([cur_phrase_counter])
+      
       ft_str=" ".join(cur_phrase_obj["feat"])
       cur_phrase_key=(cur_phrase_obj["start"],cur_phrase_obj["end"],cur_phrase_obj["cat"],ft_str)
       cur_phrase_key_i=self.phrase_key_index_dict.get(cur_phrase_key)
+
+      #rule_children_corr_phrases.append([cur_phrase_counter])
 
       rule_children_corr_phrase_keys=[]
       rule_children_corr_phrase_keys.append([cur_phrase_key_i])
