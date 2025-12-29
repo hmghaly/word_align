@@ -36,7 +36,7 @@ class Parser:
     self.max_n_phrases=params.get("max_n_phrases",10) #max n phrases per key
     self.max_skip_distance=params.get("max_skip_distance",3) #max number of tokens to skip between phrases
     self.debug=params.get("debug",False)
-    self.projection_counter={}
+    
 
     self.pos_tagger=POS(self.pos_model_path)
 
@@ -63,7 +63,7 @@ class Parser:
     self.feat_fwd_index.sort()
     self.cat_inv_index=dict(iter([(key,[v[1] for v in list(group)]) for key,group in groupby(self.cat_fwd_index,lambda x:x[0])]))
     self.feat_inv_index=dict(iter([(key,[v[1] for v in list(group)]) for key,group in groupby(self.feat_fwd_index,lambda x:x[0])]))
-    self.phrase_list=[]
+    #self.phrase_list=[]
 
   def parse(self,tokens):
     self.phrase_list=[] #list of all phrase objects, with spans, weights, children
@@ -77,6 +77,8 @@ class Parser:
     self.span_phrase_key_map_dict={} #an index to map each span (start,end) to the corresponding keys
     self.main_phrase_dict={} #mapping each key to the actual phrases corresponding to this key - sorting phrases by weight
     self.main_phrase_wt_dict={} #mapping each key to the heighest weight for any of its phrases
+
+    self.projection_counter={}
 
 
     tokens_pos_list=self.pos_tagger.tag_words(tokens,min_wt=self.min_pos_wt)
