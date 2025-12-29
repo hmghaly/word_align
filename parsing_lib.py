@@ -19,6 +19,11 @@ import torch
 import numpy as np
 
 #27 December 2025 Update
+import re, copy
+import itertools
+from itertools import product
+from code_utils.parsing_lib import *
+
 class Parser:
   def __init__(self,rules_list=[],word_features_list=[],params={}) -> None:
     self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
@@ -31,6 +36,7 @@ class Parser:
     self.max_n_phrases=params.get("max_n_phrases",10) #max n phrases per key
     self.max_skip_distance=params.get("max_skip_distance",3) #max number of tokens to skip between phrases
     self.debug=params.get("debug",False)
+    self.projection_counter={}
 
 
 
@@ -81,7 +87,12 @@ class Parser:
     if self.debug: print(tokens_pos_list)
     for i,a in enumerate(tokens_pos_list): #process each token
       token0=a["word"]
-      if self.debug: print(i,token0,len(self.phrase_list),len(self.phrase_key_list))
+      if self.debug: 
+        proj_items=list(self.projection_counter.items())
+        proj_items.sort(key=lambda x:-x[-1])
+        first_item=None
+        if proj_items: first_item=proj_items[0]
+        print(i,token0,len(self.phrase_list),len(self.phrase_key_list),"proj_items",len(proj_items),"first_item",proj_items[:3])
 
       xpos0=a.get("xpos",[])
       start,end=i,i
@@ -102,11 +113,18 @@ class Parser:
         feat_split=feat0#.split()
         #only one phrase object per cat/features pair
         cur_token_rules=[] #retrieved rules that apply to current token
-        phrase_i=len(self.phrase_list)
-        cur_phrase_obj={"wt":wt0,"span":1,"start":start,"end":end,"cat":cat0,"feat":feat_split,"head_loc":start,"head_phrase":phrase_i,"children":[],"i":phrase_i}
+        #phrase_i=len(self.phrase_list)
+
+        ft_str=" ".join(feat_split)
+        cur_phrase_key=(start,end,cat0,ft_str)
+        cur_phrase_key_i=self.phrase_key_index_dict.get(cur_phrase_key)        
+
+        #cur_phrase_obj={"wt":wt0,"span":1,"start":start,"end":end,"cat":cat0,"feat":feat_split,"head_loc":start,"head_phrase":phrase_i,"children":[],"i":phrase_i}
+        cur_phrase_obj={"wt":wt0,"span":1,"start":start,"end":end,"cat":cat0,"feat":feat_split,"head_loc":start,"head_phrase":cur_phrase_key_i,"children":[],"i":cur_phrase_key_i,"level":0}
         self.add_phrase(cur_phrase_obj)
         #print(cur_phrase_obj)
         new_phrases=self.project_phrase(cur_phrase_obj)
+        #if self.debug: print("main terminal projection", len(new_phrases),cur_phrase_obj)
         for a in new_phrases: self.add_phrase(a)
         while new_phrases:
           new_phrases_copy=copy.deepcopy(new_phrases)
@@ -114,7 +132,7 @@ class Parser:
           for ph0 in new_phrases_copy:
             #print("copy",ph0)
             projected_phrases=self.project_phrase(ph0)
-            if self.debug: print("projected", len(projected_phrases),ph0)
+            #if self.debug: print("non-terminal projection", len(projected_phrases),ph0)
             new_phrases.extend(projected_phrases)
           for a in new_phrases: self.add_phrase(a)
 
@@ -154,6 +172,17 @@ class Parser:
     #cur_phrase_counter=cur_phrase_obj["i"]
     new_phrases=[]
     new_phrases2=[]
+    new_level=cur_phrase_obj.get("level",0)+1
+
+    ft_str=" ".join(cur_phrase_obj["feat"])
+    cur_phrase_key=(cur_phrase_obj["start"],cur_phrase_obj["end"],cur_phrase_obj["cat"],ft_str)
+
+    self.projection_counter[cur_phrase_key]=self.projection_counter.get(cur_phrase_key,0)+1
+
+    if self.projection_counter.get(cur_phrase_key,0)>10: return []
+
+    cur_phrase_key_i=self.phrase_key_index_dict.get(cur_phrase_key)
+
     rules=self.get_rules(cur_phrase_obj)
     #for r_i in rules:
     for r_i in rules:
@@ -171,9 +200,9 @@ class Parser:
 
       rule_children_corr_phrases=[]
       
-      ft_str=" ".join(cur_phrase_obj["feat"])
-      cur_phrase_key=(cur_phrase_obj["start"],cur_phrase_obj["end"],cur_phrase_obj["cat"],ft_str)
-      cur_phrase_key_i=self.phrase_key_index_dict.get(cur_phrase_key)
+      # ft_str=" ".join(cur_phrase_obj["feat"])
+      # cur_phrase_key=(cur_phrase_obj["start"],cur_phrase_obj["end"],cur_phrase_obj["cat"],ft_str)
+      # cur_phrase_key_i=self.phrase_key_index_dict.get(cur_phrase_key)
 
       #rule_children_corr_phrases.append([cur_phrase_counter])
 
@@ -186,7 +215,8 @@ class Parser:
         #corr_phrases=self.scan_phrases(child0,cur_phrase_start=cur_phrase_obj["start"])
         corr_phrases2=self.scan_phrases2(child0,cur_phrase_start=cur_phrase_obj["start"])
         #print("corr_phrases",corr_phrases)
-        #print("corr_phrases2",corr_phrases2)
+        # if self.debug: 
+        #   if corr_phrases2: print("corr_phrases2",corr_phrases2,"child0",child0)
         
 
 
@@ -207,7 +237,9 @@ class Parser:
       if len(rule_children_corr_phrase_keys)!=len(rule_children): continue
       rule_children_corr_phrase_keys=list(reversed(rule_children_corr_phrase_keys))
       phrase_combinations2 = list(product(*rule_children_corr_phrase_keys))
-      #print("phrase_combinations2",phrase_combinations2)
+      # if self.debug: 
+      #   print(rule_obj)
+      #   print("phrase_combinations2",phrase_combinations2)
 
       for pc in phrase_combinations2: #combinations of phrase ids
         parent_phrase_obj={}
@@ -253,6 +285,7 @@ class Parser:
         #parent_phrase_obj["head_loc"]=heade_phrase_obj["head_loc"]
 
         parent_phrase_obj["rule_i"]=r_i
+        parent_phrase_obj["level"]=new_level
         
         new_phrases2.append(parent_phrase_obj)
 
@@ -264,6 +297,7 @@ class Parser:
     phrase_obj_start,phrase_obj_end=cur_phrase_obj["start"],cur_phrase_obj["end"]
     phrase_obj_wt=cur_phrase_obj["wt"]
     cur_phrase_span=(phrase_obj_start,phrase_obj_end)
+    cur_children=cur_phrase_obj["children"]
 
     # cur_phrase_counter=len(self.phrase_list)
     # self.cat_phrase_index[phrase_obj_cat]=self.cat_phrase_index.get(phrase_obj_cat,[])+[cur_phrase_counter] #add this phrase to the inverted index of categories and their corresponding phrase counter
@@ -274,28 +308,43 @@ class Parser:
 
     phrase_key=(phrase_obj_start,phrase_obj_end,phrase_obj_cat," ".join(phrase_obj_feat))
     phrase_key_i=self.phrase_key_index_dict.get(phrase_key)
+
+    found_phrases=self.main_phrase_dict.get(phrase_key,[])
+    found_phrases_children=[v["children"] for v in found_phrases] #exclude 
+    if cur_children in found_phrases_children: return
+
+
     cur_phrase_obj["i"]=phrase_key_i
     if phrase_key_i==None: #if no key exists, we create a key, and index the 
 
       phrase_key_i=len(self.phrase_key_list)
+      cur_phrase_obj["i"]=phrase_key_i
       self.phrase_key_index_dict[phrase_key]=phrase_key_i #map the phrase key to its number in the phrase key list
       self.phrase_key_list.append(phrase_key)
       for ft0 in phrase_obj_feat: #update the list of phrase keys associated with each feature
         temp_ft_key_indexes=self.ft_phrase_key_map_dict.get(ft0,[])
-        self.ft_phrase_key_map_dict[ft0]=temp_ft_key_indexes+[phrase_key_i]
+        updated_temp_ft_key_indexes=temp_ft_key_indexes+[phrase_key_i]
+        self.ft_phrase_key_map_dict[ft0]=list(set(updated_temp_ft_key_indexes))
 
       temp_cat_key_indexes=self.cat_phrase_key_map_dict.get(phrase_obj_cat,[]) #update list of keys corresponding to current phrase category
-      self.cat_phrase_key_map_dict[phrase_obj_cat]=temp_cat_key_indexes+[phrase_key_i]
+      updated_temp_cat_key_indexes=temp_cat_key_indexes+[phrase_key_i]
+      self.cat_phrase_key_map_dict[phrase_obj_cat]=list(set(updated_temp_cat_key_indexes))
       temp_span_key_indexes=self.span_phrase_key_map_dict.get(cur_phrase_span,[]) #update list of keys corresponding to current phrase span
-      self.span_phrase_key_map_dict[cur_phrase_span]=temp_span_key_indexes+[phrase_key_i]
+      updated_temp_span_key_indexes=temp_span_key_indexes+[phrase_key_i]
+      self.span_phrase_key_map_dict[cur_phrase_span]=list(set(updated_temp_span_key_indexes))
 
     #adding the actual phrase to the corresponding key at the main phrase dict
-    found_phrases=self.main_phrase_dict.get(phrase_key,[])+[cur_phrase_obj]
-    found_phrases.sort(key=lambda x:-x["wt"])
-    found_phrases=found_phrases[:self.max_n_phrases] #use only top n phrases for each key
-    self.main_phrase_dict[phrase_key]=found_phrases
     found_wt=self.main_phrase_wt_dict.get(phrase_key,0) #update the top weight of the current key
     if phrase_obj_wt>found_wt: self.main_phrase_wt_dict[phrase_key]=phrase_obj_wt
+
+    updated_found_phrases=found_phrases+[cur_phrase_obj]
+    updated_found_phrases.sort(key=lambda x:-x["wt"])
+    updated_found_phrases=updated_found_phrases[:self.max_n_phrases] #use only top n phrases for each key
+    self.main_phrase_dict[phrase_key]=updated_found_phrases
+
+
+
+    self.phrase_list.append(cur_phrase_obj)
 
 
     # self.phrase_key_list=[] #phrase key is (start,end,cat,feat)
@@ -320,25 +369,25 @@ class Parser:
       all_rules.extend(corr_rules)
     return list(set(all_rules))
 
-  def scan_phrases(self,rule_child,cur_phrase_start=None):
-    #for any child of a given rule, scan all the phrases that match this child (both cat/feat)
-    phrases_i_list=[]
-    rule_child_info_cat,rule_child_info_feat=rule_child["cat"],rule_child["feat"]
-    corr_cat_phraes=self.cat_phrase_index.get(rule_child_info_cat,[])
-    phrases_i_list.extend(corr_cat_phraes)
-    for feat0 in rule_child_info_feat:
-      corr_feat_phrases=self.feat_phrase_index.get(feat0,[])
-      phrases_i_list.extend(corr_feat_phrases)
-    phrases_i_list=list(set(phrases_i_list))
-    final_phrase_list=[] #with phrase indexes
-    for ph_i in phrases_i_list:
-      found_phrase_obj=self.phrase_list[ph_i]
-      found_phrase_obj_end=found_phrase_obj["end"]
-      matched=match_rule(found_phrase_obj,rule_child)
-      if cur_phrase_start!=None and found_phrase_obj_end>=cur_phrase_start: continue
-      if not match_rule(found_phrase_obj,rule_child): continue
-      final_phrase_list.append(ph_i)
-    return final_phrase_list
+  # def scan_phrases(self,rule_child,cur_phrase_start=None):
+  #   #for any child of a given rule, scan all the phrases that match this child (both cat/feat)
+  #   phrases_i_list=[]
+  #   rule_child_info_cat,rule_child_info_feat=rule_child["cat"],rule_child["feat"]
+  #   corr_cat_phraes=self.cat_phrase_index.get(rule_child_info_cat,[])
+  #   phrases_i_list.extend(corr_cat_phraes)
+  #   for feat0 in rule_child_info_feat:
+  #     corr_feat_phrases=self.feat_phrase_index.get(feat0,[])
+  #     phrases_i_list.extend(corr_feat_phrases)
+  #   phrases_i_list=list(set(phrases_i_list))
+  #   final_phrase_list=[] #with phrase indexes
+  #   for ph_i in phrases_i_list:
+  #     found_phrase_obj=self.phrase_list[ph_i]
+  #     found_phrase_obj_end=found_phrase_obj["end"]
+  #     matched=match_rule(found_phrase_obj,rule_child)
+  #     if cur_phrase_start!=None and found_phrase_obj_end>=cur_phrase_start: continue
+  #     if not match_rule(found_phrase_obj,rule_child): continue
+  #     final_phrase_list.append(ph_i)
+  #   return final_phrase_list
 
 
   def scan_phrases2(self,rule_child,cur_phrase_start=None):
@@ -381,6 +430,26 @@ class Parser:
       final_applicable_keys.append(key_i)
 
     return final_applicable_keys
+
+
+  def get_children(self,phrase_obj):
+    all_phrases=[phrase_obj]
+    children=phrase_obj.get("children",[])
+    new_children=[]
+    while children: #go on a semi-recursive way to identify children and subchildren of current main phrase
+      for ch0 in children:
+        ch_phrase_key=self.phrase_key_list[ch0]
+        child_phrase=self.main_phrase_dict[ch_phrase_key][0]
+        all_phrases.append(child_phrase)
+        sub_children=child_phrase.get("children",())
+        sub_children=list(sub_children)
+        for sc in sub_children:
+          if sc==ch0: continue
+          new_children.append(sc) #print("sc",sc)
+      children=new_children
+      new_children=[]
+    return all_phrases
+
 
   def export_parse(self,words,phrase_obj):
     pass
@@ -446,6 +515,18 @@ class Parser:
       cur_xpos0=cur_tokens_xpos_dict.get(i0,"-")
       final_dep_list.append({"id":str(cur_id0),"word": w0,"head":cur_dep,"xpos":cur_xpos0,"head_word":head_word,"offset":offset})
     return final_dep_list, parse_phrases  
+
+
+    # cur_key_phrases=self.main_phrase_dict[phrase_key]
+    # for a in cur_key_phrases:
+    #   print(a)
+    #   print(a["children"])
+
+
+
+
+
+
 
 
 # class Parser:
