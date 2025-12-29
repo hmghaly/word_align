@@ -82,6 +82,8 @@ class Parser:
     tokens_pos_list=self.pos_tagger.tag_words(tokens,min_wt=self.min_pos_wt)
     self.cur_tokens_pos_list=tokens_pos_list
 
+    self.tag_wt_list=[]
+
     if self.debug: print(tokens_pos_list)
     for i,a in enumerate(tokens_pos_list): #process each token
       token0=a["word"]
@@ -105,6 +107,8 @@ class Parser:
       #if nothing found
       if outcome_wt==[]:
         for cat0,feat0 in self.unknown_token_tags: outcome_wt.append((cat0,feat0,self.default_wt))
+
+      self.tag_wt_list.append((token0,outcome_wt))
 
 
       for cat0,feat0,wt0 in outcome_wt:
