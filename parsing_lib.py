@@ -144,7 +144,7 @@ class Parser:
       span_wt_items.sort(key=lambda x:-x[-1])
       for span0,wt0 in span_wt_items[:5]:
         start0,end0=span0
-        cat_phrases_subdict=parser_obj.end_start_phrase_dict[end0][start0]
+        cat_phrases_subdict=self.end_start_phrase_dict[end0][start0]
         for cat0,phrases0 in cat_phrases_subdict.items():
           for ph0 in phrases0: final_parse_phrases.append(ph0) #print(ph0)
 
