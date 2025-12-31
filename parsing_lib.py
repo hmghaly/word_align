@@ -226,7 +226,12 @@ class Parser:
         # child_phrase=self.main_phrase_dict[ch_phrase_key][0]
 
         ch_phrase_key=ch0
-        child_phrase=self.phrase_key_obj_dict[ch_phrase_key]
+        #child_phrase=self.phrase_key_obj_dict[ch_phrase_key]
+        child_phrase=self.phrase_key_obj_dict.get(ch_phrase_key)
+        if child_phrase==None:
+          start,end,cat,feat=ch_phrase_key
+          span=end-start+1
+          child_phrase={"start":start,"end":end,"cat":cat, "feat":feat.split() "head_loc":start,"children":[],"span":span}
         phrase_head_loc_dict[ch0]=child_phrase["head_loc"]
         if child_phrase["span"]==1 and child_phrase["children"]==[]: #identify the matching XPOS for terminal phrases
           cur_tokens_xpos_dict[child_phrase["start"]]=child_phrase["cat"]
