@@ -314,10 +314,14 @@ class Parser:
       cur_phrases=[phrase_obj0]
     else:
       cur_top_phrase,cur_bottom_phrase=cur_phrases[0],cur_phrases[-1]
-      if len(cur_phrases)>=self.max_n_phrases and wt0<cur_bottom_phrase["wt"]: return False
+      if len(cur_phrases)>=self.max_n_phrases and wt0<cur_bottom_phrase["wt"]: 
+        #print("1","cur_phrases",len(cur_phrases))
+        return False
       for cur_ph0 in cur_phrases:
         cur_ph0_cat,cur_ph0_children=cur_ph0["cat"],cur_ph0["children"]
-        if cur_ph0_cat==cat0 and cur_ph0_children==children0: return False #and wt0<=cur_top_phrase["wt"]: return False
+        if cur_ph0_cat==cat0 and cur_ph0_children==children0 and len(children0)>1: 
+          #print("2","cur_ph0_cat",cur_ph0_cat,"cat0",cat0)
+          return False #and wt0<=cur_top_phrase["wt"]: return False
       cur_phrases+=[phrase_obj0]
       cur_phrases.sort(key=lambda x:-x["wt"])
     
