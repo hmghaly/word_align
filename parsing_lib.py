@@ -165,7 +165,8 @@ class Parser:
   def project_phrase3(self,phrase_obj0): #only for maximum binary branching
     #print("projecting:",phrase_obj0)
     new_level=phrase_obj0.get("level",0)+1
-    wt_inc=new_level*0.001 #weight increment - to give a higher weight for the higher level projection phrases
+    #wt_inc=new_level*0.001 #weight increment - to give a higher weight for the higher level projection phrases
+    wt_inc=0
 
     #phrase_obj0["level"]=phrase_obj0.get("level",0)+1
     cur_phrase_key=self.get_phrase_key(phrase_obj0)
@@ -300,6 +301,9 @@ class Parser:
     cat0,children0=phrase_obj0["cat"],phrase_obj0["children"]
 
     phrase_key0=self.get_phrase_key(phrase_obj0)
+    self.phrase_key_obj_dict[phrase_key0]=phrase_obj0
+
+
     used_phrase_key_dict={}
 
     
@@ -323,8 +327,6 @@ class Parser:
 
     if cur_phrases[0]["wt"]>found_span_wt0: self.span_wt_dict[span0]=cur_phrases[0]["wt"]
 
-    phrase_key0=self.get_phrase_key(phrase_obj0)
-    self.phrase_key_obj_dict[phrase_key0]=phrase_obj0
 
     head_loc0=phrase_obj0["head_loc"]
     head_loc_cat_pair=(head_loc0,cat0)
