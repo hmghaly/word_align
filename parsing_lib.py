@@ -319,9 +319,13 @@ class Parser:
         return False
       for cur_ph0 in cur_phrases:
         cur_ph0_cat,cur_ph0_children=cur_ph0["cat"],cur_ph0["children"]
-        if cur_ph0_cat==cat0 and cur_ph0_children==children0 and len(children0)>1: 
-          #print("2","cur_ph0_cat",cur_ph0_cat,"cat0",cat0)
-          return False #and wt0<=cur_top_phrase["wt"]: return False
+        
+        
+        # if cur_ph0_cat==cat0 and cur_ph0_children==children0 and len(children0)>1: 
+        #   #print("2","cur_ph0_cat",cur_ph0_cat,"cat0",cat0)
+        #   return False #and wt0<=cur_top_phrase["wt"]: return False
+
+
       cur_phrases+=[phrase_obj0]
       cur_phrases.sort(key=lambda x:-x["wt"])
     
