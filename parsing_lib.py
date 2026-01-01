@@ -30,15 +30,16 @@ class Parser:
     self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
     self.sent_padding=params.get("sent_padding",False)
     self.default_wt=params.get("default_wt",0.5) #to apply on unknown tags
-    self.min_pos_wt=params.get("min_pos_wt",0.1)
+    self.min_pos_wt=params.get("min_pos_wt",0.2)
     self.pos_model_path=params.get("pos_model_path")
     self.final_word_features_dict=params.get("final_word_features_dict",{})
     self.xpos_ft_dict=params.get("xpos_ft_dict",{})
     self.max_n_phrases=params.get("max_n_phrases",10) #max n phrases per key
+
     self.max_skip_distance=params.get("max_skip_distance",3) #max number of tokens to skip between phrases
     self.debug=params.get("debug",False)
 
-
+    self.max_cat_proj=params.get("max_cat_proj",100) #maximum number of times to project a category for a particular head token
     self.pos_tagger=POS(self.pos_model_path)
 
     self.unknown_token_tags=[("N","noun"),("V","verb"),("JJ","adj"),("RB","adv")]
@@ -52,6 +53,7 @@ class Parser:
     for i0,r0 in enumerate(rules_list):
       processed_rule=process_rule(r0)
       if processed_rule==None: continue
+      processed_rule["rule_i"]=i0
       self.all_processed_rules.append(processed_rule)
 
     for i0, processed_rule in enumerate(self.all_processed_rules):
@@ -78,6 +80,7 @@ class Parser:
 
 
     self.projection_counter={}
+    self.head_loc_cat_projection_counter={} #counting how many times this category was projected from the same head token dict[(head_loc,cat)]=count
 
 
     tokens_pos_list=self.pos_tagger.tag_words(tokens,min_wt=self.min_pos_wt)
@@ -112,8 +115,9 @@ class Parser:
         if cat0=="": continue
         #only one phrase object per cat/features pair
         cur_phrase_obj={"wt":wt0,"span":1,"start":start0,"end":end0,"cat":cat0,"feat":feat_split,"head_loc":start0,"children":[],"level":0}
-        self.add_phrase3(cur_phrase_obj)
-        #print("Projecting:",cur_phrase_obj)
+        check_added_phrases=self.add_phrase3(cur_phrase_obj)
+        
+        #print(check_added_phrases,"Projecting:",cur_phrase_obj)
         new_phrases=self.project_phrase3(cur_phrase_obj)  
         # for a in new_phrases:
         #   print("NEW:",a)
@@ -122,8 +126,9 @@ class Parser:
         all_token_new_phrases_copy=copy.deepcopy(all_token_new_phrases)
         all_token_new_phrases=[]
         for ph0 in all_token_new_phrases_copy:
-          check=self.add_phrase3(ph0)
-          #print("recursive check/project:", check,ph0)
+          check_added_phrases=self.add_phrase3(ph0)
+          #print("recursive check/project:", check_added_phrases,ph0)
+          if check_added_phrases==False: continue
           projected_new_phrases=self.project_phrase3(ph0)
            
           all_token_new_phrases.extend(projected_new_phrases)          
@@ -195,6 +200,16 @@ class Parser:
             temp_phrases=temp_start_sub_dict0.get(first_child_cat,[])
             for tph0 in temp_phrases:
               new_combined_phrase=self.combine_phrases([tph0,phrase_obj0],cur_rule_obj)
+              #we want to monitor projection from same rule e.g. VP --> VP^ PP or NP --> NP NP^
+              #and limit having so many projections from the same head phrase according to the same rule
+              # new_combined_phrase_head_key=new_combined_phrase["head_phrase"] #checking the key/phrase of the new combined phrase
+              # new_combined_phrase_head_phrase=self.phrase_key_obj_dict.get(new_combined_phrase_head_key)
+              # if new_combined_phrase_head_phrase==None: continue
+              # new_combined_phrase_head_phrase_rule=new_combined_phrase_head_phrase.get("rule")
+              # same_rule_proj_level=new_combined_phrase.get("same_rule_proj_level",0)
+              # if new_combined_phrase_head_phrase_rule==cur_rule_obj:  same_rule_proj_level+=1 
+              # new_combined_phrase["same_rule_proj_level"]=same_rule_proj_level
+
               new_combined_phrase["level"]=new_level
               new_combined_phrase["wt"]+=wt_inc
               all_combined_phrases.append(new_combined_phrase)
@@ -283,6 +298,7 @@ class Parser:
     # phrase_has_top_span_wt=False
 
     cat0,children0=phrase_obj0["cat"],phrase_obj0["children"]
+
     phrase_key0=self.get_phrase_key(phrase_obj0)
     used_phrase_key_dict={}
 
@@ -309,6 +325,13 @@ class Parser:
 
     phrase_key0=self.get_phrase_key(phrase_obj0)
     self.phrase_key_obj_dict[phrase_key0]=phrase_obj0
+
+    head_loc0=phrase_obj0["head_loc"]
+    head_loc_cat_pair=(head_loc0,cat0)
+    updated_head_loc_cat_proj_level=self.head_loc_cat_projection_counter.get(head_loc_cat_pair,0)+1
+    #if updated_head_loc_cat_proj_level>self.max
+    self.head_loc_cat_projection_counter[head_loc_cat_pair]=updated_head_loc_cat_proj_level
+
 
     return True
 
