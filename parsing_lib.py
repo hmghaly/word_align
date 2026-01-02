@@ -72,7 +72,7 @@ class Parser:
     #self.phrase_list=[]
 
 
-  def parse2(self,tokens):
+  def parse(self,tokens):
     self.phrase_list=[] #list of all phrase objects, with spans, weights, children
     self.cat_phrase_index={}
     self.feat_phrase_index={}
@@ -140,49 +140,67 @@ class Parser:
 
 
     final_parse_phrases=[]
+    final_raw_parses=[]
     end_of_sentence_dict=self.end_start_phrase_dict.get(len(tokens)-1,{})
-    full_span_sub_dict=end_of_sentence_dict.get(0,{})
+    
+    full_span_sub_dict=end_of_sentence_dict.get(0,{}) #first getting the parses that span the full sentence
     for cat0,phrases0 in full_span_sub_dict.items():
       final_parse_phrases.extend(phrases0)
+      for ph0 in phrases0:
+        dep0,const0=self.export_parse2(tokens,ph0,True)
+        final_raw_parses.append((ph0,dep0,const0))
 
     #full_span_phrases=end_of_sentence_dict.get(0,[])
 
     #combine_exported_deps(words,dep_list)
-    djk_phrases=self.optimum_path(tokens,self.span_phrase_dict)
+    djk_phrases=self.optimum_path(tokens,self.span_phrase_dict) #then get djk optimum path phrases
     temp_dep_list=[]
     combined_const=[]
     for djk_ph0 in djk_phrases:
       dep0,const0=self.export_parse2(tokens,djk_ph0,False)
       temp_dep_list.append(dep0)
       combined_const.extend(const0)
+    combined_djk_phrase=self.combine_phrases(djk_phrases,{}) #combine all phrases on djk path into one phrase
+    combined_djk_phrase["cat"]="DJK-combined"
     self.combined_dep=combine_exported_deps(tokens,temp_dep_list)
+    final_raw_parses.append((combined_djk_phrase,self.combined_dep,combined_const))
 
+    #finally include additional top phrases based on weight and span
+    span_wt_items=list(self.span_wt_dict.items())
+    span_wt_items.sort(key=lambda x:-x[-1])
 
-    
+    cur_max=self.max_n_phrases-len(final_raw_parses) #remaining number of parses till we get to the maximum n_parses/prases per span
+    for span0,wt0 in span_wt_items[:cur_max]:
+      ph0=self.span_phrase_dict.get(span0)
+      if ph0==None: continue
+      dep0,const0=self.export_parse2(tokens,ph0,True)
+      final_raw_parses.append((ph0,dep0,const0))
 
-    if final_parse_phrases==[]:
-      span_wt_items=list(self.span_wt_dict.items())
-      span_wt_items.sort(key=lambda x:-x[-1])
-      for span0,wt0 in span_wt_items[:5]:
-        start0,end0=span0
-        cat_phrases_subdict=self.end_start_phrase_dict[end0][start0]
-        for cat0,phrases0 in cat_phrases_subdict.items():
-          for ph0 in phrases0: final_parse_phrases.append(ph0) #print(ph0)
+  
+
+    # if final_parse_phrases==[]:
+    #   span_wt_items=list(self.span_wt_dict.items())
+    #   span_wt_items.sort(key=lambda x:-x[-1])
+    #   for span0,wt0 in span_wt_items[:5]:
+    #     start0,end0=span0
+    #     cat_phrases_subdict=self.end_start_phrase_dict[end0][start0]
+    #     for cat0,phrases0 in cat_phrases_subdict.items():
+    #       for ph0 in phrases0: final_parse_phrases.append(ph0) #print(ph0)
 
 
     #return self.tag_wt_list
-    final_raw_parses=[]
-    final_parse_phrases.sort(key=lambda x:(-x["span"],-x["wt"]))
-    for fp0 in final_parse_phrases[:self.max_n_phrases]:
-      dep0,const0=self.export_parse2(tokens,fp0)
-      final_raw_parses.append((fp0,dep0,const0))
+    # final_raw_parses=[]
+    # final_parse_phrases.sort(key=lambda x:(-x["span"],-x["wt"]))
+    # for fp0 in final_parse_phrases[:self.max_n_phrases]:
+    #   dep0,const0=self.export_parse2(tokens,fp0)
+    #   final_raw_parses.append((fp0,dep0,const0))
     return final_raw_parses
 
   def project_phrase3(self,phrase_obj0): #only for maximum binary branching
     #print("projecting:",phrase_obj0)
     new_level=phrase_obj0.get("level",0)+1
-    #wt_inc=new_level*0.001 #weight increment - to give a higher weight for the higher level projection phrases
-    wt_inc=0
+    wt_inc=new_level*0.00001 #weight increment - to give a higher weight for the higher level projection phrases
+    #wt_inc=0
 
     #phrase_obj0["level"]=phrase_obj0.get("level",0)+1
     cur_phrase_key=self.get_phrase_key(phrase_obj0)
@@ -366,7 +384,7 @@ class Parser:
     return True
 
 
-  def combine_phrases(self,phrase_obj_list,applied_rule):
+  def combine_phrases(self,phrase_obj_list,applied_rule={}):
     parent_phrase_obj={}
     #cur_child_keys=[v["i"] for v in phrase_obj_list]
     cur_child_keys=[self.get_phrase_key(v) for v in phrase_obj_list]
@@ -379,9 +397,18 @@ class Parser:
     parent_phrase_obj["start"]=phrase_start0
     parent_phrase_obj["end"]=phrase_end0
 
-    parent_phrase_obj["cat"]=applied_rule["parent"]["cat"]
-    parent_phrase_obj["feat"]=applied_rule["parent"]["feat"]
-    rule_head_i=applied_rule["head_i"]
+    if applied_rule!={}:
+      parent_phrase_obj["cat"]=applied_rule["parent"]["cat"]
+      parent_phrase_obj["feat"]=applied_rule["parent"]["feat"]
+      rule_head_i=applied_rule["head_i"]
+    else:
+      parent_phrase_obj["cat"]=""
+      parent_phrase_obj["feat"]=[]
+      rule_head_i=0
+
+
+
+
     parent_phrase_obj["children"]=cur_child_keys
     head_phrase_index=cur_child_keys[rule_head_i] #which of the child phrases is the head
     
