@@ -35,6 +35,9 @@ class Parser:
     self.final_word_features_dict=params.get("final_word_features_dict",{})
     self.xpos_ft_dict=params.get("xpos_ft_dict",{})
     self.max_n_phrases=params.get("max_n_phrases",10) #max n phrases per key
+    self.djk_max_span_distance=params.get("djk_max_span_distance",3) #max difference between two spans when applying djekstra's algorithm
+    self.djk_distance_penalty_ratio=params.get("djk_distance_penalty_ratio",0.5) #penalty applied dpending on the distance between two consecutive spans on djk path
+    self.djk_use_negative_wt=params.get("djk_use_negative_wt",False) #whether to use actual weight or negative weight to get the optimum path
 
     self.max_skip_distance=params.get("max_skip_distance",3) #max number of tokens to skip between phrases
     self.debug=params.get("debug",False)
@@ -76,6 +79,7 @@ class Parser:
 
     self.end_start_phrase_dict={} #dict[end][start][cat]=[{phrase_obj1},{phrase_obj2},{phrase_obj3}]
     self.span_wt_dict={} #dict[(start,end)]=wt
+    self.span_phrase_dict={} #dict[(start,end)]={phrase_obj}
     self.phrase_key_obj_dict={} #dict[phrase_key]=phrase_obj
 
 
@@ -333,7 +337,9 @@ class Parser:
     temp_end_sub_dict[start0]=temp_start_sub_dict2
     self.end_start_phrase_dict[end0]=temp_end_sub_dict
 
-    if cur_phrases[0]["wt"]>found_span_wt0: self.span_wt_dict[span0]=cur_phrases[0]["wt"]
+    if cur_phrases[0]["wt"]>found_span_wt0: 
+      self.span_wt_dict[span0]=cur_phrases[0]["wt"]
+      self.span_phrase_dict[span0]=cur_phrases[0]
 
 
     head_loc0=phrase_obj0["head_loc"]
@@ -413,9 +419,58 @@ class Parser:
       children=new_children
       new_children=[]
     return all_phrases
+  def inspect_span(self,start,end,cat=None):
+    end_temp_dict=self.end_start_phrase_dict.get(end,{})
+    final_temp_dict=end_temp_dict.get(start,{})
+    if cat!=None: final_temp_dict=final_temp_dict.get(cat,{})
+    return final_temp_dict
+  
+  
+  def optimum_path(self,words,span_phrase_dict): #apply Djkestra's algorithm to get the optimum path of phrases
+    inc0=self.djk_max_span_distance
+    dist_penalty0=self.djk_distance_penalty_ratio
+    use_negative=self.djk_use_negative_wt
+
+    span_list=sorted(list(span_phrase_dict.keys()))
+    span_list=[v for v in span_list if (v[1]-v[0])>0] #only choose multi word phrases
+    first_pt0=(-1,-1)
+    last_pt0=(len(words),len(words))
+    span_list=[first_pt0]+span_list+[last_pt0]
+    grouped=[(key,list(group)) for key,group in groupby(span_list,lambda x:x[0])]
+    grouped_dict=dict(iter(grouped))
+    
+
+    transition_dict={}
+    for span0 in span_list:
+      span0_start,span0_end=span0
+      transition_dict[span0]={}
+      all_corr_spans=[]
+      for span1_start in range(span0_end+1,span0_end+inc0+1):
+        corr_spans=grouped_dict.get(span1_start,[])
+        span_dist=span1_start-span0_end-1
+        cur_dist_penalty=span_dist*dist_penalty0
+        for span1 in corr_spans:
+          cur_phrase=span_phrase_dict.get(span1,{})
+          span1_wt=cur_phrase.get("wt",0)
+          adj_wt=span1_wt-cur_dist_penalty
+          if use_negative: adj_wt=-adj_wt
+          transition_dict[span0][span1]=adj_wt
+      if transition_dict[span0]=={}: transition_dict[span0]={last_pt0:0}
+
+    path0,path_wt0=general.djk(first_pt0,last_pt0,transition_dict,pt_list0=span_list)
+
+    final_top_phrases=[]
+    for span0 in path0:
+      corr_phrase=span_phrase_dict.get(span0)
+      if corr_phrase!=None: final_top_phrases.append(corr_phrase)
+    return final_top_phrases
+
+
 
 #End of new parser def
 
+
+#=====================
 
 #OLD
 # class Parser:
