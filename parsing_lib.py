@@ -148,7 +148,7 @@ class Parser:
     #full_span_phrases=end_of_sentence_dict.get(0,[])
 
     #combine_exported_deps(words,dep_list)
-    #djk_phrases=self.optimum_path(tokens,self.span_phrase_dict)
+    djk_phrases=self.optimum_path(tokens,self.span_phrase_dict)
     temp_dep_list=[]
     combined_const=[]
     for djk_ph0 in djk_phrases:
@@ -156,7 +156,7 @@ class Parser:
       temp_dep_list.append(dep0)
       combined_const.extend(const0)
     self.combined_dep=combine_exported_deps(tokens,temp_dep_list)
-    
+
 
     
 
