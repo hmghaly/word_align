@@ -494,7 +494,7 @@ def combine_exported_deps(words,dep_list):
     cur_id0=str(i0+1)
     found_line_obj=temp_dep_dict.get(cur_id0)
     temp_line_obj={"id":cur_id0,"word": w0,"head":'-',"xpos":'-',"head_word":"","offset":100}
-    print(cur_id0, found_line_obj)
+    #print(cur_id0, found_line_obj)
     if found_line_obj==None: found_line_obj=temp_line_obj
     final_dep_lines.append(found_line_obj)
   return final_dep_lines
