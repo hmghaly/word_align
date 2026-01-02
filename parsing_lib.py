@@ -276,7 +276,7 @@ class Parser:
     for i0,w0 in enumerate(words): #create dependency info for each word
       cur_id0=i0+1
       if not export_full_sent: #export only the tokens and dependency info within the span of the exported phrase 
-        if i0<start0 ot i0>end0: continue
+        if i0<start0 or i0>end0: continue
 
       #identify head index
       if i0==root_index: #root word
