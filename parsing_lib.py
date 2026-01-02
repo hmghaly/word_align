@@ -223,7 +223,7 @@ class Parser:
 
 
 
-  def export_parse2(self,words,cur_phrase):
+  def export_parse2(self,words,cur_phrase,export_full_sent=True):
     start0,end0=cur_phrase["start"],cur_phrase["end"]
     phrase_key0=self.get_phrase_key(cur_phrase)
     # print(cur_phrase)
@@ -275,6 +275,8 @@ class Parser:
     final_dep_list=[]
     for i0,w0 in enumerate(words): #create dependency info for each word
       cur_id0=i0+1
+      if not export_full_sent: #export only the tokens and dependency info within the span of the exported phrase 
+        if i0<start0 ot i0>end0: continue
 
       #identify head index
       if i0==root_index: #root word
