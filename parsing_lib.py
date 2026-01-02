@@ -152,7 +152,7 @@ class Parser:
     temp_dep_list=[]
     combined_const=[]
     for djk_ph0 in djk_phrases:
-      dep0,const0=parser_obj1.export_parse2(tokens,djk_ph0,False)
+      dep0,const0=self.export_parse2(tokens,djk_ph0,False)
       temp_dep_list.append(dep0)
       combined_const.extend(const0)
     self.combined_dep=combine_exported_deps(tokens,temp_dep_list)
