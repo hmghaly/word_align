@@ -146,6 +146,18 @@ class Parser:
       final_parse_phrases.extend(phrases0)
 
     #full_span_phrases=end_of_sentence_dict.get(0,[])
+
+    #combine_exported_deps(words,dep_list)
+    #djk_phrases=self.optimum_path(tokens,self.span_phrase_dict)
+    temp_dep_list=[]
+    combined_const=[]
+    for djk_ph0 in djk_phrases:
+      dep0,const0=parser_obj1.export_parse2(tokens,djk_ph0,False)
+      temp_dep_list.append(dep0)
+      combined_const.extend(const0)
+    self.combined_dep=combine_exported_deps(tokens,temp_dep_list)
+    
+
     
 
     if final_parse_phrases==[]:
@@ -470,6 +482,25 @@ class Parser:
 
 
 #End of new parser def
+
+def combine_exported_deps(words,dep_list):
+  temp_dep_dict={}
+  for dep1 in dep_list:
+    for d1 in dep1: 
+      cur_id1=d1["id"]
+      temp_dep_dict[d1["id"]]=d1
+  final_dep_lines=[]
+  for i0,w0 in enumerate(words):
+    cur_id0=str(i0+1)
+    found_line_obj=temp_dep_dict.get(cur_id0)
+    temp_line_obj={"id":cur_id0,"word": w0,"head":'-',"xpos":'-',"head_word":"","offset":100}
+    print(cur_id0, found_line_obj)
+    if found_line_obj==None: found_line_obj=temp_line_obj
+    final_dep_lines.append(found_line_obj)
+  return final_dep_lines
+
+
+
 
 
 #=====================
