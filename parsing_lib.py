@@ -154,16 +154,17 @@ class Parser:
 
     #combine_exported_deps(words,dep_list)
     djk_phrases=self.optimum_path(tokens,self.span_phrase_dict) #then get djk optimum path phrases
-    temp_dep_list=[]
-    combined_const=[]
-    for djk_ph0 in djk_phrases:
-      dep0,const0=self.export_parse2(tokens,djk_ph0,False)
-      temp_dep_list.append(dep0)
-      combined_const.extend(const0)
-    combined_djk_phrase=self.combine_phrases(djk_phrases,{}) #combine all phrases on djk path into one phrase
-    combined_djk_phrase["cat"]="DJK-combined"
-    self.combined_dep=combine_exported_deps(tokens,temp_dep_list)
-    final_raw_parses.append((combined_djk_phrase,self.combined_dep,combined_const))
+    if djk_phrases:
+      temp_dep_list=[]
+      combined_const=[]
+      for djk_ph0 in djk_phrases:
+        dep0,const0=self.export_parse2(tokens,djk_ph0,False)
+        temp_dep_list.append(dep0)
+        combined_const.extend(const0)
+      combined_djk_phrase=self.combine_phrases(djk_phrases,{}) #combine all phrases on djk path into one phrase
+      combined_djk_phrase["cat"]="DJK-combined"
+      self.combined_dep=combine_exported_deps(tokens,temp_dep_list)
+      final_raw_parses.append((combined_djk_phrase,self.combined_dep,combined_const))
 
     #finally include additional top phrases based on weight and span
     span_wt_items=list(self.span_wt_dict.items())
