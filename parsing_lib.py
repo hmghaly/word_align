@@ -179,6 +179,15 @@ class Parser:
       dep0,const0=self.export_parse2(tokens,ph0,True)
       final_raw_parses.append((ph0,dep0,const0))
 
+    temp_wt_score_parse_list=[]
+    for ph0,dep0,const0 in final_raw_parses:
+      ph_wt0=ph0["wt"]
+      dep_score0=self.score_dep_obj(dep0)
+      temp_wt_score_parse_list.append((ph0,dep0,const0,ph_wt0,dep_score0))
+
+    temp_wt_score_parse_list.sort(key=lambda x:(-x[-1],-x[-2])) #sort by the dependency score then the top phrase weight
+    final_sorted_parses=[v[:3] for v in temp_wt_score_parse_list]
+
   
 
     # if final_parse_phrases==[]:
@@ -197,7 +206,7 @@ class Parser:
     # for fp0 in final_parse_phrases[:self.max_n_phrases]:
     #   dep0,const0=self.export_parse2(tokens,fp0)
     #   final_raw_parses.append((fp0,dep0,const0))
-    return final_raw_parses
+    return final_sorted_parses
 
   def score_dep_obj(self,dep_obj,rerank_params=None):
     if rerank_params==None: cur_rerank_params=rerank_params
