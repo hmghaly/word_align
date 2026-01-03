@@ -172,7 +172,7 @@ class Parser:
     span_wt_items=list(self.span_wt_dict.items())
     span_wt_items.sort(key=lambda x:-x[-1])
 
-    cur_max=self.max_n_phrases-len(final_raw_parses) #remaining number of parses till we get to the maximum n_parses/prases per span
+    cur_max=max(0,self.max_n_phrases-len(final_raw_parses))  #remaining number of parses till we get to the maximum n_parses/prases per span
     for span0,wt0 in span_wt_items[:cur_max]:
       ph0=self.span_phrase_dict.get(span0)
       if ph0==None: continue
