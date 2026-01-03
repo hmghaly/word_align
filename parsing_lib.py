@@ -42,6 +42,8 @@ class Parser:
     self.max_skip_distance=params.get("max_skip_distance",3) #max number of tokens to skip between phrases
     self.debug=params.get("debug",False)
 
+    self.rerank_params=params.get("rerank_params",{}) #rerank/parse scoring parameters, including reranking neural model 
+
     self.max_cat_proj=params.get("max_cat_proj",100) #maximum number of times to project a category for a particular head token
     self.pos_tagger=POS(self.pos_model_path)
 
@@ -196,6 +198,23 @@ class Parser:
     #   dep0,const0=self.export_parse2(tokens,fp0)
     #   final_raw_parses.append((fp0,dep0,const0))
     return final_raw_parses
+
+  def score_dep_obj(self,dep_obj,rerank_params=None):
+    if rerank_params==None: cur_rerank_params=rerank_params
+    else: cur_rerank_params=self.rerank_params
+    n_heads=0
+    n_unparsed=0
+    for d0 in dep_obj:
+      cur_head=d0["head"]
+      if cur_head=="0": n_heads+=1
+      if cur_head=='-' or cur_head=="": n_unparsed+=1
+    multi_head_penalty=n_heads-1 #if we have only one head, penalty is zero
+    multi_head_unparsed_score=(len(dep_obj)-multi_head_penalty-n_unparsed) /len(dep_obj)
+    dep_score0=multi_head_unparsed_score
+    return dep_score0
+
+
+
 
   def project_phrase3(self,phrase_obj0): #only for maximum binary branching
     #print("projecting:",phrase_obj0)
