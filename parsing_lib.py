@@ -537,6 +537,8 @@ class Parser:
 
 
 
+
+
 #End of new parser def
 
 def combine_exported_deps(words,dep_list):
@@ -555,6 +557,115 @@ def combine_exported_deps(words,dep_list):
     final_dep_lines.append(found_line_obj)
   return final_dep_lines
 
+
+
+
+#4 Jan 2026
+def viz_parse(dep,const):
+  table_items=[]
+  ids=[d0["id"] for d0 in dep]
+  tokens=[d0["word"] for d0 in dep]
+  heads=[d0["head"] for d0 in dep]
+  ids_labels=["IDs"]+ids
+  tokens_labels=["Words"]+tokens
+  heads_labels=["Heads"]+heads
+
+  border_style='style="border: 2px solid black;"'
+  ids_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in ids_labels])+"</tr>"
+  tokens_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in tokens_labels])+"</tr>"
+  head_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in heads_labels])+"</tr>"
+  table_items+=[ids_row,tokens_row,head_row]
+  head_phrase_keys_dict={}
+  child_check_dict={}
+  max_level=0
+  min_updated_level=0
+  for c0 in const:
+    if c0.get('head_phrase')!=None: head_phrase_keys_dict[c0["head_phrase"]]=True
+    for ch0 in c0.get("children",[]): child_check_dict[ch0]=True
+    if c0["level"]>max_level: max_level=c0["level"]
+
+  reverse_sorted_const_by_span=sorted(const,key=lambda x:-x.get("span",100))
+  adj_const=[]
+  adj_level_dict={}
+  for c_i in range(len(reverse_sorted_const_by_span)):
+    cur_const_obj=reverse_sorted_const_by_span[c_i]
+    cur_const_obj_key=get_phrase_key2(cur_const_obj)
+    found_adj_level=adj_level_dict.get(cur_const_obj_key)
+    if child_check_dict.get(cur_const_obj_key,False): #if a phrase is not a child of something, assign maximum level
+      cur_const_obj["level"]=max_level 
+    if found_adj_level!=None: 
+      #print("original level",cur_const_obj["level"],"adj level",found_adj_level)
+      cur_const_obj["level"]=found_adj_level
+
+    cur_const_obj_level=cur_const_obj["level"]
+    cur_obj_children=cur_const_obj["children"]
+    
+    for ch_key0 in cur_obj_children: 
+      updated_level=cur_const_obj["level"]-1
+      if updated_level<min_updated_level: min_updated_level=updated_level
+      adj_level_dict[ch_key0]=updated_level
+    #if len(cur_obj_children)==0: cur_const_obj["level"]=0
+    adj_const.append(cur_const_obj)
+  adj_const1=[]
+  for i0 in range(len(adj_const)):
+    cur_c0=adj_const[i0]
+    if len(cur_c0["children"])==0: cur_c0["level"]=min_updated_level-1
+    adj_const1.append(cur_c0)
+  # for a,b in head_phrase_keys_dict.items():
+  #   print(a,b)
+  #sorted_const_by_level=sorted(const,key=lambda x:x.get("level",100))
+  sorted_const_by_level=sorted(adj_const1,key=lambda x:x.get("level",100))
+  grouped_by_level=[(key,list(group)) for key,group in groupby(sorted_const_by_level,lambda x:x.get("level",100))]
+  level_counter=0
+  for key0,gl0 in grouped_by_level: 
+    #print(key0,gl0) #phrases at this level
+    level_phrases_start_dict={}
+    for g0 in gl0: 
+      start0=g0["start"]
+      level_phrases_start_dict[start0]=g0
+    cell_i=0
+    first_cell=f'<td></td>'
+    if level_counter==0: first_cell=f'<td>Tags</td>'
+    level_counter+=1
+    cur_row_items=[first_cell]
+    while cell_i<len(dep):
+      found_phrase=level_phrases_start_dict.get(cell_i)
+      span0=1
+      content=""
+      if found_phrase!=None: 
+        phrase_key0=get_phrase_key2(found_phrase)
+        is_head=head_phrase_keys_dict.get(phrase_key0,False)
+        #print("cell_i", cell_i,"is_head",is_head,"found_phrase",found_phrase)
+
+
+        cat0=found_phrase["cat"]
+        span0=found_phrase["span"]
+        head_loc=found_phrase["head_loc"]
+        head_word=tokens[head_loc]
+        
+        content=f"{cat0}"
+        if span0>1: content=f"{cat0} | {head_word}"
+        if is_head: content=f'<b><i>{content}</i></b>'
+        #content=f"{cat0} | {head_word}"
+        #print("content",content)
+      cell_html=f'<td colspan="{span0}"  {border_style}>{content}</td>'
+      if content=="": cell_html=f'<td colspan="{span0}">{content}</td>'
+      
+      cur_row_items.append(cell_html)
+      cell_i+=span0
+    combined_row_items_str="".join(cur_row_items)
+    cur_row=f'<tr>{combined_row_items_str}</tr>'
+    table_items.append(cur_row)
+  table_rows_str="\n".join(table_items)
+  table_str=f'<table style="width: 100%;text-align: center;">{table_rows_str}</table>'
+  return table_str
+
+#we will need to get it out of the class
+def get_phrase_key2(phrase_obj0): #check an obj for corresponding key
+  start0,end0,cat0,feat_split0=phrase_obj0["start"],phrase_obj0["end"],phrase_obj0["cat"],phrase_obj0["feat"]
+  ft_str0=" ".join(feat_split0)
+  cur_phrase_key=(start0,end0,cat0,ft_str0)
+  return cur_phrase_key
 
 
 
