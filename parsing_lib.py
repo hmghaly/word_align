@@ -566,14 +566,25 @@ def viz_parse(dep,const):
   ids=[d0["id"] for d0 in dep]
   tokens=[d0["word"] for d0 in dep]
   heads=[d0["head"] for d0 in dep]
-  ids_labels=["IDs"]+ids
-  tokens_labels=["Words"]+tokens
-  heads_labels=["Heads"]+heads
-
+  # ids_labels=["IDs"]+ids
+  # tokens_labels=["Words"]+tokens
+  # heads_labels=["Heads"]+heads
   border_style='style="border: 2px solid black;"'
-  ids_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in ids_labels])+"</tr>"
-  tokens_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in tokens_labels])+"</tr>"
-  head_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in heads_labels])+"</tr>"
+  colored_background_style='style="background-color: #F0FFFF;"' #azure
+
+  ids_labels=["<td>IDs</td>"]+[f"<td {border_style}>{v}</td>" for v in ids]
+  tokens_labels=["<td>Words</td>"]+[f"<td {border_style}>{v}</td>" for v in tokens]
+  heads_labels=["<td>Heads</td>"]+[f"<td {border_style}>{v}</td>" for v in heads]
+
+  ids_row="<tr>"+"".join(ids_labels)+"</tr>"
+  tokens_row="<tr>"+"".join(tokens_labels)+"</tr>"
+  head_row=f"<tr {colored_background_style}>"+"".join(heads_labels)+"</tr>"
+
+
+
+  # ids_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in ids_labels])+"</tr>"
+  # tokens_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in tokens_labels])+"</tr>"
+  # head_row="<tr>"+"".join([f"<td {border_style}>{v}</td>" for v in heads_labels])+"</tr>"
   table_items+=[ids_row,tokens_row,head_row]
   head_phrase_keys_dict={}
   child_check_dict={}
