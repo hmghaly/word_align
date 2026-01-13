@@ -38,10 +38,10 @@ def download_file_OLD(file_url):
 #23 June 2024
 def get_attrs(tag0): #get attributes within an html/xml tags
   tag0=tag0.replace("'",'"')
-  found_attrs0=re.findall('(\S+)="(.+?)"[\W\s$]',tag0) #'''(\S+)=["'](.+?)["']'''
+  found_attrs0=re.findall(r'(\S+)="(.+?)"[\W\s$]',tag0) #'''(\S+)=["'](.+?)["']'''
   final_dict={}
   for a,b in found_attrs0:
-    b=re.sub('"(\S)',r"'\1",b)
+    b=re.sub(r'"(\S)',r"'\1",b)
     final_dict[a]=b
   return final_dict#dict(iter(found_attrs0))
 
