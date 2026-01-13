@@ -115,7 +115,7 @@ class DOM:
     self.meta_lang=""
     self.content=general.unescape(self.content) 
     #tags=list(re.finditer('<([^<>]*?)>', self.content)) #'<[^<>]*?>|\<\!\-\-.+?\-\-\>'
-    tags=list(re.finditer('<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
+    tags=list(re.finditer(r'<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
     open_tags=[""]
     open_tags_attr_xpath_list=[]
     tag_counter_dict={}
@@ -493,8 +493,8 @@ def html_file2sents(html_fpath):
   return html2sents(content0)
 
 def split_tika_fn(txt): #split tika footnotes for alignment
-  txt=re.sub('(\.\[footnoteRef.+?\])',r'\1\n',txt)
-  txt=re.sub('(\s+\[\d+\:)',r'\n\1',txt)
+  txt=re.sub(r'(\.\[footnoteRef.+?\])',r'\1\n',txt)
+  txt=re.sub(r'(\s+\[\d+\:)',r'\n\1',txt)
   tmp_items=[v.strip("\xa0' ") for v in txt.split("\n") if v]
   # final_items=[]
   # for v in tmp_items:
@@ -718,7 +718,7 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=30):
     if href0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
     if href0.split(".")[-1].isdigit(): continue
     if not href0.lower().startswith("http"): href0=join_url(final_url,href0) #url0.strip("/")+"/"+href0.strip("/")
-    anchor0=re.sub("\s+"," ",anchor0).strip()
+    anchor0=re.sub(r"\s+"," ",anchor0).strip()
     is_social_link=False
     if "facebook" in href0 or "twitter" in href0 or "linkedin" in href0 or "youtube" in href0 or "x.com" in href0: 
       social_links.append(href0.lower())
@@ -830,7 +830,7 @@ def get_desc(html_content):
 
 def get_emails(html_content,max_name_len=50):
   all_emails=[]
-  found_em_domain=re.finditer('\@[\w\-\.]+',str(html_content))
+  found_em_domain=re.finditer(r'\@[\w\-\.]+',str(html_content))
   for a in found_em_domain:
     cur_domain=a.group(0).strip(".")
     cur_domain_split=cur_domain.split(".")
@@ -842,7 +842,7 @@ def get_emails(html_content,max_name_len=50):
     x0=a.start()
     prev0=html_content[x0-max_name_len:x0]
     if len(prev0)>0 and prev0[-1] in "\n\t\r "+string.punctuation: continue
-    check=re.findall("[\w\.]+$",prev0)
+    check=re.findall(r"[\w\.]+$",prev0)
     if check:
       cur_email=check[0]+cur_domain
       all_emails.append(cur_email)
@@ -932,7 +932,7 @@ def get_page_paras(page_url):
   # (REMOVE HTML DOCTYPE <!DOCTYPE html to > and variations)
   pattern = r'<[ ]*\![ ]*DOCTYPE.*?>'  # mach any char zero or more times
   text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
-  tags=list(re.findall('<[^<>]*?>|\<\!\-\-.+?\-\-\>', text))
+  tags=list(re.findall(r'<[^<>]*?>|\<\!\-\-.+?\-\-\>', text))
   for tag0 in list(set(tags)): text=text.replace(tag0,tag0.lower()) #make sure al tag names are in lower case
 
   text=text.replace('<br />',"_br_")
@@ -945,14 +945,14 @@ def get_page_paras(page_url):
   text=text.replace("</label>","</label>_br_")
   text=text.replace("</button>","</button>_br_")
   
-  text=re.sub('(</h\d>)',r'_br_\1',text) #to add line break at headings
-  text=re.sub('(<h\d\b.*?>)',r'_br_\1',text)
+  text=re.sub(r'(</h\d>)',r'_br_\1',text) #to add line break at headings
+  text=re.sub(r'(<h\d\b.*?>)',r'_br_\1',text)
   text=re.sub('(<p\b.*?>)',r'_br_\1',text) #and at paragraphs
   text=re.sub('(<li\b.*?>)',r'_br_\1',text) #and at lists
   text=text.replace("<br>","_br_")
   text=re.sub('<[^<>]*?>',' ',text)
   text=re.sub('[\n\r\t]+',"_br_",text)
-  text=re.sub('\s+'," ",text)
+  text=re.sub(r'\s+'," ",text)
   
   paras=[v.strip() for v in text.split("_br_") if v.strip() and not (v[0]=='<' and v[-1]=='>') ]
   return paras
