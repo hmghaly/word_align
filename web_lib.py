@@ -1,5 +1,5 @@
 #a librry for all the utilities we need for scraping data from the web
-import requests, re, sys, time, json
+import requests, re, sys, time, json, os
 import string
 import shutil
 from urllib.parse import urljoin, urlsplit
