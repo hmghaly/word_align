@@ -6,6 +6,11 @@ import spacy
 from spacy.tokenizer import Tokenizer
 from itertools import groupby
 sys.path.append("code_utils")
+
+cur_lib_path=os.path.split(__file__)[0]
+sys.path.append(cur_lib_path)
+
+
 import general
 import rnn_utils
 
@@ -22,7 +27,7 @@ import numpy as np
 import re, copy
 import itertools
 from itertools import product
-from code_utils.parsing_lib import *
+#from code_utils.parsing_lib import *
 
 #31 December 2025
 class Parser:
@@ -188,6 +193,11 @@ class Parser:
     temp_wt_score_parse_list.sort(key=lambda x:(-x[-1],-x[-2])) #sort by the dependency score then the top phrase weight
     final_sorted_parses=[v[:3] for v in temp_wt_score_parse_list]
 
+    outcome_dict={}
+    outcome_dict["pos"]=self.tag_wt_list
+    outcome_dict["parses"]=final_sorted_parses
+
+
   
 
     # if final_parse_phrases==[]:
@@ -206,7 +216,7 @@ class Parser:
     # for fp0 in final_parse_phrases[:self.max_n_phrases]:
     #   dep0,const0=self.export_parse2(tokens,fp0)
     #   final_raw_parses.append((fp0,dep0,const0))
-    return final_sorted_parses
+    return outcome_dict
 
   def score_dep_obj(self,dep_obj,rerank_params=None):
     if rerank_params==None: cur_rerank_params=rerank_params
