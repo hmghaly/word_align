@@ -9,6 +9,11 @@ import urllib.parse
 #import urllib.parse
 
 sys.path.append("code_utils")
+
+cur_lib_path=os.path.split(__file__)[0]
+sys.path.append(cur_lib_path)
+
+
 import general
 #from bs4 import BeautifulSoup
 #from lxml.html import parse
