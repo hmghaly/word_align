@@ -178,6 +178,7 @@ class Parser:
     span_wt_items.sort(key=lambda x:-x[-1])
 
     #create a parse of multiple phrases by combining the highest phrases with non-overlapping spans
+    #basically combining fragmented phrases
     valid_sorted_span_phrases=[]
     used_indexes=[]
     for span0,wt0 in span_wt_items: 
@@ -193,10 +194,11 @@ class Parser:
         ph0=self.span_phrase_dict.get(span0)
         if ph0!=None: valid_sorted_span_phrases.append(ph0)
 
-    combined_phrase=self.combine_phrases(valid_sorted_span_phrases)
-    combined_phrase["cat"]="COMBINED"
-    dep0,const0=self.export_parse2(tokens,combined_phrase,True)
-    final_raw_parses.append((ph0,dep0,const0))
+    if valid_sorted_span_phrases:
+      combined_phrase=self.combine_phrases(valid_sorted_span_phrases)
+      combined_phrase["cat"]="COMBINED"
+      dep0,const0=self.export_parse2(tokens,combined_phrase,True)
+      final_raw_parses.append((ph0,dep0,const0))
 
 
 
