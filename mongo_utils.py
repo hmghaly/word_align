@@ -53,6 +53,12 @@ def mongo_find(query,collection,sort_key=None, page_i=1,n_limit=10,descending=Tr
     out_dict["elapsed"]=t1-t0
     return out_dict
 
+
+def mongo_count(query,collection):
+    active_count = collection.count_documents(query)
+    return active_count
+
+
 def mongo_insert_many(cur_list,cur_collection):
     out_dict={}
     if len(cur_list)==0: 
