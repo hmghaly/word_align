@@ -177,6 +177,30 @@ class Parser:
     span_wt_items=list(self.span_wt_dict.items())
     span_wt_items.sort(key=lambda x:-x[-1])
 
+    #create a parse of multiple phrases by combining the highest phrases with non-overlapping spans
+    valid_sorted_span_phrases=[]
+    used_indexes=[]
+    for span0,wt0 in span_wt_items: 
+      i0,i1=span0
+      if i0==i1: continue
+      cur_span_indexes=list(range(i0,i1+1))
+      overlap_with_used=list(set(used_indexes).intersection(set(cur_span_indexes)))
+      valid=False
+      if overlap_with_used==[]:
+        used_indexes.extend(cur_span_indexes)
+        valid=True
+      if valid: 
+        ph0=self.span_phrase_dict.get(span0)
+        if ph0!=None: valid_sorted_span_phrases.append(ph0)
+
+    combined_phrase=self.combine_phrases(valid_sorted_span_phrases)
+    combined_phrase["cat"]="COMBINED"
+    dep0,const0=self.export_parse2(tokens,combined_phrase,True)
+    final_raw_parses.append((ph0,dep0,const0))
+
+
+
+
     cur_max=max(0,self.max_n_phrases-len(final_raw_parses))  #remaining number of parses till we get to the maximum n_parses/prases per span
     for span0,wt0 in span_wt_items[:cur_max]:
       ph0=self.span_phrase_dict.get(span0)
