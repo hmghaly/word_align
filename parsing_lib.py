@@ -452,6 +452,8 @@ class Parser:
     #cur_child_keys=[v["i"] for v in phrase_obj_list]
     cur_child_keys=[self.get_phrase_key(v) for v in phrase_obj_list]
 
+    levels=[vw["level"] for vw in phrase_obj_list]
+
     parent_phrase_obj["wt"]=sum([vw["wt"] for vw in phrase_obj_list])
     phrase_start0=min([vw["start"] for vw in phrase_obj_list])
     phrase_end0=max([vw["end"] for vw in phrase_obj_list])
@@ -483,6 +485,9 @@ class Parser:
     parent_phrase_obj["head_loc"]=head_phrase_obj["head_loc"]
 
     parent_phrase_obj["rule"]=applied_rule
+
+    parent_phrase_obj["level"]=max(levels)+1
+
     return parent_phrase_obj
     #parent_phrase_obj["level"]=new_level
 
