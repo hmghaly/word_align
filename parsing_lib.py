@@ -47,6 +47,10 @@ class Parser:
     self.max_skip_distance=params.get("max_skip_distance",3) #max number of tokens to skip between phrases
     self.debug=params.get("debug",False)
 
+    self.combined_fragmented=params.get("combined_fragmented",False) #combine fragmented phrases
+
+
+
     self.rerank_params=params.get("rerank_params",{}) #rerank/parse scoring parameters, including reranking neural model 
 
     self.max_cat_proj=params.get("max_cat_proj",100) #maximum number of times to project a category for a particular head token
@@ -179,26 +183,27 @@ class Parser:
 
     #create a parse of multiple phrases by combining the highest phrases with non-overlapping spans
     #basically combining fragmented phrases
-    valid_sorted_span_phrases=[]
-    used_indexes=[]
-    for span0,wt0 in span_wt_items: 
-      i0,i1=span0
-      if i0==i1: continue
-      cur_span_indexes=list(range(i0,i1+1))
-      overlap_with_used=list(set(used_indexes).intersection(set(cur_span_indexes)))
-      valid=False
-      if overlap_with_used==[]:
-        used_indexes.extend(cur_span_indexes)
-        valid=True
-      if valid: 
-        ph0=self.span_phrase_dict.get(span0)
-        if ph0!=None: valid_sorted_span_phrases.append(ph0)
+    if self.combined_fragmented:
+      valid_sorted_span_phrases=[]
+      used_indexes=[]
+      for span0,wt0 in span_wt_items: 
+        i0,i1=span0
+        if i0==i1: continue
+        cur_span_indexes=list(range(i0,i1+1))
+        overlap_with_used=list(set(used_indexes).intersection(set(cur_span_indexes)))
+        valid=False
+        if overlap_with_used==[]:
+          used_indexes.extend(cur_span_indexes)
+          valid=True
+        if valid: 
+          ph0=self.span_phrase_dict.get(span0)
+          if ph0!=None: valid_sorted_span_phrases.append(ph0)
 
-    if valid_sorted_span_phrases:
-      combined_phrase=self.combine_phrases(valid_sorted_span_phrases)
-      combined_phrase["cat"]="COMBINED"
-      dep0,const0=self.export_parse2(tokens,combined_phrase,True)
-      final_raw_parses.append((ph0,dep0,const0))
+      if valid_sorted_span_phrases:
+        combined_phrase=self.combine_phrases(valid_sorted_span_phrases)
+        combined_phrase["cat"]="COMBINED"
+        dep0,const0=self.export_parse2(tokens,combined_phrase,True)
+        final_raw_parses.append((ph0,dep0,const0))
 
 
 
