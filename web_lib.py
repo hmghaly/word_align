@@ -98,7 +98,7 @@ class element:
       self.src=""
 
 class DOM:
-  def __init__(self,content) -> None:
+  def __init__(self,content,params={}) -> None:
     self.content=content
     self.tag_dict={} #linking assigned IDs with element objects
     self.id_dict={} #mapping actual IDs with assigned IDs
@@ -118,7 +118,8 @@ class DOM:
     self.keywords=""
     self.lang=""
     self.meta_lang=""
-    self.content=general.unescape(self.content) 
+    apply_unescape=params.get("apply_unescape",False)
+    if apply_unescape: self.content=general.unescape(self.content) 
     #tags=list(re.finditer('<([^<>]*?)>', self.content)) #'<[^<>]*?>|\<\!\-\-.+?\-\-\>'
     tags=list(re.finditer(r'<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
     open_tags=[""]
