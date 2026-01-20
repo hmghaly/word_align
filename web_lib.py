@@ -617,6 +617,16 @@ def join_url(root0,rel0): #e.g. root: http://www.adsdf.dad, rel: image1.jpg
   return full0
 
 
+#20 January 2026
+def get_main_url(url): #get the main part of the url (tld/domain/http)
+  http_split=url.split("//")
+  if len(http_split)<2: return url #if no http is included 
+  http_part,without_http=http_split[:2]
+  main_part=without_http.split("/")[0]
+  final_main_url="//".join([http_part,main_part])
+  return final_main_url
+
+
 #21 June 2024
 #curl-based function for reading urls, with subprocess timeout
 #while capturing response information after the page content
