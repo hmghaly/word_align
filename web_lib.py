@@ -632,10 +632,15 @@ def get_main_url(url): #get the main part of the url (tld/domain/http)
 #while capturing response information after the page content
 from subprocess import STDOUT, check_output
 
-def curl(url,curl_path="curl",timeout=10,allow_insecure=False):
+def curl(url,curl_path="curl",timeout=10, params={}):
+  allow_insecure=params.get("allow_insecure",False) 
   #cmd='%s -A -k "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" %s -L'%(curl_path,url)
-  if allow_insecure: cmd='%s --compressed -k -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,url)
-  else: cmd='%s --compressed -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,url)
+  # if allow_insecure: cmd='%s --compressed -k -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,url)
+  # else: cmd='%s --compressed -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,url)
+
+  if allow_insecure: cmd='%s --compressed -k -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time %s -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,timeout,url)
+  else: cmd='%s --compressed -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time %s -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,timeout,url)
+
 
   try: 
     output = check_output(cmd, shell=True, stderr=STDOUT, timeout=timeout)
@@ -661,12 +666,12 @@ def curl(url,curl_path="curl",timeout=10,allow_insecure=False):
     return "", "{}"
   return content, final_json0
 
-def get_page_info(url, read_method="curl",curl_path="curl",timeout=30):
+def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={}):
   page_info_dict={}
   page_info_dict["url"]=url
 
   if read_method=="curl":
-    page_content,response_json=curl(url,curl_path=curl_path,timeout=timeout)
+    page_content,response_json=curl(url,curl_path=curl_path,timeout=timeout,params=params)
     page_content=general.unescape(page_content)
     #response_dict=json.loads(response_json)
     try: response_dict=json.loads(response_json)
