@@ -672,7 +672,7 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={})
 
   if read_method=="curl":
     params_timeout=params.get("timeout")
-    if params_time_out!=None: timeout=params_timeout
+    if params_timeout!=None: timeout=params_timeout
 
     page_content,response_json=curl(url,curl_path=curl_path,timeout=timeout,params=params)
     page_content=general.unescape(page_content)
