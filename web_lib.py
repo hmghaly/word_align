@@ -1049,7 +1049,7 @@ def get_el_text_obj_list(dom_obj, params={}):
     open_tag0=tag_obj0.open_tag
     inner0=re.sub(r"\s+"," ",inner0)
     #inner_text=general.remove_html(inner0).strip()
-    inner_text=remove_tags(inner0,repl_with=" ").strip()
+    inner_text=general.remove_tags(inner0,repl_with=" ").strip()
     if inner_text=="" or len(inner_text)>max_el_text_size: continue #remove elements with empty text or very big elements (which are probably parent elements) 
     tag_name0=tag_obj0.tag_name
     counted_recursive_tags=inner0.count(f"<{tag_name0} ")
