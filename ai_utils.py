@@ -5,6 +5,7 @@ cur_model="gpt-4o"
 
 cur_model="gpt-4o-2024-08-06"
 cur_model="gpt-4o-mini-2024-07-18"
+cur_model="gpt-5-nano-2025-08-07"
 #gpt-4.1-nano-2025-04-14
 
 chatgpt_api_key="XXX"
