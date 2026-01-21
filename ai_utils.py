@@ -113,8 +113,8 @@ def chat_with_assistant_multi(message_input_list,assistant_id, client):
 #15 June 2025
 def clean_json(json_str): #clean json output from AI systems
   json_str=re.sub(r'\s//.+?\n',"\n",json_str)
-  json_str=re.sub("/\*.+?\*/","\n",json_str)
-  json_str=re.sub('\n\-+\n',"\n",json_str)
+  json_str=re.sub(r"/\*.+?\*/","\n",json_str)
+  json_str=re.sub(r'\n\-+\n',"\n",json_str)
   return json_str
 
 
