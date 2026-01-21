@@ -1054,7 +1054,20 @@ def get_el_text_obj_list(dom_obj, params={}):
     tag_name0=tag_obj0.tag_name
     counted_recursive_tags=inner0.count(f"<{tag_name0} ")
     if counted_recursive_tags>0: continue #exclude recursive elements <span><span> or <div><div>
-    final_id_text_obj_list.append((tag_id0,inner_text,tag_obj0))
+    cur_i0=tag_obj0.open_tag_i0
+    cur_i1=cur_i0+len(tag_obj0.outer_html)
+    final_id_text_obj_list.append((tag_id0,inner_text,tag_obj0,(cur_i0,cur_i1)))
+  
+  final_id_text_obj_list.sort(key=lambda x:x[-1]) #sort all items by their position from the beginning of the page
+  temp_final=[]
+  last_i=0
+  for item0 in final_id_text_obj_list:
+    span_i0,span_i1=item_span=item0[-1]
+    valid=True
+    if span_i0<last_i: continue #do not include overlapping/nested elements
+    temp_final.append(item0[:-1])
+    last_i=span_i1
+    #print(valid,item0)
+  final_id_text_obj_list=temp_final
   return final_id_text_obj_list
-
 
