@@ -1065,7 +1065,7 @@ def get_el_text_obj_list(dom_obj, params={}):
     span_i0,span_i1=item_span=item0[-1]
     valid=True
     if span_i0<last_i: continue #do not include overlapping/nested elements
-    temp_final.append(item0[:-1])
+    temp_final.append(item0)
     last_i=span_i1
     #print(valid,item0)
   final_id_text_obj_list=temp_final
