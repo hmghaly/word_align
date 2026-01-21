@@ -943,6 +943,15 @@ def remove_html_noise(html_content): #remove script/style/comments
   pattern = r'<[ ]*svg.*?\/[ ]*svg[ ]*>'  # mach any char zero or more times
   text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
 
+  # (REMOVE HTML <SOURCE> to </SOURCE> and variations)
+  pattern = r'<[ ]*source.*?\/[ ]*source[ ]*>'  # mach any char zero or more times
+  text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
+
+
+  #remove link and variations
+  pattern = re.compile(r'<link\b[^>]*>.*?</link\b[^>]*>|<link\b[^>]*/>', re.DOTALL | re.IGNORECASE)
+  text = pattern.sub('', text)
+
 
   # (REMOVE HTML COMMENTS <!-- to --> and variations)
   pattern = r'<[ ]*!--.*?--[ ]*>'  # mach any char zero or more times
