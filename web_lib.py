@@ -164,6 +164,7 @@ class DOM:
         text_el.tag_type="text_node"
         text_el.parent=self.tag_dict.get(open_tags[-1])
         self.tag_dict[text_node_id]=text_el
+
         if text_el.parent!=None: self.tag_dict[open_tags[-1]].children+=[text_node_id]
       start_i=tag_end
 
@@ -1033,4 +1034,26 @@ def encode_qs(qs_dict):
     cur_item=f'{a}={b}'
     qs_items.append(cur_item)
   return "&".join(qs_items)
+
+
+
+#21 January 2026
+#to get a list of valid elements with their IDs and element/tag objects
+def get_el_text_obj_list(dom_obj, params={}):
+  max_el_text_size=params.get("max_el_text_size",500)
+  final_id_text_obj_list=[]
+  for tag_id0,tag_obj0 in dom_obj.tag_dict.items():
+    if tag_id0.startswith("text_node"): continue
+    inner0=tag_obj0.inner_html
+    outer0=tag_obj0.outer_html
+    open_tag0=tag_obj0.open_tag
+    inner0=re.sub(r"\s+"," ",inner0)
+    inner_text=general.remove_html(inner0).strip()
+    if inner_text=="" or len(inner_text)>max_el_text_size: continue #remove elements with empty text or very big elements (which are probably parent elements) 
+    tag_name0=tag_obj0.tag_name
+    counted_recursive_tags=inner0.count(f"<{tag_name0} ")
+    if counted_recursive_tags>0: continue #exclude recursive elements <span><span> or <div><div>
+    final_id_text_obj_list.append((tag_id0,inner_text,tag_obj0))
+  return final_id_text_obj_list
+
 
