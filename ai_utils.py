@@ -11,7 +11,7 @@ cur_model="gpt-5-nano-2025-08-07"
 chatgpt_api_key="XXX"
 
 
-
+#max_completion_tokens
 
 def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
     res = requests.post(f"https://api.openai.com/v1/chat/completions",
@@ -21,7 +21,7 @@ def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
           },
           json={"model": model,
           "messages": [{"role": "user", "content": prompt}], 
-          "max_tokens": max_tokens,
+          "max_completion_tokens": max_tokens,
           "response_format": { "type": "json_object" }
           }).json()
     return res#.choices[0].text
