@@ -119,6 +119,8 @@ class DOM:
     self.lang=""
     self.meta_lang=""
     apply_unescape=params.get("apply_unescape",False)
+    copy_with_tag_ids=params.get("copy_with_tag_ids",False)
+
     if apply_unescape: self.content=general.unescape(self.content) 
     #tags=list(re.finditer('<([^<>]*?)>', self.content)) #'<[^<>]*?>|\<\!\-\-.+?\-\-\>'
     tags=list(re.finditer(r'<[^<>]*?>|\<\!\-\-.+?\-\-\>', self.content))
@@ -127,6 +129,7 @@ class DOM:
     tag_counter_dict={}
     start_i=0
     last_open_tag_str=""
+    self.content_copy_with_ids=""
     for ti_, t in enumerate(tags):
       tag_str,tag_start,tag_end=t.group(0), t.start(), t.end()
       tag_str_lower=tag_str.lower()
@@ -176,6 +179,13 @@ class DOM:
       cur_el=element()
       cur_el.assigned_id=assigned_tag_id
 
+      tag_copy=str(tag_str) #add IDs if needed
+      if tag_type=="opening" and not ' id=' in tag_copy:
+        first_part=tag_copy.split(" ")[0]
+        tag_copy=tag_copy.replace(first_part,first_part+f' id="{assigned_tag_id}" ')
+      self.content_copy_with_ids+=tag_copy
+
+
       if tag_type=="closing" and len(open_tags)>0: #if it is a closing tag,
         if tag_name==open_tags[-1].split("_")[0]: #we check if the tag name matches the last open tag name
           cur_open_tag_id=open_tags[-1]
@@ -187,6 +197,8 @@ class DOM:
           el_to_close.outer_html=tmp_outer_html
           if tag_name=="title": self.title=tmp_inner_html
           if tag_name=="a": self.all_links.append(el_to_close)
+
+          self.content_copy_with_ids+=tmp_inner_html
           
             
           open_tags=open_tags[:-1]
