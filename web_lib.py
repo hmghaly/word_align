@@ -199,6 +199,8 @@ class DOM:
           if tag_name=="a": self.all_links.append(el_to_close)
 
           self.content_copy_with_ids+=tmp_inner_html
+
+          self.tag_dict[open_tags[-1]]=el_to_close
           
             
           open_tags=open_tags[:-1]
