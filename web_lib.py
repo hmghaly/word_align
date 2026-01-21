@@ -949,8 +949,10 @@ def remove_html_noise(html_content): #remove script/style/comments
 
 
   #remove link and variations
-  pattern = re.compile(r'<link\b[^>]*>.*?</link\b[^>]*>|<link\b[^>]*/>', re.DOTALL | re.IGNORECASE)
-  text = pattern.sub('', text)
+  #pattern = re.compile(r'<link\b[^>]*>.*?</link\b[^>]*>|<link\b[^>]*/>', re.DOTALL | re.IGNORECASE)
+  pattern= r'<link\b[^>]*>.*?</link\b[^>]*>|<link\b[^>]*/>'
+  #text = pattern.sub('', text)
+  text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
 
 
   # (REMOVE HTML COMMENTS <!-- to --> and variations)
