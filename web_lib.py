@@ -180,11 +180,11 @@ class DOM:
       cur_el=element()
       cur_el.assigned_id=assigned_tag_id
 
-      tag_copy=str(tag_str) #add IDs if needed
-      if tag_type=="opening" and not ' id=' in tag_copy:
-        first_part=tag_copy.split(" ")[0]
-        tag_copy=tag_copy.replace(first_part,first_part+f' id="{assigned_tag_id}" ')
-      self.content_copy_with_ids+=tag_copy
+      # tag_copy=str(tag_str) #add IDs if needed
+      # if tag_type=="opening" and not ' id=' in tag_copy:
+      #   first_part=tag_copy.split(" ")[0]
+      #   tag_copy=tag_copy.replace(first_part,first_part+f' id="{assigned_tag_id}" ')
+      # self.content_copy_with_ids+=tag_copy
 
 
       if tag_type=="closing" and len(open_tags)>0: #if it is a closing tag,
@@ -199,7 +199,7 @@ class DOM:
           if tag_name=="title": self.title=tmp_inner_html
           if tag_name=="a": self.all_links.append(el_to_close)
 
-          self.content_copy_with_ids+=tmp_inner_html
+          #self.content_copy_with_ids+=tmp_inner_html
 
           self.tag_dict[open_tags[-1]]=el_to_close
           
@@ -1048,7 +1048,7 @@ def get_el_text_obj_list(dom_obj, params={}):
     outer0=tag_obj0.outer_html
     open_tag0=tag_obj0.open_tag
     tag_name0=tag_obj0.tag_name
-    
+
     if tag_name0.lower() in ["html","body"]: continue
     inner0=re.sub(r"\s+"," ",inner0)
     #inner_text=general.remove_html(inner0).strip()
