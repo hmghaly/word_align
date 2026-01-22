@@ -1047,6 +1047,7 @@ def get_el_text_obj_list(dom_obj, params={}):
     inner0=tag_obj0.inner_html
     outer0=tag_obj0.outer_html
     open_tag0=tag_obj0.open_tag
+    if open_tag0.lower() in ["html","body"]: continue
     inner0=re.sub(r"\s+"," ",inner0)
     #inner_text=general.remove_html(inner0).strip()
     inner_text=general.remove_tags(inner0,repl_with=" ").strip()
