@@ -121,3 +121,26 @@ def clean_json(json_str): #clean json output from AI systems
 def process_out_json(json_str): #clean and parse json output from AI systems
   json_str=clean_json(json_str)
   return json.loads(json_str)
+
+
+#========== Generate specific prompts ===========
+#23 Jan 2026
+def gen_business_info_prompt(content):
+  prompt="""
+  we need to identify business information from  the following text extracted from a web page content:
+  {%s}
+  ============
+  extract the following information in JSON format, exactly as it appears in the text in order to match it with the original text
+  {
+    "business_name": "Abb Century Ltd",
+    "business_description": "our company is a family business",
+    "business_role": [" manufacture","produces", "supplier","providers of transport","marketplace","venue"]
+    "business_products":["apples","bananas","sheet metal"],
+    "business_services":["warehousing","financing","insurance"],
+    "business_phone":["+33 1234234 34","+1234 2134234"],
+    "business_addresses":["213 Olive st, 1231","189 Orchard Ave, 342"]
+  }
+  For business role, indicate only the words exactly as they appear in the text: verbs, nouns or phrases that best represent that the company does (e.g. producer, retailer, manufacurer .. etc)
+  For every piece of information, it has to be pulled exactly from the text without any paraphrasing.
+  """%content
+  return prompt
