@@ -123,6 +123,22 @@ def process_out_json(json_str): #clean and parse json output from AI systems
   return json.loads(json_str)
 
 
+def ai_query_multi_run(prompt,n_runs,api_key=chatgpt_api_key,max_tokens=3000,model=cur_model,combine_outcomes=True):
+  all_outcomes=[]
+  for run_i in range(n_runs):
+    #print("run_i",run_i)
+    output=ai_query(prompt,api_key=api_key,max_tokens=max_tokens,model=model)
+    #print(output)
+    output_dict=json.loads(output)
+    all_outcomes.append(output_dict)
+  combined_dict={}
+  for o_dict0 in all_outcomes:
+    for key0,vals0 in o_dict0.items():
+      combined_dict[key0]=combined_dict.get(key0,[])+vals0
+  return combined_dict
+
+
+
 #========== Generate specific prompts ===========
 #23 Jan 2026
 def gen_business_info_prompt(content):
