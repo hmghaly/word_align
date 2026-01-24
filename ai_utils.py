@@ -132,12 +132,12 @@ def gen_business_info_prompt(content):
   ============
   extract the following information in JSON format, exactly as it appears in the text in order to match it with the original text
   {
-    "business_name": "Abb Century Ltd",
-    "business_description": "our company is a family business",
-    "business_role": [" manufacture","produces", "supplier","providers of transport","marketplace","venue"]
+    "business_names": ["Abb Century Ltd"],
+    "business_descriptions": ["our company is a family business"],
+    "business_roles": [" manufacture","produces", "supplier","providers of transport","marketplace","venue"]
     "business_products":["apples","bananas","sheet metal"],
     "business_services":["warehousing","financing","insurance"],
-    "business_phone":["+33 1234234 34","+1234 2134234"],
+    "business_phones":["+33 1234234 34","+1234 2134234"],
     "business_addresses":["213 Olive st, 1231","189 Orchard Ave, 342"]
   }
   For business role, indicate only the words exactly as they appear in the text: verbs, nouns or phrases that best represent that the company does (e.g. producer, retailer, manufacurer .. etc)
