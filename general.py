@@ -1,6 +1,10 @@
-import re, os, shelve, unicodedata, sys, json, time, random, string, base64, copy, math
+import os, shelve, unicodedata, sys, json, time, random, string, base64, copy, math
+
+
 #import pandas as pd
-import re
+import regex as re
+
+
 from itertools import groupby
 from difflib import SequenceMatcher
 
@@ -451,6 +455,45 @@ def tok(txt):
         else: new_str+=" _"+char0+"_ "
     new_str+=" "    
   return [v for v in new_str.split(" ") if v]
+
+#24 Jan 2026 
+#create tokenization function to keep punctuation space info, option to keep HTML tags and other elements, and to split chinese & japanese chars
+def tok_2026(text,params={}):
+  text=text.replace("\n"," ")
+  keep_html_tags=params.get("keep_html_tags",True)
+  keep_urls=params.get("keep_urls",True)
+  keep_emails=params.get("keep_emails",True)
+  keep_numbers=params.get("keep_numbers",True)
+  keep_un_symbols=params.get("keep_un_symbols",True)
+  split_chinese=params.get("split_chinese",True)
+
+  split_all=params.get("split_all",False)
+  if split_all: keep_html_tags,keep_urls, keep_emails,keep_numbers,keep_un_symbols=False,False,False,False,False
+  multi_dot_words=params.get("multi_dot_words",["Mr.,Ms.,Mrs.,Dr."])
+  replaced=[]
+  if keep_html_tags: replaced.extend(TAG_RE.findall(text))
+  #if keep_urls: replaced.extend(re.findall(r"""(https?\:\/\/\S+)[\'\"]?""",text))
+  if keep_urls: replaced.extend(re.findall(r"""(https?\:\/\/[^\s\"\']+)""",text))
+  if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",text))
+  if keep_numbers: replaced.extend(re.findall(r"\d[\d,\.]*",text))
+  if keep_emails: replaced.extend(re.findall(r"""[\w\d\.\-]+\@[\w\d\.\-]+""",text))
+  #do something for multiword expressions
+  repl_dict={}
+  for i0,u0 in enumerate(replaced):
+      key="__item%s__"%i0
+      repl_dict[key]=u0
+      text=text.replace(u0,key)
+
+  split_punc_text=re.sub(r'(\p{Punct})', lambda m: punc_repl_func(m) ,text)
+  if split_chinese: 
+    split_punc_text=re.sub(r'[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\u3400-\u4DBF]', lambda m: repl_chinese(m) ,split_punc_text)
+  
+  split_punc_text=re.sub(r"\s+","\n",split_punc_text)
+  for a,b in repl_dict.items():
+      split_punc_text=split_punc_text.replace(a,b)
+  return split_punc_text.strip().split("\n") #re.split(r"\s+",split_punc_text.strip())
+
+
 
 #updated 26 May - to accommodate raw tokenized items (not produced by the tokenization scheme included in this file)
 def de_tok_space(tokens): #outputs list of tokens with the following, whether it is followed by space or not identify which tokens are followed by space and which are not, based on latest tok
