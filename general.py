@@ -472,7 +472,7 @@ def tok_2026(text,params={}):
   multi_dot_words=params.get("multi_dot_words",["Mr.,Ms.,Mrs.,Dr."])
   replaced=[]
   if keep_html_tags: 
-    TAG_RE.sub(r" \1 ", text)
+    text=re.sub(r'(<[^>]+>)',r" \1 ",text)
     replaced.extend(TAG_RE.findall(text))
 
   #if keep_urls: replaced.extend(re.findall(r"""(https?\:\/\/\S+)[\'\"]?""",text))
