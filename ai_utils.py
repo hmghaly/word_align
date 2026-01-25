@@ -131,6 +131,7 @@ def ai_query_multi_run(prompt,n_runs,api_key=chatgpt_api_key,max_tokens=3000,mod
     #print(output)
     output_dict=json.loads(output)
     all_outcomes.append(output_dict)
+  if not combine_outcomes: return all_outcomes
   combined_dict={}
   for o_dict0 in all_outcomes:
     for key0,vals0 in o_dict0.items():
