@@ -493,6 +493,32 @@ def tok_2026(text,params={}):
       split_punc_text=split_punc_text.replace(a,b)
   return split_punc_text.strip().split("\n") #re.split(r"\s+",split_punc_text.strip())
 
+#25 Jan 2026
+#support functions for the new tokenization function
+def punc_repl_func(m): #replace a punctuation character by adding _ before and/or after, depending on whether it is followed or preceded by space
+  cur_item=m.group(0)
+  if cur_item=="_": return "_"
+  start0=m.start()
+  string0=m.string
+  prev0,next0="",""
+  if start0>0: prev0=string0[start0-1]
+  if start0<len(string0)-1: next0=string0[start0+1]
+  final_string=""
+  if prev0!=" ": final_string+=" _"
+  final_string+=cur_item
+  if next0!=" ": final_string+="_ "
+  return final_string
+
+def repl_chinese(m): #replace a chinese character by adding _ if not followed by space
+  cur_item=m.group(0)
+  start0=m.start()
+  string0=m.string
+  next0=""
+  if start0<len(string0)-1: next0=string0[start0+1]
+  final_string=cur_item
+  if next0!=" ": final_string+="_ "
+  return final_string
+
 
 
 #updated 26 May - to accommodate raw tokenized items (not produced by the tokenization scheme included in this file)
