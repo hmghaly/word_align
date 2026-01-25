@@ -475,7 +475,7 @@ def tok_2026(text,params={}):
   #if keep_urls: replaced.extend(re.findall(r"""(https?\:\/\/\S+)[\'\"]?""",text))
   if keep_urls: replaced.extend(re.findall(r"""(https?\:\/\/[^\s\"\']+)""",text))
   if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",text))
-  if keep_numbers: replaced.extend(re.findall(r"\d[\d,\.]*",text))
+  #if keep_numbers: replaced.extend(re.findall(r"\d[\d,\.]*",text)) #we'll fix it later 13,324.12
   if keep_emails: replaced.extend(re.findall(r"""[\w\d\.\-]+\@[\w\d\.\-]+""",text))
   #do something for multiword expressions
   repl_dict={}
