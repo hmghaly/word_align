@@ -518,7 +518,7 @@ def repl_chinese(m): #replace a chinese character by adding _ if not followed by
   string0=m.string
   next0=""
   if start0<len(string0)-1: next0=string0[start0+1]
-  final_string=cur_item
+  final_string=" "+cur_item
   if next0!=" ": final_string+="_ "
   return final_string
 
