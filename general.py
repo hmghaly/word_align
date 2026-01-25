@@ -471,7 +471,10 @@ def tok_2026(text,params={}):
   if split_all: keep_html_tags,keep_urls, keep_emails,keep_numbers,keep_un_symbols=False,False,False,False,False
   multi_dot_words=params.get("multi_dot_words",["Mr.,Ms.,Mrs.,Dr."])
   replaced=[]
-  if keep_html_tags: replaced.extend(TAG_RE.findall(text))
+  if keep_html_tags: 
+    TAG_RE.sub(r" \1 ", text)
+    replaced.extend(TAG_RE.findall(text))
+
   #if keep_urls: replaced.extend(re.findall(r"""(https?\:\/\/\S+)[\'\"]?""",text))
   if keep_urls: replaced.extend(re.findall(r"""(https?\:\/\/[^\s\"\']+)""",text))
   if keep_un_symbols: replaced.extend(re.findall(r"[A-Z]+/\S+\d\b",text))
