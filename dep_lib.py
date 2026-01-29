@@ -39,6 +39,23 @@ def conll2obj(conll_str):
     return line_obj_list
 
 
+#28 January 2026
+def obj2conll(dep_obj,params={}):
+    final_conll_str=""
+    ignored_cols=params.get("ignored_cols",["deps"])
+    col_headers=["id","form","lemma","upos","xpos","feats","head","deprel","deps","misc"]
+    for obj0 in dep_obj:
+        cur_cells=[]
+        for col0 in col_headers:
+            cur_val=obj0.get(col0,"_")
+            if col0 in ignored_cols: cur_val="_"
+            cur_cells.append(cur_val)
+        line="\t".join(cur_cells)+"\n"
+        final_conll_str+=line
+    return final_conll_str
+
+
+
 
 # def get_conll(sent_input):
 #   #nlp = spacy.load("en_core_web_sm")
