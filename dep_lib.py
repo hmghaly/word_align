@@ -1,4 +1,4 @@
-import os, re, random
+import os, re, random, copy
 from itertools import groupby
 import itertools
 
