@@ -4,6 +4,171 @@ import itertools
 
 random.seed(0)
 
+#2 Feb 2026
+#converting dependency object to constituency structure (with multiple options for projections and final format)
+class dep_const:
+  def __init__(self,dep_obj,params={}) -> None:
+    self.dep_obj=dep_obj #obtaining basic info from the dependency object
+    self.id_list,self.heads,self.words=[],[],[]
+    self.id_info_dict={}
+    self.head_children_dict={}
+    self.id_projection_dict={}
+
+    for it0 in dep_obj:
+      id0,head0,word0=it0["id"],it0["head"],it0["form"]
+      self.id_list.append(id0)
+      self.heads.append(head0)
+      self.words.append(word0)
+      self.id_info_dict[id0]=it0
+      self.head_children_dict[head0]=self.head_children_dict.get(head0,[])+[id0] #identify the ids of children corresponding to current head
+    #print(self.words)
+
+    childless_ids=list(set(self.id_list).difference(set(self.head_children_dict))) #tokens that are not heads/have no children
+    childless_ids.sort(key=lambda x:int(x))
+
+    for ch_id in childless_ids: #creating projections for tokens without children
+      cur_info=self.id_info_dict[ch_id]
+      loc_i=int(ch_id)-1
+      phrase_obj={"cat": cur_info["xpos"],"word": cur_info["form"], "deprel":cur_info["deprel"],"upos":cur_info["upos"], "xpos":cur_info["xpos"],"children":[],"id":ch_id,"start":loc_i,"end":loc_i,"span":1, "rule":"","level":0}
+      phrase_obj["ptb"]=f'({phrase_obj["cat"]} {phrase_obj["word"]})'
+      cur_proj_list=[phrase_obj]
+
+      phrase_obj1=copy.deepcopy(phrase_obj)
+      phrase_cat=None
+      if cur_info["upos"].lower()=="noun" or cur_info["deprel"].lower().startswith(("nsubj","nobj")): phrase_cat="NP"
+      if cur_info["upos"].lower()=="verb": phrase_cat="VP"
+      if cur_info["upos"].lower()=="adj": phrase_cat="AP"
+      if phrase_cat!=None:
+        phrase_obj1["cat"]=phrase_cat
+        phrase_obj["ptb"]=f'({phrase_cat} {phrase_obj["word"]})'
+        phrase_obj1["level"]=1
+        cur_proj_list.append(phrase_obj1)
+      self.id_projection_dict[ch_id]=cur_proj_list
+
+    #iterating over remaining tokens that are heads, stop when all are projected
+    while len(self.id_projection_dict)<len(self.id_list):
+      for head_id,ch_id_list in self.head_children_dict.items():
+        if self.id_projection_dict.get(head_id)!=None: continue #already projected - skip
+        head_info=self.id_info_dict.get(head_id)
+        if head_info==None: continue #mainly zero/root heads
+
+        head_id_int=int(head_id)
+        head_level=head_info.get("level",0)
+        child_projection_list=[]
+        child_sorting_list=[]
+        all_children_projected=True
+        #identifying and sorting children
+        for ch0 in ch_id_list:
+          ch_id_int=int(ch0)
+          offset0=head_id_int-ch_id_int
+          #offset0=ch_id_int-head_id_int
+          ch_proj0=self.id_projection_dict.get(ch0)
+          if ch_proj0==None: #if a child is not projected yet, we skip this head
+            all_children_projected=False
+            break
+          highest_ch_proj=ch_proj0[-1]
+          ch_ch_upos=highest_ch_proj["upos"]
+          ch_ch_cat=highest_ch_proj["cat"]
+          ch_ch_deprel=highest_ch_proj["deprel"]
+          abs_offset=abs(offset0)
+          direction0=int(offset0/abs_offset)
+          ch_sorting_obj={"id": ch0,"offset":abs_offset,"direction":direction0,"upos":ch_ch_upos,"cat":ch_ch_cat,"deprel":ch_ch_deprel}
+          child_sorting_list.append(ch_sorting_obj)
+
+          child_projection_list.append(ch_proj0)
+
+        if not all_children_projected: continue
+
+        head_loc_i=head_id_int-1
+        #head_level+=1
+        head_phrase_obj={"cat":head_info["xpos"],"word": head_info["form"],"upos":head_info["upos"],"xpos":head_info["xpos"],"deprel":head_info["deprel"],"children":[],"id":head_id,"start":head_loc_i,"end":head_loc_i,"span":1,"rule":""}
+        head_phrase_obj["ptb"]=f'({head_phrase_obj["cat"]} {head_phrase_obj["word"]})'
+        cur_head_projections=[head_phrase_obj]
+        head_phrase_obj1=copy.deepcopy(head_phrase_obj)
+        phrase_cat=None
+        if head_phrase_obj["upos"].lower()=="noun" or head_phrase_obj["deprel"].lower().startswith(("nsubj","nobj")): phrase_cat="NP"
+        if head_phrase_obj["upos"].lower()=="verb": phrase_cat="VP"
+        if head_phrase_obj["upos"].lower()=="adj": phrase_cat="AP"
+        if phrase_cat!=None:
+          head_phrase_obj1["cat"]=phrase_cat
+          head_phrase_obj1["ptb"]=f'({phrase_cat} {head_phrase_obj1["word"]})'
+          head_phrase_obj1["level"]=1
+          cur_head_projections.append(head_phrase_obj1)
+
+
+        child_sorting_list.sort(key=lambda x:(x["direction"],x["offset"])) #we sort children IDs based on direction and distance from the head, we go right firest, from closer to farther, and then go left the same way
+        
+        
+        for ch_sort0 in child_sorting_list: 
+          ch_proj=self.id_projection_dict[ch_sort0["id"]][-1]
+          hightest_cur_proj=cur_head_projections[-1] #we get the hightest projection for each new child/dependency
+          new_combined_projection=copy.deepcopy(hightest_cur_proj)
+          new_combined_projection["children"]+=[ch_sort0["id"]]
+
+          head_cat0=hightest_cur_proj["cat"]
+          head_word0=hightest_cur_proj["word"]
+          head_ptb0=hightest_cur_proj["ptb"]
+          original_head_cat=str(head_cat0)
+          ch_cat0=ch_proj["cat"]
+          ch_word0=ch_proj["word"]
+          ch_deprel0=ch_proj["deprel"]
+          ch_ptb0=ch_proj["ptb"]
+
+          direction0=ch_sort0["direction"]
+
+          head_xpos=hightest_cur_proj["xpos"]
+          ch_xpos=ch_proj["xpos"]
+
+          ch_start0,ch_end0=ch_proj["start"],ch_proj["end"]
+          highest_proj_start0,highest_proj_end0=hightest_cur_proj["start"],hightest_cur_proj["end"]
+
+          new_start=min(hightest_cur_proj["start"],ch_proj["start"])
+          new_end=max(hightest_cur_proj["end"],ch_proj["end"])
+          new_span=new_end-new_start+1
+
+          #direction0=ch_sort0["direction"]
+          if direction0==1 and ch_sort0["cat"]=="NP" and head_cat0=="VP": head_cat0="S"
+          if ch_sort0["deprel"].lower().startswith("nsubj") and head_cat0=="VP": head_cat0="S"
+          if direction0==1 and ch_sort0["upos"]=="ADP" and head_cat0=="NP": head_cat0="PP"
+          if direction0==1 and ch_sort0["cat"]=="CC": head_cat0="CC_"+head_cat0
+
+          new_combined_projection["cat"]=head_cat0
+          if direction0>0: #1 is left, -1 is right
+            rule=f'{head_cat0}[deprel={ch_deprel0}] --> {ch_cat0}[word={ch_word0} xpos={ch_xpos}] {original_head_cat}[word={head_word0} xpos={head_xpos}]^'
+            ptb0=f'({head_cat0} {ch_ptb0} {head_ptb0})'
+            phrase_items=self.words[ch_start0:ch_end0+1]+["| ^"]+self.words[highest_proj_start0:highest_proj_end0+1]
+            joined_phrase=" ".join(phrase_items)
+          else:
+            rule=f'{head_cat0}[deprel={ch_deprel0}] --> {original_head_cat}[word={head_word0} xpos={head_xpos}]^ {ch_cat0}[word={ch_word0} xpos={ch_xpos}]'
+            ptb0=f'({head_cat0} {head_ptb0} {ch_ptb0})'
+            phrase_items=["^"]+self.words[highest_proj_start0:highest_proj_end0+1]+["|"]+self.words[ch_start0:ch_end0+1]
+            joined_phrase=" ".join(phrase_items)
+
+          new_combined_projection["rule"]=rule
+          new_combined_projection["start"]=new_start
+          new_combined_projection["end"]=new_end
+          new_combined_projection["span"]=new_span
+          phrase0=" ".join(self.words[new_start:new_end+1])
+          new_combined_projection["phrase"]=phrase0
+          new_combined_projection["joined_phrase"]=joined_phrase
+          head_level+=1
+          new_combined_projection["level"]=head_level
+          new_combined_projection["ptb"]=ptb0
+          cur_head_projections.append(new_combined_projection)
+
+
+        self.id_projection_dict[head_id]=cur_head_projections
+    self.all_phrases=[]
+    for id0 in self.id_list:
+      projections=self.id_projection_dict[id0]
+      for pr0 in projections:
+        self.all_phrases.append(pr0)
+    self.all_phrases.sort(key=lambda x:x["span"])
+    self.ptb=self.all_phrases[-1].get("ptb","") #the PTB string for the phrase with the largest span
+
+
+
+
 
 
 #16 Dec 2025
@@ -75,6 +240,10 @@ def obj2conll(dep_obj,params={}):
 #   tmp_pos_tags=[]
 #   for token in doc: tmp_pos_tags.append(token.tag_)
 #   return tmp_pos_tags
+
+
+#============ OLD ===========
+
 def get_rec_children(el0,el_child_dict0,el_list0=[],only_without_children=True):
   #print("el0",el0)
   cur_children0=el_child_dict0.get(el0,[])
@@ -85,6 +254,8 @@ def get_rec_children(el0,el_child_dict0,el_list0=[],only_without_children=True):
     else: el_list0=get_rec_children(ch0,el_child_dict0,el_list0,only_without_children)
     
   return el_list0
+
+
 
 def dep2phrases(conll2d_input):
   output_dict={}
