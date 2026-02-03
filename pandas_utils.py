@@ -100,6 +100,15 @@ def get_wb_data_dict(wb_fpath,dtype0=str): #same as above, but data output is in
   return wb_data_dict0
 
 
+def write2excel(data_list,excel_fpath,headers=None,sheet_name=None):
+  # Convert to DataFrame
+  df = pd.DataFrame(data_list, columns=headers)
+
+  # Save to Excel
+  if sheet_name!=None: df.to_excel(excel_fpath, index=False,sheet_name=sheet_name)  
+  else: df.to_excel(excel_fpath, index=False)
+  return True
+
 
 if __name__=="__main__":
   print("Hello")
