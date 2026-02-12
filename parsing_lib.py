@@ -490,12 +490,13 @@ class Parser:
 
 
     #11 Feb 2026
-    head_child_cat0=head_phrase_obj["cat"]
-    applied_rule_parent_obj=applied_rule["parent"]
-    percolate=applied_rule_parent_obj.get("percolate",False)
-    apply_cat=applied_rule_parent_obj.get("apply_cat",False)
-    if percolate: parent_phrase_obj["feat"]=head_phrase_obj["feat"]
-    if apply_cat: parent_phrase_obj["feat"]+=[f"cat={head_child_cat0}"]
+    if applied_rule!={}:
+      head_child_cat0=head_phrase_obj["cat"]
+      applied_rule_parent_obj=applied_rule["parent"]
+      percolate=applied_rule_parent_obj.get("percolate",False)
+      apply_cat=applied_rule_parent_obj.get("apply_cat",False)
+      if percolate: parent_phrase_obj["feat"]=head_phrase_obj["feat"]
+      if apply_cat: parent_phrase_obj["feat"]+=[f"cat={head_child_cat0}"]
 
 
 
