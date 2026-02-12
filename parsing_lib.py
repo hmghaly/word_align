@@ -1221,8 +1221,6 @@ def process_rule(rule_str):
     cur_lhs_features.remove("apply_cat")
     apply_cat=True
 
-  lhs_dict={"cat":lhs_cat0,"feat":cur_lhs_features,"percolate":percolate,"apply_cat":apply_cat}
-  final_rule_dict["parent"]=lhs_dict
   rule_children=[]
   rhs_items=rhs.split()
   head_i=0 #the location of the head among the children
@@ -1240,7 +1238,14 @@ def process_rule(rule_str):
       cur_features.extend(ft0.split())
 
     item_dict={"cat":item_cat0,"is_head":is_head,"feat":cur_features}
+
+    if is_head==True and item_cat0==lhs_cat0: percolate=True #if the category of head child is the same as parent category, percolate
     rule_children.append(item_dict)
+
+  lhs_dict={"cat":lhs_cat0,"feat":cur_lhs_features,"percolate":percolate,"apply_cat":apply_cat}
+  final_rule_dict["parent"]=lhs_dict
+
+
   final_rule_dict["children"]=rule_children
   final_rule_dict["head_i"]=head_i
   return final_rule_dict
