@@ -486,7 +486,17 @@ class Parser:
     
     parent_phrase_obj["head_phrase"]=head_phrase_index
     # head_phrase_key=self.phrase_key_list[head_phrase_index]
-    head_phrase_obj=phrase_obj_list[rule_head_i]  #self.main_phrase_dict[head_phrase_key][0]
+    head_phrase_obj=phrase_obj_list[rule_head_i]  #phrase object of the head child
+
+
+    #11 Feb 2026
+    head_child_cat0=head_phrase_obj["cat"]
+    applied_rule_parent_obj=applied_rule["parent"]
+    percolate=applied_rule_parent_obj.get("percolate",False)
+    apply_cat=applied_rule_parent_obj.get("apply_cat",False)
+    if percolate: parent_phrase_obj["feat"]=head_phrase_obj["feat"]
+    if apply_cat: parent_phrase_obj["feat"]+=[f"cat={head_child_cat0}"]
+
 
 
     parent_phrase_obj["head_loc"]=head_phrase_obj["head_loc"]
