@@ -1206,12 +1206,22 @@ def process_rule(rule_str):
   if len(rule_split)!=2: return None
   lhs,rhs=rule_split
   lhs,rhs=lhs.strip(),rhs.strip()
+  percolate=False #percolate the features of the head child into parent
+  apply_cat=False #apply category of head child as a feature
+  if "^" in lhs:  #do not ever use a ^ symbol in left hand side except to percolate
+    percolate=True
+    lhs=lhs.replace("^","")
+
   lhs_cat0=lhs.split("[")[0]
   lhs_features=re.findall(r'\[(.+?)\]',lhs)
-  cur_rhs_features=[]
+  cur_lhs_features=[]
   for ft0 in lhs_features:
-    cur_rhs_features.extend(ft0.split())
-  lhs_dict={"cat":lhs_cat0,"feat":cur_rhs_features}
+    cur_lhs_features.extend(ft0.split())
+  if "apply_cat" in cur_lhs_features:
+    cur_lhs_features.remove("apply_cat")
+    apply_cat=True
+
+  lhs_dict={"cat":lhs_cat0,"feat":cur_lhs_features,"percolate":percolate,"apply_cat":apply_cat}
   final_rule_dict["parent"]=lhs_dict
   rule_children=[]
   rhs_items=rhs.split()
