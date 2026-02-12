@@ -496,7 +496,7 @@ class Parser:
       percolate=applied_rule_parent_obj.get("percolate",False)
       apply_cat=applied_rule_parent_obj.get("apply_cat",False)
       if percolate: parent_phrase_obj["feat"]=head_phrase_obj["feat"]
-      if apply_cat: parent_phrase_obj["feat"]+=[f"cat={head_child_cat0}"]
+      if apply_cat: parent_phrase_obj["feat"]=[f"cat={head_child_cat0}"] #we may need to adjust later, to accommdate multiple features + applied category of head child
 
 
 
