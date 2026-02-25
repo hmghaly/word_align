@@ -13,7 +13,7 @@ chatgpt_api_key="XXX"
 
 #max_completion_tokens
 
-def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
+def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
     res = requests.post(f"https://api.openai.com/v1/chat/completions",
           headers = {
               "Content-Type": "application/json",
@@ -24,7 +24,20 @@ def chat_with_chatgpt(prompt,api_key,max_tokens=100,model=cur_model):
           "max_completion_tokens": max_tokens,
           "response_format": { "type": "json_object" }
           }).json()
-    return res#.choices[0].text
+    try: 
+      json_output=res["choices"][0]["message"]["content"]
+      res["json_output"]=clean_json(json_output)
+    except Exception as ex: res["error"]=str(ex)
+    return res
+
+
+#Cleaning up output - utility functions
+#15 June 2025
+def clean_json(json_str): #clean json output from AI systems
+  json_str=re.sub(r'\s//.+?\n',"\n",json_str)
+  json_str=re.sub(r"/\*.+?\*/","\n",json_str)
+  json_str=re.sub(r'\n\-+\n',"\n",json_str)
+  return json_str
 
 
 
@@ -109,13 +122,6 @@ def chat_with_assistant_multi(message_input_list,assistant_id, client):
   return all_responses  
 
 
-#Cleaning up output - utility functions
-#15 June 2025
-def clean_json(json_str): #clean json output from AI systems
-  json_str=re.sub(r'\s//.+?\n',"\n",json_str)
-  json_str=re.sub(r"/\*.+?\*/","\n",json_str)
-  json_str=re.sub(r'\n\-+\n',"\n",json_str)
-  return json_str
 
 
 def process_out_json(json_str): #clean and parse json output from AI systems
