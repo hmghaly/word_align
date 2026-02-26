@@ -13,22 +13,44 @@ chatgpt_api_key="XXX"
 
 #max_completion_tokens
 
+#26 Feb 2026
 def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
+    response_format=params.get("response_format","json_object")
+    messages=[{"role": "user", "content": prompt}]
+    query_json_dict={"model": model,"messages":messages,"max_completion_tokens": max_tokens}
+    if response_format=="json_object": query_json_dict["response_format"]={ "type": response_format }
     res = requests.post(f"https://api.openai.com/v1/chat/completions",
           headers = {
               "Content-Type": "application/json",
               "Authorization": f"Bearer {api_key}"
           },
-          json={"model": model,
-          "messages": [{"role": "user", "content": prompt}], 
-          "max_completion_tokens": max_tokens,
-          "response_format": { "type": "json_object" }
-          }).json()
-    try: 
-      json_output=res["choices"][0]["message"]["content"]
-      res["json_output"]=clean_json(json_output)
+          json=query_json_dict).json()
+    try:
+      query_output=res["choices"][0]["message"]["content"]
+      if response_format=="json_object":
+        query_output=clean_json(query_output)
+        query_output_dict=json.loads(query_output)
+      res["query_output"]=query_output
     except Exception as ex: res["error"]=str(ex)
     return res
+
+# def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
+#     response_format=params.get("response_format","json_object")
+#     res = requests.post(f"https://api.openai.com/v1/chat/completions",
+#           headers = {
+#               "Content-Type": "application/json",
+#               "Authorization": f"Bearer {api_key}"
+#           },
+#           json={"model": model,
+#           "messages": [{"role": "user", "content": prompt}], 
+#           "max_completion_tokens": max_tokens,
+#           "response_format": { "type": response_format }
+#           }).json()
+#     try: 
+#       json_output=res["choices"][0]["message"]["content"]
+#       res["json_output"]=clean_json(json_output)
+#     except Exception as ex: res["error"]=str(ex)
+#     return res
 
 
 #Cleaning up output - utility functions
