@@ -1,4 +1,4 @@
-import requests, json, openai, time, re
+import requests, json, openai, time, re, traceback, copy
 
 cur_model="gpt-3.5-turbo"
 cur_model="gpt-4o"
@@ -27,13 +27,19 @@ def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
               "Authorization": f"Bearer {api_key}"
           },
           json=query_json_dict).json()
+    raw_dict=copy.deepcopy(res)
     try:
       query_output=res["choices"][0]["message"]["content"]
       if response_format=="json_object":
         query_output=clean_json(query_output)
         query_output_dict=json.loads(query_output)
       res["query_output"]=query_output
-    except Exception as ex: res["error"]=str(ex)
+    except Exception as ex: 
+      
+      res["error"]=str(ex)
+      res["trace"]=traceback.format_exc()
+      res["raw"]=raw_dict
+
     return res
 
 # def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
