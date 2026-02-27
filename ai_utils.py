@@ -16,8 +16,10 @@ chatgpt_api_key="XXX"
 #26 Feb 2026
 def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
     response_format=params.get("response_format","json_object")
+    temperature=params.get("temperature",0.2)
+
     messages=[{"role": "user", "content": prompt}]
-    query_json_dict={"model": model,"messages":messages,"max_completion_tokens": max_tokens}
+    query_json_dict={"model": model,"messages":messages,"max_completion_tokens": max_tokens,"temperature":temperature}
     if response_format=="json_object": query_json_dict["response_format"]={ "type": response_format }
     res = requests.post(f"https://api.openai.com/v1/chat/completions",
           headers = {
