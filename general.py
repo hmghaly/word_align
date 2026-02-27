@@ -606,6 +606,43 @@ def get_char_ngrams(word,min_size=2,max_size=5,padding="#",include_span=False):
   return all_char_ngrams
 
 
+#27 Feb 2026
+from collections import Counter
+
+#get charcter bigrams from any text
+def get_bigrams(text0,params={}):
+  use_stripped=params.get("use_stripped",True)
+  bigrams=[text0[i]+text0[i+1] for i in range(len(text0)-1)]
+  if use_stripped: bigrams=[v.strip() for v in bigrams if v.strip()]
+  bigrams_counter=dict(Counter(bigrams))
+  return bigrams_counter
+
+#compare the count of bigrams in each pair of texts to get a measure of text similarity
+def compare_bigrams(content1,content2,params={}):
+  content1_bigram_dict=get_bigrams(content1,params=params)
+  content2_bigram_dict=get_bigrams(content2,params=params)
+
+  cumulative_source_bigram_count=0
+  cumulative_diff_count=0
+  for bigram0,bigram_content1_count in content1_bigram_dict.items():
+    cumulative_source_bigram_count+=bigram_content1_count
+    bigram_content2_count=content2_bigram_dict.get(bigram0,0)
+    diff0=abs(bigram_content1_count-bigram_content2_count) #the difference in counts for this particular bigram
+    cumulative_diff_count+=diff0
+    #print(bigram0,bigram_content1_count,bigram_content2_count,diff0)
+
+  for bigram0,bigram_content2_count in content2_bigram_dict.items(): #and we run it also from the other side
+    bigram_content1_count=content1_bigram_dict.get(bigram0,0)
+    #print(a, check)
+    if bigram_content1_count>0: continue #but exclude the bigrams already processed from the bigram count dict from text1
+    diff0=abs(bigram_content1_count-bigram_content2_count)
+    cumulative_diff_count+=diff0
+    #print(">>>",bigram0,bigram_content1_count,bigram_content2_count,diff0)
+
+  final_matching_bigram_count=cumulative_source_bigram_count-cumulative_diff_count
+  final_matching_ratio=final_matching_bigram_count/cumulative_source_bigram_count
+  return final_matching_ratio
+
 
 
 
