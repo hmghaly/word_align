@@ -1748,6 +1748,19 @@ def get_seq_edits(tokens1,tokens2):
       final_list.append(("insert",tokens2[y0:y1]))
   return final_list
 
+#28 Feb 2026
+#get a mapping dict of locations of matched items between two lists
+def get_seq_mapping(input_seq,ref_seq,params={}):
+  mapping_dict={}
+  s = difflib.SequenceMatcher(None, input_seq, ref_seq)
+  for opcode, i1, i2, j1, j2 in s.get_opcodes():
+    if opcode in ["equal","replace"]:
+      for i_,j_ in zip(range(i1, i2),range(j1, j2)):
+        mapping_dict[i_]=j_
+  return mapping_dict
+
+
+
 def make_html_safe(text):
   text=text.replace(">","&gt;").replace("<","&lt;")
   return text
