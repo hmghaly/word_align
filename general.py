@@ -852,6 +852,54 @@ def tok_basic(txt,add_sent_tags=False):
   return tokens
 
 
+####################### HTML/XML markup tags ############
+#28 Feb 2026
+#similar to those in web_lib, but for quick operations with HMTL/XML tags 
+#get the name of an open or close tag
+def get_tag_name(any_tag,params={}):
+  tag_name=any_tag.split()[0].replace("</","").replace("<","").replace(">","")
+  return tag_name.lower()
+
+#check if an open tag matches the close tag
+def open_close_tags_match(open_tag,close_tag):
+  matched=False
+  open_tag_name=open_tag.split()[0].replace("<","").replace(">","")
+  close_tag_name=close_tag.replace("</","").replace(">","")
+  if open_tag_name==close_tag_name: matched=True
+  return matched
+
+#from a text tokenized to preserve tags, identify tag pairs with their locations
+#also identify the mismatched/malformed tags and their locations (mainly misplaced close tags, but can include misplaced open tags as well by matching previously open tags)
+def get_tag_loc_pairs(tokens,params={}):
+  loc_i=0
+  cur_open_tags=[]
+  cur_tag_pairs=[]
+  not_well_formed=[]
+  for tk0 in tokens:
+    is_open_tag,is_close_tag=False,False
+    if tk0.endswith(">"):
+      if tk0.startswith("</"): is_close_tag=True
+      elif tk0.startswith("<"): is_open_tag=True
+
+    if is_open_tag: cur_open_tags.append((tk0,loc_i))
+    if is_close_tag:
+      new_item=(tk0,loc_i)
+      if cur_open_tags==[]: continue #invalid tag
+      last_item=cur_open_tags[-1]
+      match0=open_close_tags_match(last_item[0],tk0)
+      if match0==False:
+        #print("not well formed")
+        not_well_formed.append(new_item)
+        continue
+      cur_open_tags=cur_open_tags[:-1]
+      
+      cur_tag_pairs.append((last_item,new_item))
+    if is_open_tag==is_close_tag==False:
+      loc_i+=1
+  output={"tag_pairs":cur_tag_pairs,"not_well_formed":not_well_formed}
+  return output
+
+
 
 ######################## BITEXTS ########################
 # 21 Dec 2022
