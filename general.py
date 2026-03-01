@@ -899,7 +899,8 @@ def get_tag_loc_pairs(tokens,params={}):
     if is_open_tag==is_close_tag==False:
       loc_i+=1
   not_well_formed.extend(cur_open_tags)
-  output={"tag_pairs":cur_tag_pairs,"not_well_formed":not_well_formed}
+  well_formed_ratio=len(cur_tag_pairs)/(len(cur_tag_pairs)+len(not_well_formed))
+  output={"tag_pairs":cur_tag_pairs,"not_well_formed":not_well_formed,"well_formed_ratio":well_formed_ratio}
   return output
 
 
