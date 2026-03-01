@@ -885,8 +885,10 @@ def get_tag_loc_pairs(tokens,params={}):
     if is_close_tag:
       new_item=(tk0,loc_i)
       if cur_open_tags==[]: continue #invalid tag
-      last_item=cur_open_tags[-1]
-      match0=open_close_tags_match(last_item[0],tk0)
+      match0=False
+      if cur_open_tags:
+        last_item=cur_open_tags[-1]
+        match0=open_close_tags_match(last_item[0],tk0)
       if match0==False:
         #print("not well formed")
         not_well_formed.append(new_item)
