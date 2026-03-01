@@ -896,6 +896,7 @@ def get_tag_loc_pairs(tokens,params={}):
       cur_tag_pairs.append((last_item,new_item))
     if is_open_tag==is_close_tag==False:
       loc_i+=1
+  not_well_formed.extend(cur_open_tags)
   output={"tag_pairs":cur_tag_pairs,"not_well_formed":not_well_formed}
   return output
 
