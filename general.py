@@ -646,6 +646,17 @@ def compare_bigrams(content1,content2,params={}):
 
 
 
+import numpy as np
+
+#convert a character to an array, to use for character-based neural network operations
+def char2array(char,params={}):
+  array_size=params.get("size",24)
+  byte_string=char.encode("utf-8")
+  bytes_array = np.frombuffer(byte_string, dtype=np.uint8)
+  bit_array_np = np.unpackbits(bytes_array)
+  bit_array_np1=np.pad(bit_array_np,(array_size-len(bit_array_np),0))
+  return bit_array_np1
+
 
 
 
