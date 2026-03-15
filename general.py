@@ -659,6 +659,42 @@ def char2array(char,params={}):
 
 
 
+#15 March 2026
+#remove non_text, ero width, non advancing chars and strings (mainly diacritics and markup tags), while keeping their location
+def separate_zero_advance(text,params={}):
+  final_text=""
+  include_tags=params.get("include_tags",True)
+  insertion_dict={}
+  cur_loc=0
+  tag_pattern=r"<\/?[a-zA-Z0-9]+[^<]*?>"
+  if include_tags: full_pattern=r"\p{Mn}+|%s"%tag_pattern
+  else: full_pattern=r"\p{Mn}+" #include only clusters of zero width chars (diacritics)
+  matched_items=re.finditer(full_pattern,text)
+  for it0 in matched_items:
+    start0,end0,matched0=it0.start(),it0.end(), it0.group(0)
+    cur_non_zero_width_text=text[cur_loc:start0]
+    test_loc=len(final_text)
+    if len(final_text)==0: test_loc=start0
+    insertion_dict[test_loc]=insertion_dict.get(test_loc,"")+matched0 
+    final_text+=cur_non_zero_width_text
+    cur_loc=end0
+  final_text+=text[cur_loc:]
+  return final_text, insertion_dict
+
+#insert diacritics and zero width strings into an existing clean string (reverse operation to separate_zero_advance)
+def insert_zero_width_str(clean_text,insertion_dict):
+  cur_loc=0
+  cur_text=""
+  keys=sorted(list(insertion_dict.keys()))
+  for k0 in keys:
+    inserted_chars=insertion_dict[k0]
+    if k0==0: cur_text+=inserted_chars
+    else: cur_text+=clean_text[cur_loc:k0]+inserted_chars
+    cur_loc=k0
+  cur_text+=clean_text[cur_loc:]
+  return cur_text
+
+
 
 #================== MISC ==============
 
