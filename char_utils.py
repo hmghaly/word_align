@@ -59,7 +59,7 @@ def insert_zero_width_str(clean_text,insertion_dict):
   return cur_text
 
 
-  class char_ft:
+class char_ft:
   def __init__(self,params={}) -> None:
     self.params=params
     self.character_cat_list=['Cc', 'Cf', 'Cn', 'Co', 'Cs', 'Ll', 'Lm', 'Lo', 'Lt', 'Lu', 'Mc', 'Me', 'Mn', 'Nd', 'Nl', 'No', 'Pc', 'Pd', 'Pe', 'Pf', 'Pi', 'Po', 'Ps', 'Sc', 'Sk', 'Sm', 'So', 'Zl', 'Zp', 'Zs']
