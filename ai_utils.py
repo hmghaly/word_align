@@ -12,13 +12,20 @@ chatgpt_api_key="XXX"
 
 
 #max_completion_tokens
+# messages_list = [
+#     {"role": "system", "content": "You are a helpful assistant that speaks concisely and is an expert in Python programming."},
+#     {"role": "user", "content": "Explain the concept of a list comprehension in Python."}
+# ]
+
 
 #26 Feb 2026
 def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
     response_format=params.get("response_format","json_object")
+    system_prompt=params.get("system_prompt")
     temperature=params.get("temperature",0.2)
 
     messages=[{"role": "user", "content": prompt}]
+    if system_prompt!=None: messages.append({"role": "user", "content": system_prompt})
     query_json_dict={"model": model,"messages":messages,"max_completion_tokens": max_tokens,"temperature":temperature}
     if response_format=="json_object": query_json_dict["response_format"]={ "type": response_format }
     res = requests.post(f"https://api.openai.com/v1/chat/completions",
