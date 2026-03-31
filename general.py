@@ -465,7 +465,7 @@ def tok_2026(text,params={}):
   keep_emails=params.get("keep_emails",True)
   keep_numbers=params.get("keep_numbers",True)
   keep_un_symbols=params.get("keep_un_symbols",True)
-  split_chinese=params.get("split_chinese",True)
+  split_chinese=params.get("split_chinese",False)
 
   split_all=params.get("split_all",False)
   if split_all: keep_html_tags,keep_urls, keep_emails,keep_numbers,keep_un_symbols=False,False,False,False,False
