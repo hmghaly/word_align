@@ -841,6 +841,18 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={})
   
   return page_info_dict  
 
+
+#16 April 2026
+def get_links(html_content,params={}):
+  exclude_empty_href=params.get("exclude_empty_href",True)
+  exclude_pound=params.get("exclude_pound",False)
+
+  pattern = r'<a\s+[^>]*href="([^"]*)"[^>]*>(.*?)</a>'
+  matches = re.findall(pattern, html_content)
+  final_link_list=[]
+  for href, text in matches: final_link_list.append({"href":href,"text":text})
+  return final_link_list
+
 def get_title(html_content):
   title0=""
   title_found=re.findall('(?i)<title>(.+?)</title>',html_content)
