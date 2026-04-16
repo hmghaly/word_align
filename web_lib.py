@@ -652,6 +652,8 @@ def curl(url,curl_path="curl",timeout=10, params={}):
   #cmd='%s -A -k "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" %s -L'%(curl_path,url)
   # if allow_insecure: cmd='%s --compressed -k -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,url)
   # else: cmd='%s --compressed -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time 60 -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,url)
+  params_timeout=params.get("timeout")
+  if params_timeout!=None: timeout=params_timeout
 
   if allow_insecure: cmd='%s --compressed -k -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time %s -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,timeout,url)
   else: cmd='%s --compressed -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" --max-time %s -s --max-redirs 10 -w "\n%%{json}" "%s" -L'%(curl_path,timeout,url)
