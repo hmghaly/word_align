@@ -216,7 +216,7 @@ def obj2conll(dep_obj,params={}):
             cur_val=obj0.get(col0,"_")
             if col0 in ignored_cols: cur_val="_"
             cur_cells.append(cur_val)
-        line="\t".join(cur_cells)+"\n"
+        line="\t".join([str(v) for v in cur_cells])+"\n"
         final_conll_str+=line
     return final_conll_str
 
