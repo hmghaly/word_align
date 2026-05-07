@@ -208,7 +208,8 @@ def conll2obj(conll_str):
 def obj2conll(dep_obj,params={}):
     final_conll_str=""
     ignored_cols=params.get("ignored_cols",["deps"])
-    col_headers=["id","form","lemma","upos","xpos","feats","head","deprel","deps","misc"]
+    temp_col_headers=["id","form","lemma","upos","xpos","feats","head","deprel","deps","misc"]
+    col_headers=params.get("headers",temp_col_headers)
     for obj0 in dep_obj:
         cur_cells=[]
         for col0 in col_headers:
