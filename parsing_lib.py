@@ -1209,7 +1209,63 @@ def match_rule(token_info,rule_child_info):
   return True
 
 
-def process_rule(rule_str):
+#14 May 2026
+def process_rule(rule_str,params={}):
+  #process the string of the rule to turn it into parent and children, with objects/dict of each
+  #May 2026 update: convert each string rule into a list (to allow for cases when one string rule exapnds into multiple rules)
+  final_rule_dict={}
+  rule_str=rule_str.replace("→","-->")
+  rule_split=rule_str.split("-->")
+  if len(rule_split)!=2: return {}
+  lhs,rhs=rule_split
+  lhs,rhs=lhs.strip(),rhs.strip()
+  percolate=False #percolate the features of the head child into parent
+  apply_cat=False #apply category of head child as a feature
+  if "^" in lhs:  #do not ever use a ^ symbol in left hand side except to percolate
+    percolate=True
+    lhs=lhs.replace("^","")
+
+  lhs_cat0=lhs.split("[")[0]
+  lhs_features=re.findall(r'\[(.+?)\]',lhs)
+  cur_lhs_features=[]
+  for ft0 in lhs_features:
+    cur_lhs_features.extend(ft0.split())
+  if "apply_cat" in cur_lhs_features:
+    cur_lhs_features.remove("apply_cat")
+    apply_cat=True
+
+  rule_children=[]
+  rhs_items=rhs.split()
+  head_i=0 #the location of the head among the children
+  for i_0, it0 in enumerate(rhs_items):
+    item_dict={}
+    is_head=False
+    features=re.findall(r'\[(.+?)\]',it0)
+    if "^" in it0: is_head=True
+
+    if is_head: head_i=i_0
+    it0=it0.replace("^","")
+    item_cat0=it0.split("[")[0]
+    cur_features=[]
+    for ft0 in features:
+      cur_features.extend(ft0.split())
+
+    item_dict={"cat":item_cat0,"is_head":is_head,"feat":cur_features}
+
+    if is_head==True and item_cat0==lhs_cat0: percolate=True #if the category of head child is the same as parent category, percolate
+    rule_children.append(item_dict)
+
+  lhs_dict={"cat":lhs_cat0,"feat":cur_lhs_features,"percolate":percolate,"apply_cat":apply_cat}
+  final_rule_dict["parent"]=lhs_dict
+
+
+  final_rule_dict["children"]=rule_children
+  final_rule_dict["head_i"]=head_i
+  return final_rule_dict
+
+
+
+def process_rule_OLD(rule_str):
   #process the string of the rule to turn it into parent and children, with objects/dict of each
   final_rule_dict={}
   rule_str=rule_str.replace("→","-->")
