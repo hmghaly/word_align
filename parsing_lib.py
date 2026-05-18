@@ -1250,6 +1250,9 @@ def process_rule(rule_str,params={}):
     for ft0 in features:
       cur_features.extend(ft0.split())
 
+
+    if item_cat0.startswith("\\") and item_cat0!="\\": item_cat0=item_cat0.replace("\\","") #account for lexical categories with escape slashes
+
     item_dict={"cat":item_cat0,"is_head":is_head,"feat":cur_features}
 
     if is_head==True and item_cat0==lhs_cat0: percolate=True #if the category of head child is the same as parent category, percolate
