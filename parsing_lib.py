@@ -1264,6 +1264,7 @@ def process_rule(rule_str,params={}):
 
   final_rule_dict["children"]=rule_children
   final_rule_dict["head_i"]=head_i
+  final_rule_dict["rule_str"]=rule_str
   return final_rule_dict
 
 
