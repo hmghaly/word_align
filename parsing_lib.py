@@ -29,8 +29,372 @@ import itertools
 from itertools import product
 #from code_utils.parsing_lib import *
 
-#31 December 2025
+
+#May 2026 Parser
 class Parser:
+  def __init__(self,params={}) -> None:
+    self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
+    self.rule_info_dict=params.get("rule_info_dict",{})
+    self.pos_model_path=params.get("pos_model_path")
+    self.min_pos_wt=params.get("min_pos_wt",0.5)
+    self.max_n_phrases=params.get("max_n_phrases",5) #maximum number of phrases (keys) per span
+    self.max_dist=params.get("max_dist",2) #maximum distance between parsed phrases
+
+    self.phrase_rules=self.rule_info_dict.get("phrase_rules",[])
+
+    self.terminal_rules=self.rule_info_dict.get("terminal_rules",[])
+    self.lexical_tags_dict=self.rule_info_dict.get("lexical_tags",{})
+
+
+    #self.word_rules_inv_index={} #inverted index for rules corresponding to certain word (from lexical rules)
+    self.cat_rules_inv_index={} #inverted index for rules corresponding to a certain category
+    self.feat_rules_inv_index={} #inverted index for rules corresponding to a certain feature
+
+    self.relevant_phrase_features_dict={} #features that are relevant for parsing
+    temp_child_feat_list=[]
+    # for lex_rule0 in self.lexical_rules:
+    #   word0=lex_rule0["children"][-1]["cat"]
+    #   self.word_rules_inv_index[word0]=self.word_rules_inv_index.get(word0,[])+[lex_rule0] #index the rules corresponding to this word
+    used_rule_dict={}
+    for phrase_rule0 in self.phrase_rules+self.terminal_rules:
+      children=phrase_rule0["children"]
+      rule_str0=phrase_rule0["rule_str"]
+      #print("rule_str0",rule_str0)
+      if used_rule_dict.get(rule_str0,False)==True: continue
+      used_rule_dict[rule_str0]=True
+      last_child=children[-1]
+      last_child_cat,last_child_feat=last_child["cat"],last_child["feat"]
+      self.cat_rules_inv_index[last_child_cat]=self.cat_rules_inv_index.get(last_child_cat,[])+[phrase_rule0] #index the rules corresponding to this category
+      for ft0 in last_child_feat:
+        self.feat_rules_inv_index[ft0]=self.feat_rules_inv_index.get(ft0,[])+[phrase_rule0] #index the rules corresponding to this feature
+      for ch0 in children: temp_child_feat_list.extend(ch0["feat"])
+    temp_child_feat_list=list(set(temp_child_feat_list))
+    for ft0 in temp_child_feat_list: self.relevant_phrase_features_dict[ft0]=True
+
+    if self.pos_model_path!=None: self.pos_tagger=POS(self.pos_model_path)
+    else: self.pos_tagger=None
+
+  def parse(self,tokens):
+    #self.phrase_list=[] #list of all phrase objects, with spans, weights, children
+    self.phrase_cat_counter_dict={} #counting number of instances of each category to use for generating phrase ID
+    
+    #self.end_cat_ft_start_index={} #dict[end][cat|ft][start]=[phrase_key1,phrase_key2 ...]
+    self.end_cat_ft_index={} #dict[end][cat|ft]=[phrase_key1,phrase_key2 ...]
+    self.span_key_dict={} #dict[(start,end)]=[phrase_key1,phrase_key2 ...]
+    self.span_key_phrase_id_wt_dict={} #dict[phrase_key1]=[(phrase_id1,phrase_wt1),(phrase_id2,phrase_wt2) ...]
+    self.phrase_id_obj_dict={} #mapping the ID of each phrase to its phrase object
+
+    self.n_projections=0 #calculating number of projections for the whole parse
+
+    self.tokens_pos_list=self.pos_tagger.tag_words(tokens,min_wt=self.min_pos_wt)
+    for i0,item0 in enumerate(self.tokens_pos_list):
+      #print(i0,item0)
+      start0,end0=i0,i0
+      word0,upos_list0,xpos_list0=item0["word"],item0["upos"],item0["xpos"]
+      custom_tags=self.lexical_tags_dict.get(word0.lower(),[])
+      all_applicable_tags_ft_wt=[]
+      for ct0 in custom_tags:
+        #print(ct0)
+        all_applicable_tags_ft_wt.append([ct0["category"],ct0["features"],ct0["weight"]])
+      for u0,u_wt0 in upos_list0:
+        #print(u0,u_wt0)
+        all_applicable_tags_ft_wt.append([u0,[],u_wt0])
+      for x0,x_wt0 in xpos_list0:
+        #print(x0,x_wt0)
+        all_applicable_tags_ft_wt.append([x0,[],x_wt0])
+        #xpos_rules=self.cat_rules_inv_index.get(x0,[])
+      all_applicable_tags_ft_wt.sort(key=lambda x:(-x[-1],-len(x[1])))
+      used_cat_dict={}
+      for cat0,ft0,wt0 in all_applicable_tags_ft_wt:
+        if used_cat_dict.get(cat0,False)==True: continue
+        cur_phrase_obj={"wt":wt0,"span":1,"start":start0,"end":end0,"cat":cat0,"feat":ft0,"head_loc":start0,"children":[],"level":0,"dep":"dep"}
+        used_cat_dict[cat0]=True
+        #print(cur_phrase_obj)
+        self.project_phrase(cur_phrase_obj)
+      #print("=================")
+
+    full_span=(0,len(tokens))
+    all_spans=list(self.span_key_dict.keys())
+    all_spans.sort(key=lambda x:-(x[1]-x[0]))
+    largest_span=all_spans[0] #for a full/converging parse, it should be the full span of the token sequence
+    largest_span_phrase_keys=self.span_key_dict[largest_span]
+    all_top_phrases=[]
+    for ph_key0 in largest_span_phrase_keys:
+      top_phrase_id,top_phrase_wt=self.span_key_phrase_id_wt_dict[ph_key0][0]
+      top_phrase_obj=self.phrase_id_obj_dict[top_phrase_id]
+      all_top_phrases.append(top_phrase_obj)
+      #print(top_phrase_obj)
+    all_top_phrases.sort(key=lambda x:-x["wt"])
+    #for a in all_top_phrases: print(a)
+
+    dep0,const0=self.export_parse(tokens,all_top_phrases[0])
+    return dep0,const0
+    #for d0 in dep0: print(d0)
+
+  def project_phrase(self,phrase_obj):
+    #print(phrase_obj)
+    added_phrase=self.add_phrase(phrase_obj)
+    if added_phrase==None: return
+    #print(added_phrase)
+    #now scanning applicable rules
+    rules=self.scan_rules(added_phrase)
+    for rule_obj in rules: 
+      #print(rule_obj["rule_str"])
+      rule_children=rule_obj["children"]
+      rule_children_reversed=list(reversed(rule_children))
+      last_child=rule_children_reversed[0]
+      match_last=match_rule(added_phrase,last_child) #check if the last child of the retrieved rule matches the current phrase
+      if not match_last: continue
+      #print("match_last",match_last, rule_obj["rule_str"])
+      new_combined_phrases=[]
+      if len(rule_children)>1:
+        first_child= rule_children_reversed[1]
+        found_preceding_phrases=self.scan_phrases(first_child,added_phrase)
+        for pre_phrase0 in found_preceding_phrases:
+          combined_binary_phrase=combine_phrases([pre_phrase0,phrase_obj],rule_obj)
+          new_combined_phrases.append(combined_binary_phrase)
+        #print("found_preceding_phrases",found_preceding_phrases)
+        #find previous phrases
+      else:
+        combined_unary_phrase=combine_phrases([phrase_obj],rule_obj)
+        new_combined_phrases.append(combined_unary_phrase)
+        #print("combined_unary_phrase",combined_unary_phrase)
+      for new_phrase0 in new_combined_phrases:
+        #print(">>>>>>>", a)
+        self.project_phrase(new_phrase0)
+
+    #print("----")
+
+  def add_phrase(self,phrase_obj):
+    cat0=phrase_obj["cat"]
+    ft_list0=phrase_obj["feat"]
+    start0=phrase_obj["start"]
+    end0=phrase_obj["end"]
+    wt0=phrase_obj["wt"]
+    cat_count=self.phrase_cat_counter_dict.get(cat0,0)
+    phrase_id0=f"{cat0}_{cat_count}"
+    self.phrase_cat_counter_dict[cat0]=cat_count+1
+    phrase_key0=get_phrase_key(phrase_obj)
+    phrase_obj["id"]=phrase_id0
+    #print(phrase_id0, phrase_key0)
+    key_ft_list=[cat0]
+    for ft0 in ft_list0:
+      if self.relevant_phrase_features_dict.get(ft0,False)==True: key_ft_list.append(f"ft:{ft0}")
+    #print("key_ft_list",key_ft_list)
+    #found_end_dict=self.end_cat_ft_start_index.get(end0,{}) #populate the main index - first retrieve the first key (end)
+
+    found_end_dict=self.end_cat_ft_index.get(end0,{}) #populate the main index - first retrieve the first key (end)
+    for kf0 in key_ft_list: #for each category or valid feature, update the following keys
+      found_phrase_key_list= found_end_dict.get(kf0,[])+[phrase_key0]  #from temporary found_end_dict, update it with the current cat/ft - update it with current key
+      found_end_dict[kf0]=list(set(found_phrase_key_list))
+    self.end_cat_ft_index[end0]=found_end_dict
+    self.phrase_id_obj_dict[phrase_id0]=phrase_obj
+
+    self.span_key_dict[(start0,end0)]=list(set(self.span_key_dict.get((start0,end0),[])+[phrase_key0])) 
+
+    found_phrase_ids_wts=self.span_key_phrase_id_wt_dict.get(phrase_key0,[])+[(phrase_id0,wt0)]
+    found_phrase_ids_wts.sort(key=lambda x:-x[-1])
+    self.span_key_phrase_id_wt_dict[phrase_key0]=found_phrase_ids_wts[:self.max_n_phrases]
+
+    return phrase_obj
+
+  def scan_rules(self,cur_phrase_obj):
+    #given a token or phrase with cat/feat pair, identify the rules that apply
+    all_rules=[]
+    phrase_obj_cat,phrase_obj_feat=cur_phrase_obj["cat"],cur_phrase_obj["feat"]
+    cur_cat_rules=self.cat_rules_inv_index.get(phrase_obj_cat,[])
+    all_rules.extend(cur_cat_rules)
+    for s_feat0 in phrase_obj_feat:
+      if self.relevant_phrase_features_dict.get(s_feat0,False)==True: continue
+      corr_rules=self.feat_rules_inv_index.get(s_feat0,[])
+      for cr0 in corr_rules: 
+        if not cr0 in all_rules: all_rules.append(cr0) 
+    return all_rules
+
+
+  def scan_phrases(self,rule_child,phrase_object): #scan preceding phrases for matching the first child for binary rules
+
+    phrase_start=phrase_object["start"]
+    found_preceding_phrases=[]
+    child_cat=rule_child["cat"]
+    child_feat_list=rule_child["feat"]
+
+    #create the list of keys for cat/feat for the current child
+    cat_ft_list=[child_cat]
+    for ft0 in child_feat_list:
+      if self.relevant_phrase_features_dict.get(ft0,False)==True: cat_ft_list.append(f"ft:{ft0}")
+
+    last_phrase_end=max(0,phrase_start-self.max_dist)
+    all_found_phrase_keys=[]
+    for end0 in range(last_phrase_end,phrase_start):
+      found_end_items=self.end_cat_ft_index.get(end0,{})
+      for cat_ft0 in cat_ft_list: all_found_phrase_keys.extend(found_end_items.get(cat_ft0,[]))
+    all_found_phrase_keys=list(set(all_found_phrase_keys))
+    for ph_key0 in all_found_phrase_keys:
+      corr_top_phrase_ids_wts=self.span_key_phrase_id_wt_dict.get(ph_key0,[])
+      if corr_top_phrase_ids_wts==[]: continue
+      top_phrase_id,top_phrase_wt=corr_top_phrase_ids_wts[0]
+      top_phrase_obj=self.phrase_id_obj_dict[top_phrase_id]
+      phrase_matches_child=match_rule(top_phrase_obj,rule_child)
+      if phrase_matches_child: found_preceding_phrases.append(top_phrase_obj)
+    return found_preceding_phrases
+
+  def export_parse(self,words,cur_phrase,export_full_sent=True):
+    start0,end0=cur_phrase["start"],cur_phrase["end"]
+    phrase_key0=get_phrase_key(cur_phrase)
+    # print(cur_phrase)
+    # return 
+    #phrase_head_loc_dict={cur_phrase["i"]: cur_phrase["head_loc"]} #identify the head location for each phrase obj/key is phrase number/phrase index in the phrase list
+    phrase_head_loc_dict={phrase_key0: cur_phrase["head_loc"]} #identify the head location for each phrase obj/key is phrase number/phrase index in the phrase list
+
+    dep_dict={} #identify which phrase head loc depends on which phrase head loc
+    root_index=cur_phrase["head_loc"] #the root of the current phrase
+
+    cur_tokens_xpos_dict={}
+    #unsorted_phrases=sorted(final_phrases,key=lambda x:x["i"]) #they should be sorted anyway by their original order of being added to the list
+    parse_phrases=[cur_phrase] #these are the phrases to be used for constituency parsing
+    children=cur_phrase.get("children",[])
+    new_children=[]
+
+    while children: #go on a semi-recursive way to identify children and subchildren of current main phrase
+      for ch0 in children:
+        # ch_phrase_key=self.phrase_key_list[ch0]
+        # child_phrase=self.main_phrase_dict[ch_phrase_key][0]
+
+        ch_phrase_key=ch0
+        #child_phrase=self.phrase_key_obj_dict[ch_phrase_key]
+        #child_phrase=self.phrase_key_obj_dict.get(ch_phrase_key)
+        top_phrases_ids_wts=self.span_key_phrase_id_wt_dict.get(ch_phrase_key,[])
+        top_phrase_id,top_phrase_wt=top_phrases_ids_wts[0]
+        child_phrase=self.phrase_id_obj_dict[top_phrase_id]
+        # self.span_key_phrase_id_wt_dict={} #dict[phrase_key1]=[(phrase_id1,phrase_wt1),(phrase_id2,phrase_wt2) ...]
+        # self.phrase_id_obj_dict={} #mapping the ID of each phrase to its phrase object
+
+
+
+        if child_phrase==None:
+          start,end,cat,feat=ch_phrase_key
+          span=end-start+1
+          child_phrase={"wt":0, "start":start,"end":end,"cat":cat, "feat":feat.split(), "head_loc":start,"children":[],"span":span}
+        phrase_head_loc_dict[ch0]=child_phrase["head_loc"]
+        if child_phrase["span"]==1 and child_phrase["children"]==[]: #identify the matching XPOS for terminal phrases
+          cur_tokens_xpos_dict[child_phrase["start"]]=child_phrase["cat"]
+        parse_phrases.append(child_phrase)
+        sub_children=child_phrase.get("children",())
+        sub_children=list(sub_children)
+        for sc in sub_children:
+          if sc==ch0: continue
+          new_children.append(sc) #print("sc",sc)
+      children=new_children
+      new_children=[]
+
+    for a in parse_phrases:
+      cur_children=a["children"]
+      cur_phrase_head_loc=a["head_loc"]
+      for ch0 in cur_children: #for each child of the current phrase, identify its head_loc
+        ch_head_loc=phrase_head_loc_dict[ch0]
+        if ch_head_loc==cur_phrase_head_loc: continue #skip if the head_loc for current child is the same as of the main phrase
+        dep_dict[ch_head_loc]=cur_phrase_head_loc #update dependency dict between heads of two phrases
+
+    final_dep_list=[]
+    for i0,w0 in enumerate(words): #create dependency info for each word
+      cur_id0=i0+1
+      if not export_full_sent: #export only the tokens and dependency info within the span of the exported phrase 
+        if i0<start0 or i0>end0: continue
+
+      #identify head index
+      if i0==root_index: #root word
+        cur_dep="0"
+        head_word="^"
+        offset=0
+      else:
+        cur_dep=dep_dict.get(i0)
+        if cur_dep==None:  #word without attachment
+          cur_dep="-"
+          head_word=""
+          offset=100 #any random number for no offset
+        else: #any other word
+          head_word=words[cur_dep]
+          offset=i0-cur_dep
+          cur_dep=str(cur_dep+1)
+
+      cur_xpos0=cur_tokens_xpos_dict.get(i0,"-")
+      final_dep_list.append({"id":str(cur_id0),"word": w0,"head":cur_dep,"xpos":cur_xpos0,"head_word":head_word,"offset":offset})
+    return final_dep_list, parse_phrases
+
+
+#============ End May Parser definition
+
+#May 2026 - parser utility functions
+def get_phrase_key(phrase_obj0): #check an obj for corresponding key
+  start0,end0,cat0,feat_split0=phrase_obj0["start"],phrase_obj0["end"],phrase_obj0["cat"],phrase_obj0["feat"]
+  ft_str0=" ".join(feat_split0)
+  cur_phrase_key=(start0,end0,cat0,ft_str0)
+  return cur_phrase_key
+
+
+def combine_phrases(phrase_obj_list,applied_rule={}):
+  parent_phrase_obj={}
+  #cur_child_keys=[v["i"] for v in phrase_obj_list]
+  cur_child_keys=[get_phrase_key(v) for v in phrase_obj_list]
+
+  levels=[vw["level"] for vw in phrase_obj_list]
+
+  sum_child_wt=sum([vw["wt"] for vw in phrase_obj_list])
+  rule_wt=applied_rule.get("rule_wt",1)
+
+  parent_phrase_obj["wt"]=sum_child_wt* rule_wt #apply the rule weighting factor, to account for less common rules
+
+  phrase_start0=min([vw["start"] for vw in phrase_obj_list])
+  phrase_end0=max([vw["end"] for vw in phrase_obj_list])
+  phrase_ids0=[vw.get("id") for vw in phrase_obj_list]
+
+  
+
+
+  parent_phrase_obj["span"]=phrase_end0-phrase_start0+1
+  parent_phrase_obj["start"]=phrase_start0
+  parent_phrase_obj["end"]=phrase_end0
+
+  if applied_rule!={}:
+    parent_phrase_obj["cat"]=applied_rule["parent"]["cat"]
+    parent_phrase_obj["feat"]=applied_rule["parent"]["feat"]
+    rule_head_i=applied_rule["head_i"]
+  else:
+    parent_phrase_obj["cat"]=""
+    parent_phrase_obj["feat"]=[]
+    rule_head_i=0
+
+
+  parent_phrase_obj["children"]=cur_child_keys
+  head_phrase_index=cur_child_keys[rule_head_i] #which of the child phrases is the head
+  
+  parent_phrase_obj["head_phrase"]=head_phrase_index
+  # head_phrase_key=self.phrase_key_list[head_phrase_index]
+  head_phrase_obj=phrase_obj_list[rule_head_i]  #phrase object of the head child
+
+  #11 Feb 2026
+  if applied_rule!={}:
+    head_child_cat0=head_phrase_obj["cat"]
+    applied_rule_parent_obj=applied_rule["parent"]
+    percolate=applied_rule_parent_obj.get("percolate",False)
+    apply_cat=applied_rule_parent_obj.get("apply_cat",False)
+    if percolate: parent_phrase_obj["feat"]=head_phrase_obj["feat"]
+    if apply_cat: parent_phrase_obj["feat"]+=[f"cat={head_child_cat0}"] #we may need to adjust later, to accommdate multiple features + applied category of head child
+
+  parent_phrase_obj["head_loc"]=head_phrase_obj["head_loc"]
+  parent_phrase_obj["rule"]=applied_rule
+  parent_phrase_obj["level"]=max(levels)+1
+  parent_phrase_obj["child_ids"]=phrase_ids0
+  parent_phrase_obj["dep"]=applied_rule.get("deprel","dep")
+  
+  return parent_phrase_obj
+
+
+#============================ Old Parser
+
+#31 December 2025
+class Parser_2025:
   def __init__(self,rules_list=[],word_features_list=[],params={}) -> None:
     self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
     self.sent_padding=params.get("sent_padding",False)
@@ -593,7 +957,7 @@ class Parser:
     return final_top_phrases
 
 
-
+#=========================================== End of Old parser def =================
 
 
 #End of new parser def
