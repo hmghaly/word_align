@@ -11,12 +11,27 @@ def clean_conll(conll_str,params={}):
   conll_obj_list=conll2obj(conll_str)
   used_id_head_pairs=[]
   new_obj_list=[]
+  parent_dict={}
   for o1 in conll_obj_list:
     id0,head0=o1["id"],o1["head"]
-    if (head0,id0) in used_id_head_pairs or not head0.isdigit(): 
+    head_parent=parent_dict.get(head0)
+    is_cyclic=False
+    #print("id0,head0",id0,head0,"head_parent",head_parent)
+    #check recursive cyclic dependency
+    counter=0
+    while head_parent!=None and counter<20 and is_cyclic==False:
+      new_head_parent=parent_dict.get(head_parent)
+      #print(">>>> id0",id0, "head_parent",head_parent, "new_head_parent",new_head_parent)
+      if new_head_parent==id0: 
+        is_cyclic=True
+        #print(id0,"is_cyclic")
+      head_parent=new_head_parent
+      counter+=1
+    if (head0,id0) in used_id_head_pairs or not head0.isdigit() or is_cyclic: 
       head0=replace_head_with
       o1["head"]=head0
     used_id_head_pairs.append((id0,head0))
+    parent_dict[id0]=head0
     new_obj_list.append(o1)
   return obj2conll(new_obj_list)
 
