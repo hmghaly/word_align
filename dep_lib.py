@@ -4,6 +4,24 @@ import itertools
 
 random.seed(0)
 
+#24 May 2026
+#fix conll parses where an id has a head at one line, while it points the other way in another line
+def clean_cyclic_conll(conll_str,params={}):
+  replace_head_with=params.get("replace_head_with","0")
+  conll_obj_list=dep_lib.conll2obj(conll_str)
+  used_id_head_pairs=[]
+  new_obj_list=[]
+  for o1 in conll_obj_list:
+    id0,head0=o1["id"],o1["head"]
+    if (head0,id0) in used_id_head_pairs: 
+      head0=replace_head_with
+      o1["head"]=head0
+    used_id_head_pairs.append((id0,head0))
+    new_obj_list.append(o1)
+  return dep_lib.obj2conll(new_obj_list)
+
+
+
 #2 Feb 2026
 #converting dependency object to constituency structure (with multiple options for projections and final format)
 class dep_const:
