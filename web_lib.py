@@ -684,6 +684,7 @@ def curl(url,curl_path="curl",timeout=10, params={}):
   return content, final_json0
 
 def get_page_info(url, read_method="curl",curl_path="curl",content=None,timeout=30,params={}):
+  use_dom=params.get("use_dom",True)
   page_info_dict={}
   page_info_dict["url"]=url
 
@@ -742,8 +743,11 @@ def get_page_info(url, read_method="curl",curl_path="curl",content=None,timeout=
   page_info_dict["text"]="\n".join(paras0)
 
 
-  try: page_dom_obj=DOM(page_content)
+  try: 
+    if use_dom==False: raise Exception
+    page_dom_obj=DOM(page_content)
   except: 
+    page_info_dict["dom"]=False
     title0=get_title(page_content)
     page_info_dict["title"]=title0
     lang0=get_page_lang(page_content)
