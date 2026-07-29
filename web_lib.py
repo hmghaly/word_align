@@ -683,33 +683,35 @@ def curl(url,curl_path="curl",timeout=10, params={}):
     return "", "{}"
   return content, final_json0
 
-def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={}):
+def get_page_info(url, read_method="curl",curl_path="curl",content=None,timeout=30,params={}):
   page_info_dict={}
   page_info_dict["url"]=url
 
-  if read_method=="curl":
-    params_timeout=params.get("timeout")
-    if params_timeout!=None: timeout=params_timeout
+  if content==None:
+    if read_method=="curl":
+      params_timeout=params.get("timeout")
+      if params_timeout!=None: timeout=params_timeout
 
-    page_content,response_json=curl(url,curl_path=curl_path,timeout=timeout,params=params)
-    page_content=general.unescape(page_content)
-    #response_dict=json.loads(response_json)
-    try: response_dict=json.loads(response_json)
-    except: response_dict={}
-    final_url=response_dict.get("url_effective",url)
-    status_code=response_dict.get("response_code")
-    page_info_dict["response_json"]=response_json
+      page_content,response_json=curl(url,curl_path=curl_path,timeout=timeout,params=params)
+      page_content=general.unescape(page_content)
+      #response_dict=json.loads(response_json)
+      try: response_dict=json.loads(response_json)
+      except: response_dict={}
+      final_url=response_dict.get("url_effective",url)
+      status_code=response_dict.get("response_code")
+      page_info_dict["response_json"]=response_json
+    else:
+      try: page_obj=read_page(url)
+      except: return page_info_dict
+      page_content=general.unescape(page_obj.text)
+      final_url=page_obj.url
+      status_code=page_obj.status_code
+
+    page_info_dict["status_code"]=status_code
+    final_url=final_url.strip("/")
   else:
-    try: page_obj=read_page(url)
-    except: return page_info_dict
-    page_content=general.unescape(page_obj.text)
-    final_url=page_obj.url
-    status_code=page_obj.status_code
-
-  page_info_dict["status_code"]=status_code
-  final_url=final_url.strip("/")
-
-  page_content=remove_html_noise(page_content)
+    page_content=remove_html_noise(content)
+    final_url=url.strip("/")
 
 
 
@@ -717,8 +719,55 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={})
   page_content=page_content.replace("\r","\n").replace("\t","\n")
   #page_content=page_content.replace("\r\n","|")#.replace("\r","|")
   t0=time.time()
+
+  #Getting as much info as possible, without full DOM processing
+  description0=get_desc(page_content)
+
+
+  #processing emails
+  # cur_emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
+  # for email0 in cur_emails:
+  #   if email0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
+  #   if email0.split(".")[-1].isdigit(): continue
+  #   emails.append(email0.strip("."))
+
+  cur_emails=get_emails(page_content,max_name_len=50)
+  emails=list(set([v.lower() for v in cur_emails]))
+
+
+  page_info_dict["description"]=description0
+  page_info_dict["emails"]=emails
+
+  paras0=get_page_paras(page_content)
+  page_info_dict["text"]="\n".join(paras0)
+
+
   try: page_dom_obj=DOM(page_content)
-  except: return page_info_dict
+  except: 
+    title0=get_title(page_content)
+    page_info_dict["title"]=title0
+    lang0=get_page_lang(page_content)
+    page_info_dict["lang"]=lang0
+    raw_links=get_links(page_content)
+    
+    external_links=[]
+    social_links=[]
+    all_links=[]
+
+    for item0 in raw_links:
+      href0=item0["href"]
+      if not href0.lower().startswith("http"): href0=join_url(final_url,href0)
+      all_links.append(href0)
+      if "facebook" in href0 or "twitter" in href0 or "linkedin" in href0 or "youtube" in href0 or "x.com" in href0: 
+        social_links.append(href0)
+        continue
+      if not href0.startswith(final_url) and not is_social_link: external_links.append(href0)
+    page_info_dict["links"]=list(set(all_links))
+    page_info_dict["external_links"]=list(set(external_links))
+    page_info_dict["social_links"]=list(set(social_links))
+    return page_info_dict #if content cannot be processed with our DOM class, return what we can using regex
+
+
   t1=time.time()
   dom_elapsed=round(t1-t0)
   #print("dom_elapsed",dom_elapsed)
@@ -728,7 +777,7 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={})
 
   title0=page_dom_obj.title.strip()
   #description0=page_dom_obj.description.strip()
-  description0=get_desc(page_content)
+  
 
   keywords0=page_dom_obj.keywords.strip()
   lang0=page_dom_obj.lang
@@ -807,13 +856,6 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={})
     if key0.startswith("address_"): addresses.append(general.remove_tags(val0.inner_html," "))
     if "address" in class0.lower(): addresses.append(general.remove_tags(val0.inner_html," "))
 
-  #processing emails
-  cur_emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
-  for email0 in cur_emails:
-    if email0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
-    if email0.split(".")[-1].isdigit(): continue
-    emails.append(email0.strip("."))
-  emails=list(set([v.lower() for v in emails]))
   t1=time.time()
   elapsed=round(t1-t0,2)
 
@@ -824,16 +866,16 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={})
   page_info_dict["lang"]=lang0
   #page_info_dict["meta_lang"]=meta_lang0
   page_info_dict["title"]=title0
-  page_info_dict["description"]=description0
+  #page_info_dict["description"]=description0
   page_info_dict["keywords"]=keywords0
   page_info_dict["phone_numbers"]=phone_numbers
   page_info_dict["links"]=links
   page_info_dict["social_links"]=social_links
-  page_info_dict["emails"]=emails
+
   page_info_dict["addresses"]=addresses
   page_info_dict["logos"]=logos
   #page_info_dict["text_items"]=text_items
-  page_info_dict["text"]=page_dom_obj.text
+  #page_info_dict["text"]=page_dom_obj.text
   page_info_dict["external_links"]=external_links
   page_info_dict["page_content"]=page_content
   
@@ -841,6 +883,165 @@ def get_page_info(url, read_method="curl",curl_path="curl",timeout=30,params={})
   
   return page_info_dict  
 
+
+#OLD - replaced on 29 July 2026
+# def get_page_info_OLD(url, read_method="curl",curl_path="curl",timeout=30,params={}):
+#   page_info_dict={}
+#   page_info_dict["url"]=url
+
+#   if read_method=="curl":
+#     params_timeout=params.get("timeout")
+#     if params_timeout!=None: timeout=params_timeout
+
+#     page_content,response_json=curl(url,curl_path=curl_path,timeout=timeout,params=params)
+#     page_content=general.unescape(page_content)
+#     #response_dict=json.loads(response_json)
+#     try: response_dict=json.loads(response_json)
+#     except: response_dict={}
+#     final_url=response_dict.get("url_effective",url)
+#     status_code=response_dict.get("response_code")
+#     page_info_dict["response_json"]=response_json
+#   else:
+#     try: page_obj=read_page(url)
+#     except: return page_info_dict
+#     page_content=general.unescape(page_obj.text)
+#     final_url=page_obj.url
+#     status_code=page_obj.status_code
+
+#   page_info_dict["status_code"]=status_code
+#   final_url=final_url.strip("/")
+
+#   page_content=remove_html_noise(page_content)
+
+
+
+#   #page_content=get_page_content(url)
+#   page_content=page_content.replace("\r","\n").replace("\t","\n")
+#   #page_content=page_content.replace("\r\n","|")#.replace("\r","|")
+#   t0=time.time()
+#   try: page_dom_obj=DOM(page_content)
+#   except: return page_info_dict
+#   t1=time.time()
+#   dom_elapsed=round(t1-t0)
+#   #print("dom_elapsed",dom_elapsed)
+
+#   t0=time.time()
+#   lang0=""
+
+#   title0=page_dom_obj.title.strip()
+#   #description0=page_dom_obj.description.strip()
+#   description0=get_desc(page_content)
+
+#   keywords0=page_dom_obj.keywords.strip()
+#   lang0=page_dom_obj.lang
+#   meta_lang0=page_dom_obj.meta_lang
+
+#   phone_numbers=[]
+#   logos=[]
+#   text_items=[]
+#   links=[]
+#   emails=[]
+#   addresses=[]
+#   social_links=[]
+#   external_links=[]
+
+#   #processing links
+#   raw_links=page_dom_obj.all_links
+#   for link0 in raw_links:
+#     anchor0=general.remove_tags(link0.inner_html)
+#     href0=link0.href.strip("/")
+#     if href0.startswith("#"): continue
+#     if href0.lower().startswith("javascript"): continue
+#     if href0=="": continue
+#     if href0.startswith("tel:"):
+#       phone_numbers.append(href0.replace("tel:",""))
+#       continue
+#     if href0.startswith("mailto:"):
+#       emails.append(href0.replace("mailto:",""))
+#       continue
+
+#     if href0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
+#     if href0.split(".")[-1].isdigit(): continue
+#     if not href0.lower().startswith("http"): href0=join_url(final_url,href0) #url0.strip("/")+"/"+href0.strip("/")
+#     anchor0=re.sub(r"\s+"," ",anchor0).strip()
+#     is_social_link=False
+#     if "facebook" in href0 or "twitter" in href0 or "linkedin" in href0 or "youtube" in href0 or "x.com" in href0: 
+#       social_links.append(href0.lower())
+#       is_social_link=True
+#     #print(href0,anchor0)
+#     links.append((href0,anchor0))
+#     if not href0.startswith(final_url) and not is_social_link: external_links.append(href0)
+
+
+#     #full_link_url=final_url
+
+
+#   links=list(set(links)) 
+#   social_links=list(set(social_links))
+
+#   #processing images/get logos
+#   raw_images=page_dom_obj.all_images
+#   for img0 in raw_images:
+#     if "logo" in img0.attrs.get("alt","").lower() or "logo" in img0.src.lower(): 
+#       src0=img0.src
+#       if src0.startswith("//"):src0="http://"+src0
+#       elif not src0.startswith("http"): src0=join_url(final_url,src0)
+#       logos.append(src0)
+#       #print(src0)
+
+#   #processing text items
+#   raw_items0=page_dom_obj.text_items
+#   #final_items=[]
+#   for it0 in raw_items0:
+#     it0=general.remove_tags(it0)
+#     text_items.extend(it0.split("\n"))
+#   text_items=[v.strip() for v in text_items if v.strip()]
+
+#   # html_attrs={}
+#   # html_tag=page_dom_obj.tag_dict.get("html_0")
+#   # if html_tag!=None: html_attrs=html_tag.attrs
+#   # lang0=html_attrs.get("lang","")
+
+
+#   #processing addresses
+#   for key0,val0 in page_dom_obj.tag_dict.items():
+#     class0=val0.attrs.get("class","")
+#     if key0.startswith("address_"): addresses.append(general.remove_tags(val0.inner_html," "))
+#     if "address" in class0.lower(): addresses.append(general.remove_tags(val0.inner_html," "))
+
+#   #processing emails
+#   cur_emails=re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', page_content)
+#   for email0 in cur_emails:
+#     if email0.split(".")[-1].lower() in ["pdf","png","jpg","jpeg"]: continue
+#     if email0.split(".")[-1].isdigit(): continue
+#     emails.append(email0.strip("."))
+#   emails=list(set([v.lower() for v in emails]))
+#   t1=time.time()
+#   elapsed=round(t1-t0,2)
+
+#   #print("elapsed",elapsed)
+#   if lang0=="" and meta_lang0!="": lang0=meta_lang0
+  
+#   page_info_dict["final_url"]=final_url
+#   page_info_dict["lang"]=lang0
+#   #page_info_dict["meta_lang"]=meta_lang0
+#   page_info_dict["title"]=title0
+#   page_info_dict["description"]=description0
+#   page_info_dict["keywords"]=keywords0
+#   page_info_dict["phone_numbers"]=phone_numbers
+#   page_info_dict["links"]=links
+#   page_info_dict["social_links"]=social_links
+#   page_info_dict["emails"]=emails
+#   page_info_dict["addresses"]=addresses
+#   page_info_dict["logos"]=logos
+#   #page_info_dict["text_items"]=text_items
+#   page_info_dict["text"]=page_dom_obj.text
+#   page_info_dict["external_links"]=external_links
+#   page_info_dict["page_content"]=page_content
+  
+  
+  
+#   return page_info_dict  
 
 #16 April 2026
 def get_links(html_content,params={}):
@@ -982,10 +1183,13 @@ def remove_html_noise(html_content): #remove script/style/comments
   #tags=list(re.findall('<[^<>]*?>|\<\!\-\-.+?\-\-\>', text))
   return text
 
+#OLD - replaced on 29 July 2026
+# def get_page_paras(page_url):
+#   try:text=get_page_content(page_url)
+#   except: return []
+def get_page_paras(page_content):
+  text=page_content
 
-def get_page_paras(page_url):
-  try:text=get_page_content(page_url)
-  except: return []
   # (REMOVE <SCRIPT> to </script> and variations)
   pattern = r'<[ ]*script.*?\/[ ]*script[ ]*>'  # mach any char zero or more times
   text = re.sub(pattern, '', text, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
