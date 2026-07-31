@@ -714,6 +714,8 @@ def get_page_info(url, read_method="curl",curl_path="curl",content=None,timeout=
     page_content=remove_html_noise(content)
     final_url=url.strip("/")
 
+  final_url_main=get_main_url(final_url)
+
 
 
   #page_content=get_page_content(url)
@@ -765,7 +767,7 @@ def get_page_info(url, read_method="curl",curl_path="curl",content=None,timeout=
       if "facebook" in href0 or "twitter" in href0 or "linkedin" in href0 or "youtube" in href0 or "x.com" in href0: 
         social_links.append(href0)
         continue
-      if not href0.startswith(final_url) and not is_social_link: external_links.append(href0)
+      if not href0.startswith(final_url_main) and not is_social_link: external_links.append(href0)
     page_info_dict["links"]=list(set(all_links))
     page_info_dict["external_links"]=list(set(external_links))
     page_info_dict["social_links"]=list(set(social_links))
@@ -821,7 +823,7 @@ def get_page_info(url, read_method="curl",curl_path="curl",content=None,timeout=
       is_social_link=True
     #print(href0,anchor0)
     links.append((href0,anchor0))
-    if not href0.startswith(final_url) and not is_social_link: external_links.append(href0)
+    if not href0.startswith(final_url_main) and not is_social_link: external_links.append(href0)
 
 
     #full_link_url=final_url
