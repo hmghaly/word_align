@@ -1216,6 +1216,23 @@ def read_file(fpath0):
     fopen0.close()
     return content0
 
+#31 July 2026
+def iter_file_lines(fpath,from_loc=None): #simple iteration on file lines, yielding also the line location start and end
+  fopen0=open(fpath)
+  if from_loc!=None: fopen0.seek(from_loc)
+  line0="-"
+  loc0=fopen0.tell()
+  while line0:
+    temp_loc=loc0
+    line0=fopen0.readline()
+    loc0=fopen0.tell()
+    if line0: 
+      end_loc=temp_loc+len(line0)
+      yield line0,temp_loc,end_loc
+    
+  fopen0.close()
+
+
 
 #file operations
 def get_file_loc_ratio(ratio,fpath): #get the line start location corresponding to a percentage of file size
