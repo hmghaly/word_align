@@ -1,4 +1,4 @@
-import os, json, sys
+import os, json, sys, shelve
 cur_lib_path=os.path.split(__file__)[0]
 sys.path.append(cur_lib_path)
 
@@ -7,6 +7,7 @@ import web_lib, general
 #pip install tldextract
 import tldextract
 
+#31 July 2026
 def tld_proc(url,params={}):
     special_domains=params.get("special_domains",["com","net","org"])  #domains with so many websites
     n_chars_suffix_key=params.get("n_chars_suffix_key",2) #number of characters at the end of domain name to be added to suffix to balance
@@ -19,14 +20,64 @@ def tld_proc(url,params={}):
         #print(suffix_split)
         suffix,domain= ".".join(suffix_split[-2:]) , suffix_split[-3] 
     http_part=url.split("://")[0] #http or https
-    main_domain=f"{domain}.{suffix}"
+    main_domain=f"{domain}.{suffix}" #just the key for the main domain and its suffix
     full_domain=f"{http_part}://{main_domain}"
     suffix_key=suffix
+    main_original=web_lib.get_main_url(url) #original with subdomains
+    main_original_no_http=main_original.split("://")[-1] #we just need the key, to store it in shelves and avoiding duplication
 
     if suffix in special_domains: 
         suffix_key=domain[-n_chars_suffix_key:]+"."+suffix
-    url_tld_dict={"full": full_domain,"main":main_domain,"domain":domain,"suffix":suffix,"suffix_key":suffix_key}
+    url_tld_dict={"full": full_domain,"main_key":main_domain,"original_key": main_original_no_http,"domain":domain,"suffix":suffix,"suffix_key":suffix_key}
     return url_tld_dict
+
+#process URL by identifying the base/normalized url, without subdomains and anything after the actual domain
+#reverting back to the input domain if 
+def process_url2external(url,params={}):
+    results=[]
+    input_url_tld_dict=tld_proc(url,params=params)
+    input_full_domain_url=input_url_tld_dict["full"] #main url without subdomains https://sites.google.com.eg >>> https://google.com.eg
+
+    content_dict=web_lib.get_page_info(input_full_domain_url,read_method="")
+    status_code0=content_dict.get("status_code")
+    
+    #if the main/normalized url is not accessible and it's different from the input url which has subdomains
+    if status_code0!="200" and input_url_tld_dict["main_key"]!=input_url_tld_dict["original_key"]: 
+        content_dict=web_lib.get_page_info(url,read_method="")
+        status_code0=content_dict.get("status_code")
+
+    final_url=content_dict.get("final_url",input_full_domain_url)
+    final_url_tld_dict=tld_proc(final_url,params=params)
+
+    cur_obj={"url":final_url,"status_code":status_code0,"suffix_key":final_url_tld_dict["suffix_key"],"main_key":final_url_tld_dict["main_key"]}
+
+    results.append(cur_obj)
+    external_links=content_dict.get("external_links",[])
+    external_links=list(set(external_links))
+    used_links_dict={}
+    for ex0 in external_links:
+        ex_tld_dict=tld_proc(ex0,params=params)
+        ex_full_link=ex_tld_dict["full"]
+        if used_links_dict.get(ex_full_link,False)==True: continue
+        used_links_dict[ex_full_link]=True
+        results.append({"url":ex_full_link,"suffix_key":ex_tld_dict["suffix_key"],"main_key":ex_tld_dict["main_key"]})
+    return results
+    # if url_tld_dict["main_key"]!=url_tld_dict["original_key"]: #check also the main domain without the subdomains
+    #     content_dict_main=web_lib.get_page_info(url,read_method="")
+
+
+    # root_dir=params.get("root_dir","scrape_root")
+    
+    # final_url_main=web_lib.get_main_url(final_url)
+    # links=content_dict.get("links",[])
+    # external_links=[v for v in links if not v[0].startswith(final_url_main)]
+    # used_href_dict={}
+    # for ex0 in external_links: 
+    #     href0,anchor0=ex0
+    #     main_href=web_lib.get_main_url(href0)
+    #     if used_href_dict.get(main_href,False)==True: continue
+    #     used_href_dict[main_href]=True
+    #     print(main_href)    
 
 #url2content
 #content2info_dict
@@ -65,20 +116,9 @@ def tld_proc(url,params={}):
 #we add it to the lists
 
 
-def process_url(url,params={}):
-    root_dir=params.get("root_dir","scrape_root")
-    content_dict=web_lib.get_page_info(url,read_method="")
-    final_url=content_dict.get("final_url","")
-    final_url_main=web_lib.get_main_url(final_url)
-    links=content_dict.get("links",[])
-    external_links=[v for v in links if not v[0].startswith(final_url_main)]
-    used_href_dict={}
-    for ex0 in external_links: 
-        href0,anchor0=ex0
-        main_href=web_lib.get_main_url(href0)
-        if used_href_dict.get(main_href,False)==True: continue
-        used_href_dict[main_href]=True
-        print(main_href)    
+#iter_file_lines
+
+
 
 
 def process_url_list_file(url_list_fpath,params={}):
