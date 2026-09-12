@@ -17,6 +17,48 @@ chatgpt_api_key="XXX"
 #     {"role": "user", "content": "Explain the concept of a list comprehension in Python."}
 # ]
 
+#12 Sep 2026 - generic function for both OpenAI and deepseek APIs
+def chat_with_ai(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
+    response_format=params.get("response_format","json_object")
+    system_prompt=params.get("system_prompt")
+    temperature=params.get("temperature",0.2)
+    reasoning_effort_deepseek=params.get("reasoning_effort","none")
+    thinking_type_deepseek=params.get("thinking_type","disabled")
+    base_url=params.get("base_url","https://api.openai.com/v1") #deepseek: "https://api.deepseek.com"
+
+    messages=[{"role": "user", "content": prompt}]
+    if system_prompt!=None: messages.append({"role": "user", "content": system_prompt})
+    query_json_dict={"model": model,
+                     "messages":messages,
+                     "max_completion_tokens": max_tokens,
+                     "temperature":temperature}
+    if "deepseek" in base_url.lower():
+      query_json_dict["reasoning_effort"]=reasoning_effort_deepseek
+      query_json_dict["thinking_type"]=thinking_type_deepseek
+    for a,b in query_json_dict.items(): print(a,b) #print(query_json_dict)
+    if response_format=="json_object": query_json_dict["response_format"]={ "type": response_format }
+    res = requests.post(f"{base_url}/chat/completions",
+          headers = {
+              "Content-Type": "application/json",
+              "Authorization": f"Bearer {api_key}"
+          },
+          json=query_json_dict).json()
+    raw_dict=copy.deepcopy(res)
+    try:
+      query_output=res["choices"][0]["message"]["content"]
+      if response_format=="json_object":
+        query_output=clean_json(query_output)
+        query_output_dict=json.loads(query_output)
+      res["query_output"]=query_output
+    except Exception as ex: 
+      
+      res["error"]=str(ex)
+      res["trace"]=traceback.format_exc()
+      res["raw"]=raw_dict
+
+    return res
+
+
 
 #26 Feb 2026
 def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
