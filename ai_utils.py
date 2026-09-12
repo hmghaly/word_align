@@ -59,6 +59,20 @@ def chat_with_ai(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
     return res
 
 
+#12 Sep 2026
+def calculate_api_call_cost(api_reponse_dict,ai_model,pricing_dict):
+  model_cost_dict=pricing_dict.get(ai_model)
+  if model_cost_dict==None: return None
+  usage=api_reponse_dict.get("usage")
+  if usage==None: return None
+  prompt_tokens=usage.get("prompt_tokens")
+  completion_tokens=usage.get("completion_tokens")
+  if completion_tokens==None or prompt_tokens==None: return None
+  api_call_cost=prompt_tokens*model_cost_dict["prompt_tokens"]+completion_tokens*model_cost_dict["completion_tokens"]
+  return api_call_cost
+
+
+
 
 #26 Feb 2026
 def chat_with_chatgpt(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
