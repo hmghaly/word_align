@@ -25,6 +25,7 @@ def chat_with_ai(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
     reasoning_effort_deepseek=params.get("reasoning_effort","none")
     thinking_type_deepseek=params.get("thinking_type","disabled")
     base_url=params.get("base_url","https://api.openai.com/v1") #deepseek: "https://api.deepseek.com"
+    debug=params.get("debug",False)
 
     messages=[{"role": "user", "content": prompt}]
     if system_prompt!=None: messages.append({"role": "user", "content": system_prompt})
@@ -35,7 +36,8 @@ def chat_with_ai(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
     if "deepseek" in base_url.lower():
       query_json_dict["reasoning_effort"]=reasoning_effort_deepseek
       query_json_dict["thinking_type"]=thinking_type_deepseek
-    for a,b in query_json_dict.items(): print(a,b) #print(query_json_dict)
+    #for a,b in query_json_dict.items(): print(a,b) #print(query_json_dict)
+    if debug: print(query_json_dict)
     if response_format=="json_object": query_json_dict["response_format"]={ "type": response_format }
     res = requests.post(f"{base_url}/chat/completions",
           headers = {
