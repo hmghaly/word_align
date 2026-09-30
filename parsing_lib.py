@@ -381,7 +381,7 @@ def combine_phrases(phrase_obj_list,applied_rule={}):
     apply_cat=applied_rule_parent_obj.get("apply_cat",False)
     if percolate: 
       parent_phrase_obj["feat"]=head_phrase_obj["feat"]
-      if applied_rule["parent"] in ["X","XP"]: parent_phrase_obj["cat"]=head_phrase_obj["cat"] 
+      if applied_rule["parent"]["cat"] in ["X","XP"]: parent_phrase_obj["cat"]=head_phrase_obj["cat"] 
 
     if apply_cat: parent_phrase_obj["feat"]+=[f"cat={head_child_cat0}"] #we may need to adjust later, to accommdate multiple features + applied category of head child
 
