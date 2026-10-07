@@ -1592,6 +1592,14 @@ def process_rule(rule_str,params={}):
   #May 2026 update: convert each string rule into a list (to allow for cases when one string rule exapnds into multiple rules)
   final_rule_dict={}
   rule_str=rule_str.replace("→","-->")
+  
+  #7 October 2026 - feature brackets must not have spaces, or they will be split as children
+  feature_brackets=re.findall(r'\[.+?\]',rule_str)
+  for fb0 in feature_brackets:
+    fb_no_space=re.sub(r"\s+","&",fb0)
+    rule_str=rule_str.replace(fb0,fb_no_space)
+
+
   rule_split=rule_str.split("-->")
   if len(rule_split)!=2: return {}
   lhs,rhs=rule_split
@@ -1606,7 +1614,7 @@ def process_rule(rule_str,params={}):
   lhs_features=re.findall(r'\[(.+?)\]',lhs)
   cur_lhs_features=[]
   for ft0 in lhs_features:
-    cur_lhs_features.extend(ft0.split())
+    cur_lhs_features.extend(ft0.split("&"))
   if "apply_cat" in cur_lhs_features:
     cur_lhs_features.remove("apply_cat")
     apply_cat=True
@@ -1628,7 +1636,7 @@ def process_rule(rule_str,params={}):
     item_cat0=it0.split("[")[0]
     cur_features=[]
     for ft0 in features:
-      cur_features.extend(ft0.split())
+      cur_features.extend(ft0.split("&"))
     cur_item_features_params=get_feat_params(cur_features)
 
 
