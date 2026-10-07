@@ -1576,6 +1576,16 @@ def match_rule(token_info,rule_child_info):
   return True
 
 
+#7 Oct 2026
+#convert a feature list from a list of strings  [phrase NP gender=F] into actual parameters {phrase:True}, {gender:F} .. etc
+def get_feat_params(feat_str_list):
+  cur_features_params=[] #a parametric version of features {feat1:True}, {feat2=NP}
+  for ft0 in feat_str_list:
+    if not "=" in ft0: key,val=ft0,True
+    else: key,val=ft0.split("=")[:2]
+    cur_features_params.append({key:val})
+  return cur_features_params
+
 #14 May 2026
 def process_rule(rule_str,params={}):
   #process the string of the rule to turn it into parent and children, with objects/dict of each
@@ -1602,11 +1612,7 @@ def process_rule(rule_str,params={}):
     apply_cat=True
 
   #7 October 2026
-  cur_lhs_features_params=[] #a parametric version of features {feat1:True}, {feat2=NP}
-  for ft0 in cur_lhs_features:
-    if not "=" in ft0: key,val=ft0,True
-    else: key,val=ft0.split("=")[:2]
-    cur_lhs_features_params.append({key:val})
+  cur_lhs_features_params=get_feat_params(cur_lhs_features) #a parametric version of features {feat1:True}, {feat2=NP}
 
   rule_children=[]
   rhs_items=rhs.split()
@@ -1623,11 +1629,12 @@ def process_rule(rule_str,params={}):
     cur_features=[]
     for ft0 in features:
       cur_features.extend(ft0.split())
+    cur_item_features_params=get_feat_params(cur_features)
 
 
     if item_cat0.startswith("\\") and item_cat0!="\\": item_cat0=item_cat0.replace("\\","") #account for lexical categories with escape slashes
 
-    item_dict={"cat":item_cat0,"is_head":is_head,"feat":cur_features}
+    item_dict={"cat":item_cat0,"is_head":is_head,"feat":cur_features,"feat_params":cur_item_features_params}
 
     if is_head==True and item_cat0==lhs_cat0: percolate=True #if the category of head child is the same as parent category, percolate
     rule_children.append(item_dict)
