@@ -1601,6 +1601,13 @@ def process_rule(rule_str,params={}):
     cur_lhs_features.remove("apply_cat")
     apply_cat=True
 
+  #7 October 2026
+  cur_lhs_features_params=[] #a parametric version of features {feat1:True}, {feat2=NP}
+  for ft0 in cur_lhs_features:
+    if not "=" in ft0: key,val=ft0,True
+    else: key,val=ft0.split("=")[:2]
+    cur_lhs_features_params.append({key:val})
+
   rule_children=[]
   rhs_items=rhs.split()
   head_i=0 #the location of the head among the children
@@ -1625,7 +1632,7 @@ def process_rule(rule_str,params={}):
     if is_head==True and item_cat0==lhs_cat0: percolate=True #if the category of head child is the same as parent category, percolate
     rule_children.append(item_dict)
 
-  lhs_dict={"cat":lhs_cat0,"feat":cur_lhs_features,"percolate":percolate,"apply_cat":apply_cat}
+  lhs_dict={"cat":lhs_cat0,"feat":cur_lhs_features,"percolate":percolate,"apply_cat":apply_cat,"param_feat":cur_lhs_features_params}
   final_rule_dict["parent"]=lhs_dict
 
 
