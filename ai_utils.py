@@ -32,7 +32,7 @@ def ai_client_chat(ai_client,model_name,user_prompt,params={},pricing_dict={}):
   system_prompt=params.get("system_prompt") #"you are a helpful assistant"
   example_prompt=params.get("example_prompt") #"follow this example [1,2,3]"
 
-  current_messages=[{"role": "user", "content": text_input}]
+  current_messages=[{"role": "user", "content": user_prompt}]
   if system_prompt: current_messages.append({"role": "system", "content": system_prompt})
   if example_prompt: current_messages.append({"role": "system", "content": f"follow this example: {example_prompt}"})
 
