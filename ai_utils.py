@@ -49,6 +49,7 @@ def ai_client_chat(ai_client,model_name,user_prompt,params={},pricing_dict={}):
   cur_out["query_output"]=query_output
   if pricing_dict=={}: cost=None
   else: cost=calculate_api_call_cost(cur_out,model_name,pricing_dict)
+  cur_out["cost"]=cost
   
   return cur_out
 
