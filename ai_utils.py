@@ -1,4 +1,5 @@
 import requests, json, openai, time, re, traceback, copy
+from openai import OpenAI
 
 cur_model="gpt-3.5-turbo"
 cur_model="gpt-4o"
@@ -16,6 +17,41 @@ chatgpt_api_key="XXX"
 #     {"role": "system", "content": "You are a helpful assistant that speaks concisely and is an expert in Python programming."},
 #     {"role": "user", "content": "Explain the concept of a list comprehension in Python."}
 # ]
+
+#15 October 2026
+#general purpose function to send a prompt to an AI API client
+def ai_client_chat(ai_client,model_name,user_prompt,params={},pricing_dict={}):
+  base_url=str(ai_client.base_url)
+
+  response_format=params.get("response_format") #"json_object"
+  temperature=params.get("temperature") #1
+  max_tokens=params.get("max_tokens") # 1000
+  reasoning_effort_deepseek=params.get("reasoning_effort","none")
+  thinking_type_deepseek=params.get("thinking_type","disabled")
+  
+  system_prompt=params.get("system_prompt") #"you are a helpful assistant"
+  example_prompt=params.get("example_prompt") #"follow this example [1,2,3]"
+
+  current_messages=[{"role": "user", "content": text_input}]
+  if system_prompt: current_messages.append({"role": "system", "content": system_prompt})
+  if example_prompt: current_messages.append({"role": "system", "content": f"follow this example: {example_prompt}"})
+
+  call_params={"model":model_name,"messages":current_messages}
+  if response_format!=None: call_params["response_format"]=response_format
+  if temperature!=None: call_params["temperature"]=temperature
+  if max_tokens!=None: call_params["max_tokens"]=max_tokens
+  if "deepseek" in base_url.lower():
+    call_params["extra_body"]={"thinking": {"type": thinking_type_deepseek},"reasoning_effort":reasoning_effort_deepseek}
+
+  cur_response = ai_client.chat.completions.create(**call_params)
+  cur_out=json.loads(cur_response.model_dump_json())
+  query_output=cur_out["choices"][0]["message"]["content"]
+  cur_out["query_output"]=query_output
+  if pricing_dict=={}: cost=None
+  else: cost=calculate_api_call_cost(cur_out,model_name,pricing_dict)
+  
+  return cur_out
+
 
 #12 Sep 2026 - generic function for both OpenAI and deepseek APIs
 def chat_with_ai(prompt,api_key,max_tokens=1000,model=cur_model,params={}):
