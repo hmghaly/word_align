@@ -1208,12 +1208,14 @@ def combine_terminal_tags(pos_output,xpos_dict={},lexical_dict={}):
 #7 Oct 2026
 #convert a feature list from a list of strings  [phrase NP gender=F] into actual parameters {phrase:True}, {gender:F} .. etc
 def get_feat_params(feat_str_list):
-  cur_features_params=[] #a parametric version of features {feat1:True}, {feat2=NP}
+  #cur_features_params=[] #a parametric version of features {feat1:True}, {feat2=NP}
+  cur_feat_params_dict={} #a parametric version of features {feat1:True}, {feat2=NP}
   for ft0 in feat_str_list:
     if not "=" in ft0: key,val=ft0,True
     else: key,val=ft0.split("=")[:2]
-    cur_features_params.append({key:val})
-  return cur_features_params
+    #cur_features_params.append({key:val})
+    cur_feat_params_dict[key]=val
+  return cur_feat_params_dict
 
 
 #11 Oct 2026
