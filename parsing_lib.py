@@ -1213,6 +1213,7 @@ def get_feat_params(feat_str_list):
   for ft0 in feat_str_list:
     if not "=" in ft0: key,val=ft0,True
     else: key,val=ft0.split("=")[:2]
+    if key=="": continue
     #cur_features_params.append({key:val})
     cur_feat_params_dict[key]=val
   return cur_feat_params_dict
