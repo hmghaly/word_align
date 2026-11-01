@@ -1142,7 +1142,7 @@ def workbook2parse_config(wb_path,phrase_rules_sheet_name="phrase_rules",xpos_fe
     if tmp_row_dict.get("rule","")=="": continue #ignore the row without rules
     if tmp_row_dict.get("weight","")=="": wt=1 #default wt is 1
     else: wt=float(tmp_row_dict["weight"]) #otherwise it's the value of the column weight
-    tmp_row_dict["wt"]=wt
+    tmp_row_dict["rule_wt"]=wt
     tmp_row_dict.pop("weight")
     rule_obj_list.append(tmp_row_dict)
   #now we process feature for xpos features sheet
