@@ -1229,6 +1229,8 @@ def create_phrase(params):
   if phrase_obj0.get("end")==None: phrase_obj0["end"]=0
   if phrase_obj0.get("head_i")==None: phrase_obj0["head_i"]=0
   if phrase_obj0.get("level")==None: phrase_obj0["level"]=0
+  if phrase_obj0.get("head_loc")==None: phrase_obj0["head_loc"]=phrase_obj0["start"]
+  
   #get_feat_params(feat_str_list)
   phrase_obj0["param_feat"]=get_feat_params(phrase_obj0["feat"])
 
