@@ -366,6 +366,9 @@ def combine_phrases(phrase_obj_list,applied_rule={}):
     parent_phrase_obj["feat"]=[]
     rule_head_i=0
 
+  #1 Nov 2026
+  parent_phrase_obj["param_feat"]= get_feat_params(parent_phrase_obj["feat"])  
+
 
   parent_phrase_obj["children"]=cur_child_keys
   head_phrase_index=cur_child_keys[rule_head_i] #which of the child phrases is the head
