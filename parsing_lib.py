@@ -31,6 +31,168 @@ from itertools import product
 #from code_utils.parsing_lib import *
 
 
+#Nov 2026 Parser
+class parsing_2:
+  def __init__(self,config_dict,params={}):
+    self.params=params
+    self.config_dict=config_dict
+    self.rule_list=config_dict["rule_list"]
+    self.lexical_dict=config_dict["lexical_dict"]
+    self.xpos_dict=config_dict["xpos_dict"]
+    self.pos_model_path=params.get("pos_model_path")
+    self.pos_obj=POS(self.pos_model_path)
+
+    self.max_dist=params.get("max_dist",0) #maximum distance between parsed phrases
+    self.unknown_tags=params.get("unknown_tags",["N","V","JJ","RB"]) #maybe get the actual distribution of these tags from corpora
+    self.min_pos_wt=params.get("min_pos_wt",0.5)
+    self.max_n_phrases=params.get("max_n_phrases",5) #maximum number of phrases (keys) per span
+    self.processed_rules=[]
+    #last_child_fwd_index=[] #last child in a processed rule + the rule itself
+    self.cat_rule_inv_index={}
+    self.feat_rule_inv_index={}
+
+    for r0 in self.rule_list:
+      print(r0)
+      rule0=r0["rule"]
+      processed_rule=process_rule(rule0)
+      processed_rule["rule_wt"]=r0["rule_wt"]
+      processed_rule["deprel"]=r0["deprel"]
+      processed_rule["description"]=r0.get("description","")
+      processed_rule["example"]=r0.get("example","")
+
+
+      print(processed_rule)
+      rule_i=len(self.processed_rules)
+      self.processed_rules.append(processed_rule)
+      children=processed_rule["children"]
+      last_child=children[-1]
+      #print(last_child)
+      last_child_cat=last_child["cat"]
+      last_child_param_feat=last_child["feat_params"]
+      self.cat_rule_inv_index[last_child_cat]=self.cat_rule_inv_index.get(last_child_cat,[])+[rule_i]
+      for key_val0 in last_child_param_feat.items():
+        self.feat_rule_inv_index[key_val0]=self.feat_rule_inv_index.get(key_val0,[])+[rule_i]
+
+  def parse(self,sent_tokens):
+    self.phrase_dict={} #key: phrase_id, val: phrase_obj
+    self.cat_end_index_dict={} #key1: end location | key2: phrase category or features | value: list of phrase IDs
+    self.feat_end_index_dict={} #key1: end location | key2: feature  | value: list of phrase IDs
+    self.cat_span_dict={} #key: span+ category (NP,0,3) | value: IDs of phrases that fit in this span
+    self.cat_counter_dict={} #count of each phrase category NP, VP ... | key: phrase category (e.g. NP) | value: count (e.g. 11)
+    outcome=self.pos_obj.tag_words(sent_tokens,min_wt=0.1)
+    word_tag_list=combine_terminal_tags(outcome,lexical_dict=self.lexical_dict,xpos_dict=self.xpos_dict)
+    for w_i0,wto1 in enumerate(word_tag_list):
+      for tg1 in wto1["tags"]:
+        tg1["start"]=w_i0
+        tg1["end"]=w_i0
+        phrase1=create_phrase(tg1)
+        self.project_phrase(phrase1)
+
+    outcome_dict={}
+    outcome_dict["word_tag_list"]=word_tag_list
+    outcome_dict["parses"]=self.export_parse()
+
+    return outcome_dict
+
+
+  def project_phrase(self,phrase_obj):
+    print("projecting:",phrase_obj)
+    phrase_id=self.add_phrase(phrase_obj) #check if the phrase can be added and get an ID
+    if phrase_id==None: return
+    #print(phrase_id)
+    applicable_rules=self.scan_rules(phrase_obj) #list of rules that apply to current phrase (the phrase matches the last child of these rules)
+    rule_str_list=[v["rule_str"] for v in applicable_rules]
+    #print(phrase_id,len(applicable_rules),rule_str_list)
+    for rule0 in applicable_rules:
+      new_phrases=self.scan_phrases(phrase_obj,rule0)
+      for np0 in new_phrases: self.project_phrase(np0)
+
+  def add_phrase(self,phrase_obj):
+    cur_cat_span=phrase_cat,phrase_start,phrase_end=phrase_obj["cat"],phrase_obj["start"],phrase_obj["end"]
+    phrase_wt=phrase_obj["wt"]
+    phrase_param_feat=phrase_obj["param_feat"]
+    cat_count=self.cat_counter_dict.get(phrase_cat,0)
+    cat_span_ids=self.cat_span_dict.get(cur_cat_span,[])
+    #check if there is an existing phrase with higher weight in the current cat_span
+    if len(cat_span_ids)>0: #if there are already phrases with higher weight in this cat_span
+      last_phrase_id=cat_span_ids[-1]
+      last_phrase_obj=self.phrase_dict[last_phrase_id]
+      if phrase_wt<last_phrase_obj["wt"]: return #we exclude adding any new phrase if its weight is less than the least weight in the cat_span
+      pass
+    #there should be another check for children, to avoid having multiple phrases with the same children cat_spans
+
+    phrase_id=f"{phrase_cat}_{cat_count}"
+    phrase_obj["id"]=phrase_id
+    self.phrase_dict[phrase_id]=phrase_obj
+
+    self.cat_counter_dict[phrase_cat]=cat_count+1 #increment the count if we use the phrase ID
+
+    cat_span_ids.append(phrase_id)
+    cat_span_ids.sort(key=lambda x:-self.phrase_dict[x]["wt"]) #we sort phrase ids in the cat_span by the weight of their respective phrases
+    #we should check all the phrases have the same weight or limited by a maximum number of phrases per cat_span
+    self.cat_span_dict[cur_cat_span]=cat_span_ids
+
+    #now indexing
+    temp_cat_index=self.cat_end_index_dict.get(phrase_end,{})
+    tmp_phrase_list=temp_cat_index.get(phrase_cat,[])+[cur_cat_span] #cur_cat_span phrase_id
+    #tmp_phrase_list.sort(key=lambda x:-self.phrase_dict[x]["wt"])
+    temp_cat_index[phrase_cat]=tmp_phrase_list
+    self.cat_end_index_dict[phrase_end]=temp_cat_index
+
+    for key_val0 in phrase_param_feat.items(): #e.g. missing=NP
+      temp_feat_index=self.feat_end_index_dict.get(phrase_end,{})
+      temp_feat_index[key_val0]=temp_feat_index.get(key_val0,[])+[cur_cat_span] #cur_cat_span phrase_id
+      self.feat_end_index_dict[phrase_end]=temp_feat_index
+
+    return phrase_id
+  def scan_rules(self,phrase_obj):
+    cur_phrase_cat=phrase_obj["cat"]
+    cur_phrase_param_feat=phrase_obj["param_feat"]
+    found_cat_rules=self.cat_rule_inv_index.get(cur_phrase_cat,[])
+    all_found_rules=list(found_cat_rules)
+    for feat_val0 in cur_phrase_param_feat.items():
+      found_feat_rules=self.feat_rule_inv_index.get(feat_val0,[])
+      all_found_rules.extend(found_feat_rules)
+    out_rules=[]
+    for rule_i0 in list(set(all_found_rules)):
+      corr_rule=self.processed_rules[rule_i0]
+      out_rules.append(corr_rule)
+    return out_rules
+
+  def scan_phrases(self,phrase_obj,rule):
+    cur_new_phrases=[]
+    rule_children=rule["children"]
+    phrase_start=phrase_obj["start"]
+    if len(rule_children)==1:
+      new_phrase=combine_phrases([phrase_obj],rule)
+      cur_new_phrases.append(new_phrase)
+      print("new_phrase - Unary >>>>",new_phrase)
+    else:
+      first_rule_child=rule_children[0]
+      first_cat=first_rule_child["cat"]
+      first_feat_params=list(first_rule_child['feat_params'].items())
+      furthest_i=max(phrase_start-self.max_dist-1,0) #farthest end point after skipping max_dist
+      prev_end_i_list=list(range(furthest_i,phrase_start))
+      for prev_end_i0 in prev_end_i_list: #iterating over valid phrase end locations/
+        temp_cat_dict0=self.cat_end_index_dict.get(prev_end_i0,{}) #get all phrases ending with the current end loc/i
+        all_prev_cat_spans=temp_cat_dict0.get(first_cat,[]) #and now getting the phrases with this end location corresponding to the category of the first child
+        temp_feat_dict0=self.feat_end_index_dict.get(prev_end_i0,{}) #we also get the temp dict for phrases with feature key/val pairs ending at the specific location
+        for ft_key_val0 in first_feat_params:
+          temp_phrases=temp_feat_dict0.get(ft_key_val0,[])
+          all_prev_cat_spans.extend(temp_phrases)
+        all_prev_cat_spans=list(set(all_prev_cat_spans))
+        for sp0 in all_prev_cat_spans:
+          span_phrases=self.cat_span_dict[sp0]
+          prev_phrase_id0=span_phrases[0]
+          prev_phrase_obj0=self.phrase_dict[prev_phrase_id0]
+          cur_new_binary_phrase=combine_phrases([prev_phrase_obj0,phrase_obj],rule)
+          print("cur_new_phrase - Binary:",cur_new_binary_phrase)
+          cur_new_phrases.append(cur_new_binary_phrase)
+    return cur_new_phrases
+  def export_parse(self):
+    return []
+
+
 #May 2026 Parser
 class Parser:
   def __init__(self,params={}) -> None:
