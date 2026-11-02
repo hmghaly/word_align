@@ -337,7 +337,8 @@ def get_phrase_key(phrase_obj0): #check an obj for corresponding key
 def combine_phrases(phrase_obj_list,applied_rule={}):
   parent_phrase_obj={}
   #cur_child_keys=[v["i"] for v in phrase_obj_list]
-  cur_child_keys=[get_phrase_key(v) for v in phrase_obj_list]
+  #cur_child_keys=[get_phrase_key(v) for v in phrase_obj_list]
+  cur_child_keys=[(v["cat"], v["start"], v["end"]) for v in phrase_obj_list]
 
   levels=[vw["level"] for vw in phrase_obj_list]
 
